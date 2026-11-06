@@ -25,12 +25,15 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   (so md5), rồi mới cập nhật skill và template.
 - Không tạo bản hợp đồng thứ ba, không trích dẫn API từ nguồn khác.
 
-## 3. Test / build / install — chỉ qua scripts/vbook.js
+## 3. Test / build / install — chỉ qua CLI một cửa scripts/cli.js
 
-- Test, build và install extension **chỉ** qua
+- Test, build và install extension **chỉ** qua CLI một cửa
+  `scripts/cli.js` — điều phối xuống `tools/cli/*` và
   `.agents/skills/vbook-extensions/scripts/vbook.js`
   (`connect` / `test` / `testall` / `build` / `install` qua developer server),
   theo đúng quy tắc kết nối và kiểm chứng trong skill.
+- `build` chạy offline bằng bộ zip local (không cần điện thoại);
+  `test` / `testall` / `install` vẫn qua developer server.
 - Không build zip bằng tay, không đóng gói bằng tool khác, không sửa tay
   trong file `plugin.zip`.
 - Không suy ra quyền build / install / commit / push từ một yêu cầu chỉ hỏi
@@ -55,7 +58,12 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   - mọi file JSON hợp lệ, không typo khóa (`locale` chứ không phải
     `locate`/`local`);
   - version trong manifest nguồn khớp version trong registry gốc;
-  - branch trong URL registry là `main`, khớp branch thật của repo.
+  - branch trong URL registry là `main`, khớp branch thật của repo;
+  - **linter Rhino ES6** quét `src/*.js` và `lib/*.js`: cấm arrow function,
+    async/await, template literal, `?.`, `??`, spread, `.flat()` (runtime
+    vBook chỉ chạy Rhino ES6); kiểm tra `function execute(...)` tồn tại
+    trong mỗi script và file được `load()` không `load()` thêm file khác
+    (load không đệ quy — xem mục 9).
 
 ## 6. Quy tắc bắt buộc với mọi extension
 
@@ -91,7 +99,7 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   ở root — sinh lại bằng build-catalog, không sửa tay).
 - **Rebuild `plugin.zip` sau mỗi thay đổi** trong `src/`; không để zip cũ
   lệch với source.
-- Đóng gói bằng script chuyên dụng (`scripts/vbook.js` / `tools/cli`),
+- Đóng gói bằng CLI một cửa (`scripts/cli.js`),
   không đóng zip bằng tay.
 - **Không bao giờ commit token / cookie / JWT / mật khẩu thật**, kể cả trong
   ví dụ, comment hay file test. Config mẫu chỉ ghi tên trường, không ghi
@@ -125,20 +133,25 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   trong script map hoặc được `load()` từ một script đã khai báo — không để
   file lib mồ côi trong `src/`.
 
-## 10. Mirror failover + golden fixture (điểm mới giai đoạn 1)
+## 10. Mirror failover + fixture + health-check hàng ngày
 
 - `config.js` mẫu của mỗi nguồn chứa **danh sách mirror theo thứ tự ưu
   tiên**; helper `fetchWithFallback()` trong `lib/fetch-helpers.js` thử lần
   lượt các mirror và nhớ mirror nào đang chạy. Domain chính chết không đồng
   nghĩa extension chết.
-- Mỗi nguồn có `test.json` (golden fixture): các case có kết quả kỳ vọng
-  (vd. search từ khóa X phải trả về truyện Y; detail truyện Z phải có đúng
-  N chương). `validate` kiểm tra fixture tồn tại và đúng định dạng; CI chạy
-  fixture để phát hiện site đổi giao diện sớm.
-- CI health-check hàng tuần chạy `validate` + `build` + kiểm tra fixture;
-  kết quả sinh lại `STATUS.md` (xem file đó). `testall` trên thiết bị thật
-  chỉ chạy khi chạy tay có cấu hình `VBOOK_SERVER` — CI không có điện thoại
-  thì không chạy được `testall`.
+- Hai loại fixture, **không trộn lẫn nhau**:
+  - `test.json` (golden fixture): case theo từng script
+    (`{script, input, expect: {contains, minItems}}`) để test trên thiết bị
+    thật qua developer server.
+  - `health.json` (fixture nhẹ): case `{name, url, expectedPattern}` để CI
+    probe kiểm tra site còn sống / giao diện còn khớp mà không cần điện
+    thoại (chỉ fetch HTTP + so pattern trên mẫu body).
+  `validate` kiểm tra cả hai file tồn tại và đúng định dạng.
+- CI health-check **hàng ngày (00:00 UTC)** chạy `validate` (+ linter) +
+  `build` + probe sức khỏe từng nguồn từ `health.json`; kết quả sinh lại
+  `STATUS.md` (xem file đó). `testall` trên thiết bị thật chỉ chạy khi chạy
+  tay có cấu hình `VBOOK_SERVER` — CI không có điện thoại thì không chạy
+  được `testall`.
 
 ## 11. Attribution / license
 
@@ -148,3 +161,6 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   đọc `LICENSE` của duongden trước khi dùng bất kỳ phần nào từ đó.
 - Không mang theo catalog NSFW hay code mã hóa của repo khác; chỉ mượn
   pattern code.
+- Repo này **chưa chốt LICENSE** — không ghi tên license (vd. MIT) vào
+  `package.json`, `README.md` hay bất kỳ file nào khác khi chưa có file
+  LICENSE thật trong repo.

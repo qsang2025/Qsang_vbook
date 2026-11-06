@@ -4,8 +4,10 @@ Tuyển tập extension vBook của Qsang: đọc truyện chữ, truyện tranh
 audio, dịch, TTS và AI — viết theo một khung sườn thống nhất, có kiểm tra tự
 động, mỗi nguồn đều có fixture kiểm thử.
 
-> **Repo hiện chưa có extension nào.** Khung sườn đã xong, nguồn đầu tiên
-> đang chờ được tạo từ template (xem [Quy trình tạo extension mới](#quy-trình-tạo-extension-mới)).
+> **Repo hiện có 2 extension** (xem [Catalog](#catalog)):
+> **App Truyện Chữ** (novel, v3) và **HHKUNGFU** (video, v1).
+> Khung sườn đã xong; nguồn mới được tạo từ template
+> (xem [Quy trình tạo extension mới](#quy-trình-tạo-extension-mới)).
 
 ## Cài đặt
 
@@ -16,10 +18,9 @@ https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/plugin.json
 ```
 
 Các bước: mở vBook → mục Extension / Repository → dán URL trên → chọn
-extension muốn cài.
-
-> Lưu ý: URL trên chỉ dùng được **sau khi repo này được tạo trên GitHub**
-> (branch `main`) và push lần đầu. Hiện repo mới chỉ tồn tại local.
+extension muốn cài. Repo đã có trên GitHub
+(https://github.com/qsang2025/Qsang_vbook, branch `main`) nên URL registry
+trên dùng được ngay.
 
 Muốn dùng thêm nguồn từ repo khác, xem `repository.json` (danh sách registry
 ngoài) — dán URL registry của repo đó vào app theo cách tương tự.
@@ -43,12 +44,13 @@ Qsang_vbook/
     gbk.js                      # xử lý web Trung (GBK)
   templates/                    # template tạo nguồn mới theo từng loại
     novel/ comic/ chinese_novel/ video/ audio/ translate/ tts/ ai/
-  extensions/                   # nguồn thật — TRỐNG lúc đầu
-    novel/ chinese_novel/ comic/ video/ audio/ translate/ tts/ ai/
+  extensions/                   # nguồn thật — xem Catalog bên dưới
+    novel/apptruyenchu/         # App Truyện Chữ (novel, v3)
+    video/hhkungfu/             # HHKUNGFU (video, v1)
                                 # mỗi nguồn: icon.png + plugin.json + src/ + test.json
                                 # + plugin.zip (do build sinh ra, commit kèm để app
                                 #   cài được từ URL repo — xem AGENTS.md mục 8)
-  tools/cli/                    # build / catalog / validate / verify / scaffold
+  tools/cli/                    # build / catalog / validate
   scripts/                      # vbook.js (test/build/install) + build_registry.py + clean.py
   docs/                         # EXTENSION_DEVELOPMENT_GUIDE.md,
                                 # verify-checklist.md, CONTRIBUTING.md
@@ -68,8 +70,8 @@ Qsang_vbook/
 4. Thêm `test.json` (golden fixture): ít nhất 1 case search và 1 case detail
    có kết quả kỳ vọng.
 5. Chạy `validate` (catalog ≡ đĩa, JSON hợp lệ, version khớp, fixture đúng
-   định dạng) rồi `build` bằng `scripts/vbook.js`; test trên app thật qua
-   developer server (`test` / `testall`).
+   định dạng, linter Rhino ES6) rồi `build` bằng CLI một cửa `scripts/cli.js`;
+   test trên app thật qua developer server (`test` / `testall`).
 6. Bump version ở **cả** manifest nguồn **và** registry gốc (sinh lại bằng
    build-catalog), rebuild `plugin.zip` sau mỗi thay đổi.
 7. Kiểm tra lần cuối bằng `docs/verify-checklist.md` trước khi đưa nguồn
@@ -78,23 +80,31 @@ Qsang_vbook/
 Chi tiết đầy đủ: `docs/EXTENSION_DEVELOPMENT_GUIDE.md`.
 Hợp đồng API duy nhất: `extension-api.md`.
 
-## Quy định về plugin.zip — không commit zip
+## Quy định về plugin.zip — commit kèm để app cài được từ URL repo
 
-`plugin.zip` là artifact do build sinh ra từ `src/`, **KHÔNG commit vào
-repo** (đã chặn bằng `*.zip` trong `.gitignore`). Chỉ commit `src/` +
-`plugin.json` + `icon.png` + `test.json` của từng nguồn. Ai cần dùng thì
-build lại từ `src/` bằng `scripts/vbook.js`.
+`plugin.zip` là artifact do build sinh ra từ `src/`, **được commit kèm**
+với từng nguồn (quyết định của Anh ngày 2026-11-06). Lý do: registry trỏ
+tới `raw.githubusercontent.com/.../extensions/<loại>/<tên>/plugin.zip` nên
+app vBook chỉ cài được khi zip có mặt trên GitHub.
+
+- `.gitignore` chặn `*.zip` nhưng chừa `extensions/**/plugin.zip`.
+- Sau mỗi thay đổi trong `src/` phải **rebuild zip ngay**; `validate` kiểm
+  tra mỗi nguồn đều có `plugin.zip` và nội dung zip khớp `src/` hiện tại
+  (plugin.json + src/*.js + file lib đã inline).
+- Không commit file .zip nào khác (zip thử, zip tạm).
+
+Chi tiết: `AGENTS.md` mục 8.
 
 ## Catalog
 
-Bảng này sinh tự động từ registry (`plugin.json`) khi có nguồn đầu tiên.
-Hiện tại **chưa có extension nào**.
+Bảng này sinh tự động từ registry (`plugin.json`) — hiện có 2 nguồn.
 
 | Tên | Loại | Ngôn ngữ | Phiên bản | Nguồn | Trạng thái |
 |---|---|---|---|---|---|
-| _chưa có extension nào_ | — | — | — | — | — |
+| App Truyện Chữ | novel | vi_VN | 3 | https://apptruyenchu.pro | xem STATUS.md |
+| HHKUNGFU | video | vi_VN | 1 | https://hhkungfu.ee | xem STATUS.md |
 
-Trạng thái sống/chết từng nguồn xem `STATUS.md` (CI cập nhật hàng tuần).
+Trạng thái sống/chết từng nguồn xem `STATUS.md` (CI cập nhật hàng ngày).
 
 ## Attribution — nguồn gốc từng phần mượn
 
