@@ -91,6 +91,8 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
 8. **Ưu tiên API chính thức** khi site có API; scrape HTML chỉ là phương án
    sau. Không dùng arrow function hay cú pháp JS hiện đại vượt giới hạn
    Rhino ES6 của runtime vBook.
+9. **`home.js` chỉ trả tab tĩnh, không fetch.** App chạy tab đầu tiên ngay khi mở extension — fetch lỗi ở đó sẽ chặn cả trang chủ. Tab trỏ về `book.js` / `search.js` với input là đường dẫn danh sách (`/nosort/...`, `/quanben/nosort/...`) để list script tải dữ liệu; không parse mục trang chủ `/` trong tab đầu tiên. (Bài học novels.com.tw 2026-11-06: v1 fetch trang chủ `/` nên lỗi ngay ở ngoài, trong khi tab tĩnh trỏ về `/nosort/` chạy bình thường.)
+10. **Không xoay User-Agent mặc định.** Fetch dùng UA mặc định của runtime để cookie `cf_clearance` của Cloudflare còn hiệu lực (Cloudflare gắn cookie với UA của trình duyệt đã qua xác minh). Chỉ xoay UA khi một site cụ thể chứng minh là cần, và không bao giờ xoay trên site sau Cloudflare challenge. (Bài học novels.com.tw 2026-11-06: xoay UA bị 403 ngay cả khi đã qua xác minh trong trình duyệt của app; extension của mizhm dùng UA mặc định thì chạy được.)
 
 ## 7. Kỷ luật repo (sonzin)
 
