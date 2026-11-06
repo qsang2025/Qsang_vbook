@@ -1,0 +1,56 @@
+name: Xin nguồn mới
+description: Đề xuất thêm một nguồn (site) mới vào Qsang_vbook
+title: "[Nguồn mới] "
+labels: ["new-source"]
+body:
+  - type: input
+    id: site-name
+    attributes:
+      label: Tên site
+      description: Tên trang web muốn thêm (vd. Truyện Full)
+      placeholder: Truyện Full
+    validations:
+      required: true
+  - type: input
+    id: site-url
+    attributes:
+      label: URL của site
+      description: Địa chỉ trang chính của site
+      placeholder: https://truyenfull.live
+    validations:
+      required: true
+  - type: dropdown
+    id: source-type
+    attributes:
+      label: Loại truyện / nội dung
+      options:
+        - novel (truyện chữ tiếng Việt)
+        - chinese_novel (truyện Trung)
+        - comic (truyện tranh)
+        - video
+        - audio (nghe truyện / nhạc)
+        - translate (dịch)
+        - tts (đọc thành tiếng)
+        - ai
+    validations:
+      required: true
+  - type: dropdown
+    id: login-required
+    attributes:
+      label: Có cần đăng nhập / trả phí không?
+      description: Nguồn có yêu cầu tài khoản, VIP hay trả phí để đọc không?
+      options:
+        - "Không — đọc miễn phí, không cần đăng nhập"
+        - "Cần đăng nhập (miễn phí)"
+        - "Có nội dung trả phí / VIP"
+        - "Không rõ"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Ghi chú thêm
+      description: "Vd. site hay đổi domain, có mirror nào, bị chặn Cloudflare, truyện nào nên test trước…"
+      placeholder: "Site có 2 mirror: …"
+    validations:
+      required: false

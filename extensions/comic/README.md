@@ -1,0 +1,12 @@
+# comic — Truyện tranh
+
+**Chưa có extension nào.**
+
+Thư mục này chứa các nguồn truyện tranh / manga / manhwa / manhua.
+
+Mỗi nguồn là một thư mục con với: `icon.png` + `plugin.json` + `src/` + `test.json`
+(`plugin.zip` do build sinh ra, không commit).
+
+Script dùng cho loại này: `home.js`, `genre.js`, `search.js`, `detail.js`,
+`toc.js`, `chap.js` (chap trả về danh sách ảnh của chương).
+Mọi nguồn phải có `src/config.js`. Xem `docs/EXTENSION_DEVELOPMENT_GUIDE.md`.
