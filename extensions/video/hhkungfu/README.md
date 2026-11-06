@@ -26,9 +26,13 @@ Loại: `video`, locale `vi_VN`, format `series`. Version 1 (2026-11-06).
   → trả về `<iframe src="https://streamfree.vip/embed/vt|<id>">`.
   Tập chưa có video ở server đó trả về iframe `not-found.jpg` — track.js
   phát hiện và báo lỗi tiếng Việt để người dùng đổi server.
-- Video host là **streamfree.vip** (trình phát JS, không lộ .m3u8/.mp4 trong
-  HTML ban đầu) nên track trả về `type: "auto"` để app tự bắt stream từ
-  trang embed; chỉ đổi sang `webview` nếu `auto` không xem được.
+- Video host là **streamfree.vip** (trình phát JS giải mã chunk bằng WASM/WebWorker,
+  kiểm tra bắt buộc chạy trong iframe `window.top !== window.self` với Referer từ site nguồn,
+  không có link raw `.m3u8` unencrypted trên trang). Resolver `type: "auto"` của vBook dùng
+  headless WebView để sniff link media nên bị chặn và báo lỗi "Không thể tải máy chủ này. Hãy thử máy chủ khác."
+  Từ v2, `track.js` bọc `embedUrl` trong HTML iframe container (width/height 100%, background đen)
+  và trả về `type: "webview"` với `host: BASE_URL`, giúp player JWPlayer khởi tạo và phát trực tiếp
+  ngay trong WebView của vBook mượt mà.
 - Phân trang WordPress dạng `/page/N/` (không phải `?page=N`):
   `/moi-cap-nhat/page/2`, `/category/tu-tien/page/2`, `/page/2/?s=<từ khóa>`.
   Trang chủ `/` không phân trang (chỉ 16 phim mới nhất) nên tab home dùng

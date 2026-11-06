@@ -64,13 +64,24 @@ function execute(data) {
         });
     }
 
-    // Khong boc duoc stream truc tiep — de app tu bat stream ("auto").
-    // Chi doi sang "webview" neu "auto" khong xem duoc embed nay.
+    // streamfree.vip ma hoa chunk va giai ma bang WASM/WebWorker,
+    // bat buoc chay trong iframe (window.top !== window.self) voi Referer site nguon.
+    // Resolver "auto" (headless sniff) bi chan va bao loi "Khong the tai may chu nay".
+    // Chuyen sang "webview" va boc embed vao HTML iframe container de player JWPlayer
+    // phat muot ma trong webview cua app.
+    var playerHtml = '<!DOCTYPE html><html><head>' +
+        '<meta charset="utf-8">' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">' +
+        '<style>* { margin:0; padding:0; box-sizing:border-box; } html,body { width:100%; height:100%; background:#000; overflow:hidden; } iframe { width:100%; height:100%; border:none; display:block; }</style>' +
+        '</head><body>' +
+        '<iframe src="' + embed + '" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; encrypted-media"></iframe>' +
+        '</body></html>';
+
     return Response.success({
-        type: "auto",
-        data: embed,
+        type: "webview",
+        data: playerHtml,
         host: siteOrigin(),
-        headers: { "User-Agent": UserAgent.chrome(), "Referer": BASE_URL },
+        headers: { "User-Agent": UserAgent.chrome(), "Referer": BASE_URL + "/" },
         timeSkip: []
     });
 }
