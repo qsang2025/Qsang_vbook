@@ -1,37 +1,24 @@
 # STATUS — Trạng thái các nguồn (sinh tự động)
 
-> **Chưa có nguồn nào.** Repo mới lập khung sườn, thư mục `extensions/` vẫn
-> trống. Bảng dưới đây sẽ được điền khi nguồn đầu tiên được thêm vào.
+> Cập nhật lần cuối: 2026-11-06 10:16 UTC (CI health-check hàng tuần + chạy tay).
+> File này **không sửa tay**. GitHub Actions sinh lại file này;
+> muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.
 
-## Cơ chế cập nhật tự động
+## Kiểm tra tĩnh (job validate-build)
 
-File này **không sửa tay**. GitHub Actions (CI health-check) chạy **hàng tuần**
-và khi chạy tay sẽ sinh lại file này:
+- `validate`: PASS — catalog ≡ đĩa, JSON hợp lệ, version khớp,
+  script map khớp file trong `src/`, golden fixture (`test.json`) đúng định dạng,
+  mỗi nguồn đều có `plugin.zip` đã commit kèm và khớp với `src/` hiện tại.
+- `build-catalog --check`: PASS — registry khớp với các nguồn trên đĩa.
+- Build thử template novel: PASS (chỉ kiểm tra cơ chế, zip thử đã bỏ đi).
 
-- **Job 1 — luôn chạy, không cần điện thoại:** `validate` (catalog ≡ đĩa,
-  JSON hợp lệ, version khớp) + `build` + kiểm tra golden fixture
-  (`test.json`) của từng nguồn.
-- **Job 2 — chỉ khi chạy tay có cấu hình `VBOOK_SERVER`:** `testall` trên
-  thiết bị thật qua developer server. CI không có điện thoại thì **không
-  chạy được `testall`** — job 2 là tùy chọn, không phải mặc định.
+## Trạng thái nguồn
 
-Khi một nguồn gãy, CI tự mở issue báo nguồn đó gãy.
-
-## Trạng thái
-
-| Trạng thái | Nghĩa |
-|---|---|
-| WORK | Nguồn đang chạy tốt (fixture pass, build pass). |
-| MOVED | Site đổi domain/mirror — extension đã chuyển sang mirror khác trong danh sách failover, hoặc cần cập nhật `config.js`. |
-| AUTH | Nguồn cần đăng nhập / trả phí / bị chặn (Cloudflare, 429…) — chưa chạy được nếu không có session. |
-| EMPTY | Nguồn chạy nhưng không trả về dữ liệu (site đổi giao diện, selector cũ hết tác dụng). |
-| CRASH | Extension lỗi khi chạy (lỗi script, `Response.error`, crash runtime). |
-| UNREACHABLE | Không kết nối được tới site/mirror nào (site sập, mạng chặn). |
-
-## Bảng nguồn
-
-| Nguồn | Loại | Trạng thái | Ghi chú / chết từ khi nào |
+| Nguồn | Loại | Trạng thái testall | Ghi chú |
 |---|---|---|---|
-| _chưa có_ | — | — | — |
+| App Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| HHKUNGFU | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 
-_Cập nhật lần cuối: chưa chạy CI lần nào._
+Trạng thái testall: WORK (chạy tốt), MOVED (site đổi domain),
+AUTH/MSG (site chặn/yêu cầu đăng nhập), EMPTY (trả về rỗng),
+CRASH (script lỗi), UNREACHABLE (không tới được developer server).
