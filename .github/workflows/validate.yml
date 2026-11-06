@@ -1,0 +1,35 @@
+name: Validate Extensions & Catalog
+
+# Chạy mỗi lần push/PR vào main: bắt lỗi tĩnh sớm (validate chặt của repo
+# mình: catalog ≡ đĩa, JSON, version khớp, script map, file mồ côi, linter
+# Rhino ES6, fixture, plugin.zip khớp src/) và chặn registry lệch.
+# Tách khỏi health-check (chạy hàng ngày): workflow này không cần mạng
+# tới site nguồn, chỉ kiểm tra repo.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Cài Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate repo (catalog, JSON, version, script map, linter...)
+        run: node tools/cli/validate.js
+
+      - name: Kiểm tra registry khớp với đĩa (không sửa tay plugin.json)
+        run: |
+          node tools/cli/build-catalog.js --check
+          git diff --exit-code plugin.json
