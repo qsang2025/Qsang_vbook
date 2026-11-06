@@ -14,6 +14,17 @@
       "description": "App Truyện Chữ - Truyện Dịch & Truyện Convert. Next.js App Router. Code viết mới từ khảo sát site ngày 2026-11-06; chỉ tham khảo tên/nguồn công khai và icon của bản ivanzzz (Ivan1hai/ext), không dùng code mã hóa của bản đó.",
       "type": "novel",
       "locale": "vi_VN"
+    },
+    {
+      "name": "HHKUNGFU",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/plugin.zip",
+      "version": 1,
+      "source": "https://hhkungfu.ee",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/icon.png",
+      "description": "HHKUNGFU - Phim Hoạt Hình Kungfu Trung Quốc Vietsub / Thuyết Minh (Thương Nguyên Đồ, Đấu La Đại Lục, Tru Tiên...).",
+      "type": "video",
+      "locale": "vi_VN"
     }
   ]
 }
