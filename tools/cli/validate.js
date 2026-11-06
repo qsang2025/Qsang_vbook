@@ -20,6 +20,13 @@
 //       URL repo); nội dung zip phải khớp src/ hiện tại (plugin.json +
 //       src/*.js + file lib đã inline); không có file .zip lạ nào khác
 //       trong extensions/.
+//   (i) linter Rhino ES6: cấm arrow function, async/await, template literal,
+//       ?., ??, spread, .flat() trong src/*.js và lib/*.js (runtime vBook
+//       chỉ chạy Rhino ES6); script chạy được phải có function execute(...);
+//       file được load() không được load() tiếp; load() không chứa đường
+//       dẫn (chỉ tên file ở top level của src/).
+//   (j) health.json (nếu có) đúng định dạng fixture nhẹ
+//       {"cases": [{"name", "url", "pattern"}]}.
 //   (+) branch trong URL registry phải là "main" (theo AGENTS.md mục 5).
 //
 // In từng lỗi rõ ràng bằng tiếng Việt + tổng kết số nguồn đã kiểm tra.
@@ -50,7 +57,8 @@ function printHelp() {
       "script map khớp file trong src/, không có file .js mồ côi, locale/type\n" +
       "chuẩn, test.json đúng định dạng golden fixture, mỗi nguồn có plugin.zip\n" +
       "đã commit kèm và khớp nội dung src/ hiện tại, không có file .zip lạ\n" +
-      "trong extensions/, branch trong URL registry là \"main\".\n" +
+      "trong extensions/, branch trong URL registry là \"main\", linter Rhino\n" +
+      "ES6 cho src/*.js và lib/*.js, health.json đúng định dạng fixture nhẹ.\n" +
       "\n" +
       "Exit code: 0 khi pass (kể cả khi chưa có extension nào),\n" +
       "1 khi có lỗi. Cảnh báo không làm fail."
@@ -107,16 +115,61 @@ function walkFiles(dir, base) {
   return out;
 }
 
+// Tìm mọi lệnh load('file.js') THẬT trong code (bỏ qua comment và chuỗi
+// ký tự — vd. comment hướng dẫn "load('config.js');" hay thông báo lỗi
+// "can load('config.js')..." không phải lệnh load thật). Dùng cho cả
+// findLoads() lẫn kiểm tra load() đệ quy ở dưới.
+function findLoadCalls(code) {
+  const found = [];
+  let i = 0;
+  const n = code.length;
+  while (i < n) {
+    const c = code.charAt(i);
+    // Chuỗi "..." / '...' / `...` (có escape \).
+    if (c === '"' || c === "'" || c === "`") {
+      const q = c;
+      i++;
+      while (i < n && code.charAt(i) !== q) {
+        if (code.charAt(i) === "\\") i++;
+        i++;
+      }
+      i++;
+      continue;
+    }
+    // Comment // tới cuối dòng.
+    if (c === "/" && code.charAt(i + 1) === "/") {
+      while (i < n && code.charAt(i) !== "\n") i++;
+      continue;
+    }
+    // Comment /* ... */ (có thể nhiều dòng).
+    if (c === "/" && code.charAt(i + 1) === "*") {
+      i += 2;
+      while (i + 1 < n && !(code.charAt(i) === "*" && code.charAt(i + 1) === "/")) i++;
+      i += 2;
+      continue;
+    }
+    // Từ khóa load( ở code thật (không phải hậu tố của tên khác).
+    if (code.slice(i, i + 4) === "load" && !/[a-zA-Z0-9_$]/.test(code.charAt(i - 1) || "")) {
+      const m = /^load\s*\(\s*(['"])([^'"]+)\1/.exec(code.slice(i));
+      if (m) {
+        found.push(m[2]);
+        i += m[0].length;
+        continue;
+      }
+    }
+    i++;
+  }
+  return found;
+}
+
 // Tìm mọi lệnh load('xxx.js') trong nội dung các file src/.
 function findLoads(srcDir) {
   const loaded = new Set();
   if (!fs.existsSync(srcDir)) return loaded;
-  const re = /load\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
   for (const f of fs.readdirSync(srcDir)) {
     if (!f.endsWith(".js")) continue;
     const text = fs.readFileSync(path.join(srcDir, f), "utf8");
-    let m;
-    while ((m = re.exec(text)) !== null) loaded.add(path.basename(m[1]));
+    findLoadCalls(text).forEach(function (name) { loaded.add(path.basename(name)); });
   }
   return loaded;
 }
@@ -287,6 +340,80 @@ function validateTestJson(source, file) {
   });
 }
 
+// (i) Linter Rhino ES6: runtime vBook chỉ chạy Rhino ES6 (xem
+// extension-api.md) — cấm arrow function, async/await, template literal,
+// ?., ??, spread, .flat(). Trả về mảng lỗi dạng "Dòng N: ...".
+// Lưu ý: strip comment // có false-negative nhỏ khi "//" nằm trong chuỗi
+// (vd. "https://...") — chấp nhận được, linter là lưới an toàn, không thay
+// thế việc đọc code. Chuỗi "..." / '...' được strip trước khi check các
+// pattern còn lại để tránh false positive từ nội dung text trong code.
+function lintRhinoES6(code) {
+  const errors = [];
+  const lines = code.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const num = i + 1;
+    const stripped = lines[i].replace(/\/\/.*$/, "").replace(/\/\*.*?\*\//g, "");
+    if (stripped.indexOf("`") !== -1) {
+      errors.push("Dòng " + num + ": template literal (`...`) bị cấm trong Rhino ES6 — dùng nối chuỗi (+).");
+    }
+    const noStr = stripped.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, '""');
+    if (/(?:\([^\)]*\)|[a-zA-Z0-9_$]+)\s*=>/.test(noStr)) {
+      errors.push("Dòng " + num + ": arrow function (=>) bị cấm trong Rhino ES6.");
+    }
+    if (/\basync\s+function\b|\bawait\s+/.test(noStr)) {
+      errors.push("Dòng " + num + ": async/await bị cấm trong Rhino ES6.");
+    }
+    if (/\?\./.test(noStr)) {
+      errors.push("Dòng " + num + ": optional chaining (?.) bị cấm trong Rhino ES6.");
+    }
+    if (/\?\?/.test(noStr)) {
+      errors.push("Dòng " + num + ": nullish coalescing (??) bị cấm trong Rhino ES6 — dùng || hoặc toán tử 3 ngôi.");
+    }
+    if (/\.\.\.[a-zA-Z0-9_$]+/.test(noStr)) {
+      errors.push("Dòng " + num + ": spread (...) bị cấm trong Rhino ES6.");
+    }
+    if (/\.(flat|flatMap)\s*\(/.test(noStr)) {
+      errors.push("Dòng " + num + ": .flat()/.flatMap() bị cấm trong Rhino ES6.");
+    }
+  }
+  return errors;
+}
+
+// (j) health.json đúng định dạng fixture nhẹ: mảng case hoặc
+// {"cases": [...]}, mỗi case là {"name"?, "url", "pattern"?}.
+function validateHealthJson(source, file) {
+  const parsed = readJson(file);
+  if (!parsed.ok) {
+    err("[" + source.rel + "] health.json không parse được: " + parsed.error);
+    return;
+  }
+  let cases = parsed.value;
+  if (cases && typeof cases === "object" && !Array.isArray(cases) && Array.isArray(cases.cases)) {
+    cases = cases.cases;
+  }
+  if (!Array.isArray(cases)) {
+    err("[" + source.rel + "] health.json phải là mảng case hoặc {\"cases\": [...]}.");
+    return;
+  }
+  cases.forEach(function (c, i) {
+    const label = "[" + source.rel + "] health.json case " + (i + 1);
+    if (!c || typeof c !== "object" || Array.isArray(c)) {
+      err(label + ": mỗi case phải là object {\"url\", \"pattern\"?} (\"name\" tùy chọn).");
+      return;
+    }
+    if (typeof c.url !== "string" || !c.url) {
+      err(label + ": thiếu trường \"url\" (string).");
+    }
+    if (c.pattern !== undefined && c.pattern !== null && c.pattern !== "") {
+      try {
+        new RegExp(String(c.pattern), "i");
+      } catch (e) {
+        err(label + ": pattern sai regex: " + e.message);
+      }
+    }
+  });
+}
+
 function main() {
   const argv = process.argv.slice(2);
   if (argv.includes("--help") || argv.includes("-h")) {
@@ -432,9 +559,64 @@ function main() {
     const testPath = path.join(s.dir, "test.json");
     if (fs.existsSync(testPath)) validateTestJson(s, testPath);
 
+    // (j) health.json (nếu có) đúng định dạng fixture nhẹ.
+    const healthPath = path.join(s.dir, "health.json");
+    if (fs.existsSync(healthPath)) validateHealthJson(s, healthPath);
+
+    // (i) linter Rhino ES6 + execute() + load() cho từng file trong src/.
+    fs.readdirSync(srcDir).forEach(function (f) {
+      if (!f.endsWith(".js")) return;
+      const code = fs.readFileSync(path.join(srcDir, f), "utf8");
+      lintRhinoES6(code).forEach(function (e) {
+        err(label + " src/" + f + ": " + e);
+      });
+      // Script chạy được phải có function execute(...); bỏ qua helper
+      // (config.js/helper.js) và file lib đã inline vào src/.
+      if (HELPER_NAMES.indexOf(f) === -1 && !libNames.has(f)) {
+        if (!/\bfunction\s+execute\s*\(/.test(code)) {
+          err(label + " src/" + f + ": thiếu function execute(...) bắt buộc.");
+        }
+      }
+      // load() chỉ nhận tên file ở top level của src/, không chứa đường dẫn.
+      findLoadCalls(code).forEach(function (target) {
+        if (target.indexOf("/") !== -1 || target.indexOf("\\") !== -1) {
+          err(label + " src/" + f + ": load('" + target + "') chứa đường dẫn — " +
+            "load() của runtime vBook chỉ load file ở top level của src/.");
+        }
+      });
+    });
+    // File được load() không được load() tiếp (runtime không đệ quy).
+    loaded.forEach(function (name) {
+      const libPath = path.join(srcDir, name);
+      if (!fs.existsSync(libPath)) return; // thiếu file đã báo ở (e) qua validateZipContents/load check
+      const libCode = fs.readFileSync(libPath, "utf8");
+      const subs = findLoadCalls(libCode);
+      if (subs.length > 0) {
+        err(label + " file được load() \"" + name + "\" lại gọi load('" + subs.join("', '") +
+          "') — runtime vBook không cho file được load load thêm file khác.");
+      }
+    });
+
     // (h) plugin.zip đã commit kèm và khớp nội dung src/ hiện tại.
     validateZipContents(s, label, libNames);
   });
+
+  // (i) linter Rhino ES6 cho file lib dùng chung ở root (đây là file mẫu
+  // sẽ được inline vào src/ rồi load() lúc chạy, nên cũng không được chứa
+  // cú pháp vượt Rhino ES6 hay gọi load()).
+  if (fs.existsSync(libDir)) {
+    fs.readdirSync(libDir).forEach(function (f) {
+      if (!f.endsWith(".js")) return;
+      const code = fs.readFileSync(path.join(libDir, f), "utf8");
+      lintRhinoES6(code).forEach(function (e) {
+        err("[lib] " + f + ": " + e);
+      });
+      if (findLoadCalls(code).length > 0) {
+        err("[lib] " + f + ": chứa lệnh load() — file lib được load lúc chạy " +
+          "nên không được load thêm file khác.");
+      }
+    });
+  }
 
   // (h) quét toàn bộ extensions/ xem còn file .zip nào khác không
   // (plugin.zip trong từng nguồn đã kiểm tra ở trên nên bỏ qua ở đây để

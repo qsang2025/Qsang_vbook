@@ -22,3 +22,8 @@ Thumbs.db
 
 # Per-machine vBook dev-server list (phone IP changes; never commit)
 **/servers.json
+
+# CI health-check: file sinh ra lúc chạy (dùng nội bộ trong workflow),
+# không commit.
+health-check-failures.json
+issue-body.md

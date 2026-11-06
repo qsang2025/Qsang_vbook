@@ -143,8 +143,8 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   - `test.json` (golden fixture): case theo từng script
     (`{script, input, expect: {contains, minItems}}`) để test trên thiết bị
     thật qua developer server.
-  - `health.json` (fixture nhẹ): case `{name, url, expectedPattern}` để CI
-    probe kiểm tra site còn sống / giao diện còn khớp mà không cần điện
+  - `health.json` (fixture nhẹ): `{"cases": [{"name"?, "url", "pattern"?}]}`
+    để CI probe kiểm tra site còn sống / giao diện còn khớp mà không cần điện
     thoại (chỉ fetch HTTP + so pattern trên mẫu body).
   `validate` kiểm tra cả hai file tồn tại và đúng định dạng.
 - CI health-check **hàng ngày (00:00 UTC)** chạy `validate` (+ linter) +
@@ -164,3 +164,35 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
 - Repo này **chưa chốt LICENSE** — không ghi tên license (vd. MIT) vào
   `package.json`, `README.md` hay bất kỳ file nào khác khi chưa có file
   LICENSE thật trong repo.
+
+## 12. Health-check probe + fixture nhẹ (giai đoạn 1)
+
+- `scripts/health-check.js` probe sức khỏe các nguồn **không cần điện thoại**:
+  HTTP GET tới `metadata.source`, đo latency, theo redirect (tối đa 5),
+  kiểm tra các case trong `health.json` của nguồn. Trạng thái: `HEALTHY` /
+  `MOVED` / `DEGRADED` / `BROKEN` / `NO_SOURCE` / `UNKNOWN`.
+- Redirect sang origin khác (đổi domain) hoặc kẹt ở 3xx được phân loại
+  `MOVED`, **không** tính là HEALTHY. Lỗi mạng/5xx được thử lại 1 lần; mỗi
+  lần thử có hard timeout 10s (bao cả kẹt DNS/connect).
+- Probe ghi `health-check-failures.json` (dùng nội bộ trong workflow, đã
+  gitignore) và **exit 1 khi có nguồn không HEALTHY**. Probe không ghi
+  `STATUS.md` — file đó do job `status` trong workflow sinh.
+- `health.json` là **fixture nhẹ cho CI** — khác `test.json` (fixture sâu
+  theo từng script, chỉ chạy được trên máy thật qua developer server).
+  Định dạng: `{"cases": [{"name"?, "url", "pattern"?}]}` (chấp nhận cả mảng
+  trần). Mỗi case GET `url` rồi tìm `pattern` (regex, không phân biệt
+  hoa/thường) trong body (mẫu tối đa 512KB). `pattern` tùy chọn — không có
+  thì chỉ kiểm tra HTTP 200. `validate` kiểm tra `health.json` đúng định
+  dạng; probe báo `DEGRADED` khi case lỗi hoặc pattern không thấy.
+- Linter Rhino ES6 nằm trong `tools/cli/validate.js`: cấm arrow function,
+  async/await, template literal, `?.`, `??`, spread, `.flat()` trong
+  `src/*.js` và `lib/*.js`; script chạy được phải có `function execute(...)`;
+  file được `load()` không được `load()` tiếp. Linter bỏ qua `load('...')`
+  nằm trong comment/chuỗi (chỉ tính lệnh thật).
+- Workflow `validate.yml` chạy mỗi push/PR vào main (`validate` +
+  `build-catalog --check` + `git diff --exit-code plugin.json`).
+- Workflow `health-check.yml` chạy **hàng ngày 00:00 UTC** + chạy tay.
+  Job `validate-build` chạy probe (nguồn gãy không fail job). Job
+  `auto-issue` mở issue GitHub khi có nguồn gãy, **chống trùng theo tiêu đề**
+  cố định `[Health-check] Có nguồn vBook bị lỗi / đổi giao diện` (chỉ mở
+  khi chưa có issue mở cùng tiêu đề).

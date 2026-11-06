@@ -45,13 +45,16 @@ Qsang_vbook/
   templates/                    # template tạo nguồn mới theo từng loại
     novel/ comic/ chinese_novel/ video/ audio/ translate/ tts/ ai/
   extensions/                   # nguồn thật — xem Catalog bên dưới
-    novel/apptruyenchu/         # App Truyện Chữ (novel, v3)
+    novel/apptruyenchu/         # App Truyện Chữ (novel, v4)
     video/hhkungfu/             # HHKUNGFU (video, v1)
                                 # mỗi nguồn: icon.png + plugin.json + src/ + test.json
                                 # + plugin.zip (do build sinh ra, commit kèm để app
                                 #   cài được từ URL repo — xem AGENTS.md mục 8)
   tools/cli/                    # build / catalog / validate
-  scripts/                      # vbook.js (test/build/install) + build_registry.py + clean.py
+  scripts/                      # cli.js (CLI một cửa) + health-check.js
+                                # (probe) + vbook.js (test/testall/install)
+                                # + build_registry.py + clean.py
+  package.json                  # npm scripts cho CLI một cửa
   docs/                         # EXTENSION_DEVELOPMENT_GUIDE.md,
                                 # verify-checklist.md, CONTRIBUTING.md
                                 # (hợp đồng API ở extension-api.md tại root, không ở docs/)
