@@ -1,14 +1,18 @@
+// explore.js — trang kham pha theo muc: banner + cac hang danh sach (template audio).
+// Y tuong: Darkrai9x explore.js. Moi muc chon dang tinh hoac dong tuy theo
+// site: du lieu da co trong response nay -> `items`; du lieu can trang/API
+// rieng -> `script`/`input`. Banner/moi cap nhat duoi day la tinh, xep hang
+// la dong; doi chieu tuy site.
+// Tat ca SELECTOR_ doi theo giao dien site that.
+// Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-// explore.js — sectioned discover page: a banner carousel + one or more rows.
-// Per section, pick static or dynamic to match the site: data already in this
-// response → `items`; data needing its own page/API → `script`/`input`.
-// Banner/latest below are static, ranking is dynamic; switch either way as needed.
-function execute() {
-    let response = fetch(BASE_URL);
-    if (!response.ok) return Response.error("HTTP " + response.status);
-    let doc = response.html();
 
-    let bannerItems = doc.select("SELECTOR_BANNER_SLIDES").map(function (el) {
+function execute() {
+    var response = fetch(BASE_URL);
+    if (!response.ok) return Response.error("Lỗi HTTP " + response.status);
+    var doc = response.html();
+
+    var bannerItems = doc.select("SELECTOR_BANNER_SLIDES").map(function (el) {
         return {
             name: el.select("SELECTOR_BANNER_TITLE").text(),
             cover: el.select("SELECTOR_BANNER_IMAGE img").attr("src"),
@@ -16,7 +20,7 @@ function execute() {
         };
     });
 
-    let latestItems = doc.select("SELECTOR_LATEST_ITEMS").map(function (el) {
+    var latestItems = doc.select("SELECTOR_LATEST_ITEMS").map(function (el) {
         return {
             name: el.select("SELECTOR_ITEM_NAME").text(),
             cover: el.select("SELECTOR_ITEM_COVER img").attr("src"),
@@ -47,8 +51,8 @@ function execute() {
             title: "Xem nhiều",
             subtitle: "",
             type: "ranking",
-            // Dynamic: the app calls search.js as execute(input, "") after the page shows.
-            // If this data is on the homepage, parse it above and use `items` instead.
+            // Dong: app goi search.js dang execute(input, "") sau khi trang hien.
+            // Neu du lieu nay co tren trang chu, parse o tren roi dung `items`.
             script: "search.js",
             input: "/xem-nhieu",
             more: { type: "list", name: "Danh sách", script: "search.js", input: "/xem-nhieu" }

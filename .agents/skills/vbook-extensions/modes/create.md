@@ -2,46 +2,114 @@
 
 Create and verify one extension end to end. Before editing, read
 `reference/runtime.md`, `reference/type-contracts.md`, the relevant API sections, and
-the selected `templates/<type>/`. Before testing, read `reference/cli.md` and
-`reference/verify-checklist.md`.
+the selected repo-root `templates/<type>/`. Before testing, read `reference/cli.md` and
+`reference/verify-checklist.md`. Follow phases in order.
 
-## 1. Scope
+## Phase 0 — scope the site
 
-1. Fetch the target and determine its type.
-2. Obtain a real detail URL and a reachable chapter/episode URL. Provider engines need
-   no content pages. If only a homepage is given, follow it to a real detail page or ask.
-3. Identify required and genuinely-supported optional scripts from the API contract.
+1. Fetch the target URL (WebFetch or `curl`).
+2. Determine `type`: `novel` / `chinese_novel` / `comic` / `audio` / `video` / `tts` /
+   `translate` / `ai`.
+3. Collect real sample pages: one real **detail** page URL, one real **chapter/episode**
+   page URL reachable from it. `tts`/`translate`/`ai` need none.
+4. If only given a homepage, ask for a detail-page URL, or fetch the homepage and click
+   through to one yourself.
 
-## 2. Scaffold
+## Phase 1 — scaffold
 
-1. Copy only `templates/<type>/` to the target directory.
-2. Fill metadata with real values. Verify `metadata.regexp` against a complete detail
-   URL. For content sources, keep `config.DOMAIN.default == metadata.source`.
-3. Remove unsupported optional scripts; keep `page` only for paginated TOCs.
-4. Use a real provider/site icon when supplied and keep it decodable and under 5 MB.
+1. Copy only repo-root `templates/<type>/` into the extension's target folder.
+2. Fill `plugin.json.metadata`: `name`, `source`, `regexp` (must match the real
+   detail-page URL — verify against a complete detail URL), `locale`, `type`, `nsfw`.
+3. Set `config.DOMAIN.default` to the **exact same URL** as `metadata.source`
+   (`BASE_URL` in `config.js` traces back to this value) — the two must never diverge.
+   For content sources, keep `config.DOMAIN.default == metadata.source`.
+4. Cross-check `reference/extension-api.md`'s "Required scripts per type" table. Drop any
+   `plugin.json.script` key (and file) the site genuinely can't support. Keep everything
+   else, including optional ones. Keep `page` only for paginated TOCs.
+   - `comic` only: the per-chapter image list is **required** — `page.js` and `chap.js`
+     are its two alternative implementations (both ship in the template). Check whether
+     the site has a separate page-list endpoint or the chapter page itself lists all
+     images, pick the matching one, delete the other file and its `plugin.json.script`
+     key. Exactly one must remain — never both, never neither.
+5. `icon.png` — **mandatory, every extension ships one**. Real site logo/favicon, not a
+   placeholder. Prefer apple-touch-icon/og:image/logo asset over favicon.ico. Resize to
+   200x200 if the source is larger, keep it decodable and under 5 MB. The file must
+   exist at `<ext-dir>/icon.png` before the final install — an install without it (or
+   run with `--no-icon`) leaves the extension iconless in the app.
 
-## 3. Implement and test incrementally
+## Phase 2 — write → test → fix, one script at a time
 
-Use live responses and real chained inputs. Typical order:
+Order:
 
-1. detail
-2. optional page → toc
-3. chap; then track for audio/video
-4. search
-5. home, genre, explore (per section, static `items` or dynamic `script`/`input` to match
-   the site; test each section script with its `input` and page `""`)
-6. dynamically referenced similar/comments
-7. provider chain: voice→tts, language/model/style→translate, or chatStream
+1. `detail.js` (or the type's primary script)
+2. `toc.js` (with optional `page` first when the TOC is paginated)
+3. Per-chapter content: `chap.js` / `page.js` / `track.js`
+   - **video/audio is a `chap`→`track` chain** (see `reference/extension-api.md`).
+     `chap.js(episodeUrl)` returns the episode's server list `[{title, data}]` (one entry
+     per source button; single-server sites return a one-element list). `track.js(data)`
+     then resolves the chosen `data` to the playback object. Test both: `chap` first
+     (get a real server `data`), then `track` with that `data`.
+   - **audio differs from video on five points** — `chap` is required (not optional),
+     only the first `chap` entry is ever used (no source picker), `chap` must return an
+     array/object not a bare URL string, `track` must resolve `native` (no
+     `auto`/`webview` path), and `detail.js`'s `format` must be `"album"` (playlist) or
+     `"audio"` (single track). Lyrics ride on `track.js`'s `lyrics` field (prefer an LRC
+     url so the pane syncs), never `subtitles`. Read the audio-chain section of
+     `reference/extension-api.md` before writing one.
+   - `track.js`: **always try to resolve the real direct stream first** (`.m3u8`/`.mp4`)
+     and return `type: "native"`. If `data` is a 3rd-party embed URL, fetch it and grab
+     the stream from the page (regex the `.m3u8`/`.mp4`, or the `file:`/`sources:` key).
+     When direct resolution is genuinely too hard (obfuscated/JS-built links, DRM,
+     per-request tokens), fall back to **`type: "auto"`** (pass the embed URL as `data`,
+     let the app sniff the stream) — prefer `auto` over `webview`. Only use
+     `type: "webview"` (resolve in a headless page) if `auto` also can't play it. Order:
+     `native` → `auto` → `webview`.
+4. `search.js`
+5. `home.js`, `genre.js`, `explore.js` (per section, static `items` or dynamic
+   `script`/`input` to match the site; test each section script with its `input` and
+   page `""`)
+6. `similar.js`, `comments.js` (if `detail.js` references them)
+7. `tts`: `voice.js` then `tts.js`. `translate`: `language.js` then `translate.js`.
+   `ai`: `chatStream.js`.
 
-For each script: write from observed markup/API data, save, run `vbook.js test`, and
-verify the returned shape and content. Do not move on while it fails. After roughly
-three unproductive cycles, re-fetch the page, check trailing-slash behavior and
-client-rendering, then reassess instead of stacking speculative fixes.
+For each script:
 
-## 4. Finish
+1. **Write** selectors from the real fetched HTML — never guess a class/id. Apply every
+   constraint in `SKILL.md`. Save the file before testing (the CLI reads from disk).
+2. **Run** `node .agents/skills/vbook-extensions/scripts/vbook.js test <ext-dir> <script>.js <arg1> <arg2> ...`
+   (args in documented order, all strings). It calls `/connect` first (prints the
+   target device), then logs the input and the `{code,log,data}` output. See the CLI
+   section in `SKILL.md`.
+3. **Verify `data` against the shared standard in `reference/verify-checklist.md`** —
+   `code:0` alone is not a pass. All checks hold → script done, move to the next. Any
+   fail → read `log`, fix precisely, re-run step 2.
+4. **Escalate after ~3 fix/retest cycles without progress**:
+   - For a `url`-receiving script: check for the trailing-`/`-stripped case (the app
+     strips a trailing `/` from URL args at runtime — see `reference/runtime.md`).
+   - Re-fetch the live page, re-diff selectors.
+   - Check if content is JS-rendered — switch to `Engine.newBrowser()`.
+   - Check if the site needs a bypass for a bot check — re-check the runtime doc's
+     browser-fallback guidance instead of guessing a bypass pattern.
 
-Strip template teaching comments, verify all retained scripts and dependent chains, and
-summarize supported/unsupported behavior. Ask before build or install.
+Do not move to the next script while the current one fails.
 
-Done means every declared script passes with correct live data and all runtime/type
-contracts hold.
+## Phase 3 — package
+
+Once every mandatory and kept-optional script passes:
+
+1. Strip the template's teaching comments from every script (see the Templates section
+   in `SKILL.md`) — keep only comments documenting non-obvious site-specific logic you
+   added.
+2. Summarize what was built and what was dropped as unsupported.
+3. Confirm `<ext-dir>/icon.png` exists (200x200 preferred) — the final install must
+   carry it. Never ship the final install with `--no-icon`; that flag is for fast
+   iteration probes only.
+4. Ask before running build and/or install. Build the zip offline with
+   `node scripts/cli.js build <ext-dir>` (pure-Node zip, no phone needed); install via
+   `node .agents/skills/vbook-extensions/scripts/vbook.js install <ext-dir>`.
+
+## Done criteria
+
+Every script in the final `plugin.json.script` passes `vbook.js test` with correctly-shaped,
+verified data. No script violates a `SKILL.md` constraint. `<ext-dir>/icon.png` exists
+and the final install was run **without** `--no-icon`.

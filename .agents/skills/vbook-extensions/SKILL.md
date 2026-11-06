@@ -6,8 +6,8 @@ description: Create, fix, test, audit, refactor, build, or install vBook extensi
 # vBook extensions
 
 Canonical, vendor-neutral skill for this repository. Resolve every linked path relative
-to this file. `.claude/skills/vbook-extensions/SKILL.md` is only a compatibility pointer;
-never duplicate this skill there.
+to this file. This skill lives only under `.agents/skills/vbook-extensions/`; there is
+no `.claude/` copy in this repo — never create one.
 
 ## Route the task
 
@@ -31,8 +31,12 @@ and the choice would change behavior, ask.
 - For type-specific fields/chains, read [Type contracts](reference/type-contracts.md).
 - Before any test/build/install, read [CLI](reference/cli.md).
 - When judging script output, use [Verify checklist](reference/verify-checklist.md).
-- Templates live under `templates/<type>/`; use only the selected type. Replace all
-  placeholders and remove teaching comments before shipping.
+- Templates: the single canonical source is repo-root `templates/<type>/`
+  (Qsang style: `var`, Vietnamese comments). The copy under
+  `.agents/skills/vbook-extensions/templates/` is an identical mirror kept in
+  sync with it — never edit one tree without syncing the other. Use only the
+  selected type. Replace all placeholders and remove teaching comments
+  before shipping.
 
 The repo-root `extension-api.md` and `reference/extension-api.md` are the same current
 contract. Keep them identical; when the contract changes, update both, then the
@@ -53,12 +57,12 @@ affected guidance and templates.
   function. A script is at most 10 MB, `plugin.json` at most 2 MB, and an optional icon
   at most 5 MB.
 - The current contract is authoritative. Do not copy patterns from known old-contract
-  extensions such as `wikidich/` or `truyenqq/` without migrating them.
+  extensions without migrating them.
 
 ## Resources
 
-- `templates/novel`, `comic`, `audio`, `video`, `tts`, `translate`, `ai`: complete
-  scaffolds for each supported type.
+- `templates/novel`, `chinese_novel`, `comic`, `audio`, `video`, `tts`,
+  `translate`, `ai` (repo root): complete scaffolds for each supported type.
 - `scripts/vbook.js`: connection-aware REST CLI.
 - `scripts/servers.example.json`: local server-list example; `servers.json` is
   per-machine and ignored.

@@ -1,15 +1,28 @@
 # vBook CLI
 
 Use only `.agents/skills/vbook-extensions/scripts/vbook.js` for device connection,
-testing, building, and installation. Run from the repository root:
+testing, and installation. Run from the repository root:
 
 ```text
 node .agents/skills/vbook-extensions/scripts/vbook.js connect
 node .agents/skills/vbook-extensions/scripts/vbook.js test <ext-dir> <script.js> [args...]
 node .agents/skills/vbook-extensions/scripts/vbook.js testall [ext...] [--query kw] [--timeout ms] [--json file]
-node .agents/skills/vbook-extensions/scripts/vbook.js build <ext-dir> [out.zip]
 node .agents/skills/vbook-extensions/scripts/vbook.js install <ext-dir> [--no-icon]
 ```
+
+Building the zip is OFFLINE and does not need the phone — use the repo one-door CLI
+(`scripts/cli.js`), which calls `tools/cli/build.js` (pure-Node zip, lib-inline into a
+temp dir):
+
+```text
+node scripts/cli.js build <ext-dir> [out.zip]   # one extension
+node scripts/cli.js build                       # every extension under extensions/
+node scripts/cli.js validate                    # static checks (run before build)
+node scripts/cli.js build-catalog [--check]     # regenerate the root registry
+```
+
+`scripts/vbook.js build <ext-dir>` still exists but builds through the developer server
+on the phone — prefer `scripts/cli.js build` (offline, same zip layout).
 
 The CLI reads `plugin.json` and `src/*.js` from disk, so save edits first. A temporary
 probe belongs in the extension's `src/` only for the test and must be removed afterward.
