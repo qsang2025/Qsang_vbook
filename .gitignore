@@ -19,3 +19,6 @@ Thumbs.db
 # Các file .zip khác (zip thử, zip tạm) vẫn bị chặn.
 *.zip
 !extensions/**/plugin.zip
+
+# Per-machine vBook dev-server list (phone IP changes; never commit)
+**/servers.json

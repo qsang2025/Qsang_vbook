@@ -81,6 +81,8 @@ function isJunk(line) {
     if (/^Bạn đang đọc truyện trên/i.test(line)) return true;
     if (/^Báo lỗi chương$/i.test(line)) return true;
     if (/^Quảng cáo$/i.test(line)) return true;
+    if (/^Aa$/.test(line)) return true;
+    if (/^\d+\s+\/\s+[\d\.]+$/.test(line)) return true;
     return false;
 }
 

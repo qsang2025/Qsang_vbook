@@ -69,6 +69,18 @@ thẻ `<script src="/_next/static/chunks/...js">`) rồi regex
 Firebase của site chỉ dùng cho Auth (đăng nhập), không dùng để lấy chương
 nên extension không cần cấu hình Firebase.
 
+**Bẫy runtime vBook (gặp 2026-11-06, sửa ở v3):** Element trả về từ
+`select()` chỉ có các hàm đã ghi trong `extension-api.md` (`text()`,
+`html()`, `attr()`, `attributes()`, `remove()`, `first()`, `last()`,
+`get()`, `size()`, `forEach()`...) — **không có `.parent()`** (dùng sẽ ném
+`TypeError: Cannot find function parent` và làm cả màn hình chi tiết lỗi
+"Không thể tải nội dung"). Muốn lấy khối bao quanh một thẻ thì cắt trực
+tiếp từ chuỗi HTML (`scope.html()` + regex) thay vì đi qua `.parent()`.
+
+**Thẻ truyện:** tác giả + số chương nằm trong 2 thẻ `<p>` (không phải
+`<div>` như đoán ban đầu); chip thể loại trên `/truyen` là `<button>`
+không có `href`, còn trên trang chi tiết thì là link `/truyen?cate=...`.
+
 ## Kiểm thử
 
 - `node tools/cli/validate.js` (repo root) — kiểm tra manifest, registry,

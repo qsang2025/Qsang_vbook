@@ -1,1 +1,38 @@
-{"config":{"DOMAIN":{"default":"https://apptruyenchu.pro","mode":"select","title":"Domain","values":["https://apptruyenchu.pro"]},"MIRRORS":{"default":"","format":"text","mode":"input","title":"Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"}},"metadata":{"author":"Qsang","description":"App Truyện Chữ - Truyện Dịch & Truyện Convert. Next.js App Router. Code viết mới từ khảo sát site ngày 2026-11-06; chỉ tham khảo tên/nguồn công khai và icon của bản ivanzzz (Ivan1hai/ext), không dùng code mã hóa của bản đó.","language":"javascript","locale":"vi_VN","name":"App Truyện Chữ","regexp":"^https://apptruyenchu\\.pro/truyen/[^/]+/?$","source":"https://apptruyenchu.pro","type":"novel","version":2},"script":{"book":"book.js","chap":"chap.js","detail":"detail.js","genre":"genre.js","home":"home.js","search":"search.js","toc":"toc.js"}}
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://apptruyenchu.pro",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://apptruyenchu.pro"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "Qsang",
+    "description": "App Truyện Chữ - Truyện Dịch & Truyện Convert. Next.js App Router. Code viết mới từ khảo sát site ngày 2026-11-06; chỉ tham khảo tên/nguồn công khai và icon của bản ivanzzz (Ivan1hai/ext), không dùng code mã hóa của bản đó.",
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "App Truyện Chữ",
+    "regexp": "^https://apptruyenchu\\.pro/truyen/[^/]+/?$",
+    "source": "https://apptruyenchu.pro",
+    "type": "novel",
+    "version": 3
+  },
+  "script": {
+    "book": "book.js",
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js"
+  }
+}

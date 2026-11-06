@@ -54,18 +54,30 @@ function execute(url) {
     var img = scope.select("img").first();
     if (img !== null) cover = unwrapCover(img.attr("src"));
 
-    // Mo ta: khoi chua h2 "Gioi thieu" (lay html cua the cha, bo chinh h2).
+    // Mo ta: doan HTML sau dong "Gioi thieu" (h2) toi h2 ke tiep.
+    // (Runtime vBook chi mo text()/html()/attr()... tren Element, KHONG co
+    // .parent() — dung .parent() se nem TypeError va lam ca detail loi.
+    // Vi vay cat mo ta truc tiep tu chuoi HTML cua <main>.)
     var description = "";
-    var h2s = scope.select("h2");
-    var hi = 0;
-    for (hi = 0; hi < h2s.size(); hi++) {
-        if (cleanText(h2s.get(hi).text()) === "Giới thiệu") {
-            var parent = h2s.get(hi).parent();
-            if (parent !== null) {
-                description = String(parent.html()).replace(/<h2[^>]*>[\s\S]*?<\/h2>/i, "");
-            }
-            break;
+    var mainHtml = "";
+    try { mainHtml = String(scope.html()); } catch (e) { mainHtml = ""; }
+    var giIdx = mainHtml.search(/Giới thiệu/);
+    if (giIdx !== -1) {
+        var closeH2 = mainHtml.indexOf("</h2>", giIdx);
+        var start = closeH2 !== -1 ? closeH2 + 5 : giIdx + 10;
+        var after = mainHtml.substring(start);
+        // Mo ta nam trong mot <section>; cat o </section> dau tien (truoc
+        // khoi "Chuong moi nhat" va "Danh sach chuong"). Du phong: h2 ke.
+        var closeSec = after.search(/<\/section>/i);
+        if (closeSec !== -1) after = after.substring(0, closeSec);
+        else {
+            var nextH2 = after.search(/<h2[\s>]/i);
+            if (nextH2 !== -1) after = after.substring(0, nextH2);
         }
+        after = after.replace(/<script[\s\S]*?<\/script>/gi, "")
+            .replace(/<style[\s\S]*?<\/style>/gi, "")
+            .replace(/<button[\s\S]*?<\/button>/gi, "");
+        description = after;
     }
 
     // Tac gia: nhan trong khoi thong tin truoc, roi "Tac gia:" trong mo ta.
@@ -96,9 +108,16 @@ function execute(url) {
     });
 
     // So chuong / luot doc / theo doi (phuc vu khoi detail + kiem tra toc).
+    // Luot doc / theo doi chi lay so dau tien: sau "Theo doi 20" con co
+    // diem danh gia "5 (1 danh gia)" va so chuong lap lai, khong phai so
+    // theo doi.
     var chapters = totalChapters(mainText);
     var views = labelValue(mainText, "Lượt đọc", ["Theo dõi", "Chương", "Thể loại"]);
     var follows = labelValue(mainText, "Theo dõi", ["Chương", "Lượt đọc"]);
+    var vm = String(views).match(/^\d+/);
+    if (vm) views = vm[0];
+    var fm = String(follows).match(/^\d+/);
+    if (fm) follows = fm[0];
 
     var detailHtml = "";
     if (author) detailHtml += "Tác giả: " + author + "<br>";

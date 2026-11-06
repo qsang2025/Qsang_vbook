@@ -165,9 +165,17 @@ function parseBookCard(a) {
     var cover = "";
     if (img !== null) cover = unwrapCover(img.attr("src"));
 
-    var divs = a.select("div");
-    var author = divs.size() > 0 ? cleanText(divs.get(0).text()) : "";
-    var info = divs.size() > 1 ? cleanText(divs.get(1).text()) : "";
+    // Tac gia + thong tin nam trong 2 the <p> (khao sat tren may that
+    // 2026-11-06: the <a> chi co 2 <div> — div vo anh bia (rong) va div
+    // ngoai — nen doc <div> se ra tac gia rong). Du phong: <div>.
+    var ps = a.select("p");
+    var author = ps.size() > 0 ? cleanText(ps.get(0).text()) : "";
+    var info = ps.size() > 1 ? cleanText(ps.get(1).text()) : "";
+    if (ps.size() === 0) {
+        var divs = a.select("div");
+        author = divs.size() > 0 ? cleanText(divs.get(0).text()) : "";
+        info = divs.size() > 1 ? cleanText(divs.get(1).text()) : "";
+    }
 
     return {
         name: htmlDecode(name),
