@@ -1,1 +1,19 @@
-{"data":[],"metadata":{"author":"Qsang","description":"Tuyển tập extension vBook của Qsang — đọc truyện, truyện tranh, video, audio, dịch, TTS và AI. Registry sinh tự động từ extensions/, không sửa tay."}}
+{
+  "metadata": {
+    "author": "Qsang",
+    "description": "Tuyển tập extension vBook của Qsang — đọc truyện, truyện tranh, video, audio, dịch, TTS và AI. Registry sinh tự động từ extensions/, không sửa tay."
+  },
+  "data": [
+    {
+      "name": "App Truyện Chữ",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/apptruyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://apptruyenchu.pro",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/apptruyenchu/icon.png",
+      "description": "App Truyện Chữ - Truyện Dịch & Truyện Convert. Next.js App Router. Code viết mới từ khảo sát site ngày 2026-11-06; chỉ tham khảo tên/nguồn công khai và icon của bản ivanzzz (Ivan1hai/ext), không dùng code mã hóa của bản đó.",
+      "type": "novel",
+      "locale": "vi_VN"
+    }
+  ]
+}
