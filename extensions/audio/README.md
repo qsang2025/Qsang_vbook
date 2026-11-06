@@ -5,7 +5,7 @@
 Thư mục này chứa các nguồn audio (nghe truyện, nhạc, ASMR…).
 
 Mỗi nguồn là một thư mục con với: `icon.png` + `plugin.json` + `src/` + `test.json`
-(`plugin.zip` do build sinh ra, không commit).
+(`plugin.zip` do build sinh ra, commit kèm để app cài được từ URL repo).
 
 Script dùng cho loại này: `home.js`, `genre.js`, `search.js`, `detail.js`,
 `toc.js` + `track.js` (danh sách track audio + phụ đề lrc/vtt nếu có).

@@ -108,8 +108,9 @@ testall    # chạy toàn bộ nguồn — chỉ khi có thiết bị thật (VB
 - `plugin.json` ở root sinh tự động bằng build-catalog — **không sửa tay**.
 - Bump version ở cả manifest nguồn và registry gốc sau mỗi thay đổi; rebuild
   `plugin.zip` sau mỗi thay đổi trong `src/`.
-- `plugin.zip` là artifact, **không commit** (chỉ commit `src/` +
-  `plugin.json` + `icon.png` + `test.json`).
+- `plugin.zip` do build sinh ra, **commit kèm** với nguồn để app cài
+  được từ URL repo (chỉ commit `plugin.zip` của nguồn, không commit
+  zip thử/zip tạm).
 
 ## 7. Checklist trước khi đưa nguồn vào catalog
 

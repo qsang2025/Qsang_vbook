@@ -10,7 +10,12 @@ Thumbs.db
 # Log
 *.log
 
-# QUYẾT ĐỊNH: plugin.zip là artifact do build sinh ra, KHÔNG commit zip.
-# Chỉ commit src/ + plugin.json + icon.png + test.json của từng nguồn.
-# Muốn dùng extension thì build lại từ src/ bằng scripts/vbook.js.
+# QUYẾT ĐỊNH (đổi 2026-11-06 theo yêu cầu của Anh — trước đây zip KHÔNG
+# commit): plugin.zip của từng nguồn ĐƯỢC commit kèm, để app vBook cài
+# được extension thẳng từ URL repo (registry trỏ tới
+# raw.githubusercontent.com/.../extensions/<loại>/<tên>/plugin.zip).
+# Sau mỗi thay đổi trong src/ phải rebuild zip (xem AGENTS.md mục 8);
+# validate kiểm tra zip có mặt và khớp nội dung src/ hiện tại.
+# Các file .zip khác (zip thử, zip tạm) vẫn bị chặn.
 *.zip
+!extensions/**/plugin.zip

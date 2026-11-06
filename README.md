@@ -46,7 +46,8 @@ Qsang_vbook/
   extensions/                   # nguồn thật — TRỐNG lúc đầu
     novel/ chinese_novel/ comic/ video/ audio/ translate/ tts/ ai/
                                 # mỗi nguồn: icon.png + plugin.json + src/ + test.json
-                                # (plugin.zip chỉ là artifact do build sinh ra)
+                                # + plugin.zip (do build sinh ra, commit kèm để app
+                                #   cài được từ URL repo — xem AGENTS.md mục 8)
   tools/cli/                    # build / catalog / validate / verify / scaffold
   scripts/                      # vbook.js (test/build/install) + build_registry.py + clean.py
   docs/                         # EXTENSION_DEVELOPMENT_GUIDE.md,

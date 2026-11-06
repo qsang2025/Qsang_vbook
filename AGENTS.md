@@ -39,7 +39,8 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
 ## 4. Nguồn sự thật duy nhất: src/
 
 - `extensions/<loại>/<tên>/src/` trên đĩa là **nguồn sự thật duy nhất**.
-- `plugin.zip` chỉ là artifact do build sinh ra từ `src/` — xem mục 8.
+- `plugin.zip` do build sinh ra từ `src/` và **được commit kèm** để app
+  cài được từ URL repo — xem mục 8.
 - Không sửa code trong zip; muốn sửa thì sửa `src/` rồi build lại.
 
 ## 5. Registry sinh tự động — không sửa tay
@@ -97,12 +98,18 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   giá trị thật; cảnh báo rõ "không nhập mật khẩu vào plugin, dùng lại
   session trình duyệt".
 
-## 8. plugin.zip là artifact — không commit zip
+## 8. plugin.zip — commit kèm để app cài được từ URL repo
 
-- `plugin.zip` do build sinh ra, **KHÔNG commit** (chỉ commit `src/` +
-  `plugin.json` + `icon.png` + `test.json`).
-- `.gitignore` chặn `*.zip` ở mọi nơi trong repo. Quyết định này cũng được
-  ghi trong `README.md`.
+- `plugin.zip` do build sinh ra từ `src/`, **được commit kèm** với nguồn
+  (quyết định của Anh ngày 2026-11-06; trước đó zip không commit). Lý do:
+  registry trỏ tới
+  `raw.githubusercontent.com/.../extensions/<loại>/<tên>/plugin.zip` nên
+  app vBook chỉ cài được khi zip có mặt trên GitHub.
+- `.gitignore` chặn `*.zip` nhưng chừa `extensions/**/plugin.zip`.
+- Sau mỗi thay đổi trong `src/` phải **rebuild zip ngay**; `validate`
+  kiểm tra mỗi nguồn đều có `plugin.zip` và nội dung zip khớp `src/`
+  hiện tại (plugin.json + src/*.js + file lib đã inline).
+- Không commit file .zip nào khác (zip thử, zip tạm).
 
 ## 9. Cơ chế lib-inline (lib/ chỉ là nguồn mẫu)
 

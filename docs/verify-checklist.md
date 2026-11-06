@@ -75,5 +75,6 @@ Mục nào không áp dụng thì ghi rõ lý do, không bỏ qua im lặng.
 - [ ] Đã bump version ở **cả** manifest nguồn **và** registry gốc.
 - [ ] Đã chạy build-catalog để sinh lại `plugin.json` gốc — không sửa tay
       registry.
-- [ ] `plugin.zip` **không** được commit (đã chặn bởi `.gitignore`).
+- [ ] `plugin.zip` đã commit kèm và khớp với `src/` hiện tại (để app
+      cài được từ URL repo).
 - [ ] `STATUS.md` sẽ được CI cập nhật — không sửa tay trạng thái nguồn.

@@ -5,7 +5,7 @@
 Thư mục này chứa các nguồn AI (tóm tắt, gợi ý, trò chuyện… gắn với truyện).
 
 Mỗi nguồn là một thư mục con với: `icon.png` + `plugin.json` + `src/` + `test.json`
-(`plugin.zip` do build sinh ra, không commit).
+(`plugin.zip` do build sinh ra, commit kèm để app cài được từ URL repo).
 
 Script dùng cho loại này: `home.js`, `search.js`, `detail.js`, `chap.js`
 (tùy theo tính năng AI của nguồn; khai báo đủ trong script map).

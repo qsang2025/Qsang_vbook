@@ -36,8 +36,9 @@
 ## Quy tắc khác
 
 - Branch mặc định là `main`; mọi URL registry dùng `main`.
-- `plugin.json` gốc sinh tự động — không sửa tay. `plugin.zip` là
-  artifact — không commit (đã chặn bởi `.gitignore`).
+- `plugin.json` gốc sinh tự động — không sửa tay. `plugin.zip` của nguồn
+  được commit kèm (để app cài được từ URL repo); zip thử/zip tạm vẫn bị
+  `.gitignore` chặn.
 - Lỗi trả `Response.error` tiếng Việt, không `return null`. Locale chuẩn
   `vi_VN` / `zh_CN` / `ja_JP` / `en_US`. Không `encrypt: true` mặc định.
 - Thảo luận bằng tiếng Việt. PR mô tả rõ: nguồn nào, site nào, đã chạy

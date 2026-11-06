@@ -5,7 +5,7 @@
 Thư mục này chứa các nguồn truyện tranh / manga / manhwa / manhua.
 
 Mỗi nguồn là một thư mục con với: `icon.png` + `plugin.json` + `src/` + `test.json`
-(`plugin.zip` do build sinh ra, không commit).
+(`plugin.zip` do build sinh ra, commit kèm để app cài được từ URL repo).
 
 Script dùng cho loại này: `home.js`, `genre.js`, `search.js`, `detail.js`,
 `toc.js`, `chap.js` (chap trả về danh sách ảnh của chương).

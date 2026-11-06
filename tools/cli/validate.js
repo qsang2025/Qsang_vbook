@@ -16,8 +16,10 @@
 //   (f) locale thuộc tập chuẩn, type thuộc tập chuẩn;
 //   (g) test.json (nếu có) đúng định dạng golden fixture
 //       {"script", "input", "expect"} (một case hoặc mảng các case);
-//   (h) không có file plugin.zip nào trong extensions/ (zip là artifact,
-//       không commit).
+//   (h) mỗi nguồn phải có plugin.zip đã commit kèm (để app cài được từ
+//       URL repo); nội dung zip phải khớp src/ hiện tại (plugin.json +
+//       src/*.js + file lib đã inline); không có file .zip lạ nào khác
+//       trong extensions/.
 //   (+) branch trong URL registry phải là "main" (theo AGENTS.md mục 5).
 //
 // In từng lỗi rõ ràng bằng tiếng Việt + tổng kết số nguồn đã kiểm tra.
@@ -25,6 +27,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const zlib = require("zlib");
 
 const REPO = "qsang2025/Qsang_vbook";
 const BRANCH = "main";
@@ -45,7 +48,8 @@ function printHelp() {
       "\n" +
       "Kiểm tra toàn bộ repo: JSON hợp lệ, catalog ≡ đĩa, version khớp,\n" +
       "script map khớp file trong src/, không có file .js mồ côi, locale/type\n" +
-      "chuẩn, test.json đúng định dạng golden fixture, không có plugin.zip\n" +
+      "chuẩn, test.json đúng định dạng golden fixture, mỗi nguồn có plugin.zip\n" +
+      "đã commit kèm và khớp nội dung src/ hiện tại, không có file .zip lạ\n" +
       "trong extensions/, branch trong URL registry là \"main\".\n" +
       "\n" +
       "Exit code: 0 khi pass (kể cả khi chưa có extension nào),\n" +
@@ -115,6 +119,138 @@ function findLoads(srcDir) {
     while ((m = re.exec(text)) !== null) loaded.add(path.basename(m[1]));
   }
   return loaded;
+}
+
+// ---- Đọc file .zip bằng Node stdlib (fs + zlib, không cần dependency) ----
+// Trả về { ok, entries, buf } — entries là mảng
+// { name, method, compSize, size, localOff }.
+function readZipEntries(zipPath) {
+  const buf = fs.readFileSync(zipPath);
+  // Tìm End Of Central Directory trong 64KB cuối file.
+  let eocd = -1;
+  const min = Math.max(0, buf.length - 65557);
+  for (let i = buf.length - 22; i >= min; i--) {
+    if (buf.readUInt32LE(i) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd === -1) return { ok: false, error: "không tìm được End Of Central Directory" };
+  const total = buf.readUInt16LE(eocd + 10);
+  let off = buf.readUInt32LE(eocd + 16);
+  const entries = [];
+  for (let n = 0; n < total; n++) {
+    if (off + 46 > buf.length || buf.readUInt32LE(off) !== 0x02014b50) {
+      return { ok: false, error: "central directory hỏng ở entry " + n };
+    }
+    const method = buf.readUInt16LE(off + 10);
+    const compSize = buf.readUInt32LE(off + 20);
+    const size = buf.readUInt32LE(off + 24);
+    const nameLen = buf.readUInt16LE(off + 28);
+    const extraLen = buf.readUInt16LE(off + 30);
+    const commentLen = buf.readUInt16LE(off + 32);
+    const localOff = buf.readUInt32LE(off + 42);
+    const name = buf.toString("utf8", off + 46, off + 46 + nameLen);
+    entries.push({ name: name, method: method, compSize: compSize, size: size, localOff: localOff });
+    off += 46 + nameLen + extraLen + commentLen;
+  }
+  return { ok: true, entries: entries, buf: buf };
+}
+
+// Giải nén 1 entry (method 0 = stored, 8 = deflate) thành Buffer; null nếu
+// không đọc được hoặc method không hỗ trợ.
+function inflateEntry(zip, entry) {
+  try {
+    const buf = zip.buf;
+    const off = entry.localOff;
+    if (off + 30 > buf.length || buf.readUInt32LE(off) !== 0x04034b50) return null;
+    const nameLen = buf.readUInt16LE(off + 26);
+    const extraLen = buf.readUInt16LE(off + 28);
+    const start = off + 30 + nameLen + extraLen;
+    const data = buf.slice(start, start + entry.compSize);
+    if (entry.method === 0) return data;
+    if (entry.method === 8) return zlib.inflateRawSync(data);
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// (h) plugin.zip đã commit kèm và khớp nội dung src/ hiện tại.
+// Quy tắc (quyết định 2026-11-06): app cài từ URL repo nên mỗi nguồn phải
+// có plugin.zip trên GitHub; zip lệch với src/ thì người dùng sẽ cài phải
+// bản cũ. Kiểm tra bằng cách đọc thẳng nội dung zip:
+//   - đủ entry: plugin.json, icon.png (nếu có trên đĩa), toàn bộ file
+//     trong src/, cộng file lib đã inline (tên trong load() mà có trong lib/);
+//   - không có entry lạ (trừ entry thư mục như "src/");
+//   - nội dung từng entry khớp byte với file tương ứng trên đĩa
+//     (src/*.js so với src/, file lib so với lib/).
+function validateZipContents(s, label, libNames) {
+  const zipPath = path.join(s.dir, "plugin.zip");
+  if (!fs.existsSync(zipPath)) {
+    err(label + " thiếu plugin.zip — app cài từ URL repo sẽ lỗi 404. " +
+      "Chạy \"node tools/cli/build.js extensions/" + s.rel + "\" để đóng zip rồi commit kèm.");
+    return;
+  }
+  let zip;
+  try {
+    zip = readZipEntries(zipPath);
+  } catch (e) {
+    err(label + " không đọc được plugin.zip: " + e.message);
+    return;
+  }
+  if (!zip.ok) {
+    err(label + " plugin.zip hỏng: " + zip.error);
+    return;
+  }
+
+  // Bản đồ entry trong zip -> file trên đĩa để so nội dung.
+  const expected = new Map(); // tên entry -> đường dẫn đĩa
+  expected.set("plugin.json", path.join(s.dir, "plugin.json"));
+  if (fs.existsSync(path.join(s.dir, "icon.png"))) {
+    expected.set("icon.png", path.join(s.dir, "icon.png"));
+  }
+  const srcDir = path.join(s.dir, "src");
+  if (fs.existsSync(srcDir)) {
+    fs.readdirSync(srcDir).forEach(function (f) {
+      const full = path.join(srcDir, f);
+      if (fs.statSync(full).isFile()) expected.set("src/" + f, full);
+    });
+  }
+  const loaded = findLoads(srcDir);
+  loaded.forEach(function (name) {
+    if (libNames.has(name) && !expected.has("src/" + name)) {
+      expected.set("src/" + name, path.join(repoRoot(), "lib", name));
+    }
+  });
+
+  const seen = new Set();
+  zip.entries.forEach(function (entry) {
+    if (entry.name.endsWith("/")) return; // entry thư mục (vd. "src/")
+    seen.add(entry.name);
+    const diskPath = expected.get(entry.name);
+    if (!diskPath) {
+      err(label + " plugin.zip chứa entry lạ \"" + entry.name +
+        "\" không có trên đĩa — rebuild zip từ src/ hiện tại.");
+      return;
+    }
+    if (!fs.existsSync(diskPath)) {
+      err(label + " plugin.zip chứa \"" + entry.name +
+        "\" nhưng không tìm được file gốc trên đĩa.");
+      return;
+    }
+    const content = inflateEntry(zip, entry);
+    if (content === null) {
+      err(label + " không giải nén được \"" + entry.name + "\" trong plugin.zip.");
+      return;
+    }
+    if (!content.equals(fs.readFileSync(diskPath))) {
+      err(label + " plugin.zip lệch với src/: \"" + entry.name +
+        "\" trong zip khác file trên đĩa — rebuild zip rồi commit lại.");
+    }
+  });
+  expected.forEach(function (diskPath, name) {
+    if (!seen.has(name)) {
+      err(label + " plugin.zip thiếu \"" + name + "\" — rebuild zip từ src/ hiện tại.");
+    }
+  });
 }
 
 function validateTestJson(source, file) {
@@ -296,19 +432,16 @@ function main() {
     const testPath = path.join(s.dir, "test.json");
     if (fs.existsSync(testPath)) validateTestJson(s, testPath);
 
-    // (h) không có plugin.zip trong thư mục nguồn.
-    if (fs.existsSync(path.join(s.dir, "plugin.zip"))) {
-      err(label + " có file plugin.zip trong thư mục nguồn — zip là artifact, " +
-        "không commit (đã có trong .gitignore). Xóa file này đi.");
-    }
+    // (h) plugin.zip đã commit kèm và khớp nội dung src/ hiện tại.
+    validateZipContents(s, label, libNames);
   });
 
   // (h) quét toàn bộ extensions/ xem còn file .zip nào khác không
-  // (plugin.zip trong từng nguồn đã báo ở trên nên bỏ qua ở đây để
+  // (plugin.zip trong từng nguồn đã kiểm tra ở trên nên bỏ qua ở đây để
   // không báo trùng cùng một file hai lần).
   walkFiles(path.join(root, "extensions"), "extensions").forEach(function (rel) {
     if (rel.toLowerCase().endsWith(".zip") && path.basename(rel).toLowerCase() !== "plugin.zip") {
-      err("có file zip trong extensions/: " + rel + " — zip là artifact, không commit.");
+      err("có file zip lạ trong extensions/: " + rel + " — chỉ plugin.zip của nguồn mới được commit, xóa file này đi.");
     }
   });
 
