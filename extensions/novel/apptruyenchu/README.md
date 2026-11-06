@@ -33,29 +33,41 @@ Truyện Dịch & Truyện Convert), viết mới hoàn toàn từ khảo sát s
 - Ảnh bìa: bóc URL gốc từ tham số `url=` của `/_next/image` (CDN
   `cdn.truyenonl.net`, `s2.ttyapi.site`).
 
-## Giới hạn đã biết — mục lục (toc)
+## Mục lục (toc) — lấy qua Next.js Server Action (đã giải quyết, v2)
 
-**Danh sách chương KHÔNG có trong HTML tải lần đầu.** Trang chi tiết chỉ
-có 2 link chương trong HTML: nút "Đọc truyện" (chương 1) và link "Chương
-mới nhất" (chương cuối). Danh sách đầy đủ được tải bằng JavaScript phía
-client từ một API/Firebase ẩn — đã thử nhiều cách (xem nguồn, DevTools
-Network, sitemap, route `/api/...` đoán mò, Firebase service worker) nhưng
-trình duyệt hiện tại không xem được Network/JS nên chưa tìm ra URL đó.
-Sitemap của site cũng chỉ liệt kê 10 chương đầu mỗi truyện, không dùng
-làm mục lục được. URL chương thiếu slug tên (vd `/chuong-2` khi chương
-thật là `/chuong-2-nhiem-vu-hoan-thanh`) thì site trả lỗi "Application
-error: a server-side exception" — nên không liệt kê chương bằng cách
-đoán số được.
+Danh sách chương KHÔNG có trong HTML tải lần đầu (trang chi tiết chỉ có
+2 link chương: nút "Đọc truyện" và link "Chương mới nhất"), sitemap chỉ
+liệt kê 10 chương đầu mỗi truyện, và URL chương thiếu slug tên
+(vd `/chuong-2` khi chương thật là `/chuong-2-nhiem-vu-hoan-thanh`) thì
+site trả lỗi "Application error" — nên không liệt kê chương bằng cách đoán
+số được.
 
-`toc.js` hiện làm 3 lớp (link trong DOM + regex trên HTML thô để bắt dữ
-liệu Next.js nhúng + sắp xếp theo số chương) và trả về những chương tìm
-được (thường là chương 1 + chương mới nhất), kèm log cảnh báo số lượng
-thiếu. Đọc chương 1 và chương mới nhất vẫn chạy; đọc giữa truyện thì
-chưa có mục lục đầy đủ.
+Cách lấy đúng (tìm ra nhờ phân tích code JS của site, xác minh bằng curl
+ngày 2026-11-06: HTTP 200, trả về đủ 2.479 chương cho truyện mẫu):
 
-**Việc cần làm tiếp:** mở trang chi tiết một truyện trên máy tính, bấm
-F12 → tab Network → tải lại trang, tìm request trả về danh sách chương
-và copy URL của nó. Có URL đó thì `toc.js` đổi sang gọi API là xong.
+1. Lấy `bookId` (24 ký tự hex) trong HTML trang chi tiết, dạng
+   `"bookId":"<24 hex>"` (nằm trong dữ liệu RSC nhúng của Next.js).
+2. `POST` về chính URL truyện với header
+   `Next-Action: 40846d9ab28025db6a72550e98f102a4cdecf4a9a7`
+   (ID của Server Action `fetchChaptersOfBook`),
+   `Content-Type: text/plain;charset=UTF-8`,
+   `Accept: text/x-component`, body JSON `["<bookId>"]`.
+3. Response là stream Server Action; dòng bắt đầu `1:[` là mảng JSON
+   `[{value, label, slugId, number, isLock}, ...]`. URL chương =
+   `/truyen/<slug>/<slugId>`.
+
+`toc.js` (v2) làm theo đúng 3 bước trên; nếu Server Action thất bại thì
+fallback về link chương trong DOM (chương 1 + chương mới nhất) thay vì
+báo lỗi ngay.
+
+**Lưu ý bảo trì:** `Next-Action` ID là hash sinh lúc build website, cố
+định ở bản build hiện tại. Nếu site deploy bản mới và đổi ID (dấu hiệu:
+toc chỉ trả 2 chương, log báo Server Action thất bại), lấy ID mới bằng
+cách tải file chunk JS chứa chuỗi `fetchChaptersOfBook` (tìm trong HTML
+thẻ `<script src="/_next/static/chunks/...js">`) rồi regex
+`createServerReference\("([a-f0-9]{40})"[^)]*"fetchChaptersOfBook"\)`.
+Firebase của site chỉ dùng cho Auth (đăng nhập), không dùng để lấy chương
+nên extension không cần cấu hình Firebase.
 
 ## Kiểm thử
 

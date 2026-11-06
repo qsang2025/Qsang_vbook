@@ -1,19 +1,21 @@
 // toc.js — muc luc chuong cua App Truyen Chu.
 //
-// GIOI HAN DA BIET (khao sat 2026-11-06, xem README cua extension):
-// Danh sach chuong KHONG co trong HTML tai lan dau cua trang chi tiet —
-// site tai no bang JavaScript phia client (API/Firebase an, chua tim ra
-// duoc URL). Trong HTML chi co 2 link chuong: nut "Doc truyen" (chuong 1)
-// va link "Chuong moi nhat" (chuong cuoi). Sitemap cua site cung chi liet
-// ke 10 chuong dau moi truyen. Vi vay toc.js lam 3 lop:
-//   1. Link chuong trong DOM: a[href*="/chuong-"].
-//   2. Regex tren HTML tho (doc.html()): bat cac URL chuong co the nam
-//      trong du lieu Next.js nhung (flight data) ma cay DOM khong thay.
-//   3. Sap xep theo so chuong, bo trung (site render 2 ban mobile/desktop).
-// Neu chi tim duoc chuong 1 + chuong moi nhat thi van tra ve chung (de doc
-// duoc 2 dau moc) va ghi log canh bao so luong thieu so voi tong so chuong
-// doc duoc tren trang. Khi nao tim ra API danh sach chuong cua site thi
-// thay the ham nay bang ban goi API.
+// Cach site lay danh sach chuong (tim ra nho phan tich code JS cua site,
+// xac minh bang curl 2026-11-06: HTTP 200, tra ve du 2.479 chuong cho
+// truyen mau): Next.js Server Action fetchChaptersOfBook.
+//   1. Lay bookId (24 ky tu hex) trong HTML trang chi tiet, dang
+//      "bookId":"<24 hex>" (nam trong du lieu RSC nhung cua Next.js).
+//   2. POST ve chinh URL truyen voi header Next-Action = ID cua action,
+//      body JSON ["<bookId>"].
+//   3. Response la stream Server Action; dong bat dau "1:[" la mang JSON
+//      [{value, label, slugId, number, isLock}, ...]. URL chuong =
+//      /truyen/<slug>/<slugId>.
+// Next-Action ID la hash sinh luc build website (co dinh hien tai); neu
+// site deploy ban moi va doi ID thi lay lai ID moi tu file chunk JS chua
+// chuoi "fetchChaptersOfBook" (xem README cua extension).
+// Neu Server Action that bai (het bookId, POST loi, response khong co
+// dong 1:[) thi fallback ve link chuong trong DOM (chuong 1 + chuong moi
+// nhat) thay vi bao loi ngay.
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
 // helper.js vao src/.
@@ -23,8 +25,70 @@ load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
 
-// Ten chuong tu text cua link: uu tien phan "Chuong N: <ten>" neu co,
-// neu khong thi "Chuong N".
+// ID cua Next.js Server Action fetchChaptersOfBook (hash build-time cua
+// website; xac minh 2026-11-06).
+var CHAPTER_ACTION_ID = "40846d9ab28025db6a72550e98f102a4cdecf4a9a7";
+
+// Trich bookId (24 ky tu hex) tu HTML tho cua trang chi tiet.
+// Trong flight data cua Next.js, gia tri nam dang \"bookId\":\"...\" (dau
+// ngoac kep da escape) hoac "bookId":"..." (dau ngoac kep thuong) tuy cach
+// doc HTML, nen thu ca hai mau.
+function extractBookId(raw) {
+    var m = raw.match(/bookId\\":\\"([a-f0-9]{24})\\"/);
+    if (m) return m[1];
+    m = raw.match(/["']bookId["']\s*:\s*["']([a-f0-9]{24})["']/i);
+    if (m) return m[1];
+    return "";
+}
+
+// Goi Server Action fetchChaptersOfBook, tra ve mang chuong tho
+// [{label, slugId, number, isLock}] hoac null neu that bai.
+function fetchChaptersViaAction(bookUrl, bookId) {
+    var res = null;
+    try {
+        res = fetch(bookUrl, {
+            method: "POST",
+            headers: {
+                "Next-Action": CHAPTER_ACTION_ID,
+                "Content-Type": "text/plain;charset=UTF-8",
+                "Accept": "text/x-component"
+            },
+            body: JSON.stringify([bookId])
+        });
+    } catch (e) {
+        Console.log("toc POST Server Action loi: " + e);
+        return null;
+    }
+    if (!res || !res.ok) {
+        Console.log("toc POST Server Action HTTP " + (res ? res.status : 0));
+        return null;
+    }
+    var text = "";
+    try {
+        text = String(res.text());
+    } catch (e2) {
+        Console.log("toc doc response Server Action loi: " + e2);
+        return null;
+    }
+    var lines = text.split("\n");
+    var i = 0;
+    for (i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("1:[") === 0) {
+            try {
+                var arr = JSON.parse(lines[i].substring(2));
+                if (arr instanceof Array) return arr;
+            } catch (e3) {
+                Console.log("toc parse dong 1:[ loi: " + e3);
+            }
+            return null;
+        }
+    }
+    Console.log("toc: response Server Action khong co dong 1:[");
+    return null;
+}
+
+// Ten chuong tu text cua link (dung cho duong fallback): uu tien phan
+// "Chuong N: <ten>" neu co, neu khong thi "Chuong N".
 function tocChapterName(url, linkText) {
     var n = chapterNumber(url);
     var t = dedupeTitle(cleanText(linkText || ""));
@@ -34,14 +98,12 @@ function tocChapterName(url, linkText) {
     return t || url;
 }
 
-function execute(url) {
-    url = normalizeUrl(url);
-    var doc = fetchDoc(url);
-    if (!doc) return Response.error("Không tải được mục lục: " + url);
-
+// Duong fallback: gom link chuong trong DOM + regex tren HTML tho
+// (chi tim duoc chuong 1 + chuong moi nhat vi danh sach day du khong co
+// trong HTML). Tra ve mang chuong {name, url, description, lock, pay}.
+function collectDomChapters(doc, raw, slug) {
     var chapters = [];
     var seen = {};
-    var slug = bookSlug(url);
 
     function addChapter(link, text) {
         if (!link) return;
@@ -60,16 +122,13 @@ function execute(url) {
         });
     }
 
-    // Lop 1: link chuong trong DOM.
     doc.select("a[href]").forEach(function (el) {
         var href = el.attr("href");
         if (!href || href.indexOf("/chuong-") === -1) return;
         addChapter(href, el.text());
     });
 
-    // Lop 2: regex tren HTML tho (du lieu Next.js nhung, neu co).
     try {
-        var raw = String(doc.html());
         var re = new RegExp("/truyen/" + slug + "/chuong-(\\d+)(?:-[^\"'\\s<>]*)?", "g");
         var m = null;
         while ((m = re.exec(raw)) !== null) {
@@ -79,18 +138,7 @@ function execute(url) {
         Console.log("toc regex HTML tho loi: " + e);
     }
 
-    if (chapters.length === 0) {
-        return Response.error("Không đọc được mục lục (danh sách chương của site tải bằng JavaScript, chưa lấy được): " + url);
-    }
-
-    // Sap xep theo so chuong tang dan.
     chapters.sort(function (a, b) { return a.num - b.num; });
-
-    var total = totalChapters(cleanText(doc.text()));
-    if (total > 0 && chapters.length < total) {
-        Console.log("toc CHUA DU: chi tim duoc " + chapters.length + "/" + total + " chuong — danh sach day du can API cua site (xem README).");
-    }
-
     var out = [];
     var i = 0;
     for (i = 0; i < chapters.length; i++) {
@@ -102,5 +150,78 @@ function execute(url) {
             pay: false
         });
     }
-    return Response.success(out);
+    return out;
+}
+
+function execute(url) {
+    url = normalizeUrl(url);
+    var slug = bookSlug(url);
+
+    // Tai HTML tho cua trang chi tiet (1 lan duy nhat, dung cho ca 2 duong).
+    var res = null;
+    try {
+        res = fetch(url);
+    } catch (e) {
+        return Response.error("Không tải được trang truyện: " + url);
+    }
+    if (!res || !res.ok) {
+        return Response.error("Không tải được trang truyện (HTTP " + (res ? res.status : 0) + "): " + url);
+    }
+    var raw = "";
+    try {
+        raw = String(res.text());
+    } catch (e2) {
+        return Response.error("Không đọc được trang truyện: " + url);
+    }
+    var doc = Html.parse(raw);
+
+    // Duong chinh: Server Action fetchChaptersOfBook.
+    var bookId = extractBookId(raw);
+    if (bookId) {
+        var data = fetchChaptersViaAction(url, bookId);
+        if (data && data.length > 0) {
+            var chapters = [];
+            var i = 0;
+            for (i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (!item || !item.slugId) continue;
+                chapters.push({
+                    name: cleanText(item.label || ("Chương " + item.number)),
+                    url: absUrl("/truyen/" + slug + "/" + item.slugId),
+                    num: item.number || 0,
+                    description: "",
+                    lock: !!item.isLock,
+                    pay: false
+                });
+            }
+            chapters.sort(function (a, b) { return a.num - b.num; });
+            var out = [];
+            var j = 0;
+            for (j = 0; j < chapters.length; j++) {
+                out.push({
+                    name: chapters[j].name,
+                    url: chapters[j].url,
+                    description: "",
+                    lock: chapters[j].lock,
+                    pay: false
+                });
+            }
+            Console.log("toc Server Action: " + out.length + " chuong");
+            return Response.success(out);
+        }
+        Console.log("toc Server Action that bai, chuyen sang fallback DOM");
+    } else {
+        Console.log("toc: khong tim duoc bookId trong HTML, chuyen sang fallback DOM");
+    }
+
+    // Duong fallback: link chuong trong DOM (chuong 1 + chuong moi nhat).
+    var fallback = collectDomChapters(doc, raw, slug);
+    if (fallback.length === 0) {
+        return Response.error("Không đọc được mục lục (Server Action lỗi và trang không có link chương): " + url);
+    }
+    var total = totalChapters(cleanText(doc.text()));
+    if (total > 0 && fallback.length < total) {
+        Console.log("toc CHUA DU: chi tim duoc " + fallback.length + "/" + total + " chuong — Server Action that bai, xem README.");
+    }
+    return Response.success(fallback);
 }
