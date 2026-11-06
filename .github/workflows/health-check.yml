@@ -1,0 +1,197 @@
+# health-check.yml — CI kiểm tra sức khỏe các nguồn vBook (hàng tuần + chạy tay).
+#
+# LƯU Ý TRUNG THỰC: CI chạy trên máy chủ GitHub, KHÔNG có điện thoại và
+# không có developer server của app vBook, nên KHÔNG chạy được `testall`
+# (test thật trên thiết bị). Vì vậy:
+#   - Job 1 (validate-build) LUÔN chạy, không cần secret, không cần điện thoại:
+#     validate + build-catalog --check + build thử + kiểm tra golden fixture.
+#   - Job 2 (device-test) CHỈ chạy khi chạy tay (workflow_dispatch) VÀ đã
+#     cấu hình secret VBOOK_SERVER (URL developer server trên điện thoại
+#     thật, bật debug/dev mode trong app vBook). Không có điện thoại/dev
+#     server thì job này không chạy được — đó là giới hạn thật, không phải
+#     lỗi cấu hình.
+#   - Job 3 (status) chạy sau job 1: sinh/cập nhật STATUS.md từ kết quả.
+#     Hiện chưa có extension nào nên STATUS.md ban đầu ghi "chưa có nguồn nào";
+#     khi có nguồn, job này ghi kết quả testall (WORK/MOVED/AUTH/EMPTY/
+#     CRASH/UNREACHABLE) vào STATUS.md nếu có file test-results.json
+#     (do job 2 hoặc một lần chạy tay nộp lên), rồi commit lại nếu có thay đổi.
+name: health-check
+
+on:
+  schedule:
+    # 01:00 UTC thứ Hai hàng tuần.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Job 1 — LUÔN CHẠY, không cần secret, không cần điện thoại.
+  # Kiểm tra tĩnh toàn repo + build thử để bắt lỗi sớm.
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Cài Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate repo (catalog ≡ đĩa, JSON, version, script map, fixture...)
+        run: node tools/cli/validate.js
+
+      - name: Kiểm tra registry khớp với đĩa (không sửa tay plugin.json)
+        run: node tools/cli/build-catalog.js --check
+
+      # Build thử template novel chỉ để kiểm tra cơ chế build + lib-inline
+      # (templates/novel là template mẫu của skeleton, không phải nguồn thật).
+      # Zip thử bỏ đi ngay sau đó, không commit.
+      - name: Build thử template novel (kiểm tra cơ chế, zip thử bỏ đi)
+        run: |
+          node tools/cli/build.js templates/novel /tmp/template-novel-test.zip
+          rm -f /tmp/template-novel-test.zip
+
+  # Job 2 — CHỈ CHẠY khi chạy tay VÀ có secret VBOOK_SERVER.
+  # Test thật từng nguồn qua developer server trên điện thoại (testall).
+  # Không có điện thoại/dev-server thì job này bị bỏ qua, không làm fail CI.
+  device-test:
+    needs: validate-build
+    if: ${{ github.event_name == 'workflow_dispatch' && secrets.VBOOK_SERVER != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Cài Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # testall cần thiết bị thật: điện thoại mở app vBook, bật debug/dev
+      # mode để có developer server; URL server nằm trong secret VBOOK_SERVER.
+      # vbook.js đọc server từ biến môi trường VBOOK_SERVER.
+      - name: Chạy testall qua developer server
+        env:
+          VBOOK_SERVER: ${{ secrets.VBOOK_SERVER }}
+        run: |
+          EXTS=$(find extensions -mindepth 2 -maxdepth 2 -name plugin.json -exec dirname {} \; | sort)
+          if [ -z "$EXTS" ]; then
+            echo "Chưa có extension nào — bỏ qua testall."
+            exit 0
+          fi
+          # shellcheck disable=SC2086
+          node scripts/vbook.js testall $EXTS --json test-results.json
+
+      - name: Lưu kết quả testall làm artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.json
+          if-no-files-found: ignore
+
+  # Job 3 — CHẠY SAU job 1 (và sau job 2 nếu job 2 có chạy).
+  # Sinh/cập nhật STATUS.md từ kết quả validate + kết quả testall (nếu có),
+  # rồi commit lại nếu có thay đổi (dùng GITHUB_TOKEN).
+  status:
+    needs: [validate-build, device-test]
+    # device-test có thể bị skip (không chạy tay / không có secret) nên dùng
+    # always(); chỉ cần job 1 thành công là đủ để cập nhật STATUS.md.
+    if: ${{ always() && needs.validate-build.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Lấy file test-results.json của job 2 nếu có (job 2 chạy tay có
+      # VBOOK_SERVER). Không có thì bỏ qua, STATUS.md ghi "chưa chạy testall".
+      - name: Lấy kết quả testall (nếu job 2 đã chạy)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: test-results
+          path: .
+
+      - name: Sinh STATUS.md
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+
+          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+          with open("plugin.json", encoding="utf-8") as f:
+              registry = json.load(f)
+          entries = registry.get("data") or []
+
+          lines = []
+          lines.append("# STATUS — Trạng thái các nguồn (sinh tự động)")
+          lines.append("")
+          lines.append("> Cập nhật lần cuối: %s (CI health-check hàng tuần + chạy tay)." % now)
+          lines.append("> File này **không sửa tay**. GitHub Actions sinh lại file này;")
+          lines.append("> muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.")
+          lines.append("")
+          if not entries:
+              lines.append("**Chưa có nguồn nào.** Repo mới lập khung sườn, thư mục `extensions/` vẫn")
+              lines.append("trống. Bảng dưới đây sẽ được điền khi nguồn đầu tiên được thêm vào.")
+              lines.append("")
+          lines.append("## Kiểm tra tĩnh (job validate-build)")
+          lines.append("")
+          lines.append("- `validate`: PASS — catalog ≡ đĩa, JSON hợp lệ, version khớp,")
+          lines.append("  script map khớp file trong `src/`, golden fixture (`test.json`) đúng định dạng,")
+          lines.append("  không có `plugin.zip` nào trong `extensions/`.")
+          lines.append("- `build-catalog --check`: PASS — registry khớp với các nguồn trên đĩa.")
+          lines.append("- Build thử template novel: PASS (chỉ kiểm tra cơ chế, zip thử đã bỏ đi).")
+          lines.append("")
+          lines.append("## Trạng thái nguồn")
+          lines.append("")
+          results = {}
+          if os.path.isfile("test-results.json"):
+              try:
+                  with open("test-results.json", encoding="utf-8") as f:
+                      for row in json.load(f):
+                          results[row.get("ext")] = row
+              except (OSError, ValueError):
+                  pass
+          if not entries:
+              lines.append("Chưa có nguồn nào để kiểm tra.")
+          else:
+              lines.append("| Nguồn | Loại | Trạng thái testall | Ghi chú |")
+              lines.append("|---|---|---|---|")
+              for e in entries:
+                  # test-results.json ghi ext theo đường dẫn thư mục, vd. extensions/novel/ten.
+                  ext_dir = e.get("path", "").replace(
+                      "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/", ""
+                  ).replace("/plugin.zip", "")
+                  row = results.get(ext_dir) or {}
+                  status = row.get("status") or "CHƯA TEST"
+                  note = row.get("note") or ""
+                  if status == "CHƯA TEST":
+                      note = "chưa chạy testall (cần thiết bị thật / VBOOK_SERVER)"
+                  lines.append("| %s | %s | %s | %s |" % (
+                      e.get("name", "?"), e.get("type", "?"), status, note))
+              lines.append("")
+              lines.append("Trạng thái testall: WORK (chạy tốt), MOVED (site đổi domain),")
+              lines.append("AUTH/MSG (site chặn/yêu cầu đăng nhập), EMPTY (trả về rỗng),")
+              lines.append("CRASH (script lỗi), UNREACHABLE (không tới được developer server).")
+          lines.append("")
+          with open("STATUS.md", "w", encoding="utf-8") as f:
+              f.write("\n".join(lines))
+          print("Đã sinh STATUS.md (%d nguồn)." % len(entries))
+          PY
+
+      - name: Commit STATUS.md nếu có thay đổi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add STATUS.md
+          if git diff --cached --quiet; then
+            echo "STATUS.md không thay đổi — không commit."
+          else
+            git commit -m "chore(ci): cập nhật STATUS.md [skip ci]"
+            git push
+          fi
