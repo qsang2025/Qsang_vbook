@@ -11,7 +11,10 @@ Truyện Dịch & Truyện Convert), viết mới hoàn toàn từ khảo sát s
   (`encrypt: true`, không đọc được) nên **không dùng code** của bản đó.
   Chỉ tham khảo thông tin công khai: tên "App Truyện Chữ", nguồn
   `https://apptruyenchu.pro/`, mô tả "Next.js App Router + Firebase backend",
-  và icon của app (file `icon.png` 64×64, là logo của chính site).
+  và icon của app (file `icon.png` 180×180 — là `apple-icon.png` chính
+  thức của site, kiểm chứng md5 khớp với
+  `https://apptruyenchu.pro/apple-icon.png` ngày 2026-11-06; từ v4 thay
+  cho bản 64×64 lấy từ Ivan1hai trước đó).
 - Khung sườn, skill, template, lib dùng chung: Qsang_vbook (Darkrai9x làm
   chuẩn, xem `README.md` ở root repo).
 
@@ -80,6 +83,28 @@ tiếp từ chuỗi HTML (`scope.html()` + regex) thay vì đi qua `.parent()`.
 **Thẻ truyện:** tác giả + số chương nằm trong 2 thẻ `<p>` (không phải
 `<div>` như đoán ban đầu); chip thể loại trên `/truyen` là `<button>`
 không có `href`, còn trên trang chi tiết thì là link `/truyen?cate=...`.
+
+## Thay đổi v4 (2026-11-06)
+
+- **Sửa bug kẹt trang tìm kiếm (search.js):** trang kết quả tìm kiếm theo
+  từ khóa không render link phân trang `?page=N` trong HTML nên
+  `parseListPage` luôn trả token trang kế rỗng — tìm kiếm kẹt ở trang 1.
+  v4 dò thử trang kế (fetch 1 lần, chỉ chấp nhận khi có truyện mới chưa
+  có ở trang hiện tại) khi trang đủ 20 mục mà không thấy link phân trang.
+  Không dùng mẹo "đủ 20 mục thì chắc còn trang" (sinh trang trống khi tổng
+  đúng bội số của 20). Trang danh sách (book.js) vẫn tính trang kế từ link
+  phân trang như cũ vì các trang đó có pager.
+- **Mô tả detail trả text sạch (detail.js):** strip thẻ HTML + khoảng
+  trắng, giữ nguyên nội dung đầy đủ (~731 ký tự). Không lấy bản preview
+  `line-clamp-4` của JSON-LD (299 ký tự, cắt cụt giữa câu).
+- **"Lượt xem: 17.2K" (detail.js):** giữ hậu tố K/M và dấu chấm phân nghìn
+  trong token số đầu tiên; v3 cắt về `^\d+` nên "17.2K" thành "17".
+- **Ảnh bìa dự phòng JSON-LD (detail.js):** chỉ khi img đầu tiên trong
+  `<main>` lỗi/trống mới thử lấy `Book.image` trong JSON-LD (URL CDN trực
+  tiếp). JSON-LD trên site là mảng `[{@type:"Book",...},
+  {@type:"BreadcrumbList",...}]` — code xử lý cả 2 dạng mảng/đối tượng.
+- **Icon 180×180:** thay bản 64×64 bằng `apple-icon.png` chính thức của
+  site (md5 `37922e46c707108b8beb403c4a7c9e52`).
 
 ## Kiểm thử
 
