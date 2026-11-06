@@ -140,5 +140,8 @@ Muốn tự thêm nguồn: đọc `docs/CONTRIBUTING.md` và
 
 ## Giấy phép
 
-Chưa chốt LICENSE cho repo này. Code tự viết thuộc về Qsang; phần mượn giữ
-nguyên attribution ở bảng trên và tuân thủ LICENSE gốc (nếu có).
+Repo này dùng **MIT License** (file `LICENSE` ở root, copyright Dương Nguyễn
+Quốc Sáng, 2026): ai cũng được dùng, copy, sửa, kể cả dùng vào việc kiếm tiền,
+với điều kiện giữ lại dòng copyright + bản LICENSE. Code tự viết thuộc về
+Qsang; phần mượn giữ nguyên attribution ở bảng trên và tuân thủ LICENSE gốc
+(nếu có).

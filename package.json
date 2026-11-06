@@ -10,6 +10,7 @@
     "audio",
     "rhino-es6"
   ],
+  "license": "MIT",
   "name": "qsang-vbook",
   "private": true,
   "scripts": {

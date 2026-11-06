@@ -161,9 +161,9 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   đọc `LICENSE` của duongden trước khi dùng bất kỳ phần nào từ đó.
 - Không mang theo catalog NSFW hay code mã hóa của repo khác; chỉ mượn
   pattern code.
-- Repo này **chưa chốt LICENSE** — không ghi tên license (vd. MIT) vào
-  `package.json`, `README.md` hay bất kỳ file nào khác khi chưa có file
-  LICENSE thật trong repo.
+- Repo này dùng **MIT License** (file `LICENSE` ở root, copyright Dương
+  Nguyễn Quốc Sáng, 2026 — Anh chốt ngày 2026-11-06). Ghi tên license ở
+  `package.json` / `README.md` phải khớp với file LICENSE thật này.
 
 ## 12. Health-check probe + fixture nhẹ (giai đoạn 1)
 
