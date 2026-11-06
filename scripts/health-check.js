@@ -12,7 +12,13 @@
 //     {name, url, pattern} — GET url rồi tìm pattern (regex, không phân biệt
 //     hoa/thường) trong body. Case lỗi -> DEGRADED.
 //
-// Trạng thái: HEALTHY / MOVED / DEGRADED / BROKEN / NO_SOURCE / UNKNOWN.
+// Trạng thái: HEALTHY / MOVED / DEGRADED / BROKEN / NO_SOURCE / UNKNOWN / BLOCKED.
+// BLOCKED = HTTP 403: site chặn truy cập từ IP của CI (tường lửa Cloudflare
+// chặn dải IP datacenter của GitHub Actions — đã xác minh 2026-11-06: cùng
+// request từ máy này trả HTTP 200, từ runner GitHub trả 403 trong ~90ms).
+// 403 không kết luận được site sống hay chết nên KHÔNG tính là gãy:
+// BLOCKED được ghi vào failures nhưng không tính vào failedCount (để job
+// auto-issue không mở issue sai), và cần kiểm tra tay khi thấy.
 // Ghi health-check-failures.json (để workflow CI mở issue khi có nguồn gãy).
 // Exit 0 khi mọi nguồn HEALTHY, exit 1 khi có bất kỳ nguồn nào không HEALTHY.
 // Không ghi STATUS.md — file đó do job `status` trong workflow sinh.
@@ -55,7 +61,7 @@ function printHelp() {
       "đo latency, theo redirect, kiểm tra các case trong health.json\n" +
       "(nếu có). Ghi health-check-failures.json. Exit 0 khi mọi nguồn\n" +
       "HEALTHY, 1 khi có nguồn MOVED / DEGRADED / BROKEN / NO_SOURCE /\n" +
-      "UNKNOWN."
+      "UNKNOWN / BLOCKED."
   );
 }
 
@@ -262,7 +268,11 @@ async function checkOne(source, root) {
   base.latency = probe.latency + "ms";
 
   if (!probe.ok) {
-    if (probe.status >= 300 && probe.status < 400) {
+    if (probe.status === 403) {
+      // Site chặn IP của CI (Cloudflare) — không kết luận được sống/chết.
+      base.status = "BLOCKED";
+      base.detail = "HTTP 403 — site chặn truy cập từ IP của CI (tường lửa Cloudflare); chưa kết luận được site sống hay chết — kiểm tra tay.";
+    } else if (probe.status >= 300 && probe.status < 400) {
       base.status = "MOVED";
       base.detail = "Kẹt ở redirect HTTP " + probe.status + " (tới " + probe.finalUrl + ").";
     } else {
@@ -294,8 +304,13 @@ async function checkOne(source, root) {
       const label = c.name || ("case " + (i + 1));
       const cp = await probeUrl(c.url);
       if (!cp.ok) {
-        base.status = "DEGRADED";
-        base.detail += " | Fixture \"" + label + "\" lỗi: " + (cp.error || ("HTTP " + cp.status)) + " (" + c.url + ").";
+        if (cp.status === 403) {
+          base.status = "BLOCKED";
+          base.detail += " | Fixture \"" + label + "\" bị chặn: HTTP 403 từ IP của CI (" + c.url + ") — kiểm tra tay.";
+        } else {
+          base.status = "DEGRADED";
+          base.detail += " | Fixture \"" + label + "\" lỗi: " + (cp.error || ("HTTP " + cp.status)) + " (" + c.url + ").";
+        }
         return base;
       }
       if (c.pattern !== undefined && c.pattern !== null && c.pattern !== "") {
@@ -331,17 +346,24 @@ async function runHealthCheck(root) {
     console.log("[" + r.status + "] " + r.name + " -> " + r.detail);
   }
 
-  const counts = { HEALTHY: 0, MOVED: 0, DEGRADED: 0, BROKEN: 0, NO_SOURCE: 0, UNKNOWN: 0 };
+  const counts = { HEALTHY: 0, MOVED: 0, DEGRADED: 0, BROKEN: 0, NO_SOURCE: 0, UNKNOWN: 0, BLOCKED: 0 };
   results.forEach(function (r) {
     if (counts[r.status] === undefined) counts[r.status] = 0;
     counts[r.status]++;
   });
 
+  // failedCount chỉ tính các lỗi thật (không tính BLOCKED) — job auto-issue
+  // trong workflow đọc failedCount để quyết định mở issue. BLOCKED vẫn nằm
+  // trong failures để người đọc thấy và kiểm tra tay.
+  const realFailures = failures.filter(function (f) { return f.status !== "BLOCKED"; });
+  const blockedCount = failures.length - realFailures.length;
+
   const summaryPath = path.join(root, "health-check-failures.json");
   fs.writeFileSync(summaryPath, JSON.stringify({
     timestamp: new Date().toISOString(),
     total: results.length,
-    failedCount: failures.length,
+    failedCount: realFailures.length,
+    blockedCount: blockedCount,
     counts: counts,
     failures: failures
   }, null, 2), "utf8");
@@ -350,7 +372,7 @@ async function runHealthCheck(root) {
     "\nKết quả: " + counts.HEALTHY + "/" + results.length + " HEALTHY" +
     " (MOVED " + counts.MOVED + ", DEGRADED " + counts.DEGRADED +
     ", BROKEN " + counts.BROKEN + ", NO_SOURCE " + counts.NO_SOURCE +
-    ", UNKNOWN " + counts.UNKNOWN + ")."
+    ", UNKNOWN " + counts.UNKNOWN + ", BLOCKED " + counts.BLOCKED + ")."
   );
   return { results: results, failures: failures, counts: counts };
 }
