@@ -112,7 +112,7 @@ function fetchViaBrowser(url) {
             if (browser && browser.close) browser.close();
         } catch (e2) {
         }
-        Console.log("fetchViaBrowser loi: " + e);
+        console.log("fetchViaBrowser loi: " + e);
         return null;
     }
 }
@@ -134,7 +134,7 @@ function fetchPage(url, options) {
             var res = fetch(url, { headers: headers });
             if (res && res.ok) return res;
             var status = res ? res.status : 0;
-            Console.log("fetchPage HTTP " + status + " lan " + (attempt + 1) + ": " + url);
+            console.log("fetchPage HTTP " + status + " lan " + (attempt + 1) + ": " + url);
             lastError = "HTTP " + status;
             // 429: ton trong Retry-After, doi roi thu lai. Loi khac thi dung ngay.
             if (status === 429) {
@@ -143,7 +143,7 @@ function fetchPage(url, options) {
             }
             break;
         } catch (e) {
-            Console.log("fetchPage loi lan " + (attempt + 1) + ": " + e);
+            console.log("fetchPage loi lan " + (attempt + 1) + ": " + e);
             lastError = String(e);
             sleepMs(500 * (attempt + 1));
         }
@@ -155,7 +155,7 @@ function fetchPage(url, options) {
         if (doc) return { doc: doc, ok: true, status: 200, browser: true };
     }
 
-    Console.log("fetchPage that bai: " + url + " (" + lastError + ")");
+    console.log("fetchPage that bai: " + url + " (" + lastError + ")");
     return null;
 }
 
@@ -168,7 +168,7 @@ function fetchDoc(url, options) {
     try {
         return res.html();
     } catch (e) {
-        Console.log("fetchDoc .html() loi: " + e);
+        console.log("fetchDoc .html() loi: " + e);
         return null;
     }
 }
@@ -188,7 +188,7 @@ function fetchWithFallback(url, mirrors) {
         var mirror = String(list[i]).replace(/\/+$/, "");
         if (!mirror) continue;
         var altUrl = url.replace(/^https?:\/\/[^\/]+/, mirror);
-        Console.log("fetchWithFallback thu mirror: " + mirror);
+        console.log("fetchWithFallback thu mirror: " + mirror);
         var r2 = fetchPage(altUrl);
         if (r2) {
             try {

@@ -1,16 +1,21 @@
 load('config.js');
 load('config-helpers.js');
-load('fetch-helpers.js');
 load('helper.js');
+
 // chap.js (video: buoc 1 cua chuoi chap -> track) — HHKUNGFU.
 // Nhan URL tap phim (/watch-<slug>/tap-<N>-sv<S>.html), doc trang xem
 // de lay data-post-id / data-ep / data-sv cua tap do (link tap dang
-// active) va 2 nut server .get-eps ("1080P V1" data-type=tiktik,
-// "1080P V2" data-type=pro). Tra ve 2 muc server; data cua moi muc la
-// URL AJAX player.php — track.js se goi no de lay iframe embed that.
+// active) va cac nut server .get-eps ("1080P V1" data-type=tiktik,
+// "1080P V2" data-type=pro). Tra ve cac server co san kem server
+// du phong "Webview Trang Nguon".
 function execute(url) {
     url = normalizeUrl(url);
-    var response = fetchWithFallback(url);
+    var response = fetch(url, {
+        headers: {
+            "User-Agent": UserAgent.chrome(),
+            "Referer": BASE_URL + "/"
+        }
+    });
     if (!response.ok) return Response.error("Không tải được trang xem (HTTP " + response.status + ")");
     var doc = response.html();
 
@@ -38,16 +43,33 @@ function execute(url) {
         if (!type) return;
         servers.push({
             title: title || ("Server " + type),
-            data: playerUrl(postId, chapter, sv, type)
+            data: JSON.stringify({
+                type: type,
+                postId: postId,
+                chapter: chapter,
+                sv: sv,
+                url: url
+            })
         });
     });
 
-    // Neu trang khong render nut server (doi giao dien), dung 2 server
-    // mac dinh da biet cua site.
+    // Neu trang khong render nut server, dung 2 server mac dinh da biet cua site.
     if (servers.length === 0) {
-        servers.push({ title: "1080P V1", data: playerUrl(postId, chapter, sv, "tiktik") });
-        servers.push({ title: "1080P V2", data: playerUrl(postId, chapter, sv, "pro") });
+        servers.push({
+            title: "1080P V1",
+            data: JSON.stringify({ type: "tiktik", postId: postId, chapter: chapter, sv: sv, url: url })
+        });
+        servers.push({
+            title: "1080P V2",
+            data: JSON.stringify({ type: "pro", postId: postId, chapter: chapter, sv: sv, url: url })
+        });
     }
+
+    // Luon bo sung server du phong: Webview Trang Nguon (xem truc tiep trang web tren app)
+    servers.push({
+        title: "Webview Trang Nguồn",
+        data: JSON.stringify({ type: "web", url: url })
+    });
 
     return Response.success(servers);
 }

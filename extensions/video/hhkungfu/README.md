@@ -30,9 +30,11 @@ Loại: `video`, locale `vi_VN`, format `series`. Version 1 (2026-11-06).
   kiểm tra bắt buộc chạy trong iframe `window.top !== window.self` với Referer từ site nguồn,
   không có link raw `.m3u8` unencrypted trên trang). Resolver `type: "auto"` của vBook dùng
   headless WebView để sniff link media nên bị chặn và báo lỗi "Không thể tải máy chủ này. Hãy thử máy chủ khác."
-  Từ v2, `track.js` bọc `embedUrl` trong HTML iframe container (width/height 100%, background đen)
-  và trả về `type: "webview"` với `host: BASE_URL`, giúp player JWPlayer khởi tạo và phát trực tiếp
-  ngay trong WebView của vBook mượt mà.
+  Từ v3:
+  1. `track.js` tạo `iframe` động thời gian thực bằng JavaScript (`document.createElement('iframe')`) thay vì tag HTML thô, ngăn vBook Android bóc tách `iframe src` thành URL top-level (tránh lỗi `window.top === window.self`).
+  2. Bổ sung server dự phòng **"Webview Trang Nguồn"** trong `chap.js` (mở trực tiếp trang xem gốc với player của website, 100% luôn chạy được).
+  3. Xử lý try/catch an toàn tuyệt đối: nếu AJAX `player.php` lỗi mạng hoặc timeout sẽ tự động fallback về webview trang nguồn thay vì báo lỗi.
+  4. Sửa dứt điểm lỗi `Console.log` (viết hoa chữ C gây `ReferenceError`) trên toàn bộ codebase.
 - Phân trang WordPress dạng `/page/N/` (không phải `?page=N`):
   `/moi-cap-nhat/page/2`, `/category/tu-tien/page/2`, `/page/2/?s=<từ khóa>`.
   Trang chủ `/` không phân trang (chỉ 16 phim mới nhất) nên tab home dùng

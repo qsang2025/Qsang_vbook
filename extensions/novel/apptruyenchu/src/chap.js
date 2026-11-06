@@ -49,7 +49,7 @@ function getPage(url) {
             var res = fetch(url, { headers: headers });
             if (res && res.ok) return res;
             var status = res ? res.status : 0;
-            Console.log("chap HTTP " + status + " lan " + (i + 1) + ": " + url);
+            console.log("chap HTTP " + status + " lan " + (i + 1) + ": " + url);
             if (status === 429) {
                 var wait = 1000 * (i + 1);
                 try {
@@ -63,7 +63,7 @@ function getPage(url) {
                 continue;
             }
         } catch (e) {
-            Console.log("chap fetch loi lan " + (i + 1) + ": " + e);
+            console.log("chap fetch loi lan " + (i + 1) + ": " + e);
         }
         try { sleep(500 * (i + 1)); } catch (e4) {}
     }
@@ -127,7 +127,7 @@ function fromSelectors(raw) {
             var lines = toLines(String(els.first().html()));
             if (lines.length > best.length) best = lines;
         } catch (e) {
-            Console.log("selector " + CHAP_SELECTORS[i] + " loi: " + e);
+            console.log("selector " + CHAP_SELECTORS[i] + " loi: " + e);
         }
     }
     return best;
@@ -178,7 +178,7 @@ function execute(url) {
     }
 
     var lines = [];
-    try { lines = fromSelectors(raw); } catch (e) { Console.log("fromSelectors loi: " + e); }
+    try { lines = fromSelectors(raw); } catch (e) { console.log("fromSelectors loi: " + e); }
 
     var title = "";
     try { title = chapterTitle(raw); } catch (e) {}
@@ -190,7 +190,7 @@ function execute(url) {
 
     var n = chapterNumber(url);
     var fullTitle = title ? (n > 0 ? "Chương " + n + ": " + title : title) : "";
-    Console.log("chap dong: " + lines.length + " | tieu de: " + fullTitle);
+    console.log("chap dong: " + lines.length + " | tieu de: " + fullTitle);
 
     return Response.success(cleanHtml(lines.join("<br>")), fullTitle);
 }

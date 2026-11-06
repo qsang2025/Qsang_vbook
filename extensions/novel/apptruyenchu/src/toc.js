@@ -56,18 +56,18 @@ function fetchChaptersViaAction(bookUrl, bookId) {
             body: JSON.stringify([bookId])
         });
     } catch (e) {
-        Console.log("toc POST Server Action loi: " + e);
+        console.log("toc POST Server Action loi: " + e);
         return null;
     }
     if (!res || !res.ok) {
-        Console.log("toc POST Server Action HTTP " + (res ? res.status : 0));
+        console.log("toc POST Server Action HTTP " + (res ? res.status : 0));
         return null;
     }
     var text = "";
     try {
         text = String(res.text());
     } catch (e2) {
-        Console.log("toc doc response Server Action loi: " + e2);
+        console.log("toc doc response Server Action loi: " + e2);
         return null;
     }
     var lines = text.split("\n");
@@ -78,12 +78,12 @@ function fetchChaptersViaAction(bookUrl, bookId) {
                 var arr = JSON.parse(lines[i].substring(2));
                 if (arr instanceof Array) return arr;
             } catch (e3) {
-                Console.log("toc parse dong 1:[ loi: " + e3);
+                console.log("toc parse dong 1:[ loi: " + e3);
             }
             return null;
         }
     }
-    Console.log("toc: response Server Action khong co dong 1:[");
+    console.log("toc: response Server Action khong co dong 1:[");
     return null;
 }
 
@@ -135,7 +135,7 @@ function collectDomChapters(doc, raw, slug) {
             addChapter("/truyen/" + slug + "/chuong-" + m[1], "");
         }
     } catch (e) {
-        Console.log("toc regex HTML tho loi: " + e);
+        console.log("toc regex HTML tho loi: " + e);
     }
 
     chapters.sort(function (a, b) { return a.num - b.num; });
@@ -206,12 +206,12 @@ function execute(url) {
                     pay: false
                 });
             }
-            Console.log("toc Server Action: " + out.length + " chuong");
+            console.log("toc Server Action: " + out.length + " chuong");
             return Response.success(out);
         }
-        Console.log("toc Server Action that bai, chuyen sang fallback DOM");
+        console.log("toc Server Action that bai, chuyen sang fallback DOM");
     } else {
-        Console.log("toc: khong tim duoc bookId trong HTML, chuyen sang fallback DOM");
+        console.log("toc: khong tim duoc bookId trong HTML, chuyen sang fallback DOM");
     }
 
     // Duong fallback: link chuong trong DOM (chuong 1 + chuong moi nhat).
@@ -221,7 +221,7 @@ function execute(url) {
     }
     var total = totalChapters(cleanText(doc.text()));
     if (total > 0 && fallback.length < total) {
-        Console.log("toc CHUA DU: chi tim duoc " + fallback.length + "/" + total + " chuong — Server Action that bai, xem README.");
+        console.log("toc CHUA DU: chi tim duoc " + fallback.length + "/" + total + " chuong — Server Action that bai, xem README.");
     }
     return Response.success(fallback);
 }
