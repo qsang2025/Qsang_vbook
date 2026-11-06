@@ -36,6 +36,28 @@
       "description": "HHKUNGFU - Phim Hoạt Hình Kungfu Trung Quốc Vietsub / Thuyết Minh (Thương Nguyên Đồ, Đấu La Đại Lục, Tru Tiên...).",
       "type": "video",
       "locale": "vi_VN"
+    },
+    {
+      "name": "Hoạt Hình 3D Trung Quốc",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/plugin.zip",
+      "version": 1,
+      "source": "https://phimapi.com/v1/api/the-loai",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/icon.png",
+      "description": "Kho phim hoạt hình 3D Trung Quốc (Donghua 3D) Vietsub & Thuyết minh: Thế Giới Hoàn Mỹ, Tiên Nghịch, Đấu Phá Thương Khung, Linh Cảnh Hành Giả... Link m3u8 trực tiếp, phát mượt trên ExoPlayer.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "Hoạt Hình AI Trung Quốc",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh_ai/plugin.zip",
+      "version": 1,
+      "source": "https://www.dailymotion.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh_ai/icon.png",
+      "description": "Hoạt Hình AI Trung Quốc — phim hoạt hình AI, truyện tranh động (漫剧) và short drama Trung Quốc thuyết minh qua Dailymotion: tìm kiếm theo từ khóa, phát trực tiếp bằng link .m3u8 gốc, không qua streamfree.",
+      "type": "video",
+      "locale": "vi_VN"
     }
   ]
 }
