@@ -91,7 +91,7 @@ Mỗi nguồn có `test.json` với các case có **kết quả kỳ vọng**:
 ```
 
 - `validate` kiểm tra fixture tồn tại và đúng định dạng.
-- CI chạy fixture hàng tuần để phát hiện site đổi giao diện sớm.
+- CI chạy fixture hàng ngày để phát hiện site đổi giao diện sớm.
 - Fixture chỉ chứa dữ liệu công khai (tên truyện, URL công khai) — không
   chứa token, cookie hay tài khoản.
 
