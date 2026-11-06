@@ -143,7 +143,7 @@ jobs:
           lines.append("")
           lines.append("- `validate`: PASS — catalog ≡ đĩa, JSON hợp lệ, version khớp,")
           lines.append("  script map khớp file trong `src/`, golden fixture (`test.json`) đúng định dạng,")
-          lines.append("  không có `plugin.zip` nào trong `extensions/`.")
+          lines.append("  mỗi nguồn đều có `plugin.zip` đã commit kèm và khớp với `src/` hiện tại.")
           lines.append("- `build-catalog --check`: PASS — registry khớp với các nguồn trên đĩa.")
           lines.append("- Build thử template novel: PASS (chỉ kiểm tra cơ chế, zip thử đã bỏ đi).")
           lines.append("")
