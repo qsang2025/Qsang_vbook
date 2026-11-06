@@ -16,6 +16,28 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Truyện Full",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/plugin.zip",
+      "version": 1,
+      "source": "https://truyenfull.link",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/icon.png",
+      "description": "Truyện Full — truyện chữ tiếng Việt miễn phí, không khóa chương VIP: Tiên Hiệp, Đô Thị, Võng Du, Huyền Huyễn, Kiếm Hiệp... Đọc full chương, cập nhật mỗi ngày.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "笔趣阁",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/biquge/plugin.zip",
+      "version": 1,
+      "source": "https://www.biquge.tw",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/biquge/icon.png",
+      "description": "笔趣阁 (www.biquge.tw) — truyện chữ giản thể miễn phí: tu tiên/huyền huyễn, đô thị, võng du. Chương đọc miễn phí, không khóa VIP, nội dung nằm trong HTML SSR.",
+      "type": "novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "繁體小說",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novels/plugin.zip",

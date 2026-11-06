@@ -175,11 +175,14 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   `MOVED` / `DEGRADED` / `BROKEN` / `NO_SOURCE` / `UNKNOWN` / `BLOCKED`.
 - `BLOCKED` = HTTP 403: site chặn truy cập từ IP của CI (tường lửa Cloudflare
   chặn dải IP datacenter của GitHub Actions — đã xác minh 2026-11-06: cùng
-  request từ máy này trả 200, từ runner GitHub trả 403). 403 không kết luận
-  được site sống hay chết nên **không tính là gãy**: BLOCKED vẫn ghi vào
-  `health-check-failures.json` nhưng không tính vào `failedCount` (job
-  auto-issue không mở issue sai); thấy BLOCKED thì kiểm tra tay bằng trình
-  duyệt/máy thật.
+  request từ máy này trả 200, từ runner GitHub trả 403). BLOCKED còn gồm
+  trường hợp site/WAF cắt TLS handshake của probe Node (đã gặp ở biquge.tw
+  và truyenfull.link ngày 2026-11-07 — curl với UA trình duyệt trả 200,
+  máy thật đọc bình thường, chỉ stack TLS của Node bị từ chối). Cả hai đều
+  không kết luận được site sống hay chết nên **không tính là gãy**: BLOCKED
+  vẫn ghi vào `health-check-failures.json` nhưng không tính vào `failedCount`
+  (job auto-issue không mở issue sai); thấy BLOCKED thì kiểm tra tay bằng
+  trình duyệt/máy thật.
 - Redirect sang origin khác (đổi domain) hoặc kẹt ở 3xx được phân loại
   `MOVED`, **không** tính là HEALTHY. Lỗi mạng/5xx được thử lại 1 lần; mỗi
   lần thử có hard timeout 10s (bao cả kẹt DNS/connect).

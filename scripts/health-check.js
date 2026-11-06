@@ -16,9 +16,14 @@
 // BLOCKED = HTTP 403: site chặn truy cập từ IP của CI (tường lửa Cloudflare
 // chặn dải IP datacenter của GitHub Actions — đã xác minh 2026-11-06: cùng
 // request từ máy này trả HTTP 200, từ runner GitHub trả 403 trong ~90ms).
-// 403 không kết luận được site sống hay chết nên KHÔNG tính là gãy:
-// BLOCKED được ghi vào failures nhưng không tính vào failedCount (để job
-// auto-issue không mở issue sai), và cần kiểm tra tay khi thấy.
+// BLOCKED còn gồm trường hợp site/WAF cắt TLS handshake của probe Node
+// ("Client network socket disconnected before secure TLS connection was
+// established" — đã gặp ở biquge.tw và truyenfull.link ngày 2026-11-07:
+// cùng URL đó curl với UA trình duyệt trả 200 nhanh, và máy thật đọc được
+// bình thường; chỉ stack TLS của Node bị từ chối). Cả hai đều không kết luận
+// được site sống hay chết nên KHÔNG tính là gãy: BLOCKED được ghi vào
+// failures nhưng không tính vào failedCount (để job auto-issue không mở
+// issue sai), và cần kiểm tra tay khi thấy.
 // Ghi health-check-failures.json (để workflow CI mở issue khi có nguồn gãy).
 // Exit 0 khi mọi nguồn HEALTHY, exit 1 khi có bất kỳ nguồn nào không HEALTHY.
 // Không ghi STATUS.md — file đó do job `status` trong workflow sinh.
@@ -47,6 +52,14 @@ const MAX_REDIRECTS = 5;
 const BODY_SAMPLE_MAX = 512 * 1024;
 const RETRY_DELAY_MS = 2000;
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
+// Site/WAF cắt TLS handshake của probe Node trước khi có HTTP response:
+// server còn sống và chủ động từ chối handshake này (khác với DNS lỗi hay
+// ECONNREFUSED — site thật sự chết). Chỉ khớp đúng chuỗi lỗi TLS này, không
+// khớp timeout chung hay lỗi chứng chỉ (vẫn là BROKEN).
+function isTlsHandshakeDrop(error) {
+  return typeof error === "string" && /secure TLS connection|TLS handshake/i.test(error);
+}
 
 function repoRoot() {
   return path.resolve(__dirname, "..");
@@ -123,9 +136,23 @@ function fetchOnce(targetUrl, redirectsLeft, deadlineMs) {
       done({ ok: false, status: 504, finalUrl: targetUrl, movedOrigin: false, bodySample: "", error: "Timeout sau " + TIMEOUT_MS + "ms" });
       return;
     }
+    // Theo dõi giai đoạn kết nối để phân biệt kẹt ở TCP connect, kẹt ở TLS
+    // handshake (site/WAF cắt handshake — BLOCKED) và kẹt ở body (BROKEN).
+    // Socket timeout của Node không bắn trong lúc handshake nên chỉ hard
+    // timer mới chặn được trường hợp này (đã gặp kẹt ~600s ở biquge.tw).
+    let tcpConnected = false;
+    let tlsDone = false;
+    function timeoutError() {
+      // Dự phòng khi event 'connect' chưa kịp bắn: socket đã gán và không
+      // còn ở trạng thái connecting nghĩa là TCP đã nối xong.
+      const s = req && req.socket;
+      const tcpOk = tcpConnected || (s && s.connecting === false);
+      if (!tlsDone && tcpOk) return "Timeout ở TLS handshake sau " + TIMEOUT_MS + "ms";
+      return "Timeout sau " + TIMEOUT_MS + "ms";
+    }
     const hardTimer = setTimeout(function () {
       if (req) req.destroy();
-      done({ ok: false, status: 504, finalUrl: targetUrl, movedOrigin: false, bodySample: "", error: "Timeout sau " + TIMEOUT_MS + "ms" });
+      done({ ok: false, status: 504, finalUrl: targetUrl, movedOrigin: false, bodySample: "", error: timeoutError() });
     }, remaining);
     let u;
     try {
@@ -135,7 +162,7 @@ function fetchOnce(targetUrl, redirectsLeft, deadlineMs) {
       return;
     }
     const lib = u.protocol === "https:" ? https : http;
-    req = lib.get(u, {
+    req = lib.request(u, {
       headers: { "User-Agent": UA, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" },
       timeout: TIMEOUT_MS
     }, function (res) {
@@ -175,12 +202,20 @@ function fetchOnce(targetUrl, redirectsLeft, deadlineMs) {
         });
       });
     });
+    req.on("socket", function (socket) {
+      if (!socket || typeof socket.once !== "function") return;
+      socket.once("connect", function () { tcpConnected = true; });
+      socket.once("secureConnect", function () { tlsDone = true; });
+    });
+    // lib.request không tự gửi request như lib.get — phải end() sau khi đã
+    // gắn listener 'socket' (gắn sau end() sẽ lỡ mất event này).
+    req.end();
     req.on("error", function (err) {
       done({ ok: false, status: 0, finalUrl: targetUrl, movedOrigin: false, bodySample: "", error: err.message });
     });
     req.on("timeout", function () {
       req.destroy();
-      done({ ok: false, status: 504, finalUrl: targetUrl, movedOrigin: false, bodySample: "", error: "Timeout sau " + TIMEOUT_MS + "ms" });
+      done({ ok: false, status: 504, finalUrl: targetUrl, movedOrigin: false, bodySample: "", error: timeoutError() });
     });
   });
 }
@@ -272,6 +307,10 @@ async function checkOne(source, root) {
       // Site chặn IP của CI (Cloudflare) — không kết luận được sống/chết.
       base.status = "BLOCKED";
       base.detail = "HTTP 403 — site chặn truy cập từ IP của CI (tường lửa Cloudflare); chưa kết luận được site sống hay chết — kiểm tra tay.";
+    } else if (isTlsHandshakeDrop(probe.error)) {
+      // Site/WAF cắt TLS handshake của probe Node — không kết luận được sống/chết.
+      base.status = "BLOCKED";
+      base.detail = "TLS handshake bị site/WAF từ chối (" + probe.error + "); site vẫn mở được bằng trình duyệt/curl — kiểm tra tay.";
     } else if (probe.status >= 300 && probe.status < 400) {
       base.status = "MOVED";
       base.detail = "Kẹt ở redirect HTTP " + probe.status + " (tới " + probe.finalUrl + ").";
@@ -307,6 +346,9 @@ async function checkOne(source, root) {
         if (cp.status === 403) {
           base.status = "BLOCKED";
           base.detail += " | Fixture \"" + label + "\" bị chặn: HTTP 403 từ IP của CI (" + c.url + ") — kiểm tra tay.";
+        } else if (isTlsHandshakeDrop(cp.error)) {
+          base.status = "BLOCKED";
+          base.detail += " | Fixture \"" + label + "\" bị chặn: TLS handshake bị site/WAF từ chối (" + c.url + ") — kiểm tra tay.";
         } else {
           base.status = "DEGRADED";
           base.detail += " | Fixture \"" + label + "\" lỗi: " + (cp.error || ("HTTP " + cp.status)) + " (" + c.url + ").";
