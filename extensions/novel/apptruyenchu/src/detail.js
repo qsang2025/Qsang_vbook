@@ -3,12 +3,14 @@
 // ten the + thu bac), nen detail dung selector cau truc + regex tren text:
 //   ten: h1 dau tien trong <main>
 //   anh bia: img dau tien trong <main> (qua proxy /_next/image -> boc ve
-//     URL goc tren CDN), xem helper.js unwrapCover()
+//     URL goc tren CDN), xem helper.js unwrapCover(); du phong: JSON-LD
+//     Book.image (URL CDN truc tiep) khi img trong <main> loi/trong
 //   tac gia: nhan "Tac gia" trong khoi thong tin; du phong: "Tac gia: X"
 //     trong mo ta (co truyen de trong o Tac gia nhung mo ta co ghi tac gia)
 //   trang thai: "Hoan thanh" / "Dang ra" trong khoi thong tin
 //   the loai: chip link /truyen?cate=<slug>
-//   mo ta: khoi sau h2 "Gioi thieu"
+//   mo ta: khoi sau h2 "Gioi thieu", tra TEXT SACH (strip the HTML, giu
+//     nguyen noi dung day du; khong lay ban preview line-clamp-4 cua JSON-LD)
 //   so chuong / luot doc / theo doi: regex tren text khoi thong tin
 //   goi y: cac link truyen khac tren trang ("Truyen khac", "Cung tac gia")
 //
@@ -53,6 +55,33 @@ function execute(url) {
     var cover = "";
     var img = scope.select("img").first();
     if (img !== null) cover = unwrapCover(img.attr("src"));
+    // Du phong (v4): JSON-LD Book.image (URL CDN truc tiep) khi img trong
+    // <main> loi/trong. JSON-LD tren site la mang [{@type:"Book", image},
+    // {@type:"BreadcrumbList", ...}] (khao sat 2026-11-06). Chi chay khi
+    // cover rong — khong doi nguon chinh.
+    if (!cover) {
+        try {
+            var scripts = doc.select("script");
+            var si = 0;
+            for (si = 0; si < scripts.size() && !cover; si++) {
+                var sc = scripts.get(si);
+                if (cleanText(sc.attr("type")) !== "application/ld+json") continue;
+                var parsedLd = JSON.parse(sc.html());
+                var arr = (parsedLd instanceof Array) ? parsedLd : [parsedLd];
+                var ai = 0;
+                for (ai = 0; ai < arr.length && !cover; ai++) {
+                    var im = arr[ai] ? arr[ai].image : null;
+                    if (typeof im === "string" && im) { cover = absUrl(im); break; }
+                    if (im && typeof im === "object") {
+                        if (typeof im.url === "string" && im.url) { cover = absUrl(im.url); break; }
+                        if (im instanceof Array && im.length > 0 && typeof im[0] === "string" && im[0]) { cover = absUrl(im[0]); break; }
+                    }
+                }
+            }
+        } catch (e) {
+            // JSON-LD loi thi giu cover rong, khong lam hong detail.
+        }
+    }
 
     // Mo ta: doan HTML sau dong "Gioi thieu" (h2) toi h2 ke tiep.
     // (Runtime vBook chi mo text()/html()/attr()... tren Element, KHONG co
@@ -77,7 +106,13 @@ function execute(url) {
         after = after.replace(/<script[\s\S]*?<\/script>/gi, "")
             .replace(/<style[\s\S]*?<\/style>/gi, "")
             .replace(/<button[\s\S]*?<\/button>/gi, "");
-        description = after;
+        // Mo ta tra TEXT SACH (v4): strip the HTML, giu nguyen noi dung day
+        // du (~731 ky tu). Khong lay ban preview line-clamp-4 cua JSON-LD
+        // (299 ky tu, cat cut giua cau).
+        description = cleanText(htmlDecode(String(after)
+            .replace(/<br\s*\/?>/gi, " ")
+            .replace(/<\/p\s*>/gi, " ")
+            .replace(/<[^>]+>/g, " ")));
     }
 
     // Tac gia: nhan trong khoi thong tin truoc, roi "Tac gia:" trong mo ta.
@@ -108,15 +143,16 @@ function execute(url) {
     });
 
     // So chuong / luot doc / theo doi (phuc vu khoi detail + kiem tra toc).
-    // Luot doc / theo doi chi lay so dau tien: sau "Theo doi 20" con co
-    // diem danh gia "5 (1 danh gia)" va so chuong lap lai, khong phai so
-    // theo doi.
+    // Chi lay token so dau tien, GIU hau to K/M va dau cham phan nghin
+    // (vd "17.2K", "2.479", "385") — v3 cat ve ^\d+ nen "17.2K" thanh "17".
+    // Bo phan thua sau do (diem danh gia "5 (1 danh gia)" va so chuong
+    // lap lai sau "Theo doi", khong phai so theo doi).
     var chapters = totalChapters(mainText);
     var views = labelValue(mainText, "Lượt đọc", ["Theo dõi", "Chương", "Thể loại"]);
     var follows = labelValue(mainText, "Theo dõi", ["Chương", "Lượt đọc"]);
-    var vm = String(views).match(/^\d+/);
+    var vm = String(views).match(/^[\d.,]+[KkMm]?/);
     if (vm) views = vm[0];
-    var fm = String(follows).match(/^\d+/);
+    var fm = String(follows).match(/^[\d.,]+[KkMm]?/);
     if (fm) follows = fm[0];
 
     var detailHtml = "";
