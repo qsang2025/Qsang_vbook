@@ -1,30 +1,38 @@
+// toc.js — muc luc chuong cua mot truyen (template novel).
+// Y tuong: Darkrai9x toc.js. Tra ve mang chuong { name, url, description,
+// lock, pay }. Neu site phan trang muc luc thi khai bao them page.js
+// (app goi toc.js tren tung URL ma page.js tra ve).
+// SELECTOR_CHAPTER_LINKS: doi thanh selector danh sach chuong that cua site.
+//
+// Load: build se copy config.js, config-helpers.js, fetch-helpers.js vao src/.
+// Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-// toc.js (audio) — the track list. This IS the player's playlist: entry order and
-// `name` are what the user sees. A single-song ("audio" format) page still
-// returns a one-element list.
+load('config-helpers.js');
+load('fetch-helpers.js');
+
 function execute(url) {
     url = normalizeUrl(url);
-    let response = fetch(url);
-    if (!response.ok) return Response.error("HTTP " + response.status);
-    let doc = response.html();
+    var doc = fetchDoc(url);
+    if (!doc) return Response.error("Không tải được mục lục: " + url);
 
-    let tracks = [];
-    doc.select("SELECTOR_TRACK_ROWS").forEach(function (el) {
-        let link = el.select("a").first();
-        if (!link) return;
-        tracks.push({
-            name: link.text().trim(),
-            url: link.attr("href"),
-            // Shown under the track title — artist / duration text if the page has it.
-            description: el.select("SELECTOR_TRACK_ARTIST").text(),
+    var chapters = [];
+    var seen = {};
+    doc.select("SELECTOR_CHAPTER_LINKS a").forEach(function (el) {
+        var href = el.attr("href");
+        var name = cleanText(el.text());
+        if (!href || !name) return;
+        var link = absUrl(href);
+        if (seen[link]) return;
+        seen[link] = true;
+        chapters.push({
+            name: name,
+            url: link,
+            description: "",
             lock: false,
             pay: false
         });
     });
 
-    if (tracks.length === 0) {
-        tracks.push({ name: doc.select("SELECTOR_TITLE").text(), url: url, description: "", lock: false, pay: false });
-    }
-
-    return Response.success(tracks);
+    if (chapters.length === 0) return Response.error("Không đọc được mục lục (site có thể đã đổi giao diện): " + url);
+    return Response.success(chapters);
 }

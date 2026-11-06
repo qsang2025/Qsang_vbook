@@ -1,7 +1,7 @@
 # Type contracts
 
 Use with the relevant field/signature sections of `extension-api.md`. Templates under
-`templates/<type>/` are complete scaffolds; keep required scripts and only supported
+repo-root `templates/<type>/` are complete scaffolds; keep required scripts and only supported
 optional scripts.
 
 ## Novel and comic

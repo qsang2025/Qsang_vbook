@@ -1,10 +1,13 @@
-// similar.js — referenced from detail.js `suggests`. `input` here is a raw
-// HTML fragment (already scraped alongside the detail page), not a URL —
-// parse it directly instead of fetching.
+// similar.js — truyen tuong tu (template audio).
+// Y tuong: Darkrai9x similar.js. Duoc goi tu detail.js qua truong
+// `suggests` ({title, input, script}). `input` o day la doan HTML tho
+// (da cat san cung trang detail), khong phai URL — parse thang, khong fetch.
+// Tat ca SELECTOR_ doi theo giao dien site that.
+// Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 function execute(input) {
-    let doc = Html.parse(input);
+    var doc = Html.parse(input);
 
-    let items = doc.select("SELECTOR_SIMILAR_ITEMS").map(function (el) {
+    var items = doc.select("SELECTOR_SIMILAR_ITEMS").map(function (el) {
         return {
             name: el.select("SELECTOR_ITEM_NAME").text(),
             cover: el.select("SELECTOR_ITEM_COVER img").attr("src"),

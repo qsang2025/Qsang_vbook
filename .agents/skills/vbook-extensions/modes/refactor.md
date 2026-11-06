@@ -12,7 +12,7 @@ them during refactoring.
 
 ## 2. Build a template diff
 
-Compare with `templates/<type>/` and list only convention gaps, including:
+Compare with repo-root `templates/<type>/` and list only convention gaps, including:
 
 - hardcoded fallback BASE_URL plus optional DOMAIN override
 - shared normalizeUrl on site-URL inputs

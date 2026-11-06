@@ -1,17 +1,22 @@
+// comments.js — binh luan cua mot truyen (template comic).
+// Y tuong: Darkrai9x comments.js. Duoc goi tu detail.js qua truong
+// `comments` ({title, input, script}).
+// Phan trang: (input, page) -> (items, next). Moi item co the long
+// `replies` (cung dang, de quy). Xem "comment scripts" trong extension-api.md.
+// Tat ca SELECTOR_ doi theo giao dien site that.
+// Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-// comments.js — referenced from detail.js `comments` ({title, input, script}).
-// Paginated: (input, page) -> (items, next). Each item may nest `replies`
-// (same shape, recursive). See "comment scripts" in extension-api.md.
+
 function execute(input, page) {
     page = page || "1";
-    let url = input.indexOf("http") === 0 ? input : BASE_URL + input;
+    var url = input.indexOf("http") === 0 ? input : BASE_URL + input;
     url += (url.indexOf("?") === -1 ? "?" : "&") + "page=" + page;
 
-    let response = fetch(url);
-    if (!response.ok) return Response.error("HTTP " + response.status);
-    let doc = response.html();
+    var response = fetch(url);
+    if (!response.ok) return Response.error("Lỗi HTTP " + response.status);
+    var doc = response.html();
 
-    let items = doc.select("SELECTOR_COMMENT_ITEMS").map(function (el) {
+    var items = doc.select("SELECTOR_COMMENT_ITEMS").map(function (el) {
         return {
             name: el.select("SELECTOR_COMMENT_AUTHOR").text(),
             avatar: el.select("SELECTOR_COMMENT_AVATAR img").attr("src"),
@@ -29,8 +34,8 @@ function execute(input, page) {
         };
     });
 
-    let hasNext = !doc.select("SELECTOR_NEXT_PAGE").isEmpty();
-    let nextPage = hasNext ? (parseInt(page) + 1).toString() : "";
+    var hasNext = !doc.select("SELECTOR_NEXT_PAGE").isEmpty();
+    var nextPage = hasNext ? (parseInt(page) + 1).toString() : "";
 
     return Response.success(items, nextPage);
 }

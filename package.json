@@ -1,0 +1,26 @@
+{
+  "author": "Qsang",
+  "description": "Tuyển tập extension vBook của Qsang — đọc truyện, truyện tranh, video, audio, dịch, TTS và AI. Registry sinh tự động từ extensions/, không sửa tay.",
+  "keywords": [
+    "vbook",
+    "vbook-extension",
+    "novel",
+    "comic",
+    "video",
+    "audio",
+    "rhino-es6"
+  ],
+  "name": "qsang-vbook",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/cli.js build",
+    "build-catalog": "node scripts/cli.js build-catalog",
+    "connect": "node scripts/cli.js connect",
+    "health-check": "node scripts/cli.js health-check",
+    "install": "node scripts/cli.js install",
+    "test": "node scripts/cli.js test",
+    "testall": "node scripts/cli.js testall",
+    "validate": "node scripts/cli.js validate"
+  },
+  "version": "1.0.0"
+}
