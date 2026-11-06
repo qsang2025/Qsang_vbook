@@ -77,9 +77,9 @@ jobs:
         env:
           VBOOK_SERVER: ${{ secrets.VBOOK_SERVER }}
         run: |
-            if [ -z "$VBOOK_SERVER" ]; then
-              echo "Chưa cấu hình secret VBOOK_SERVER — bỏ qua testall."
-              exit 0
+          if [ -z "$VBOOK_SERVER" ]; then
+            echo "Chưa cấu hình secret VBOOK_SERVER — bỏ qua testall."
+            exit 0
           fi
           EXTS=$(find extensions -mindepth 2 -maxdepth 2 -name plugin.json -exec dirname {} \; | sort)
           if [ -z "$EXTS" ]; then
