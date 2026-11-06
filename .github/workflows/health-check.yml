@@ -1,10 +1,12 @@
-# health-check.yml — CI kiểm tra sức khỏe các nguồn vBook (hàng tuần + chạy tay).
+# health-check.yml — CI kiểm tra sức khỏe các nguồn vBook (hàng ngày + chạy tay).
 #
 # LƯU Ý TRUNG THỰC: CI chạy trên máy chủ GitHub, KHÔNG có điện thoại và
 # không có developer server của app vBook, nên KHÔNG chạy được `testall`
 # (test thật trên thiết bị). Vì vậy:
 #   - Job 1 (validate-build) LUÔN chạy, không cần secret, không cần điện thoại:
-#     validate + build-catalog --check + build thử + kiểm tra golden fixture.
+#     validate + build-catalog --check + build thử + kiểm tra golden fixture
+#     + probe sức khỏe các nguồn (scripts/health-check.js: HTTP + latency +
+#     fixture nhẹ health.json — cũng không cần điện thoại).
 #   - Job 2 (device-test) CHỈ chạy khi chạy tay (workflow_dispatch) VÀ đã
 #     cấu hình secret VBOOK_SERVER (URL developer server trên điện thoại
 #     thật, bật debug/dev mode trong app vBook). Không có điện thoại/dev
@@ -15,12 +17,14 @@
 #     khi có nguồn, job này ghi kết quả testall (WORK/MOVED/AUTH/EMPTY/
 #     CRASH/UNREACHABLE) vào STATUS.md nếu có file test-results.json
 #     (do job 2 hoặc một lần chạy tay nộp lên), rồi commit lại nếu có thay đổi.
+#   - Job 4 (auto-issue) mở issue GitHub khi probe phát hiện nguồn gãy
+#     (chống trùng theo tiêu đề issue).
 name: health-check
 
 on:
   schedule:
-    # 01:00 UTC thứ Hai hàng tuần.
-    - cron: "0 1 * * 1"
+    # 00:00 UTC hàng ngày.
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions:
@@ -53,6 +57,22 @@ jobs:
         run: |
           node tools/cli/build.js templates/novel /tmp/template-novel-test.zip
           rm -f /tmp/template-novel-test.zip
+
+      # Probe sức khỏe các nguồn (HTTP + latency + fixture nhẹ health.json).
+      # Không cần điện thoại. Nguồn gãy không làm fail job này
+      # (continue-on-error) — kết quả ghi vào health-check-failures.json
+      # để job auto-issue đọc; probe tự exit 1 khi có nguồn gãy.
+      - name: Probe sức khỏe các nguồn (không cần điện thoại)
+        if: ${{ always() }}
+        continue-on-error: true
+        run: node scripts/health-check.js
+
+      - name: Lưu kết quả probe làm artifact (cho job auto-issue)
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-check-failures
+          path: health-check-failures.json
+          if-no-files-found: error
 
   # Job 2 — CHỈ CHẠY khi chạy tay VÀ có secret VBOOK_SERVER.
   # Test thật từng nguồn qua developer server trên điện thoại (testall).
@@ -135,7 +155,7 @@ jobs:
           lines = []
           lines.append("# STATUS — Trạng thái các nguồn (sinh tự động)")
           lines.append("")
-          lines.append("> Cập nhật lần cuối: %s (CI health-check hàng tuần + chạy tay)." % now)
+          lines.append("> Cập nhật lần cuối: %s (CI health-check hàng ngày + chạy tay)." % now)
           lines.append("> File này **không sửa tay**. GitHub Actions sinh lại file này;")
           lines.append("> muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.")
           lines.append("")
@@ -199,3 +219,47 @@ jobs:
             git commit -m "chore(ci): cập nhật STATUS.md [skip ci]"
             git push
           fi
+
+  # Job 4 — Mở issue GitHub khi probe phát hiện nguồn gãy.
+  # Luôn chạy sau job 1 (kể cả khi job 1 fail, để không mất tín hiệu).
+  # Chống trùng: chỉ mở issue mới khi chưa có issue MỞ nào cùng tiêu đề
+  # (tiêu đề cố định — số nguồn gãy ghi trong nội dung issue).
+  auto-issue:
+    needs: [validate-build]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Lấy kết quả probe (nếu job 1 có chạy)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: health-check-failures
+          path: .
+
+      - name: Mở issue khi có nguồn gãy (chống trùng theo tiêu đề)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f health-check-failures.json ]; then
+            echo "Không có file health-check-failures.json — bỏ qua."
+            exit 0
+          fi
+          FAILED_COUNT=$(node -e "const f = require('./health-check-failures.json'); console.log(f.failedCount || 0);")
+          if [ "$FAILED_COUNT" -eq 0 ]; then
+            echo "Mọi nguồn đều khỏe — không cần mở issue."
+            exit 0
+          fi
+          TITLE="[Health-check] Có nguồn vBook bị lỗi / đổi giao diện"
+          OPEN_COUNT=$(gh issue list --search "\"$TITLE\" in:title state:open" --json number --jq 'length')
+          if [ "$OPEN_COUNT" -gt 0 ]; then
+            echo "Đã có issue mở cùng tiêu đề — không mở trùng."
+            exit 0
+          fi
+          echo "Phát hiện $FAILED_COUNT nguồn gãy — mở issue mới..."
+          node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('./health-check-failures.json', 'utf8')); let body = '### Cảnh báo: phát hiện nguồn vBook bị lỗi trong lượt quét định kỳ\n\n'; body += '| Nguồn | Loại | URL | Trạng thái | Chi tiết |\n'; body += '| :--- | :--- | :--- | :---: | :--- |\n'; for (const item of data.failures) { body += '| **' + item.name + '** | ' + item.type + ' | ' + item.source + ' | ' + item.status + ' | ' + item.detail + ' |\n'; } body += '\n\n*Hệ thống phát hiện tự động bởi CI health-check (scripts/health-check.js).*'; fs.writeFileSync('./issue-body.md', body, 'utf8');"
+          gh issue create --title "$TITLE" --body-file ./issue-body.md --label "bug"
