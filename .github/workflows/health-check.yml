@@ -217,6 +217,7 @@ jobs:
             echo "STATUS.md không thay đổi — không commit."
           else
             git commit -m "chore(ci): cập nhật STATUS.md [skip ci]"
+            git pull --rebase
             git push
           fi
 
