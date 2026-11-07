@@ -2,7 +2,7 @@
   "metadata": {
     "name": "TruyenC",
     "author": "Qsang",
-    "version": 1,
+    "version": 2,
     "source": "https://truyenc.net",
     "regexp": "^https?://(www\\.)?truyenc\\.net/truyen/[^/]+/?$",
     "description": "TruyenC — nền tảng đọc truyện chữ online miễn phí chất lượng cao, đầy đủ bản Dịch và Convert hot: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Hệ Thống...",
@@ -15,7 +15,8 @@
       "title": "Domain chính",
       "mode": "select",
       "values": [
-        "https://truyenc.net"
+        "https://truyenc.net",
+        "https://www.truyenc.net"
       ],
       "default": "https://truyenc.net"
     }

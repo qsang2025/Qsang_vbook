@@ -1,5 +1,6 @@
 // gen.js — Danh sach truyen theo the loai / danh muc TruyenC
 load('config.js');
+load('fetch-helpers.js');
 
 function normalizeLink(href) {
     if (!href) return "";
@@ -23,37 +24,45 @@ function execute(url, page) {
         }
     }
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
-    var doc = response.html();
+    var doc = fetchDoc(url);
+    if (!doc) {
+        var altUrl = url.replace("https://truyenc.net", "https://www.truyenc.net");
+        doc = fetchDoc(altUrl);
+    }
+    if (!doc) return Response.error("Không thể kết nối đến TruyenC. Vui lòng kiểm tra lại mạng hoặc bấm Trang nguồn để xác minh.");
+
     var novelList = [];
     var seen = {};
 
-    // TruyenC list item cards
-    doc.select("a[href*='/truyen/']").forEach(function(a) {
-        var href = a.attr("href");
-        if (!href) return;
-        // Chi lay link truyen chinh: /truyen/<slug> (khong lay link chuong)
-        if (href.indexOf("/chuong-") !== -1) return;
-        var fullLink = normalizeLink(href);
-        if (seen[fullLink]) return;
+    var links = doc.select("a[href*='/truyen/']");
+    for (var i = 0; i < links.size(); i++) {
+        var a = links.get(i);
+        var href = a.attr("href") || "";
+        if (!href || href.indexOf("/chuong-") !== -1) continue;
 
-        // Tim khoi cha chua the a nay
-        var parent = a.parent();
-        var card = parent;
-        for (var k = 0; k < 3; k++) {
-            if (card && card.select("img").size() > 0 && card.text().length > 10) break;
-            if (card && card.parent()) card = card.parent();
-        }
+        var fullLink = normalizeLink(href);
+        var cleanLink = fullLink.replace(/\/+$/, "");
+        if (seen[cleanLink]) continue;
 
         var name = a.attr("title");
-        if (!name) {
-            var hEl = (card || a).select("h2, h3, h4, .font-semibold, .font-bold").first();
+        var card = a;
+        try {
+            var p = a.parent();
+            if (p) {
+                card = p;
+                var p2 = p.parent();
+                if (p2 && card.select("img").size() === 0) {
+                    card = p2;
+                }
+            }
+        } catch (e1) {}
+
+        if (!name && card) {
+            var hEl = card.select("h1, h2, h3, h4, .font-semibold, .font-bold").first();
             if (hEl) name = hEl.text().trim();
         }
         if (!name) name = a.text().trim();
-        // Bo cac chuoi vo nghia nhu "Full", "Đọc ngay", "HOT"
-        if (!name || name.length < 2 || name === "Đọc ngay" || name === "Xem thêm" || name === "Full") return;
+        if (!name || name.length < 2 || name === "Đọc ngay" || name === "Xem thêm" || name === "Full") continue;
 
         var cover = "";
         var imgEl = (card || a).select("img").first();
@@ -68,7 +77,7 @@ function execute(url, page) {
             if (descEl) desc = descEl.text().trim();
         }
 
-        seen[fullLink] = true;
+        seen[cleanLink] = true;
         novelList.push({
             name: name,
             link: fullLink,
@@ -76,15 +85,14 @@ function execute(url, page) {
             description: desc,
             host: BASE_URL
         });
-    });
+    }
 
     if (novelList.length === 0) {
-        return Response.error("Không tìm thấy truyện trên trang.");
+        return Response.error("Không tìm thấy truyện trên trang (bấm Trang nguồn để kiểm tra).");
     }
 
     var next = null;
     var currentPage = page ? parseInt(page, 10) : 1;
-    // Kiem tra nut trang ke tiep
     var nextA = doc.select("a[href*='page=" + (currentPage + 1) + "']").first();
     if (nextA) {
         next = String(currentPage + 1);

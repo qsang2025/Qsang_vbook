@@ -1,5 +1,6 @@
 // detail.js — Thong tin chi tiet truyen tren TruyenC
 load('config.js');
+load('fetch-helpers.js');
 
 function execute(url) {
     if (url.indexOf("http") !== 0) {
@@ -8,9 +9,12 @@ function execute(url) {
     }
     url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
-    var doc = response.html();
+    var doc = fetchDoc(url);
+    if (!doc) {
+        var altUrl = url.replace("https://truyenc.net", "https://www.truyenc.net");
+        doc = fetchDoc(altUrl);
+    }
+    if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
     var name = doc.select("h1").first() ? doc.select("h1").first().text().trim() : "";
     if (!name) return Response.error("Không đọc được tên truyện: " + url);

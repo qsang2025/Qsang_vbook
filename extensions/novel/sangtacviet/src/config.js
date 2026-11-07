@@ -1,5 +1,5 @@
 // config.js — Cau hinh domain cho Sang Tac Viet
-var BASE_URL = "https://sangtacviet.vip";
+var BASE_URL = "https://sangtacviet.app";
 
 try {
     if (typeof CONFIG_URL !== "undefined" && CONFIG_URL) {
