@@ -1,6 +1,6 @@
 # STATUS — Trạng thái các nguồn (sinh tự động)
 
-> Cập nhật lần cuối: 2026-11-06 11:35 UTC (CI health-check hàng ngày + chạy tay).
+> Cập nhật lần cuối: 2026-11-07 00:39 UTC (CI health-check hàng ngày + chạy tay).
 > File này **không sửa tay**. GitHub Actions sinh lại file này;
 > muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.
 
@@ -17,7 +17,12 @@
 | Nguồn | Loại | Trạng thái testall | Ghi chú |
 |---|---|---|---|
 | App Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Truyện Full | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 笔趣阁 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 繁體小說 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | HHKUNGFU | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Hoạt Hình 3D Trung Quốc | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Hoạt Hình AI Trung Quốc | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 
 Trạng thái testall: WORK (chạy tốt), MOVED (site đổi domain),
 AUTH/MSG (site chặn/yêu cầu đăng nhập), EMPTY (trả về rỗng),
