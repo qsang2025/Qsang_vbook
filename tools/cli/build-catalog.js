@@ -125,6 +125,10 @@ function buildRegistry(root) {
       description: m.description || "",
       type: m.type || s.type,
       locale: m.locale || "vi_VN",
+      // Co NSFW (metadata.nsfw === true) thi ghi ro vao registry de app
+      // biet ma loc/an theo cai dat nguoi dung (AGENTS.md §6.7). Chi ghi
+      // khi true de khong lam phinh registry cua cac nguon binh thuong.
+      ...(m.nsfw === true ? { nsfw: true } : {}),
     };
   });
 
