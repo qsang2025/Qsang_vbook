@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "name": "TruyenC",
+    "author": "Qsang",
+    "version": 1,
+    "source": "https://truyenc.net",
+    "regexp": "^https?://(www\\.)?truyenc\\.net/truyen/[^/]+/?$",
+    "description": "TruyenC — nền tảng đọc truyện chữ online miễn phí chất lượng cao, đầy đủ bản Dịch và Convert hot: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Hệ Thống...",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain chính",
+      "mode": "select",
+      "values": [
+        "https://truyenc.net"
+      ],
+      "default": "https://truyenc.net"
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js"
+  }
+}

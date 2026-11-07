@@ -28,6 +28,39 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Mê Truyện Chữ",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://metruyenchu.com.vn",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu/icon.png",
+      "description": "Mê Truyện Chữ VN — truyện chữ tiếng Việt miễn phí, kho convert & dịch lớn: Tiên Hiệp, Huyền Huyễn, Đô Thị, Dị Giới, Võng Du... Cập nhật liên tục.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "Sáng Tác Việt",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacviet/plugin.zip",
+      "version": 1,
+      "source": "https://sangtacviet.vip",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacviet/icon.png",
+      "description": "Sáng Tác Việt — nền tảng đọc và nhúng truyện dịch máy / convert từ nguồn Trung Quốc (Qidian, Fanqie, 69shu, uukanshu...).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "TruyenC",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc/plugin.zip",
+      "version": 1,
+      "source": "https://truyenc.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc/icon.png",
+      "description": "TruyenC — nền tảng đọc truyện chữ online miễn phí chất lượng cao, đầy đủ bản Dịch và Convert hot: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Hệ Thống...",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyện Full",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/plugin.zip",
@@ -35,6 +68,17 @@
       "source": "https://truyenfull.link",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/icon.png",
       "description": "Truyện Full — truyện chữ tiếng Việt miễn phí, không khóa chương VIP: Tiên Hiệp, Đô Thị, Võng Du, Huyền Huyễn, Kiếm Hiệp... Đọc full chương, cập nhật mỗi ngày.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "Truyện Hoàn",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoan/plugin.zip",
+      "version": 1,
+      "source": "https://truyenhoan.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoan/icon.png",
+      "description": "Truyện Hoàn (hỗ trợ mirror WeTruyen / DTruyen) — kho truyện chữ tiếng Việt miễn phí, truyện full dài tập: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Kiếm Hiệp...",
       "type": "novel",
       "locale": "vi_VN"
     },

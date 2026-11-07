@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "minItems": 1
+      },
+      "input": "sort=update",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 5
+      },
+      "input": "",
+      "script": "genre.js"
+    }
+  ],
+  "note": "Golden fixture cho Sáng Tác Việt (sangtacviet.vip / .app / .com)."
+}

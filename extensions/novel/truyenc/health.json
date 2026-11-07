@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "pattern": "TruyenC",
+      "url": "https://truyenc.net/"
+    },
+    {
+      "name": "Thể loại Tiên Hiệp",
+      "pattern": "Tiên Hiệp",
+      "url": "https://truyenc.net/the-loai/tien-hiep"
+    },
+    {
+      "name": "Chi tiết truyện",
+      "pattern": "Phàm Nhân Tu Tiên",
+      "url": "https://truyenc.net/truyen/pham-nhan-tu-tien"
+    }
+  ]
+}

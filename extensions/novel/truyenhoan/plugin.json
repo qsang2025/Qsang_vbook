@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "name": "Truyện Hoàn",
+    "author": "Qsang",
+    "version": 1,
+    "source": "https://truyenhoan.com",
+    "regexp": "^https?://(www\\.)?(truyenhoan\\.com|wetruyen\\.com|dtruyen\\.com)/[a-z0-9\\-]+\\.\\d+/?$",
+    "description": "Truyện Hoàn (hỗ trợ mirror WeTruyen / DTruyen) — kho truyện chữ tiếng Việt miễn phí, truyện full dài tập: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Kiếm Hiệp...",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain chính",
+      "mode": "select",
+      "values": [
+        "https://truyenhoan.com",
+        "https://wetruyen.com",
+        "https://dtruyen.com"
+      ],
+      "default": "https://truyenhoan.com"
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "page": "page.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js"
+  }
+}

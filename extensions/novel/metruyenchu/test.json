@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "Mục Thần Ký"
+        ],
+        "minItems": 1
+      },
+      "input": "muc than ky",
+      "script": "search.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Mục Thần Ký"
+        ],
+        "minItems": 5
+      },
+      "input": "/the-loai/tien-hiep",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Mục Thần Ký"
+        ],
+        "minItems": 1
+      },
+      "input": "https://metruyenchu.com.vn/muc-than-ky-convert",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chương 1"
+        ],
+        "minItems": 50
+      },
+      "input": "https://metruyenchu.com.vn/muc-than-ky-convert",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Mục Thần Ký"
+        ],
+        "minItems": 1
+      },
+      "input": "https://metruyenchu.com.vn/muc-than-ky-convert/chuong-1",
+      "script": "chap.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Tiên Hiệp",
+          "Huyền Huyễn",
+          "Đô Thị"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "genre.js"
+    }
+  ],
+  "note": "Golden fixture cho Me Truyen Chu (metruyenchu.com.vn & mirror metruyenchuvn.com)."
+}

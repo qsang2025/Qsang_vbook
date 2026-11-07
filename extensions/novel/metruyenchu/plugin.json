@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "name": "Mê Truyện Chữ",
+    "author": "Qsang",
+    "version": 1,
+    "source": "https://metruyenchu.com.vn",
+    "regexp": "^https?://(www\\.)?(metruyenchu\\.com\\.vn|metruyenchuvn\\.com|metruyenchuvn\\.org|wikidichvn\\.com)/[^/]+/?$",
+    "description": "Mê Truyện Chữ VN — truyện chữ tiếng Việt miễn phí, kho convert & dịch lớn: Tiên Hiệp, Huyền Huyễn, Đô Thị, Dị Giới, Võng Du... Cập nhật liên tục.",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain chính",
+      "mode": "select",
+      "values": [
+        "https://metruyenchu.com.vn",
+        "https://metruyenchuvn.com",
+        "https://wikidichvn.com"
+      ],
+      "default": "https://metruyenchu.com.vn"
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js"
+  }
+}

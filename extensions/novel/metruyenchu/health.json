@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "pattern": "truyen",
+      "url": "https://metruyenchu.com.vn/"
+    },
+    {
+      "name": "Thể loại Tiên Hiệp",
+      "pattern": "Tiên Hiệp",
+      "url": "https://metruyenchu.com.vn/the-loai/tien-hiep"
+    },
+    {
+      "name": "Chi tiết truyện",
+      "pattern": "Mục Thần Ký",
+      "url": "https://metruyenchu.com.vn/muc-than-ky-convert"
+    }
+  ]
+}

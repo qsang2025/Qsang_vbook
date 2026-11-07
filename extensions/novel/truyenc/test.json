@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "Phàm Nhân Tu Tiên"
+        ],
+        "minItems": 1
+      },
+      "input": "pham nhan tu tien",
+      "script": "search.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Phàm Nhân Tu Tiên"
+        ],
+        "minItems": 10
+      },
+      "input": "/the-loai/tien-hiep",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Phàm Nhân Tu Tiên"
+        ],
+        "minItems": 1
+      },
+      "input": "https://truyenc.net/truyen/pham-nhan-tu-tien",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chương 1"
+        ],
+        "minItems": 50
+      },
+      "input": "https://truyenc.net/truyen/pham-nhan-tu-tien",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "tang điền"
+        ],
+        "minItems": 1
+      },
+      "input": "https://truyenc.net/truyen/duong-chuyen/chuong-1",
+      "script": "chap.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Tiên Hiệp",
+          "Huyền Huyễn",
+          "Đô Thị"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "genre.js"
+    }
+  ],
+  "note": "Golden fixture cho TruyenC (https://truyenc.net)."
+}

@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "pattern": "Truyện Hoàn",
+      "url": "https://truyenhoan.com/"
+    },
+    {
+      "name": "Truyện hot",
+      "pattern": "Truyện",
+      "url": "https://truyenhoan.com/truyen-hot/"
+    },
+    {
+      "name": "Chi tiết truyện",
+      "pattern": "Vạn Cổ Thần Đế",
+      "url": "https://truyenhoan.com/van-co-than-de.4780/"
+    }
+  ]
+}

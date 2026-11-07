@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "name": "Sáng Tác Việt",
+    "author": "Qsang",
+    "version": 1,
+    "source": "https://sangtacviet.vip",
+    "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:vip|app|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
+    "description": "Sáng Tác Việt — nền tảng đọc và nhúng truyện dịch máy / convert từ nguồn Trung Quốc (Qidian, Fanqie, 69shu, uukanshu...).",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain Sáng Tác Việt",
+      "mode": "select",
+      "values": [
+        "https://sangtacviet.vip",
+        "https://sangtacviet.app",
+        "https://sangtacviet.com",
+        "https://sangtacviet.pro"
+      ],
+      "default": "https://sangtacviet.vip"
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js"
+  }
+}
