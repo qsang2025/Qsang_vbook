@@ -82,6 +82,17 @@
       },
       "input": "https://lacatruyen.site/chapter/Chuong-1-Ngoai-Huong-Nhan",
       "script": "chap.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Cassius",
+          "Phiêu lưu"
+        ],
+        "minItems": 1
+      },
+      "input": "https://lacatruyen.site/chapter/chuong-1-bang-thong-tin-nghe-nghiep-3682-599697",
+      "script": "chap.js"
     }
   ],
   "note": "Golden fixture cho La Cà Truyện (https://lacatruyen.site)."

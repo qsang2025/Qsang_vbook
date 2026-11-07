@@ -7,13 +7,13 @@ function decryptChapterContent(pageProps) {
     var chapterEnc = pageProps.chapter || {};
     var rsEnc = pageProps.rs || {};
     var riEnc = pageProps.ri || "";
-    var commentCount = pageProps.comment_count;
+    var commentCount = (typeof pageProps.comment_count === "number") ? pageProps.comment_count : formatCommentSeed(pageProps.comment_count);
 
     // Tang 1: Giai ma ri va rs bang MASTER_KEY -> tinh firstKey = "" + (rs[ri] + comment_count)
     var riDec = aesDecrypt(riEnc, MASTER_KEY);
     var rsDec = aesDecryptObject(rsEnc, MASTER_KEY);
     var rsVal = (rsDec && riDec !== "") ? rsDec[riDec] : undefined;
-    var firstKey = "" + (rsVal + commentCount);
+    var firstKey = "" + ((rsVal !== undefined ? rsVal : "undefined") + commentCount);
 
     // Giai ma cac truong cua chapter bang firstKey
     var chapterDec = aesDecryptObject(chapterEnc, firstKey);
@@ -54,26 +54,28 @@ function cleanChapterHtml(html) {
         .trim();
 }
 
-function tryBrowserExtract(chapterUrl) {
-    var browser = null;
-    try {
-        browser = Engine.newBrowser();
-        browser.launch(chapterUrl, 7000);
-        var doc = browser.html();
-        if (doc) {
-            var nextData = extractNextData(doc);
-            if (nextData && nextData.props && nextData.props.pageProps) {
-                return nextData.props.pageProps;
-            }
-        }
-    } catch (e) {
-    } finally {
+function extractDomChapterFallback(res, rawHtml) {
+    if (res && typeof res.html === "function") {
         try {
-            if (browser) browser.close();
-        } catch (e2) {
+            var doc = res.html();
+            if (doc && typeof doc.select === "function") {
+                var el = doc.select(".chapter-content, #chapter-content, article").first();
+                if (el) {
+                    var domHtml = cleanChapterHtml(el.html() || "");
+                    if (domHtml && domHtml.length > 50) return domHtml;
+                }
+            }
+        } catch (e) {
         }
     }
-    return null;
+    if (rawHtml) {
+        var m = String(rawHtml).match(/<article[^>]*>([\s\S]*?)<\/article>/i);
+        if (m && m[1]) {
+            var artHtml = cleanChapterHtml(m[1]);
+            if (artHtml && artHtml.length > 50) return artHtml;
+        }
+    }
+    return "";
 }
 
 function execute(url) {
@@ -82,15 +84,34 @@ function execute(url) {
 
     var res = fetch(chapterUrl, {
         method: "GET",
-        headers: buildAuthHeaders()
+        headers: buildAuthHeaders({
+            "Referer": BASE_URL + "/"
+        })
     });
     if (!res || !res.ok) {
         return Response.error("Không thể tải trang chương truyện.");
     }
 
-    var nextData = extractNextData(res.html());
+    var rawHtml = "";
+    try {
+        rawHtml = String(res.text() || "");
+    } catch (e) {
+    }
+
+    var nextData = rawHtml ? extractNextData(rawHtml) : null;
+    if (!nextData) {
+        try {
+            nextData = extractNextData(res.html());
+        } catch (e2) {
+        }
+    }
+
     var pageProps = (nextData && nextData.props && nextData.props.pageProps) ? nextData.props.pageProps : null;
     if (!pageProps) {
+        var domOnly = extractDomChapterFallback(res, rawHtml);
+        if (domOnly) {
+            return Response.success(domOnly);
+        }
         return Response.error("Không đọc được dữ liệu chương từ trang.");
     }
 
@@ -103,28 +124,18 @@ function execute(url) {
         return Response.success(html);
     }
 
-    // Neu chua co noi dung ma hoa (vd: notify === "not_login") va nguoi dung chua dien TOKEN,
-    // thu lay tu phien trinh duyet vBook (neu nguoi dung da dang nhap trong trinh duyet)
-    if (!getSavedToken()) {
-        var browserProps = tryBrowserExtract(chapterUrl);
-        if (browserProps) {
-            var browserHtml = cleanChapterHtml(decryptChapterContent(browserProps));
-            if (browserHtml) {
-                return Response.success(browserHtml);
-            }
-            if (!pageProps.previewHtml && browserProps.previewHtml) {
-                pageProps = browserProps;
-            }
-        }
-    }
-
     var notify = String(pageProps.notify || "").trim().toLowerCase();
 
-    // Fallback sang previewHtml neu server tra san noi dung xem truoc
+    // Fallback sang previewHtml neu server tra san noi dung xem truoc (vd: notify === "not_login")
     var preview = cleanChapterHtml(pageProps.previewHtml || "");
+    if (!preview) {
+        preview = extractDomChapterFallback(res, rawHtml);
+    }
     if (preview) {
-        var note = "<br><p><i>[Nội dung xem trước — Để đọc trọn vẹn toàn bộ chương trên La Cà Truyện, vui lòng đăng nhập tài khoản trong trình duyệt vBook hoặc cấu hình TOKEN trong cài đặt tiện ích.]</i></p>";
-        if (notify === "no_package" || notify === "need_package" || notify === "must_buy") {
+        var note = "";
+        if (notify === "not_login") {
+            note = "<br><p><i>[Nội dung xem trước — Để đọc trọn vẹn toàn bộ chương trên La Cà Truyện, vui lòng đăng nhập tài khoản trong trình duyệt vBook hoặc cấu hình TOKEN trong cài đặt tiện ích.]</i></p>";
+        } else if (notify === "no_package" || notify === "need_package" || notify === "must_buy") {
             note = "<br><p><i>[Nội dung xem trước — Chương này yêu cầu gói đọc hoặc mở khóa trên web La Cà Truyện.]</i></p>";
         }
         return Response.success(preview + note);

@@ -74,7 +74,18 @@ function execute(url) {
         if (!pageRes || !pageRes.ok) {
             return Response.error("Không thể tải trang truyện để lấy mục lục.");
         }
-        var nextData = extractNextData(pageRes.html());
+        var rawHtml = "";
+        try {
+            rawHtml = String(pageRes.text() || "");
+        } catch (e) {
+        }
+        var nextData = rawHtml ? extractNextData(rawHtml) : null;
+        if (!nextData) {
+            try {
+                nextData = extractNextData(pageRes.html());
+            } catch (e2) {
+            }
+        }
         var pageProps = (nextData && nextData.props && nextData.props.pageProps) ? nextData.props.pageProps : null;
         if (!pageProps || !pageProps.story || !pageProps.story.id) {
             return Response.error("Không tìm thấy mã truyện (story.id) từ trang.");

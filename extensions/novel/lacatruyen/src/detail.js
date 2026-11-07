@@ -79,7 +79,18 @@ function execute(url) {
         return Response.error("Không thể tải trang chi tiết truyện.");
     }
 
-    var nextData = extractNextData(res.html());
+    var rawHtml = "";
+    try {
+        rawHtml = String(res.text() || "");
+    } catch (e) {
+    }
+    var nextData = rawHtml ? extractNextData(rawHtml) : null;
+    if (!nextData) {
+        try {
+            nextData = extractNextData(res.html());
+        } catch (e2) {
+        }
+    }
     if (!nextData || !nextData.props || !nextData.props.pageProps) {
         return Response.error("Không đọc được dữ liệu truyện từ trang.");
     }

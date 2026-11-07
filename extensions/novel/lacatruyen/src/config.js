@@ -17,9 +17,11 @@ try {
 
 try {
     if (typeof TOKEN !== "undefined" && TOKEN) {
-        USER_TOKEN = normalizeToken(TOKEN);
+        USER_TOKEN = String(TOKEN).trim();
+    } else if (typeof token !== "undefined" && token) {
+        USER_TOKEN = String(token).trim();
     } else if (typeof CONFIG_COOKIE !== "undefined" && CONFIG_COOKIE) {
-        USER_TOKEN = normalizeToken(CONFIG_COOKIE);
+        USER_TOKEN = String(CONFIG_COOKIE).trim();
     }
 } catch (e) {
 }
@@ -28,6 +30,7 @@ function normalizeToken(rawVal) {
     if (!rawVal) return "";
     var s = String(rawVal).trim();
     if (!s) return "";
+    s = s.replace(/^Bearer\s+/i, "").trim();
     var m = s.match(/(?:^|;\s*)token=([^;]+)/i);
     if (m && m[1]) {
         return String(m[1]).trim();
@@ -35,24 +38,50 @@ function normalizeToken(rawVal) {
     return s.replace(/^token=/i, "").trim();
 }
 
-function getSavedToken() {
+function getActiveToken() {
     if (USER_TOKEN) return USER_TOKEN;
     try {
-        if (typeof localStorage !== "undefined" && localStorage) {
-            var t = localStorage.getItem("laca_token");
-            if (t) return normalizeToken(t);
+        if (typeof localConfig !== "undefined" && localConfig && typeof localConfig.getItem === "function") {
+            var c1 = localConfig.getItem("TOKEN");
+            if (c1) return String(c1).trim();
+            var c2 = localConfig.getItem("token");
+            if (c2) return String(c2).trim();
         }
     } catch (e) {
     }
+    try {
+        if (typeof localStorage !== "undefined" && localStorage && typeof localStorage.getItem === "function") {
+            var s1 = localStorage.getItem("lacatruyen_token");
+            if (s1) return String(s1).trim();
+            var s2 = localStorage.getItem("laca_token");
+            if (s2) return String(s2).trim();
+        }
+    } catch (e2) {
+    }
+    try {
+        if (typeof localCookie !== "undefined" && localCookie && typeof localCookie.getCookie === "function") {
+            var ck = localCookie.getCookie();
+            if (ck) {
+                var m = String(ck).match(/(?:^|;\s*)token=([^;]+)/i);
+                if (m && m[1]) return String(m[1]).trim();
+            }
+        }
+    } catch (e3) {
+    }
     return "";
+}
+
+function getSavedToken() {
+    return normalizeToken(getActiveToken());
 }
 
 function saveToken(t) {
     var clean = normalizeToken(t);
     if (!clean) return;
     try {
-        if (typeof localStorage !== "undefined" && localStorage) {
+        if (typeof localStorage !== "undefined" && localStorage && typeof localStorage.getItem === "function") {
             localStorage.setItem("laca_token", clean);
+            localStorage.setItem("lacatruyen_token", clean);
         }
     } catch (e) {
     }
@@ -109,13 +138,36 @@ function buildAuthHeaders(extraHeaders) {
         "Origin": BASE_URL,
         "Referer": BASE_URL + "/"
     };
-    var tk = getSavedToken();
-    if (tk) {
-        headers["Cookie"] = "token=" + tk;
+    var cookieParts = [];
+    try {
+        if (typeof localCookie !== "undefined" && localCookie && typeof localCookie.getCookie === "function") {
+            var hostCookies = String(localCookie.getCookie() || "").trim();
+            if (hostCookies) cookieParts.push(hostCookies);
+        }
+    } catch (e) {
     }
+
+    var rawTk = getActiveToken();
+    if (rawTk) {
+        var cleanTk = normalizeToken(rawTk);
+        if (rawTk.indexOf("=") !== -1 || rawTk.indexOf(";") !== -1) {
+            cookieParts.push(rawTk);
+            if (cleanTk && rawTk.toLowerCase().indexOf("token=") === -1) {
+                cookieParts.push("token=" + cleanTk);
+            }
+        } else if (cleanTk) {
+            cookieParts.push("token=" + cleanTk);
+            headers["Authorization"] = "Bearer " + cleanTk;
+        }
+    }
+
+    if (cookieParts.length > 0) {
+        headers["Cookie"] = cookieParts.join("; ");
+    }
+
     if (extraHeaders && typeof extraHeaders === "object") {
         for (var k in extraHeaders) {
-            if (Object.prototype.hasOwnProperty.call(extraHeaders, k)) {
+            if (typeof extraHeaders[k] !== "undefined" && typeof extraHeaders[k] !== "function") {
                 headers[k] = extraHeaders[k];
             }
         }
@@ -123,29 +175,59 @@ function buildAuthHeaders(extraHeaders) {
     return headers;
 }
 
-function extractNextData(docOrHtml) {
-    if (!docOrHtml) return null;
-    if (typeof docOrHtml === "object" && typeof docOrHtml.select === "function") {
-        try {
-            var el = docOrHtml.select("script#__NEXT_DATA__").first();
-            if (el) {
-                var raw = String(el.html() || el.text() || "").trim();
-                if (raw) return JSON.parse(raw);
+function extractNextData(input) {
+    if (!input) return null;
+    if (typeof input === "string") {
+        var mStr = input.match(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+        if (mStr && mStr[1]) {
+            try {
+                return JSON.parse(String(mStr[1]).trim());
+            } catch (e0) {
             }
-        } catch (e) {
+        }
+        return null;
+    }
+    if (typeof input === "object" && typeof input.select === "function") {
+        try {
+            var el = input.select("script#__NEXT_DATA__").first();
+            if (el) {
+                var rawText = "";
+                try {
+                    rawText = String(el.text() || "").trim();
+                } catch (e1) {
+                }
+                if (rawText) {
+                    try {
+                        return JSON.parse(rawText);
+                    } catch (e2) {
+                    }
+                }
+                var rawHtml = "";
+                try {
+                    rawHtml = String(el.html() || "").trim();
+                } catch (e3) {
+                }
+                if (rawHtml) {
+                    try {
+                        return JSON.parse(rawHtml);
+                    } catch (e4) {
+                    }
+                }
+            }
+        } catch (e5) {
         }
         try {
-            docOrHtml = String(docOrHtml.html() || "");
-        } catch (e2) {
-            docOrHtml = "";
+            input = String(input.html() || "");
+        } catch (e6) {
+            input = "";
         }
     }
-    var html = String(docOrHtml || "");
-    var m = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+    var html = String(input || "");
+    var m = html.match(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
     if (m && m[1]) {
         try {
-            return JSON.parse(m[1]);
-        } catch (e3) {
+            return JSON.parse(String(m[1]).trim());
+        } catch (e7) {
         }
     }
     return null;
@@ -244,9 +326,15 @@ function aesDecryptObject(obj, pass) {
     var out = {};
     if (!obj || typeof obj !== "object") return out;
     for (var k in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        if (typeof obj[k] !== "undefined" && typeof obj[k] !== "function") {
             out[k] = aesDecrypt(obj[k], pass);
         }
     }
     return out;
+}
+
+function formatCommentSeed(cc) {
+    if (cc === undefined || cc === null) return "";
+    if (Array.isArray(cc)) return cc.join(",");
+    return String(cc);
 }
