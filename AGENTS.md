@@ -157,6 +157,7 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
 
 ## 11. Attribution / license
 
+- **Định dạng Tác giả (`author`) chuẩn duy nhất**: Luôn để thống nhất `"author": "Qsang"`. **Tuyệt đối KHÔNG ghi `Qsang (ref: ...)` hay bất kỳ biến thể nào vào trường `author`** để đảm bảo tính năng filter/lọc extension theo tác giả trong app vBook hoạt động chính xác. Mọi thông tin ghi nhận công lao, tham khảo tác giả khác (`ref: ...`) bắt buộc chuyển xuống trường `description` của extension.
 - Code mượn từ repo khác **giữ attribution**, không ghi tác giả Qsang cho
   code copy. Bảng attribution đầy đủ ở `README.md`.
 - 32/33 repo tham khảo không có file LICENSE; chỉ `vbook_duongden` có —
