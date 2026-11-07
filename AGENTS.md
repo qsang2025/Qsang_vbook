@@ -208,3 +208,32 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   `auto-issue` mở issue GitHub khi có nguồn gãy, **chống trùng theo tiêu đề**
   cố định `[Health-check] Có nguồn vBook bị lỗi / đổi giao diện` (chỉ mở
   khi chưa có issue mở cùng tiêu đề).
+
+## 13. Điều phối tác vụ lớn tiết kiệm quota (`quota-workflow`)
+
+- Với các tác vụ lớn (ước tính **> 30 phút** hoặc có **≥ 3 bước phụ thuộc**,
+  ví dụ tạo/sửa nhiều nguồn cùng lúc hoặc đại tu lớn) hoặc khi người dùng yêu
+  cầu áp dụng `quota-workflow`, bắt buộc đọc và tuân thủ skill
+  **`quota-workflow`** (đã cài sẵn trong danh sách skill của Antigravity — gọi
+  `lookup_skill(skill_name: "quota-workflow")`, hoặc đọc từ
+  `https://github.com/qsang2025/antigravity-skills/tree/main/quota-workflow`).
+- **Quy tắc phân vai & chọn model (được người dùng cấp quyền cố định tại đây):**
+  - **Master (Planner / Decision-maker):** Chạy trên model mạnh của phiên chính
+    (`Gemini 4 Argon Medium`, tier `pro`), chỉ dùng cho việc lập Plan (1 turn)
+    và ra quyết định khi sub-agent báo cáo về.
+  - **Sub-agent (Recon / Executor):** Bắt buộc gọi `invoke_subagent` với đầy đủ
+    3 tham số tường minh:
+    `TypeName: "self"`, `Workspace: "inherit"`, `Model: "flash"`
+    (`Gemini 3.8 Flash Medium`). Tuyệt đối không dùng `TypeName: "research"` cho
+    bước khảo sát mạng/ghi file và không bỏ trống `Model`.
+  - **Bước 1 + 1.5 (Recon):** Gộp thành **1 lần gọi sub-agent `flash` duy nhất**
+    để ghi `<date>-<task>-REQUEST.md` và `<task>-CONTEXT.md`.
+  - **Bước 2 + 3 (Plan & Review):** Master viết trọn vẹn file Plan
+    (`<date>-<task>.md`) bằng 1 lần gọi `write_to_file`, tự rà Checklist và
+    dispatch luôn sub-agent `flash` thực thi cụm bước đầu tiên trong **cùng 1
+    turn** (sub-agent đầu tiên sẽ commit file Plan ở Step 0).
+  - **Kỷ luật Git & Lưu tiến độ:** Chỉ chạy **tuần tự 1 sub-agent ghi file tại
+    một thời điểm** trên cùng repo; không merge `.agents/plans/` và
+    `.agents/reports/` vào nhánh `main`; nếu hết quota ở bất kỳ bước nào thì lưu
+    tiến độ vào file Plan, commit và dừng lại báo cáo ngay (không lặp lại).
+
