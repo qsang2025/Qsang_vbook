@@ -1,0 +1,40 @@
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://czbooks.net",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://czbooks.net"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "Qsang",
+    "description": "小說狂人 (czbooks.net) — truyện chữ phồn thể miễn phí, 120k+ truyện; catalog có lẫn nội dung NSFW (đánh dấu nsfw).",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "zh_TW",
+    "name": "小說狂人",
+    "nsfw": true,
+    "regexp": "^https://czbooks\\.net/n/[^/]+/?$",
+    "source": "https://czbooks.net",
+    "type": "novel",
+    "version": 1
+  },
+  "script": {
+    "book": "book.js",
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js"
+  }
+}
