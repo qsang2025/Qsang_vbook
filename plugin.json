@@ -29,12 +29,12 @@
     },
     {
       "name": "La Cà Truyện",
-      "author": "Qsang (ref: QuocBao, ivanzzz)",
+      "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://lacatruyen.site",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/icon.png",
-      "description": "Đọc truyện chữ trên La Cà Truyện (lacatruyen.site). Hỗ trợ giải mã mục lục và chương tự động; có thể cấu hình TOKEN hoặc đăng nhập trình duyệt vBook để đọc đầy đủ các chương yêu cầu đăng nhập.",
+      "description": "Đọc truyện chữ trên La Cà Truyện (lacatruyen.site). Hỗ trợ giải mã mục lục và chương tự động; có thể cấu hình TOKEN hoặc đăng nhập trình duyệt vBook để đọc đầy đủ các chương yêu cầu đăng nhập (ref: QuocBao, ivanzzz).",
       "type": "novel",
       "locale": "vi_VN"
     },
@@ -62,12 +62,12 @@
     },
     {
       "name": "Tiệm Truyện Chữ",
-      "author": "Qsang (ref: ivanzzz, sonzin, Vearn)",
+      "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://tiemtruyenchu.cloud",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/icon.png",
-      "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua API tốc độ cao. Để đọc nội dung chương, vui lòng đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
+      "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua API tốc độ cao (ref: ivanzzz, sonzin, Vearn). Để đọc nội dung chương, vui lòng đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
       "type": "novel",
       "locale": "vi_VN"
     },
