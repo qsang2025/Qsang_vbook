@@ -67,7 +67,13 @@ function extractImages(doc) {
         if (!isContentImage(src)) return;
         if (seen[src]) return;
         seen[src] = true;
-        images.push(src);
+        // Ghi tuong minh referrerpolicy=origin vao URL anh (phan sau #
+        // khong gui len server; app dung no de gui Referer la origin cua
+        // site thay vi URL chuong day du). Anh CDN bat buoc Referer
+        // niacg.com — truoc day nho Referer mac dinh cua app (URL chuong),
+        // da kiem chung chay duoc; ghi ro ra de chac chan hon (them
+        // 2026-11-07, theo cach cua ban Antigravity).
+        images.push(src + "#referrerpolicy=origin");
     });
     return images;
 }
@@ -82,7 +88,7 @@ function execute(url) {
     if (url.indexOf("/moehome-") !== -1) {
         if (isSeriesClass(classid)) {
             // Chuong truyen tranh: tim nut "开始阅读" tren trang moehome.
-            var doc = fetchDoc(url);
+            var doc = fetchDocWithFallback(url);
             if (!doc) return Response.error("Không tải được chương: " + url);
             var reading = doc.select("a.reading").first();
             var href = reading ? (reading.attr("href") || "") : "";
@@ -100,7 +106,7 @@ function execute(url) {
         }
     }
 
-    var readDoc = fetchDoc(readUrl);
+    var readDoc = fetchDocWithFallback(readUrl);
     if (!readDoc) return Response.error("Không tải được trang đọc: " + readUrl);
 
     var images = extractImages(readDoc);

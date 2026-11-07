@@ -1,22 +1,24 @@
 // toc.js — muc luc chuong cua NiACG.
 //
 // Hai dang:
-//   Series manga (showinfo-14/15-<id>-0.html): trang chua danh sach link
-//     chuong dang /moehome-<class>-<chapterId>.html. Anchor text cua link
-//     chuong GAN NHU TRONG (chi co so luot xem), nen ten chuong dat theo
-//     thu tu tang dan cua chapterId: "Chương 1".."Chương N". Moi chuong
-//     tro ve TRANG MOEHOME cua chuong do (khong phai moeupup): trang doc
-//     that cua chuong truyen tranh la nut "开始阅读" (Bat dau doc) tren
-//     trang moehome, tro toi /showinfo-16-<readId>-0.html — chap.js se
-//     tu tim nut do de lay anh. (Kiem chung 2026-11-07: series 209 co
-//     9 chuong, id 84, 101, 102, 103, 169, 171, 172, 180, 185; moi link
-//     lap lai 3 lan tren trang. Chuong 101 co nut doc showinfo-16-3935,
-//     chuong 84 co nut doc showinfo-16-3425.)
+//   Series manga (showinfo-14/15-<id>-0.html): danh sach chuong THAT nam
+//     trong <div class="episode"> — moi chuong la link
+//     /showinfo-16-<readId>-0.html (trang doc truc tiep), ten that trong
+//     <li class="current_series"> (vd 第1话). Xoa <span class="hidden-xs">
+//     chua timestamp truoc khi lay ten, neu khong ten se dinh kem so
+//     (vd "第11话1689656426"). Trang liet ke moi nhat truoc (第11话 dau)
+//     nen dao nguoc de duoc cu -> moi (第1话 dau).
+//     (Kiem chung 2026-11-07 tren showinfo-14-209: 11 tap 第1话–第11话
+//     -> showinfo-16-5692..5702. Truoc day (v1) doc link
+//     /moehome-<class>-<id> trong carousel tac pham lien quan
+//     (.thumb-overlay-albums) va dat ten gia "Chương N" — SAI, bam vao
+//     mo nham tac pham khac. Da sua theo cach cua ban Antigravity.)
 //   Gallery don (moehome hoac showinfo muc anh khac): 1 item = 1 bo anh,
 //     tra ve 1 chuong duy nhat "Đọc toàn bộ" tro ve
 //     /moeupup-<class>-<id>.html (toan bo anh tren 1 trang).
 //   Chuong truyen tranh mo truc tiep (moehome-14/15): 1 chuong "Chương 1"
-//     tro ve chinh trang moehome do.
+//     tro ve chinh trang moehome do (chap.js se tim nut "开始阅读" de lay
+//     trang doc showinfo-16).
 // Khong co phan trang muc luc (khong can page.js).
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
@@ -55,40 +57,42 @@ function execute(url) {
         }]);
     }
 
-    // Series manga: doc danh sach chuong tren trang showinfo.
-    var doc = fetchDoc(url);
+    // Series manga: doc danh sach chuong THAT trong <div class="episode">.
+    var doc = fetchDocWithFallback(url);
     if (!doc) return Response.error("Không tải được mục lục: " + url);
 
-    var chapterIds = [];
-    var seen = {};
-    doc.select("a[href^=\"/moehome-" + classid + "-\"]").forEach(function (el) {
-        var href = el.attr("href");
-        var m = String(href || "").match(/\/moehome-\d+-(\d+)\.html/);
-        if (!m) return;
-        var cid = parseInt(m[1], 10);
-        if (isNaN(cid) || seen[cid]) return;
-        seen[cid] = true;
-        chapterIds.push(cid);
-    });
-
-    if (chapterIds.length === 0) {
-        return Response.error("Không đọc được mục lục (site có thể đã đổi giao diện): " + url);
-    }
-
-    // Sap xep tang dan theo chapterId = thu tu doc (cu nhat truoc).
-    chapterIds.sort(function (a, b) { return a - b; });
+    // Xoa span timestamp trong moi link chuong truoc khi lay ten.
+    var dateSpans = doc.select(".episode .hidden-xs");
+    dateSpans.remove();
 
     var chapters = [];
-    var i = 0;
-    for (i = 0; i < chapterIds.length; i++) {
+    var seen = {};
+    doc.select(".episode a[href*=\"showinfo-16-\"]").forEach(function (el) {
+        var href = el.attr("href");
+        if (!href) return;
+        var link = absUrl(href);
+        if (seen[link]) return;
+        seen[link] = true;
+        var name = "";
+        var li = el.select("li").first();
+        if (li !== null) name = cleanText(li.text());
+        if (!name) name = cleanText(el.text());
+        if (!name) return;
         chapters.push({
-            name: "Chương " + (i + 1),
-            url: moehomeUrl(classid, String(chapterIds[i])),
+            name: name,
+            url: link,
             description: "",
             lock: false,
             pay: false
         });
+    });
+
+    if (chapters.length === 0) {
+        return Response.error("Không đọc được mục lục (site có thể đã đổi giao diện): " + url);
     }
+
+    // Trang liet ke moi nhat truoc -> dao nguoc de chuong cu nhat len dau.
+    chapters.reverse();
     console.log("toc series: " + chapters.length + " chuong");
     return Response.success(chapters);
 }

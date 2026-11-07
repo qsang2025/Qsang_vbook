@@ -20,6 +20,18 @@ load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
 
+// Mo ta day du tu #intro-block (div 敘述/叙述), roi moi fallback ve meta
+// description. Vi du: moehome-1-162877 cho "Tiny Asa アサ - Fleurdelys
+// (Wuthering Waves)" (meta description chi co ten ngan hon); showinfo
+// -14-209 thi div 敘述 trong nen mo ta rong -> fallback meta (cung rong).
+function introDescription(doc) {
+    var el = doc.select("#intro-block div.p-t-5.p-b-5").first();
+    if (el === null) return "";
+    var text = cleanText(el.text());
+    text = text.replace(/^(敘述|叙述|简介|簡介)[:：]?\s*/, "");
+    return cleanText(text);
+}
+
 // Meta content theo ten (description / keywords).
 function metaContent(doc, name) {
     var el = doc.select("meta[name=\"" + name + "\"]").first();
@@ -79,7 +91,7 @@ function execute(url) {
     var id = itemIdOf(url);
     if (!classid || !id) return Response.error("Không đọc được mục/id từ URL: " + url);
 
-    var doc = fetchDoc(url);
+    var doc = fetchDocWithFallback(url);
     if (!doc) return Response.error("Không tải được trang chi tiết: " + url);
 
     var isMoehome = url.indexOf("/moehome-") !== -1;
@@ -99,13 +111,30 @@ function execute(url) {
 
     var cover = firstContentImage(doc);
 
-    var description = metaContent(doc, "description");
+    var description = introDescription(doc);
+    if (!description) description = metaContent(doc, "description");
 
     var dateText = "";
     var bodyText = "";
     try { bodyText = String(doc.select("body").text()); } catch (e) {}
     var dm = bodyText.match(/上架日期\s*:\s*(\d{4}-\d{2}-\d{2})/);
     if (dm) dateText = dm[1];
+
+    // Trang thai ongoing that: quet chuoi 完结/完結/最终话/最終話 (da xong)
+    // va 连载/連載 (dang ra). Mac dinh false khi khong thay dau hieu nao
+    // (them 2026-11-07, theo cach cua ban Antigravity; truoc day hardcode
+    // false). Luu y: 2 trang mau (moehome-1-162877, showinfo-14-209) deu
+    // khong co cac chuoi nay nen deu tra false.
+    var ongoing = false;
+    var statusText = "";
+    if (bodyText.indexOf("完结") !== -1 || bodyText.indexOf("完結") !== -1 ||
+        bodyText.indexOf("最终话") !== -1 || bodyText.indexOf("最終話") !== -1) {
+        ongoing = false;
+        statusText = "Đã hoàn thành";
+    } else if (bodyText.indexOf("连载") !== -1 || bodyText.indexOf("連載") !== -1) {
+        ongoing = true;
+        statusText = "Đang ra";
+    }
 
     var author = "";
     var am = bodyText.match(/作者\s*[:：]\s*([^\s]+)/);
@@ -123,6 +152,7 @@ function execute(url) {
     detailHtml += "Mục: " + className(classid);
     if (dateText) detailHtml += "<br>Ngày đăng: " + dateText;
     if (author) detailHtml += "<br>Tác giả: " + author;
+    if (statusText) detailHtml += "<br>Trạng thái: " + statusText;
     if (isSeriesUrl(url)) detailHtml += "<br>Dạng: Series nhiều chương";
 
     // Goi y: cac item anh khac tren trang (moehome/showinfo muc anh).
@@ -151,7 +181,7 @@ function execute(url) {
         url: url,
         type: "comic",
         format: "comic",
-        ongoing: false,
+        ongoing: ongoing,
         genres: genres,
         suggests: suggests.slice(0, 10)
     });

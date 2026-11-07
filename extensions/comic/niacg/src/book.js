@@ -22,7 +22,7 @@ function execute(input, page) {
     var baseUrl = input.indexOf("http") === 0 ? input : BASE_URL + input;
     var url = listPageUrl(baseUrl, page);
 
-    var doc = fetchDoc(url);
+    var doc = fetchDocWithFallback(url);
     if (!doc) return Response.error("Không tải được trang danh sách: " + url);
 
     var parsed = parseListPage(doc, page);

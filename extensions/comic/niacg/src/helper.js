@@ -157,6 +157,21 @@ function parseListPage(doc, currentPage) {
     return { items: items, next: maxSitePage > sitePage ? String(cur + 1) : "" };
 }
 
+// Lay Document, thu mirror neu domain chinh chet (dung MIRROR_LIST trong
+// config.js qua fetchWithFallback trong fetch-helpers.js). Tra ve Document
+// hoac null. Dung thay cho fetchDoc() o cac script cua extension nay de
+// mirror xpicvid.com da khai bao thuc su hoat dong (them 2026-11-07).
+function fetchDocWithFallback(url) {
+    var res = fetchWithFallback(url, MIRROR_LIST);
+    if (!res) return null;
+    if (res.browser) return res.doc;
+    try {
+        return res.html();
+    } catch (e) {
+        return null;
+    }
+}
+
 // Ghe so trang app (bat dau tu 1) vao URL danh sach dang
 // /listinfo-<class>-<N>.html hoac /tags-<kw>-<N>.html (site bat dau tu 0).
 function listPageUrl(baseUrl, page) {

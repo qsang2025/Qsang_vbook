@@ -2,9 +2,9 @@
 
 - **Nguồn:** https://www.niacg.com/ (thương hiệu **Xpicvid**, tiền thân 逆次元 / 逆ACG)
 - **Mirror:** https://www.xpicvid.com/ (cùng site, cùng nội dung)
-- **Loại:** `comic` (gallery ảnh) · **Locale:** `zh_CN` · **Version:** 1
+- **Loại:** `comic` (gallery ảnh) · **Locale:** `zh_CN` · **Version:** 2
 - **Nội dung:** COS, CG, 本子 (doujinshi), 套图 (bộ ảnh), 日漫, 韩漫, 最新, 画廊, 漫画
-- **⚠️ Nội dung 18+ (NSFW):** toàn site là nội dung người lớn (doujinshi H, manga H, COS gợi cảm). Manifest gắn `nsfw: true`. Không đưa vào catalog chung nếu repo có chính sách riêng cho NSFW (xem AGENTS.md §6.7).
+- **⚠️ Nội dung 18+ (NSFW):** toàn site là nội dung người lớn (doujinshi H, manga H, COS gợi cảm). Manifest gắn `nsfw: true` và registry gốc giữ cờ này (quyết định của Anh 2026-11-07: giữ trong catalog chung, có cờ nsfw).
 
 ## Phạm vi — chỉ ảnh, không video
 
@@ -46,18 +46,22 @@ video riêng (ví dụ `niacg-video`). Item video bị lọc khỏi kết quả 
   rỗng (không báo lỗi). Query là đường dẫn (`/listinfo/...`, `/tags/...`)
   thì duyệt thẳng như tab danh sách.
 - **detail.js** — `moehome`: tên `h1.book-name`, ngày `上架日期`, tag từ meta
-  keywords + link `/tags-`, bìa là ảnh nội dung đầu tiên, mô tả từ meta
-  description. `showinfo` (series 14/15 hoặc trang info): tên từ `<title>`,
-  bìa series từ ảnh `comic.xunge.cyou` đầu tiên trên trang.
-- **toc.js** — Series manga (showinfo-14/15): danh sách link chương
-  `/moehome-<class>-<chapterId>.html`, khử trùng, sắp xếp tăng dần theo
-  chapterId, đặt tên "Chương 1".."Chương N" (anchor text trên trang series
-  gần như trống nên không lấy được tên thật). Mỗi chương trỏ về **trang
-  moehome của chương đó** (không phải moeupup — trang moeupup của chương
-  manga chỉ có thumbnail liên quan, không có ảnh chương). Gallery đơn:
-  1 chương "Đọc toàn bộ" trỏ về `/moeupup-<class>-<id>.html`. Không có
-  phân trang mục lục. Chương manga mở trực tiếp (moehome-14/15): 1 chương
-  "Chương 1" trỏ về chính trang đó.
+  keywords + link `/tags-`, bìa là ảnh nội dung đầu tiên, mô tả từ
+  `#intro-block` (div 敘述; fallback về meta description nếu trống).
+  `showinfo` (series 14/15 hoặc trang info): tên từ `<title>`,
+  bìa series từ ảnh `comic.xunge.cyou` đầu tiên trên trang. Trạng thái
+  ongoing phát hiện thật bằng cách quét 完结/完結/最终话 (đã xong) và
+  连载/連載 (đang ra) trên trang; mặc định false khi không thấy dấu hiệu.
+- **toc.js** — Series manga (showinfo-14/15): danh sách chương **thật** trong
+  `<div class="episode">` — mỗi chương là link `/showinfo-16-<readId>-0.html`
+  (trang đọc trực tiếp), tên thật trong `<li class="current_series">`
+  (vd 第1话). Xóa `<span class="hidden-xs">` chứa timestamp trước khi lấy
+  tên, nếu không tên dính kèm số. Trang liệt kê mới nhất trước nên đảo
+  ngược để chương cũ nhất lên đầu. Mỗi chương trỏ thẳng về trang đọc
+  showinfo-16 (chap.js đọc ảnh từ đó). Gallery đơn: 1 chương "Đọc toàn bộ"
+  trỏ về `/moeupup-<class>-<id>.html`. Không có phân trang mục lục. Chương
+  manga mở trực tiếp (moehome-14/15): 1 chương "Chương 1" trỏ về chính
+  trang đó (chap.js tìm nút "开始阅读" để sang trang đọc).
 - **chap.js** — trả về mảng URL ảnh theo thứ tự.
   - Gallery: đọc trang `moeupup`, ảnh trong `<img class="comic_img"
     data-src="...">` (118 ảnh cho gallery mẫu Tiny Asa).
@@ -93,24 +97,44 @@ video riêng (ví dụ `niacg-video`). Item video bị lọc khỏi kết quả 
   phạm vi) và tham số tìm kiếm `/e/search/`.
 - `searchid` do server cấp khi tìm kiếm; nếu trang kết quả trả về lỗi hoặc
   hết hạn thì `search.js` sẽ tìm lại từ đầu (token `SID:` hết hiệu lực).
-- Tên chương manga series là tên đặt theo thứ tự (không phải tên thật trên
-  site) vì anchor text trên trang series trống; muốn tên thật phải fetch
-  từng trang chương (tốn request) — chưa làm.
+- Tên chương manga series lấy từ `<li class="current_series">` trong
+  `<div class="episode">` (tên thật, vd 第1话); nhớ xóa `<span
+  class="hidden-xs">` chứa timestamp trước khi lấy tên. Nút "开始阅读"
+  trên trang series cũng trỏ về tập đầu (showinfo-16-5692 cho series
+  mẫu) nhưng nằm ngoài khối `.episode`, không dùng làm danh sách chương.
 - Trang đọc chương manga là `showinfo-16-<readId>-0.html`, `readId` chỉ lấy
   được từ nút "开始阅读" trên trang moehome của chương (không suy ra từ
   chapterId); nếu site đổi class của nút đó thì `chap.js` sẽ báo lỗi và
   cần cập nhật selector `a.reading` / `a[href^="/showinfo-16-"]`.
 - Trang `moeupup-14/15` của chương manga KHÔNG chứa ảnh chương (chỉ có
   thumbnail liên quan + 1 `img.comic_img` rỗng) — đừng dùng moeupup cho
-  manga; luôn đi qua moehome → nút đọc.
+  manga; luôn đi qua moehome → nút đọc (hoặc showinfo-16 trực tiếp từ
+  mục lục).
 - Ảnh bìa trong danh sách dùng `data-src`; nếu site bỏ lazy-load thì
   `coverOf()` trong `helper.js` sẽ tự fallback sang `src`.
-- Mirror `xpicvid.com` có thể đổi nội dung/đổi chủ; kiểm tra lại khi
-  `fetchWithFallback()` chuyển sang mirror.
+- Mirror `xpicvid.com` có thể đổi nội dung/đổi chủ; `fetchDocWithFallback()`
+  trong `helper.js` thử domain chính trước rồi mới thử mirror (qua
+  `fetchWithFallback()` trong `fetch-helpers.js`); kiểm tra lại khi
+  chuyển sang mirror.
+
+## Lịch sử phiên bản
+
+- **v2 (2026-11-07):** sửa lỗi toc series (lấy chương thật từ
+  `<div class="episode">` → showinfo-16, tên thật, đảo thứ tự cũ→mới;
+  v1 đọc nhầm carousel tác phẩm liên quan và đặt tên giả "Chương N").
+  Gộp điểm hay từ bản Antigravity: thêm 15 tag nóng vào genre (trừ
+  2 mục video), phát hiện trạng thái ongoing thật trong detail
+  (quét 完结/连载), mô tả từ `#intro-block`. Nối `fetchWithFallback()`
+  vào các lời gọi fetch để mirror xpicvid.com thực sự hoạt động. Ghi
+  tường minh `#referrerpolicy=origin` vào URL ảnh chương. Xóa file
+  `cleanHtml.js` mồ côi. Nới regexp trong manifest để khớp cả trang đọc
+  moeupup, trang đọc showinfo-16 và mirror xpicvid.com.
+- **v1 (2026-11-07):** bản đầu tiên (xem git log).
 
 ## Kiểm thử
 
 - `node scripts/cli.js validate` (linter Rhino ES6 + catalog ≡ đĩa)
 - `node scripts/cli.js build extensions/comic/niacg` (zip offline)
 - Trên máy thật qua dev server: `node scripts/cli.js testall extensions/comic/niacg`
-  (xem `test.json` — gallery mẫu Tiny Asa 118 ảnh, series mẫu 日漫 9 chương).
+  (xem `test.json` — gallery mẫu Tiny Asa 118 ảnh, series mẫu 日漫 11 chương
+  第1话–第11话 → showinfo-16-5692..5702).
