@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "Mới cập nhật",
+          "Truyện Full"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Huyền huyễn",
+          "Tiên hiệp"
+        ],
+        "minItems": 10
+      },
+      "input": "",
+      "script": "genre.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "tiemtruyenchu.cloud"
+        ],
+        "minItems": 5
+      },
+      "input": "stories?sort=updated",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Hương Giang"
+        ],
+        "minItems": 1
+      },
+      "input": "Hương Giang",
+      "script": "search.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "50 Hương Giang Hào Môn Pháp Tắc Sinh Tồn"
+        ],
+        "minItems": 1
+      },
+      "input": "https://tiemtruyenchu.cloud/truyen/100",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chương 1"
+        ],
+        "minItems": 50
+      },
+      "input": "https://tiemtruyenchu.cloud/truyen/100",
+      "script": "toc.js"
+    }
+  ],
+  "note": "Golden fixture cho Tiệm Truyện Chữ (https://tiemtruyenchu.cloud)."
+}

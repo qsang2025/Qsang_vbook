@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "name": "Tiệm Truyện Chữ",
+    "author": "Qsang (ref: ivanzzz, sonzin, Vearn)",
+    "version": 1,
+    "source": "https://tiemtruyenchu.cloud",
+    "regexp": "^https?://(www\\.)?tiemtruyenchu\\.(cloud|com)/truyen/[0-9a-zA-Z\\-]+/?$",
+    "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua API tốc độ cao. Để đọc nội dung chương, vui lòng đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain chính",
+      "mode": "select",
+      "values": [
+        "https://tiemtruyenchu.cloud",
+        "https://www.tiemtruyenchu.com"
+      ],
+      "default": "https://tiemtruyenchu.cloud"
+    },
+    "COOKIE": {
+      "title": "Cookie phiên đăng nhập (connect.sid=... — Không nhập mật khẩu vào plugin, dùng lại session trình duyệt)",
+      "mode": "input",
+      "default": ""
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "gen": "gen.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  }
+}

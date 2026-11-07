@@ -105,6 +105,7 @@ Bảng này sinh tự động từ registry (`plugin.json`) — hiện có 2 ngu
 | Tên | Loại | Ngôn ngữ | Phiên bản | Nguồn | Trạng thái |
 |---|---|---|---|---|---|
 | App Truyện Chữ | novel | vi_VN | 3 | https://apptruyenchu.pro | xem STATUS.md |
+| Tiệm Truyện Chữ | novel | vi_VN | 1 | https://tiemtruyenchu.cloud | xem STATUS.md |
 | HHKUNGFU | video | vi_VN | 1 | https://hhkungfu.ee | xem STATUS.md |
 
 Trạng thái sống/chết từng nguồn xem `STATUS.md` (CI cập nhật hàng ngày).
@@ -130,6 +131,7 @@ bất kỳ phần nào từ đó.
 | `clean.py` (prune site chết + viết lại registry) + `test.json` theo nguồn | lethituyen | Tooling bảo trì |
 | `repository.json` (registry-of-registries) | longvuu | Danh sách 19 registry ngoài mẫu ban đầu |
 | Tài liệu, README tutorial, hướng dẫn cài "paste URL registry thô vào VBook" | SoulGod, duongden, BaoBao | README 290 dòng làm tài liệu hợp đồng (SoulGod/duongden/BaoBao) |
+| `extensions/novel/tiemtruyenchu` (API `/api/v1/*`, browser/cookie fallback & HTML selectors) | ivanzzz (`ext_Ivan1hai`), sonzin (`vbook-extension_sonzin`), Vearn (`vbook-ext_Evamirion`) | Kết hợp Public API v1 + session fallback cho `tiemtruyenchu.cloud` |
 
 ## Đóng góp
 

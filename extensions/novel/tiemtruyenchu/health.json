@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang đăng nhập Tiệm Truyện Chữ",
+      "pattern": "Tiệm Truyện Chữ",
+      "url": "https://tiemtruyenchu.cloud/login"
+    },
+    {
+      "name": "API danh sách truyện v1",
+      "pattern": "\"success\"\\s*:\\s*true",
+      "url": "https://tiemtruyenchu.cloud/api/v1/stories?page=1&limit=5"
+    },
+    {
+      "name": "API chi tiết truyện #100",
+      "pattern": "50 Hương Giang Hào Môn",
+      "url": "https://tiemtruyenchu.cloud/api/v1/stories/100"
+    }
+  ]
+}

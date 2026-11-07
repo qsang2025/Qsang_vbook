@@ -50,6 +50,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Tiệm Truyện Chữ",
+      "author": "Qsang (ref: ivanzzz, sonzin, Vearn)",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://tiemtruyenchu.cloud",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/icon.png",
+      "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua API tốc độ cao. Để đọc nội dung chương, vui lòng đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenC",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc/plugin.zip",
