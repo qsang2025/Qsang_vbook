@@ -1,0 +1,88 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "Mới cập nhật",
+          "Top ngày"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Tiên Hiệp",
+          "Huyền Huyễn"
+        ],
+        "minItems": 10
+      },
+      "input": "",
+      "script": "genre.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "lacatruyen.site"
+        ],
+        "minItems": 5
+      },
+      "input": "/api/stories/new-updates",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Túc Mệnh Chi Hoàn"
+        ],
+        "minItems": 1
+      },
+      "input": "túc mệnh",
+      "script": "search.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Túc Mệnh Chi Hoàn",
+          "Ái Tiềm Thủy Đích Ô Tặc"
+        ],
+        "minItems": 1
+      },
+      "input": "https://lacatruyen.site/story/tuc-menh-chi-hoan",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "story_id=424"
+        ],
+        "minItems": 2
+      },
+      "input": "https://lacatruyen.site/story/tuc-menh-chi-hoan",
+      "script": "page.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chương 1 - Ngoại Hương Nhân"
+        ],
+        "minItems": 100
+      },
+      "input": "https://lacatruyen.site/story/tuc-menh-chi-hoan?story_id=424&page=1&size=500",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Ngoại Hương Nhân"
+        ],
+        "minItems": 1
+      },
+      "input": "https://lacatruyen.site/chapter/Chuong-1-Ngoai-Huong-Nhan",
+      "script": "chap.js"
+    }
+  ],
+  "note": "Golden fixture cho La Cà Truyện (https://lacatruyen.site)."
+}

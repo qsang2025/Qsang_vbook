@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "name": "La Cà Truyện",
+    "author": "Qsang (ref: QuocBao, ivanzzz)",
+    "version": 1,
+    "source": "https://lacatruyen.site",
+    "regexp": "^https?://(www\\.)?lacatruyen\\.(site|com|live|homes|store|online)/story/[0-9a-zA-Z\\-]+/?$",
+    "description": "Đọc truyện chữ trên La Cà Truyện (lacatruyen.site). Hỗ trợ giải mã mục lục và chương tự động; có thể cấu hình TOKEN hoặc đăng nhập trình duyệt vBook để đọc đầy đủ các chương yêu cầu đăng nhập.",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain chính",
+      "mode": "select",
+      "values": [
+        "https://lacatruyen.site",
+        "https://lacatruyen.com",
+        "https://lacatruyen.live",
+        "https://lacatruyen.homes",
+        "https://lacatruyen.store",
+        "https://lacatruyen.online"
+      ],
+      "default": "https://lacatruyen.site"
+    },
+    "TOKEN": {
+      "title": "Token phiên đăng nhập (giá trị cookie token=... — Không nhập mật khẩu vào plugin, dùng lại session trình duyệt)",
+      "mode": "input",
+      "default": ""
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "gen": "gen.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "page": "page.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  }
+}
