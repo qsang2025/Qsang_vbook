@@ -39,6 +39,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "书海阁",
+      "author": "Qsang",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/shuhaige/plugin.zip",
+      "version": 1,
+      "source": "https://www.shuhaige.tw",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/shuhaige/icon.png",
+      "description": "书海阁 (www.shuhaige.tw) — truyện chữ giản thể miễn phí: huyền huyễn, võ hiệp, đô thị, lịch sử, khoa huyễn, ngôn tình. Chương đọc miễn phí, nội dung nằm trong HTML SSR.",
+      "type": "novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "小說狂人",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/czbooks/plugin.zip",
