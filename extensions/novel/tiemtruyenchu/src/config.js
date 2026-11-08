@@ -124,25 +124,32 @@ function resolveStoryId(url) {
 function getSavedCookie() {
     if (USER_COOKIE) return USER_COOKIE;
     try {
+        if (typeof localCookie !== "undefined" && localCookie && typeof localCookie.getCookie === "function") {
+            var lc = localCookie.getCookie();
+            if (lc && String(lc).trim()) return String(lc).trim();
+        }
+    } catch (e) {}
+    try {
         if (typeof localStorage !== "undefined" && localStorage) {
             var c = localStorage.getItem("ttc_cookie");
             if (c) return String(c).trim();
         }
-    } catch (e) {
-    }
+    } catch (e) {}
     return "";
 }
 
-function saveCookie(c) {
-    if (!c) return;
-    var s = String(c).trim();
-    if (!s) return;
+function saveCookie(cookieStr) {
+    if (!cookieStr) return;
+    try {
+        if (typeof localCookie !== "undefined" && localCookie && typeof localCookie.setCookie === "function") {
+            localCookie.setCookie(cookieStr);
+        }
+    } catch (e) {}
     try {
         if (typeof localStorage !== "undefined" && localStorage) {
-            localStorage.setItem("ttc_cookie", s);
+            localStorage.setItem("ttc_cookie", cookieStr);
         }
-    } catch (e) {
-    }
+    } catch (e) {}
 }
 
 function buildHeaders(extraCookie) {
@@ -150,11 +157,236 @@ function buildHeaders(extraCookie) {
         "Accept": "application/json, text/html, */*;q=0.8",
         "Referer": BASE_URL + "/"
     };
+    var ua = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+    try {
+        if (typeof UserAgent !== "undefined" && UserAgent && typeof UserAgent.android === "function") {
+            ua = UserAgent.android();
+        }
+    } catch (eUa) {}
+    headers["User-Agent"] = ua;
     var ck = extraCookie || getSavedCookie();
     if (ck) {
         headers["Cookie"] = ck;
     }
     return headers;
+}
+
+// --- Mobile API (gia lap app Tiem Truyen Chu v1.1.1, ke hoach APK) ---
+// Cac truong USERNAME / PASSWORD / ACCESS_TOKEN doc tu Cai dat nguon
+// (plugin.json "config"), inject dang global string giong DOMAIN / COOKIE.
+// Khong bao gio commit gia tri that (AGENTS.md §7); mac dinh de trong.
+// Luu y runtime: khong khai bao bien trung ten key config (USERNAME...),
+// chi doc global da inject roi gan sang bien TTC_*.
+var TTC_USERNAME = "";
+var TTC_PASSWORD = "";
+var TTC_ACCESS_TOKEN = "";
+
+try {
+    if (typeof USERNAME !== "undefined" && USERNAME) {
+        TTC_USERNAME = String(USERNAME).trim();
+    }
+} catch (e) {
+}
+try {
+    if (typeof PASSWORD !== "undefined" && PASSWORD) {
+        TTC_PASSWORD = String(PASSWORD).trim();
+    }
+} catch (e) {
+}
+try {
+    if (typeof ACCESS_TOKEN !== "undefined" && ACCESS_TOKEN) {
+        TTC_ACCESS_TOKEN = String(ACCESS_TOKEN).trim();
+    }
+} catch (e) {
+}
+
+function getAccessToken() {
+    if (TTC_ACCESS_TOKEN) return TTC_ACCESS_TOKEN;
+    try {
+        if (typeof localStorage !== "undefined" && localStorage) {
+            var t = localStorage.getItem("ttc_jwt");
+            if (t && String(t).trim()) return String(t).trim();
+        }
+    } catch (e) {}
+    return "";
+}
+
+function saveAccessToken(token, refreshToken) {
+    if (!token) return;
+    try {
+        if (typeof localStorage !== "undefined" && localStorage) {
+            localStorage.setItem("ttc_jwt", String(token));
+            if (refreshToken) localStorage.setItem("ttc_refresh", String(refreshToken));
+        }
+    } catch (e) {}
+}
+
+function clearAccessToken() {
+    try {
+        if (typeof localStorage !== "undefined" && localStorage) {
+            localStorage.removeItem("ttc_jwt");
+            localStorage.removeItem("ttc_refresh");
+        }
+    } catch (e) {}
+}
+
+// Boc tach token JWT tu nhieu dang envelope co the gap:
+// {data:{ttc_access_token|access_token|accessToken|token}} hoac flat.
+// Ke hoach APK khong ghi mau JSON thanh cong, nen thu tat ca dang pho bien.
+function extractToken(json) {
+    if (!json || typeof json !== "object") return "";
+    var scopes = [];
+    if (json.data && typeof json.data === "object") scopes.push(json.data);
+    scopes.push(json);
+    var keys = ["ttc_access_token", "access_token", "accessToken", "token", "jwt"];
+    for (var i = 0; i < scopes.length; i++) {
+        for (var k = 0; k < keys.length; k++) {
+            var v = scopes[i][keys[k]];
+            if (v && typeof v === "string" && v.trim()) return v.trim();
+        }
+    }
+    return "";
+}
+
+function extractRefreshToken(json) {
+    if (!json || typeof json !== "object") return "";
+    var scopes = [];
+    if (json.data && typeof json.data === "object") scopes.push(json.data);
+    scopes.push(json);
+    var keys = ["ttc_refresh_token", "refresh_token", "refreshToken"];
+    for (var i = 0; i < scopes.length; i++) {
+        for (var k = 0; k < keys.length; k++) {
+            var v = scopes[i][keys[k]];
+            if (v && typeof v === "string" && v.trim()) return v.trim();
+        }
+    }
+    return "";
+}
+
+function parseJsonSafe(res) {
+    if (!res) return null;
+    try {
+        return res.json();
+    } catch (e) {
+        try {
+            return JSON.parse(res.text());
+        } catch (e2) {
+            return null;
+        }
+    }
+}
+
+// Dang nhap Mobile API: POST /api/auth/login {username, password}.
+// Tra {ok:true, token} khi lay duoc JWT, {ok:false, message} khi that bai.
+// Khong throw — chap.js tu quyet dinh fallback.
+function loginMobile(username, password) {
+    var out = { ok: false, token: "", message: "" };
+    if (!username || !password) {
+        out.message = "Chưa nhập tài khoản trong Cài đặt nguồn.";
+        return out;
+    }
+    var headers = buildHeaders();
+    headers["Content-Type"] = "application/json";
+    var res = null;
+    try {
+        res = fetch(BASE_URL + "/api/auth/login", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ username: username, password: password })
+        });
+    } catch (e) {
+        out.message = "Không kết nối được máy chủ đăng nhập.";
+        return out;
+    }
+    if (!res) {
+        out.message = "Không kết nối được máy chủ đăng nhập.";
+        return out;
+    }
+    var json = parseJsonSafe(res);
+    if (json && json.message) out.message = String(json.message);
+    if (!res.ok) {
+        if (!out.message) out.message = "Đăng nhập thất bại (HTTP " + res.status + ").";
+        return out;
+    }
+    var token = extractToken(json);
+    if (!token) {
+        if (!out.message) out.message = "Máy chủ đăng nhập không trả về token.";
+        return out;
+    }
+    saveAccessToken(token, extractRefreshToken(json));
+    out.ok = true;
+    out.token = token;
+    return out;
+}
+
+function buildAuthHeaders(token) {
+    var headers = buildHeaders();
+    headers["Content-Type"] = "application/json";
+    if (token) headers["Authorization"] = "Bearer " + token;
+    return headers;
+}
+
+// Goi Mobile API doc chuong: POST /api/v1/chapters/content
+// {storyId, chapterNumber} + Authorization Bearer.
+// Tra {ok, status, json, message}; json giu nguyen ca khi 401 de doc message.
+function fetchMobileChapter(storyId, chapNum, token) {
+    var out = { ok: false, status: 0, json: null, message: "" };
+    var res = null;
+    try {
+        res = fetch(BASE_URL + "/api/v1/chapters/content", {
+            method: "POST",
+            headers: buildAuthHeaders(token),
+            body: JSON.stringify({
+                storyId: parseInt(storyId, 10),
+                chapterNumber: parseInt(chapNum, 10)
+            })
+        });
+    } catch (e) {
+        out.message = "Không kết nối được máy chủ đọc chương.";
+        return out;
+    }
+    if (!res) {
+        out.message = "Không kết nối được máy chủ đọc chương.";
+        return out;
+    }
+    out.status = res.status || 0;
+    out.json = parseJsonSafe(res);
+    if (out.json && out.json.message) out.message = String(out.json.message);
+    out.ok = !!res.ok;
+    if (!out.ok && !out.message) out.message = "Đọc chương thất bại (HTTP " + out.status + ").";
+    return out;
+}
+
+// Boc tach noi dung + tieu de chuong tu nhieu dang envelope co the gap:
+// {data:{content,title}} / {content,title} / {data:{chapter:{content,title}}}...
+// Ke hoach APK khong ghi mau JSON thanh cong, nen thu tat ca dang pho bien;
+// test tren dien thoai voi token that se xac nhan dang nao server dung.
+function extractChapterContent(json) {
+    var out = { content: "", title: "" };
+    if (!json || typeof json !== "object") return out;
+    var scopes = [];
+    if (json.data && typeof json.data === "object") scopes.push(json.data);
+    if (json.chapter && typeof json.chapter === "object") scopes.push(json.chapter);
+    if (json.data && json.data.chapter && typeof json.data.chapter === "object") scopes.push(json.data.chapter);
+    scopes.push(json);
+    var contentKeys = ["content", "chapter_content", "chapterContent", "text", "body", "content_html", "contentHtml"];
+    var titleKeys = ["title", "chapter_title", "chapterTitle", "name"];
+    for (var i = 0; i < scopes.length; i++) {
+        if (!out.content) {
+            for (var c = 0; c < contentKeys.length; c++) {
+                var v = scopes[i][contentKeys[c]];
+                if (v && typeof v === "string" && v.trim()) { out.content = v; break; }
+            }
+        }
+        if (!out.title) {
+            for (var t = 0; t < titleKeys.length; t++) {
+                var tv = scopes[i][titleKeys[t]];
+                if (tv && typeof tv === "string" && tv.trim()) { out.title = tv.trim(); break; }
+            }
+        }
+        if (out.content && out.title) break;
+    }
+    return out;
 }
 
 function fetchJson(url, extraCookie) {

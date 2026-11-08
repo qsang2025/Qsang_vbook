@@ -1,4 +1,4 @@
-// chap.js — Noi dung chuong Tiem Truyen Chu (API prefetch + Cookie + Engine.newBrowser fallback)
+// chap.js — Noi dung chuong Tiem Truyen Chu (Mobile API + prefetch + Cookie + Engine.newBrowser fallback)
 load('config.js');
 load('challenge-handler.js');
 
@@ -37,11 +37,17 @@ function extractChapterFromDoc(doc) {
     var contentEl = doc.select("#chapter-body, .chapter-content, #chapter-content, .content-text, .chapter-c").first();
     if (!contentEl) return "";
     var html = contentEl.html();
-    // Chi can noi dung khong rong la nhan (bo nguong cung 20 ky tu: chuong
-    // ngan that van phai doc duoc); trang interstitial khong co #chapter-body
-    // nen da tra "" o tren.
     if (!html || !cleanText(contentEl.text())) return "";
     return html;
+}
+
+function extractChapterTitleFromDoc(doc) {
+    if (!doc) return "";
+    try {
+        var t = doc.select(".chapter-title, #chapter-title, h1.title, h2.title").text();
+        if (t && String(t).trim()) return String(t).trim();
+    } catch (e) {}
+    return "";
 }
 
 function execute(url) {
@@ -51,20 +57,80 @@ function execute(url) {
     }
     var ck = getSavedCookie();
 
-    // 1. Thu goi API doc chuong nhanh /api/prefetch-chapter (can Cookie neu co).
+    // 1. Uu tien Mobile API (gia lap app): POST /api/v1/chapters/content
+    // voi JWT (tu Cai dat nguon ACCESS_TOKEN, cache localStorage, hoac tu
+    // dang nhap bang USERNAME/PASSWORD trong Cai dat nguon).
+    var mobileLoginMsg = "";
+    var token = getAccessToken();
+    var triedLogin = false;
+    if (!token && TTC_USERNAME && TTC_PASSWORD) {
+        var loginRes = loginMobile(TTC_USERNAME, TTC_PASSWORD);
+        triedLogin = true;
+        if (loginRes.ok) {
+            token = loginRes.token;
+        } else if (loginRes.message) {
+            mobileLoginMsg = loginRes.message;
+        }
+    }
+    if (token) {
+        var mRes = fetchMobileChapter(info.storyId, info.chapNum, token);
+        if (mRes.ok && mRes.json) {
+            var mData = extractChapterContent(mRes.json);
+            if (mData.content && String(mData.content).trim()) {
+                if (mData.title) {
+                    return Response.success(formatPlainContent(mData.content), mData.title);
+                }
+                return Response.success(formatPlainContent(mData.content));
+            }
+        }
+        // Token het han / khong hop le (401): thu dang nhap lai 1 lan neu co
+        // tai khoan trong Cai dat nguon, roi goi lai API 1 lan.
+        if (mRes.status === 401 && TTC_USERNAME && TTC_PASSWORD && !triedLogin) {
+            var relogin = loginMobile(TTC_USERNAME, TTC_PASSWORD);
+            triedLogin = true;
+            if (relogin.ok && relogin.token) {
+                var mRetry = fetchMobileChapter(info.storyId, info.chapNum, relogin.token);
+                if (mRetry.ok && mRetry.json) {
+                    var rData = extractChapterContent(mRetry.json);
+                    if (rData.content && String(rData.content).trim()) {
+                        if (rData.title) {
+                            return Response.success(formatPlainContent(rData.content), rData.title);
+                        }
+                        return Response.success(formatPlainContent(rData.content));
+                    }
+                }
+            } else if (relogin.message) {
+                mobileLoginMsg = relogin.message;
+            }
+        }
+        // Token trong cache co the da het han: xoa de lan sau dang nhap moi.
+        if (mRes.status === 401) {
+            clearAccessToken();
+        }
+        if (!mobileLoginMsg && mRes.message) {
+            mobileLoginMsg = mRes.message;
+        }
+    }
+
+    // 2. Thu goi API doc chuong nhanh /api/prefetch-chapter (can Cookie neu co).
     // Chua dang nhap thi API tra 401 "Vui long dang nhap de tiep tuc!" — roi
     // xuong cac buoc duoi thay vi dung lai o day.
     var prefetchUrl = BASE_URL + "/api/prefetch-chapter/" + info.storyId + "/" + info.chapNum;
     var pJson = fetchJson(prefetchUrl, ck);
     var pContent = "";
+    var pTitle = "";
     if (pJson) {
         pContent = pJson.content || (pJson.data && pJson.data.content) || "";
+        pTitle = pJson.title || pJson.chapter_title || (pJson.chapter && pJson.chapter.title) || (pJson.data && (pJson.data.title || pJson.data.chapter_title)) || "";
     }
     if (pContent && String(pContent).trim()) {
+        if (pTitle && String(pTitle).trim()) {
+            return Response.success(formatPlainContent(pContent), String(pTitle).trim());
+        }
         return Response.success(formatPlainContent(pContent));
     }
 
-    // 2. Tai trang HTML chuong truyen
+    // 3. Tai trang HTML chuong truyen
     var chapUrl = BASE_URL + "/doc-truyen/" + info.storyId + "/chuong/" + info.chapNum;
 
     var res = null;
@@ -82,54 +148,81 @@ function execute(url) {
         if (!isInterstitialDoc(doc)) {
             var bodyHtml = extractChapterFromDoc(doc);
             if (bodyHtml) {
+                var docTitle = extractChapterTitleFromDoc(doc);
+                if (docTitle) {
+                    return Response.success(bodyHtml, docTitle);
+                }
                 return Response.success(bodyHtml);
             }
         }
-        }
     }
 
-    // 3. Fallback Engine.newBrowser() de lay phien dang nhap tu trinh duyet vBook
-    var browser = null;
-    var bDoc = null;
-    try {
-        browser = Engine.newBrowser();
-        browser.launch(chapUrl, 10000);
+    // 4. Fallback Engine.newBrowser() de lay phien dang nhap tu trinh duyet vBook
+    if (typeof Engine !== "undefined" && Engine && typeof Engine.newBrowser === "function") {
+        var browser = null;
+        var bDoc = null;
         try {
-            var cookieRes = browser.callJs("document.cookie;", 1000);
-            if (cookieRes) {
-                // callJs tra ve HtmlElement — lay chuoi cookie that bang .text(),
-                // khong dung String() (se luu rac).
-                var rawCookie = "";
-                try {
-                    rawCookie = cookieRes.text();
-                } catch (eText) {
-                    rawCookie = String(cookieRes);
-                }
-                if (rawCookie && rawCookie.indexOf("=") !== -1) {
-                    saveCookie(rawCookie);
-                }
-            }
-        } catch (eCookie) {
-        }
-        bDoc = browser.html();
-    } catch (eBrowser) {
-    } finally {
-        if (browser) {
+            browser = Engine.newBrowser();
+            bDoc = browser.launch(chapUrl, 10000);
             try {
-                browser.close();
-            } catch (eClose) {
+                var cookieRes = browser.callJs("document.cookie;", 1000);
+                if (cookieRes) {
+                    var rawCookie = "";
+                    try {
+                        rawCookie = cookieRes.text();
+                    } catch (eText) {
+                        rawCookie = String(cookieRes);
+                    }
+                    if (rawCookie && rawCookie.indexOf("=") !== -1) {
+                        saveCookie(rawCookie);
+                    }
+                }
+            } catch (eCookie) {}
+
+            // Kiem tra lai cookie trong CookieManager sau khi browser launch
+            var freshCookie = getSavedCookie();
+            if (freshCookie && freshCookie !== ck) {
+                var retryJson = fetchJson(prefetchUrl, freshCookie);
+                var rContent = retryJson ? (retryJson.content || (retryJson.data && retryJson.data.content) || "") : "";
+                var rTitle = retryJson ? (retryJson.title || retryJson.chapter_title || (retryJson.chapter && retryJson.chapter.title) || "") : "";
+                if (rContent && String(rContent).trim()) {
+                    if (rTitle && String(rTitle).trim()) {
+                        return Response.success(formatPlainContent(rContent), String(rTitle).trim());
+                    }
+                    return Response.success(formatPlainContent(rContent));
+                }
+            }
+
+            if (!bDoc) {
+                bDoc = browser.html();
+            }
+        } catch (eBrowser) {
+        } finally {
+            if (browser) {
+                try {
+                    browser.close();
+                } catch (eClose) {}
             }
         }
-    }
-    if (bDoc && isChallengeDoc(bDoc)) {
-        return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
-    }
-    if (bDoc && !isInterstitialDoc(bDoc)) {
-        var bHtml = extractChapterFromDoc(bDoc);
-        if (bHtml) {
-            return Response.success(bHtml);
+
+        if (bDoc && isChallengeDoc(bDoc)) {
+            return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
+        }
+        if (bDoc && !isInterstitialDoc(bDoc)) {
+            var bHtml = extractChapterFromDoc(bDoc);
+            if (bHtml) {
+                var bTitle = extractChapterTitleFromDoc(bDoc);
+                if (bTitle) {
+                    return Response.success(bHtml, bTitle);
+                }
+                return Response.success(bHtml);
+            }
         }
     }
 
-    return Response.error(formatLoginError("Tiệm Truyện Chữ", chapUrl));
+    var guide = "Nguồn Tiệm Truyện Chữ yêu cầu tài khoản để tải chương. Vui lòng vào Cài đặt nguồn nhập Tên đăng nhập & Mật khẩu (hoặc mở Trình duyệt đăng nhập) để tiếp tục đọc.";
+    if (mobileLoginMsg) {
+        guide += "\n\nGhi chú: " + mobileLoginMsg;
+    }
+    return Response.error(guide);
 }

@@ -2,10 +2,10 @@
   "metadata": {
     "name": "Tiệm Truyện Chữ",
     "author": "Qsang",
-    "version": 4,
+    "version": 6,
     "source": "https://tiemtruyenchu.cloud",
     "regexp": "^https?://(www\\.)?tiemtruyenchu\\.cloud/truyen/[0-9a-zA-Z\\-]+/?$",
-    "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua Public API v1 (ref: ivanzzz, sonzin, Vearn). Mục lục lấy tiêu đề chương thật từ API. Đọc nội dung chương cần đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
+    "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua Mobile API của app chính thức (POST /api/v1/chapters/content, JWT) — nhập tài khoản trong Cài đặt nguồn để tự lấy token; vẫn giữ fallback prefetch + cookie trình duyệt. Mục lục lấy tiêu đề chương thật từ API. (ref: ivanzzz, sonzin, Vearn)",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"
@@ -20,7 +20,22 @@
       "default": "https://tiemtruyenchu.cloud"
     },
     "COOKIE": {
-      "title": "Cookie phiên đăng nhập (connect.sid=... — Không nhập mật khẩu vào plugin, dùng lại session trình duyệt)",
+      "title": "Cookie phiên đăng nhập (session=s%3A... — Không nhập mật khẩu vào plugin, dùng lại session trình duyệt)",
+      "mode": "input",
+      "default": ""
+    },
+    "USERNAME": {
+      "title": "Tên đăng nhập Tiệm Truyện Chữ (để extension tự lấy token đọc chương)",
+      "mode": "input",
+      "default": ""
+    },
+    "PASSWORD": {
+      "title": "Mật khẩu Tiệm Truyện Chữ (chỉ lưu trên máy trong Cài đặt nguồn, không đưa vào repo)",
+      "mode": "input",
+      "default": ""
+    },
+    "ACCESS_TOKEN": {
+      "title": "Token JWT đọc chương (tự động lưu sau khi đăng nhập, hoặc tự dán token nếu không muốn nhập mật khẩu)",
       "mode": "input",
       "default": ""
     }
