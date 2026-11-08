@@ -1,35 +1,34 @@
 {
   "metadata": {
-    "name": "Truyện Hoàn",
     "author": "Qsang",
-    "version": 1,
-    "source": "https://truyenhoan.com",
-    "regexp": "^https?://(www\\.)?(truyenhoan\\.com|wetruyen\\.com|dtruyen\\.com)/[a-z0-9\\-]+\\.\\d+/?$",
-    "description": "Truyện Hoàn (hỗ trợ mirror WeTruyen / DTruyen) — kho truyện chữ tiếng Việt miễn phí, truyện full dài tập: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Kiếm Hiệp...",
-    "locale": "vi_VN",
+    "description": "Truyện Hoàn — kho truyện chữ tiếng Việt miễn phí, truyện full dài tập: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Kiếm Hiệp... Lưu ý: mã truyện khác nhau giữa truyenhoan.com và wetruyen.com nên mỗi truyện chỉ đọc trên đúng host của link gốc, không đổi host tự động.",
     "language": "javascript",
-    "type": "novel"
+    "locale": "vi_VN",
+    "name": "Truyện Hoàn",
+    "regexp": "^https?://(www\\.)?(truyenhoan\\.com|wetruyen\\.com)/([a-z0-9\\-]+\\.\\d+/?|[a-z0-9\\-]+/chuong-\\d+\\.html)$",
+    "source": "https://truyenhoan.com",
+    "type": "novel",
+    "version": 2
   },
   "config": {
     "DOMAIN": {
-      "title": "Domain chính",
+      "default": "https://truyenhoan.com",
       "mode": "select",
+      "title": "Domain chính",
       "values": [
         "https://truyenhoan.com",
-        "https://wetruyen.com",
-        "https://dtruyen.com"
-      ],
-      "default": "https://truyenhoan.com"
+        "https://wetruyen.com"
+      ]
     }
   },
   "script": {
-    "home": "home.js",
-    "genre": "genre.js",
-    "detail": "detail.js",
-    "search": "search.js",
-    "page": "page.js",
-    "toc": "toc.js",
     "chap": "chap.js",
-    "gen": "gen.js"
+    "detail": "detail.js",
+    "gen": "gen.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "page": "page.js",
+    "search": "search.js",
+    "toc": "toc.js"
   }
 }

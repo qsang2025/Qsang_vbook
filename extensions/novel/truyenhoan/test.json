@@ -12,9 +12,6 @@
     },
     {
       "expect": {
-        "contains": [
-          "Vạn Cổ Thần Đế"
-        ],
         "minItems": 10
       },
       "input": "truyen-hot",
@@ -43,7 +40,7 @@
     {
       "expect": {
         "contains": [
-          "Tám trăm năm sau"
+          "Trương Nhược Trần"
         ],
         "minItems": 1
       },
@@ -61,7 +58,29 @@
       },
       "input": "",
       "script": "genre.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Truyện HOT",
+          "Mới Cập Nhật",
+          "Đã Hoàn Thành"
+        ],
+        "minItems": 4
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "https://truyenhoan.com/van-co-than-de.4780/"
+        ],
+        "minItems": 90
+      },
+      "input": "https://truyenhoan.com/van-co-than-de.4780/",
+      "script": "page.js"
     }
   ],
-  "note": "Golden fixture cho Truyen Hoan (truyenhoan.com & mirror wetruyen.com / dtruyen.com)."
+  "note": "Golden fixture cho Truyen Hoan (truyenhoan.com & wetruyen.com; dtruyen.com da bo vi 301 het ve wetruyen.com). Truyen mau Van Co Than De: 4.590 chuong, 92 trang TOC, chuong 1 co 12.541 ky tu trong #chapter-c. Case gen chi kiem tra minItems vi bang hot xoay theo thoi gian. Case chap kiem tra 'Truong Nhuoc Tran' trong body #chapter-c (tieu de 'Tam tram nam sau' chi co trong tieu de chuong, khong co trong body)."
 }
