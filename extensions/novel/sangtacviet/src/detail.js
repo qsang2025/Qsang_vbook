@@ -9,8 +9,13 @@ function execute(url) {
     url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
     if (url.charAt(url.length - 1) !== '/') url = url + '/';
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
+    var response = null;
+    try {
+        response = fetchWithMirrors(url);
+    } catch (e) {
+        return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
+    }
+    if (!response || !response.ok) return Response.error("Không tải được trang truyện (HTTP " + (response ? response.status : 0) + ")");
     var text = response.text();
     var doc = Html.parse(text);
 
@@ -20,12 +25,27 @@ function execute(url) {
     var description = "";
     var detail = "";
 
+    // Trang thai that cua truyen, doc tu meta og:novel:status cua site
+    // (da kiem chung: "Còn tiếp" / "Hoàn thành" / "Tạm ngưng").
+    // ongoing = true tru khi site bao "Hoàn thành".
+    var ongoing = true;
+    var statusMeta = doc.select("meta[property='og:novel:status']").first();
+    if (statusMeta) {
+        var statusText = (statusMeta.attr("content") || "").trim();
+        if (statusText.indexOf("Hoàn thành") !== -1 || statusText.toLowerCase().indexOf("complete") !== -1) {
+            ongoing = false;
+        }
+    }
+
     var regex = /var\s+bookinfo\s*=\s*(\{[\s\S]*?\});/;
     var match = text.match(regex);
     if (match) {
         try {
             var json = JSON.parse(match[1]);
-            name = json.name || "";
+            // bookinfo.name la ten goc tieng Trung; bookinfo.namevi moi la
+            // ten hien thi tieng Viet nhu site (h1 / <title> / og:title)
+            // va nhu ket qua search.js — uu tien namevi de ten nhat quan.
+            name = (json.namevi || "").trim() || json.name || "";
             cover = json.thumb || "";
             author = json.author || "";
         } catch (e) {
@@ -38,10 +58,24 @@ function execute(url) {
     }
     if (!name) return Response.error("Không đọc được tên truyện: " + url);
 
+    // Tac gia: og:novel:author la ten da chuyen sang tieng Viet (vi du
+    // "Ngã thị tiểu phi phi"), khop voi ten hien thi tren site; chi dung
+    // ten goc tieng Trung trong bookinfo khi khong co og author.
+    var ogAuthor = doc.select("meta[property='og:novel:author']").first();
+    if (ogAuthor && (ogAuthor.attr("content") || "").trim()) {
+        author = ogAuthor.attr("content").trim();
+    }
+
     if (cover && cover.indexOf("//") === 0) cover = "https:" + cover;
 
+    // Selector :has() da kiem chung chay duoc trong jsoup cua runtime
+    // (trang chi tiet that co .blk chua .fa-water va .blk-body).
     var desEl = doc.select(".blk:has(.fa-water) .blk-body, .intro, .desc").first();
     if (desEl) description = desEl.html();
+    if (!description) {
+        var ogDesc = doc.select("meta[property='og:description']").first();
+        if (ogDesc) description = (ogDesc.attr("content") || "").trim();
+    }
 
     doc.select(".blk-body.ib-100").forEach(function(e) {
         detail += "<br>" + e.text().trim();
@@ -53,7 +87,7 @@ function execute(url) {
         author: author || "Chưa rõ",
         description: description,
         detail: detail,
-        ongoing: true,
+        ongoing: ongoing,
         host: BASE_URL
     });
 }

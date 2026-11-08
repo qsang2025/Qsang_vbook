@@ -1,9 +1,1 @@
-{
-  "cases": [
-    {
-      "name": "Trang chủ",
-      "pattern": "sangtacviet",
-      "url": "https://sangtacviet.app/"
-    }
-  ]
-}
+{"cases":[{"name":"Trang chủ","pattern":"static\\.sangtacvietcdn\\.xyz","url":"https://sangtacviet.app/"},{"name":"API mục lục (truyện mẫu faloo/1020583)","pattern":"nhân vật phản diện quá ngu","url":"https://sangtacviet.app/index.php?ngmar=chapterlist&sajax=getchapterlist&h=faloo&bookid=1020583"}]}

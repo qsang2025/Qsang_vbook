@@ -6,18 +6,19 @@ function execute(key, page) {
         return Response.error("Nhập từ khóa tìm kiếm.");
     }
     page = page ? String(page) : '1';
+    var pageNum = parseInt(page, 10);
+    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
 
-    var url = BASE_URL + "/io/searchtp/searchBooks?find=&findinname=" + encodeURIComponent(String(key).trim()) + "&minc=0&p=" + page + "&tag=";
+    var url = BASE_URL + "/io/searchtp/searchBooks?find=&findinname=" + encodeURIComponent(String(key).trim()) + "&minc=0&p=" + pageNum + "&tag=";
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
-    var doc = response.html();
-
-    var next = null;
-    var nextLi = doc.select(".pagination li.active + li").first();
-    if (nextLi && nextLi.text().trim()) {
-        next = nextLi.text().trim();
+    var response = null;
+    try {
+        response = fetchWithMirrors(url);
+    } catch (e) {
+        return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
     }
+    if (!response || !response.ok) return Response.error("Không tải được kết quả tìm kiếm (HTTP " + (response ? response.status : 0) + ")");
+    var doc = response.html();
 
     var el = doc.select("a.booksearch");
     var data = [];
@@ -46,6 +47,16 @@ function execute(key, page) {
 
     if (data.length === 0) {
         return Response.error("Không tìm thấy truyện phù hợp.");
+    }
+
+    // Trang ket qua cua STV khong co phan tu phan trang trong HTML (da
+    // kiem chung bang curl 2026-11-08: khong co chuoi "pagination" nao;
+    // moi trang tra dung 48 muc). Con trang sau khi trang hien tai tra
+    // du 48 muc, het khi tra it hon. nextToken LUON la string, khong
+    // bao gio null (hop dong runtime).
+    var next = "";
+    if (data.length >= PAGE_SIZE) {
+        next = String(pageNum + 1);
     }
 
     return Response.success(data, next);

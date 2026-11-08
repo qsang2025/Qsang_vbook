@@ -1,6 +1,16 @@
 // chap.js — Doc noi dung chuong Sang Tac Viet
 load('config.js');
 
+// stvMd5 — Ham MD5 dung de ky request doc chuong (x-stv-sign).
+//
+// Ghi chu nguon: phan trien khai MD5 inline ben duoi (rotateLeft /
+// addUnsigned / FF-GG-HH-II / convertToWordArray / wordToHex / utf8Encode)
+// la thuat toan MD5 chuan RFC 1321 theo kieu trien khai md5.js kinh dien
+// cua Paul Johnston (dang public-domain, pho bien rong rai). Chi chay khi
+// runtime khong co san CryptoJS — runtime vBook da bundle CryptoJS (xem
+// reference/runtime.md: "crypto.js always resolves to bundled CryptoJS")
+// nen thuc te luon dung nhanh CryptoJS.MD5 o tren, nhanh inline chi la
+// du phong. Giu lai nhanh du phong de chap van chay neu runtime doi.
 function stvMd5(string) {
     function rotateLeft(lValue, iShiftBits) {
         return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
@@ -215,27 +225,40 @@ function extractReadContextId(res) {
     return m ? m[1] : "";
 }
 
-function evaluateChapterKey(base, code, ua) {
+// Lay chapterkey bang cach chay ma grant cua STV trong WebView that
+// (Engine.newBrowser()). Co che nay da duoc kiem chung chay dung tren may
+// that (2026-11-08): chi chay tren app that, khong chay duoc tu VM (key
+// suy ra tu Node khac key cua WebView that, server tra ma 10002).
+//
+// Thu toi da 2 lan, moi lan dung mot browser moi (loi WebView nhat thoi
+// thi lan 2 co the qua). browser.close() LUON nam trong finally de khong
+// ro ri WebView du thanh cong, that bai hay exception.
+// Ten co grant (UWNgB / tcYCI) va UA sandbox lay tu hang trong config.js.
+function evaluateChapterKey(base, code) {
     var chapterkey = "";
 
-    // 1. Chay trong Engine.newBrowser() (Android WebView chuan, khong co bien Engine/java de tranh anti-bot cua STV)
-    if (typeof Engine !== "undefined" && Engine && typeof Engine.newBrowser === "function") {
+    if (typeof Engine === "undefined" || !Engine || typeof Engine.newBrowser !== "function") {
+        return "";
+    }
+
+    for (var attempt = 0; attempt < 2 && !chapterkey; attempt++) {
+        var browser = null;
         try {
-            var browser = Engine.newBrowser();
+            browser = Engine.newBrowser();
             if (typeof browser.setUserAgent === "function") {
-                browser.setUserAgent(ua);
+                browser.setUserAgent(STV_WEBVIEW_UA);
             }
             var shell = "<html><head><meta charset='utf-8'></head><body><pre id='stv_key_out'></pre></body></html>";
             browser.loadHtml(base, shell);
 
             var runner = "(function(){"
-                + "var fw = {Capacitor:{},document:{hidden:false},navigator:{userAgent:'" + ua + "'},UWNgB:true,app:{tcYCI:true,reader:{}}};"
+                + "var fw = {Capacitor:{},document:{hidden:false},navigator:{userAgent:'" + STV_WEBVIEW_UA + "'}," + STV_GRANT_FLAG_WINDOW + ":true,app:{" + STV_GRANT_FLAG_APP + ":true,reader:{}}};"
                 + "window.fakeWindow = fw;"
                 + "window.Capacitor = {};"
-                + "window.UWNgB = true;"
+                + "window." + STV_GRANT_FLAG_WINDOW + " = true;"
                 + "window.document = window.document || {};"
                 + "window.document.hidden = false;"
-                + "window.app = {tcYCI:true, reader:{}};"
+                + "window.app = {" + STV_GRANT_FLAG_APP + ":true, reader:{}};"
                 + "try{(0,eval)(" + JSON.stringify(code) + ");}catch(e){}"
                 + "var k = String((window.app && window.app.reader && (window.app.reader.chapterkey || window.app.reader.chapterKey || window.app.reader.key)) || '');"
                 + "if (!k) { k = String((fw.app && fw.app.reader && (fw.app.reader.chapterkey || fw.app.reader.chapterKey || fw.app.reader.key)) || ''); }"
@@ -251,11 +274,34 @@ function evaluateChapterKey(base, code, ua) {
                 var el = browser.html().select("#stv_key_out").first();
                 if (el) chapterkey = el.text();
             }
-            browser.close();
-        } catch (eBrowser) {}
+        } catch (eBrowser) {
+            chapterkey = "";
+        } finally {
+            try {
+                if (browser && typeof browser.close === "function") browser.close();
+            } catch (eClose) {}
+        }
     }
 
     return (chapterkey || "").trim();
+}
+
+// Cho co gioi han (toi da 1200ms, goi dung 1 lan moi lan retry): uu tien
+// ham sleep() cua runtime, roi toi java.lang.Thread.sleep, cuoi cung moi
+// la vong busy-wait (chi la du phong, khong lap vo han).
+function waitBounded(ms) {
+    try {
+        sleep(ms);
+        return;
+    } catch (e1) {}
+    try {
+        if (typeof java !== "undefined" && java && java.lang && java.lang.Thread) {
+            java.lang.Thread.sleep(ms);
+            return;
+        }
+    } catch (e2) {}
+    var waitTarget = new Date().getTime() + ms;
+    while (new Date().getTime() < waitTarget) {}
 }
 
 function cleanChapterContent(raw) {
@@ -280,6 +326,85 @@ function cleanChapterContent(raw) {
     return text;
 }
 
+// Xin grant + giai chapterkey (1 lan). Tra ve { key, readcontextid }
+// hoac { error } khi that bai.
+function requestGrantAndKey(host, bookid) {
+    var grantUrl = BASE_URL + "/io/grantcontext/context?hostid=" + encodeURIComponent(host) + "&bookid=" + encodeURIComponent(bookid);
+    var grantRes = null;
+    try {
+        // KHONG set header User-Agent: de runtime dung UA mac dinh
+        // (AGENTS.md muc 6 quy tac 10 — Cloudflare gan cookie theo UA).
+        grantRes = fetchWithMirrors(grantUrl, {
+            method: "GET",
+            headers: {
+                "x-stv-transport": "app",
+                "x-requested-with": "com.sangtacviet.mobilereader",
+                "Cookie": "mac_tt=true;"
+            }
+        });
+    } catch (eGrant) {
+        return { error: "Không kết nối được tới Sáng Tác Việt khi xin quyền đọc: " + eGrant };
+    }
+
+    if (!grantRes || !grantRes.ok) {
+        return { error: "Không thể xin quyền đọc từ máy chủ Sáng Tác Việt (HTTP " + (grantRes ? grantRes.status : 0) + ")" };
+    }
+
+    var code = grantRes.text();
+    var readcontextid = extractReadContextId(grantRes);
+    var chapterkey = evaluateChapterKey(BASE_URL, code);
+
+    if (!chapterkey) {
+        return { error: "Không thể giải mã khóa đọc chương (chapterkey) từ Sáng Tác Việt." };
+    }
+    return { key: chapterkey, readcontextid: readcontextid };
+}
+
+// Doc noi dung chuong voi mot key da co. Tra ve { json } hoac { error }.
+function readChapterOnce(host, bookid, cid, chapterkey, readcontextid) {
+    var sorted = "bookid=" + bookid + "&c=" + cid + "&h=" + host + "&key=" + chapterkey + "&sajax=readchapter&";
+    var sign = stvMd5(sorted + STV_SIGN_SALT);
+
+    var cookie = "mac_tt=true;";
+    if (readcontextid) {
+        cookie += " readcontextid=" + readcontextid + ";";
+    }
+
+    var readUrl = BASE_URL + "/?sajax=readchapter&h=" + encodeURIComponent(host)
+        + "&bookid=" + encodeURIComponent(bookid)
+        + "&c=" + encodeURIComponent(cid)
+        + "&key=" + encodeURIComponent(chapterkey);
+
+    var readRes = null;
+    try {
+        // KHONG set header User-Agent (ly do nhu o requestGrantAndKey).
+        readRes = fetchWithMirrors(readUrl, {
+            method: "GET",
+            headers: {
+                "x-stv-transport": "app",
+                "x-requested-with": "com.sangtacviet.mobilereader",
+                "x-stv-sign": sign,
+                "Cookie": cookie,
+                "Referer": BASE_URL + "/truyen/" + encodeURIComponent(host) + "/1/" + encodeURIComponent(bookid) + "/"
+            }
+        });
+    } catch (eRead) {
+        return { error: "Không kết nối được tới Sáng Tác Việt khi đọc chương: " + eRead };
+    }
+
+    if (!readRes || !readRes.ok) {
+        return { error: "Không đọc được nội dung chương STV (HTTP " + (readRes ? readRes.status : 0) + ")" };
+    }
+
+    var json = null;
+    try {
+        json = readRes.json();
+    } catch (eJson) {
+        return { error: "Phản hồi nội dung chương không hợp lệ." };
+    }
+    return { json: json };
+}
+
 function execute(url) {
     var payload = parseChapterUrl(url);
     var host = payload.host;
@@ -292,11 +417,12 @@ function execute(url) {
             if (url.charAt(0) !== '/') url = '/' + url;
             url = BASE_URL + url;
         }
-        var directRes = fetch(url, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-            }
-        });
+        var directRes = null;
+        try {
+            directRes = fetchWithMirrors(url);
+        } catch (eDirect) {
+            return Response.error("Không tải được trang chương Sáng Tác Việt: " + eDirect);
+        }
         if (directRes && directRes.ok) {
             var doc = directRes.html();
             var el = doc.select("#content-container, .content, .reading-content").first();
@@ -308,85 +434,33 @@ function execute(url) {
         return Response.error("URL chương Sáng Tác Việt không hợp lệ: " + url);
     }
 
-    var ua = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
-    var grantUrl = BASE_URL + "/io/grantcontext/context?hostid=" + encodeURIComponent(host) + "&bookid=" + encodeURIComponent(bookid);
-    var grantRes = fetch(grantUrl, {
-        method: "GET",
-        headers: {
-            "User-Agent": ua,
-            "x-stv-transport": "app",
-            "x-requested-with": "com.sangtacviet.mobilereader",
-            "Cookie": "mac_tt=true;"
-        }
-    });
-
-    if (!grantRes || !grantRes.ok) {
-        return Response.error("Không thể xin quyền đọc từ máy chủ Sáng Tác Việt (HTTP " + (grantRes ? grantRes.status : 0) + ")");
+    var grant = requestGrantAndKey(host, bookid);
+    if (grant.error) {
+        return Response.error(grant.error);
     }
 
-    var code = grantRes.text();
-    var readcontextid = extractReadContextId(grantRes);
-    var chapterkey = evaluateChapterKey(BASE_URL, code, ua);
-
-    if (!chapterkey) {
-        return Response.error("Không thể giải mã khóa đọc chương (chapterkey) từ Sáng Tác Việt.");
+    var read = readChapterOnce(host, bookid, cid, grant.key, grant.readcontextid);
+    if (read.error) {
+        return Response.error(read.error);
     }
 
-    var sorted = "bookid=" + bookid + "&c=" + cid + "&h=" + host + "&key=" + chapterkey + "&sajax=readchapter&";
-    var sign = stvMd5(sorted + "erogh982^%*%^*");
+    var json = read.json;
 
-    var cookie = "mac_tt=true;";
-    if (readcontextid) {
-        cookie += " readcontextid=" + readcontextid + ";";
-    }
-
-    var readUrl = BASE_URL + "/?sajax=readchapter&h=" + encodeURIComponent(host)
-        + "&bookid=" + encodeURIComponent(bookid)
-        + "&c=" + encodeURIComponent(cid)
-        + "&key=" + encodeURIComponent(chapterkey);
-
-    var readHeaders = {
-        "User-Agent": ua,
-        "x-stv-transport": "app",
-        "x-requested-with": "com.sangtacviet.mobilereader",
-        "x-stv-sign": sign,
-        "Cookie": cookie,
-        "Referer": BASE_URL + "/truyen/" + encodeURIComponent(host) + "/1/" + encodeURIComponent(bookid) + "/"
-    };
-
-    var readRes = fetch(readUrl, {
-        method: "GET",
-        headers: readHeaders
-    });
-
-    if (!readRes || !readRes.ok) {
-        return Response.error("Không đọc được nội dung chương STV (HTTP " + (readRes ? readRes.status : 0) + ")");
-    }
-
-    var json = null;
-    try {
-        json = readRes.json();
-    } catch (eJson) {}
-
-    // Neu may chu dang dich hoac dang tai chuong (code 7) -> cho 1.2 giay thu lai 1 lan
+    // Neu may chu dang dich hoac dang tai chuong (code 7): cho co gioi
+    // han 1.2 giay roi thu lai TOI DA 1 LAN — va lan retry PHAI xin lai
+    // grant + key moi truoc khi doc (key cu co the het han theo phien
+    // dich), khong doc lai bang key cu nhu ban cu.
     if (json && (String(json.code) === "7" || json.code === 7)) {
-        try {
-            if (typeof java !== "undefined" && java && java.lang && java.lang.Thread) {
-                java.lang.Thread.sleep(1200);
-            } else {
-                var waitTarget = new Date().getTime() + 1200;
-                while (new Date().getTime() < waitTarget) {}
-            }
-        } catch (_) {}
-        var retryRes = fetch(readUrl, {
-            method: "GET",
-            headers: readHeaders
-        });
-        if (retryRes && retryRes.ok) {
-            try {
-                json = retryRes.json();
-            } catch (_) {}
+        waitBounded(1200);
+        var grant2 = requestGrantAndKey(host, bookid);
+        if (grant2.error) {
+            return Response.error(grant2.error);
         }
+        var read2 = readChapterOnce(host, bookid, cid, grant2.key, grant2.readcontextid);
+        if (read2.error) {
+            return Response.error(read2.error);
+        }
+        json = read2.json;
     }
 
     if (json) {

@@ -11,17 +11,27 @@ function execute(url) {
     var bookId = input[2];
     var tocUrl = BASE_URL + "/index.php?ngmar=chapterlist&sajax=getchapterlist&h=" + hostId + "&bookid=" + bookId;
 
-    var res = fetch(tocUrl, {
-        method: "GET",
-        headers: {
-            "x-stv-transport": "web",
-            "referer": BASE_URL + "/app.v2.php"
-        }
-    });
+    var res = null;
+    try {
+        res = fetchWithMirrors(tocUrl, {
+            method: "GET",
+            headers: {
+                "x-stv-transport": "web",
+                "referer": BASE_URL + "/app.v2.php"
+            }
+        });
+    } catch (e) {
+        return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
+    }
 
-    if (!res.ok) return Response.error("HTTP Error: " + res.status);
-    var json = res.json();
-    if (!json || !json.data) {
+    if (!res || !res.ok) return Response.error("Không tải được mục lục (HTTP " + (res ? res.status : 0) + ")");
+    var json = null;
+    try {
+        json = res.json();
+    } catch (eJson) {
+        return Response.error("Máy chủ Sáng Tác Việt không trả danh sách chương hợp lệ (truyện có thể chưa có chương).");
+    }
+    if (!json || typeof json.data !== "string" || !json.data) {
         return Response.error("Không lấy được danh sách chương.");
     }
 
@@ -29,6 +39,7 @@ function execute(url) {
     var regex1 = /1-\/-(\d+)-\/-([^\/]+)/;
     var chapters = [];
     var parts = toc.split("-//-");
+    var skipped = 0;
 
     for (var i = 0; i < parts.length; i++) {
         var item = parts[i];
@@ -36,15 +47,27 @@ function execute(url) {
         var m = item.match(regex1);
         if (m) {
             chapters.push({
-                name: m[2],
+                name: m[2].trim(),
                 url: "/?bookid=" + bookId + "&c=" + m[1] + "&h=" + hostId,
                 host: BASE_URL
             });
+        } else {
+            // Khong bo lang chuong parse loi: dem lai va ghi log ro
+            // doan nao hong de sua sau, thay vi im lang mat chuong.
+            skipped++;
+            try {
+                console.log("toc.js bo qua muc luc khong parse duoc (truyen " + bookId + "): " + item.substring(0, 80));
+            } catch (eLog) {}
         }
     }
 
     if (chapters.length === 0) {
         return Response.error("Mục lục trống hoặc chưa có chương.");
+    }
+    if (skipped > 0) {
+        try {
+            console.log("toc.js truyen " + bookId + ": " + chapters.length + " chuong doc duoc, " + skipped + " muc loi da bo qua (xem log tren).");
+        } catch (eLog2) {}
     }
 
     return Response.success(chapters);
