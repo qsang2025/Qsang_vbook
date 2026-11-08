@@ -1,5 +1,6 @@
 // toc.js — Muc luc chuong Sang Tac Viet
 load('config.js');
+load('challenge-handler.js');
 
 function execute(url) {
     var regex = /truyen\/([^\/]+)\/\d+\/(\d+)\/?/;
@@ -12,6 +13,7 @@ function execute(url) {
     var tocUrl = BASE_URL + "/index.php?ngmar=chapterlist&sajax=getchapterlist&h=" + hostId + "&bookid=" + bookId;
 
     var res = null;
+    var rawText = "";
     try {
         res = fetchWithMirrors(tocUrl, {
             method: "GET",
@@ -20,14 +22,31 @@ function execute(url) {
                 "referer": BASE_URL + "/app.v2.php"
             }
         });
+        if (res) rawText = String(res.text() || "");
     } catch (e) {
         return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
+    }
+
+    if (!res || !res.ok || isCloudflareChallenge(rawText, res ? res.headers : null)) {
+        var browserDoc = fetchViaBrowser(tocUrl);
+        if (browserDoc) {
+            try {
+                var bText = String(browserDoc.html() || "");
+                if (bText && !isCloudflareChallenge(bText, null)) {
+                    rawText = bText;
+                }
+            } catch (e2) {}
+        }
+    }
+
+    if (isCloudflareChallenge(rawText, res ? res.headers : null)) {
+        return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + hostId + "/1/" + bookId + "/"));
     }
 
     if (!res || !res.ok) return Response.error("Không tải được mục lục (HTTP " + (res ? res.status : 0) + ")");
     var json = null;
     try {
-        json = res.json();
+        json = JSON.parse(rawText);
     } catch (eJson) {
         return Response.error("Máy chủ Sáng Tác Việt không trả danh sách chương hợp lệ (truyện có thể chưa có chương).");
     }

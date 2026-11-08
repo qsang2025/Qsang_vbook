@@ -1,5 +1,6 @@
 // detail.js — Chi tiet truyen Sang Tac Viet
 load('config.js');
+load('challenge-handler.js');
 
 function execute(url) {
     if (url.indexOf("http") !== 0) {
@@ -10,13 +11,33 @@ function execute(url) {
     if (url.charAt(url.length - 1) !== '/') url = url + '/';
 
     var response = null;
+    var text = "";
     try {
         response = fetchWithMirrors(url);
+        if (response) {
+            text = String(response.text() || "");
+        }
     } catch (e) {
         return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
     }
+
+    if (!response || !response.ok || isCloudflareChallenge(text, response ? response.headers : null)) {
+        var browserDoc = fetchViaBrowser(url);
+        if (browserDoc) {
+            try {
+                var bHtml = String(browserDoc.html() || "");
+                if (bHtml && !isCloudflareChallenge(bHtml, null)) {
+                    text = bHtml;
+                }
+            } catch (e2) {}
+        }
+    }
+
+    if (isCloudflareChallenge(text, response ? response.headers : null)) {
+        return Response.error(formatChallengeError("Sáng Tác Việt", url));
+    }
+
     if (!response || !response.ok) return Response.error("Không tải được trang truyện (HTTP " + (response ? response.status : 0) + ")");
-    var text = response.text();
     var doc = Html.parse(text);
 
     var name = "";

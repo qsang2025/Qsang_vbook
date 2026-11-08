@@ -17,11 +17,21 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('challenge-handler.js');
 load('helper.js');
 
 function execute(url) {
     url = normalizeUrl(url);
     var doc = fetchDoc(url);
+    if (!doc) {
+        var chRes = fetchWithChallengeHandler(url, { siteName: "笔趣阁" });
+        if (chRes && chRes.ok) {
+            if (chRes.doc) doc = chRes.doc;
+            else if (chRes.html) doc = Html.parse(chRes.html);
+        } else if (chRes && chRes.error) {
+            return Response.error(chRes.error);
+        }
+    }
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
     var name = cleanText(doc.select("h1").text());

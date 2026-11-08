@@ -1,5 +1,6 @@
 // chap.js — Doc noi dung chuong Sang Tac Viet
 load('config.js');
+load('challenge-handler.js');
 
 // stvMd5 — Ham MD5 dung de ky request doc chuong (x-stv-sign).
 //
@@ -347,10 +348,17 @@ function requestGrantAndKey(host, bookid) {
     }
 
     if (!grantRes || !grantRes.ok) {
+        var rawGrant = grantRes ? String(grantRes.text() || "") : "";
+        if (isCloudflareChallenge(rawGrant, grantRes ? grantRes.headers : null)) {
+            return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
+        }
         return { error: "Không thể xin quyền đọc từ máy chủ Sáng Tác Việt (HTTP " + (grantRes ? grantRes.status : 0) + ")" };
     }
 
     var code = grantRes.text();
+    if (isCloudflareChallenge(code, grantRes.headers)) {
+        return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
+    }
     var readcontextid = extractReadContextId(grantRes);
     var chapterkey = evaluateChapterKey(BASE_URL, code);
 
@@ -393,12 +401,24 @@ function readChapterOnce(host, bookid, cid, chapterkey, readcontextid) {
     }
 
     if (!readRes || !readRes.ok) {
+        var rawReadErr = readRes ? String(readRes.text() || "") : "";
+        if (isCloudflareChallenge(rawReadErr, readRes ? readRes.headers : null)) {
+            return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
+        }
         return { error: "Không đọc được nội dung chương STV (HTTP " + (readRes ? readRes.status : 0) + ")" };
+    }
+
+    var rawRead = String(readRes.text() || "");
+    if (isCloudflareChallenge(rawRead, readRes.headers)) {
+        return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
+    }
+    if (isLoginRequired(rawRead, readUrl)) {
+        return { error: formatLoginError("Sáng Tác Việt", BASE_URL) };
     }
 
     var json = null;
     try {
-        json = readRes.json();
+        json = JSON.parse(rawRead);
     } catch (eJson) {
         return { error: "Phản hồi nội dung chương không hợp lệ." };
     }
@@ -424,6 +444,13 @@ function execute(url) {
             return Response.error("Không tải được trang chương Sáng Tác Việt: " + eDirect);
         }
         if (directRes && directRes.ok) {
+            var rawDirect = String(directRes.text() || "");
+            if (isCloudflareChallenge(rawDirect, directRes.headers)) {
+                return Response.error(formatChallengeError("Sáng Tác Việt", url));
+            }
+            if (isLoginRequired(rawDirect, url)) {
+                return Response.error(formatLoginError("Sáng Tác Việt", url));
+            }
             var doc = directRes.html();
             var el = doc.select("#content-container, .content, .reading-content").first();
             if (el) {
@@ -471,7 +498,11 @@ function execute(url) {
             }
             return Response.success(content);
         }
-        return Response.error(json.err || json.info || ("STV báo lỗi mã: " + json.code));
+        var errMsg = json.err || json.info || ("STV báo lỗi mã: " + json.code);
+        if (isLoginRequired(errMsg, BASE_URL + "/truyen/" + host + "/1/" + bookid + "/")) {
+            return Response.error(formatLoginError("Sáng Tác Việt", BASE_URL));
+        }
+        return Response.error(errMsg);
     }
 
     return Response.error("Phản hồi nội dung chương không hợp lệ.");

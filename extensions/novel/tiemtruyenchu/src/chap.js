@@ -1,5 +1,6 @@
 // chap.js — Noi dung chuong Tiem Truyen Chu (API prefetch + Cookie + Engine.newBrowser fallback)
 load('config.js');
+load('challenge-handler.js');
 
 function parseChapterInfo(url) {
     var s = String(url || "").trim();
@@ -73,12 +74,17 @@ function execute(url) {
         res = null;
     }
     if (res && res.ok) {
-        var doc = res.html();
+        var rawHtml = String(res.text() || "");
+        if (isCloudflareChallenge(rawHtml, res.headers)) {
+            return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
+        }
+        var doc = Html.parse(rawHtml);
         if (!isInterstitialDoc(doc)) {
             var bodyHtml = extractChapterFromDoc(doc);
             if (bodyHtml) {
                 return Response.success(bodyHtml);
             }
+        }
         }
     }
 
@@ -115,6 +121,9 @@ function execute(url) {
             }
         }
     }
+    if (bDoc && isChallengeDoc(bDoc)) {
+        return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
+    }
     if (bDoc && !isInterstitialDoc(bDoc)) {
         var bHtml = extractChapterFromDoc(bDoc);
         if (bHtml) {
@@ -122,5 +131,5 @@ function execute(url) {
         }
     }
 
-    return Response.error("Chưa đăng nhập Tiệm Truyện Chữ (hoặc phiên đăng nhập đã hết hạn) nên không đọc được nội dung chương. Hãy mở Trình duyệt trong vBook, vào https://tiemtruyenchu.cloud/login để đăng nhập bằng Google hoặc mã OTP 6 số, rồi quay lại mở chương này.");
+    return Response.error(formatLoginError("Tiệm Truyện Chữ", chapUrl));
 }

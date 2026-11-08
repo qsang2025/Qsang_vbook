@@ -2,7 +2,7 @@
   "metadata": {
     "name": "Tiệm Truyện Chữ",
     "author": "Qsang",
-    "version": 3,
+    "version": 4,
     "source": "https://tiemtruyenchu.cloud",
     "regexp": "^https?://(www\\.)?tiemtruyenchu\\.cloud/truyen/[0-9a-zA-Z\\-]+/?$",
     "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua Public API v1 (ref: ivanzzz, sonzin, Vearn). Mục lục lấy tiêu đề chương thật từ API. Đọc nội dung chương cần đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
