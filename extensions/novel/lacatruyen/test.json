@@ -46,7 +46,9 @@
       "expect": {
         "contains": [
           "Túc Mệnh Chi Hoàn",
-          "Ái Tiềm Thủy Đích Ô Tặc"
+          "Ái Tiềm Thủy Đích Ô Tặc",
+          "Hoàn thành",
+          "Số chương: 1180"
         ],
         "minItems": 1
       },

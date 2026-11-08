@@ -1,5 +1,7 @@
 // config.js — Cau hinh chung va ham tien ich cho La Ca Truyen (lacatruyen.site)
 // QUY TAC: File nay duoc load() vao cac script khac nen TUYET DOI KHONG goi load() o day.
+// -> Script nao goi aesEncrypt/aesDecrypt (toc.js, chap.js, page.js) PHAI load('crypto.js')
+//    TRUOC load('config.js') (load() cua runtime khong de quy nen config.js khong tu load duoc).
 
 var BASE_URL = "https://lacatruyen.site";
 var CDN_URL = "https://cms.metruyen.com/storage/uploads/";
@@ -17,11 +19,7 @@ try {
 
 try {
     if (typeof TOKEN !== "undefined" && TOKEN) {
-        USER_TOKEN = String(TOKEN).trim();
-    } else if (typeof token !== "undefined" && token) {
-        USER_TOKEN = String(token).trim();
-    } else if (typeof CONFIG_COOKIE !== "undefined" && CONFIG_COOKIE) {
-        USER_TOKEN = String(CONFIG_COOKIE).trim();
+        USER_TOKEN = normalizeToken(TOKEN);
     }
 } catch (e) {
 }
@@ -92,7 +90,9 @@ function normalizeUrl(url) {
     var s = String(url).trim();
     if (!s) return BASE_URL;
     if (s.indexOf("http://") === 0 || s.indexOf("https://") === 0) {
-        s = s.replace(/^https?:\/\/(www\.|m\.)?lacatruyen\.(site|com|live|homes|store|online|biz|art|buzz|world|life|casa|bar|shop|pro|net|me|club|xyz|info|vip)/i, BASE_URL);
+        // Chi nhan dung 6 TLD khai bao trong plugin.json; neo cuoi host (sau TLD phai la "/"
+        // hoac het chuoi) de lacatruyen.site.evil.com / lacatruyen.sitex khong bi rewrite nham.
+        s = s.replace(/^https?:\/\/(www\.|m\.)?lacatruyen\.(site|com|live|homes|store|online)(\/|$)/i, BASE_URL + "$3");
         return s.replace(/\/store\/story\//i, "/story/");
     }
     if (s.indexOf("//") === 0) {
@@ -243,7 +243,8 @@ function translateStatus(st) {
 
 function pickAuthor(item) {
     if (!item) return "Đang cập nhật";
-    var a = item.pen_name_user || item.name_user || item.author_pen_name || item.author_name || item.story_author || item.author || "";
+    // List API dung author_pen_name/author_name; pen_name_user/name_user chi la fallback.
+    var a = item.author_pen_name || item.author_name || item.pen_name_user || item.name_user || item.story_author || item.author || "";
     a = String(a).trim();
     return a || "Đang cập nhật";
 }
@@ -251,12 +252,13 @@ function pickAuthor(item) {
 function mapStoryItem(raw) {
     if (!raw) return null;
     var item = (raw.story && typeof raw.story === "object") ? raw.story : raw;
-    var name = String(item.story_title || item.title || item.name || "").trim();
-    var slug = String(item.story_slug || item.slug || "").trim();
+    // List API dung title/slug/image; story_title/story_slug/story_image chi co o fallback HTML /category/.
+    var name = String(item.title || item.story_title || item.name || "").trim();
+    var slug = String(item.slug || item.story_slug || "").trim();
     if (!name || !slug) return null;
 
     var link = slug.indexOf("http") === 0 ? normalizeUrl(slug) : (BASE_URL + "/story/" + slug.replace(/^\/+/, ""));
-    var cover = resolveCover(item.story_image || item.image || raw.story_image || raw.image || "");
+    var cover = resolveCover(item.image || item.story_image || raw.image || raw.story_image || "");
     var author = pickAuthor(item);
     var chapCount = parseInt(item.count_chap || item.count_chapter || item.chapter_count || 0, 10);
     var status = translateStatus(item.story_status || item.status || "");

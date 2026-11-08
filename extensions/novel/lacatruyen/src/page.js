@@ -9,10 +9,15 @@ function execute(url) {
     var storyUrl = stripQueryAndHash(normalizeUrl(url)).replace(/\/+$/, "");
     if (!storyUrl) return Response.error("URL truyện không hợp lệ.");
 
-    var res = fetch(storyUrl, {
-        method: "GET",
-        headers: buildAuthHeaders()
-    });
+    var res = null;
+    try {
+        res = fetch(storyUrl, {
+            method: "GET",
+            headers: buildAuthHeaders()
+        });
+    } catch (e) {
+        return Response.error("Không thể tải trang truyện để phân trang mục lục (lỗi mạng).");
+    }
     if (!res || !res.ok) {
         return Response.error("Không thể tải trang truyện để phân trang mục lục.");
     }

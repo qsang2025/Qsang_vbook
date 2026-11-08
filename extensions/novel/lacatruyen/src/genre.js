@@ -1,6 +1,9 @@
 // genre.js — Danh sach the loai La Ca Truyen (tu API /api/categories/list kem fallback tinh)
 load('config.js');
 
+// GHI CHU: genre.js CO fetch (GET /api/categories/list) — chap nhan duoc vi luon co fallback
+// 17 the loai tinh ben duoi, fetch loi khong chan man hinh (khac home.js chi tra tab tinh).
+
 var FALLBACK_GENRES = [
     { title: "Tiên Hiệp", input: "/category/tien-hiep", script: "gen.js" },
     { title: "Huyền Huyễn", input: "/category/huyen-huyen", script: "gen.js" },
@@ -8,16 +11,15 @@ var FALLBACK_GENRES = [
     { title: "Khoa Huyễn", input: "/category/khoa-huyen", script: "gen.js" },
     { title: "Hệ Thống", input: "/category/he-thong", script: "gen.js" },
     { title: "Xuyên Không", input: "/category/xuyen-khong", script: "gen.js" },
-    { title: "Trọng Sinh", input: "/category/trong-sinh", script: "gen.js" },
+    { title: "Trọng Sinh", input: "/category/trung-sinh", script: "gen.js" },
     { title: "Linh Dị", input: "/category/linh-di", script: "gen.js" },
     { title: "Võng Du", input: "/category/vong-du", script: "gen.js" },
     { title: "Đồng Nhân", input: "/category/dong-nhan", script: "gen.js" },
-    { title: "Kiếm Hiệp", input: "/category/kiem-hiep", script: "gen.js" },
-    { title: "Lịch Sử", input: "/category/lich-su", script: "gen.js" },
+    { title: "Võ Hiệp", input: "/category/vo-hiep", script: "gen.js" },
     { title: "Quân Sự", input: "/category/quan-su", script: "gen.js" },
     { title: "Dị Giới", input: "/category/di-gioi", script: "gen.js" },
     { title: "Mạt Thế", input: "/category/mat-the", script: "gen.js" },
-    { title: "Ngôn Tình", input: "/category/ngon-tinh", script: "gen.js" },
+    { title: "Ngôn Tình", input: "/category/tinh-cam", script: "gen.js" },
     { title: "Cổ Đại", input: "/category/co-dai", script: "gen.js" },
     { title: "Điền Văn", input: "/category/dien-van", script: "gen.js" }
 ];

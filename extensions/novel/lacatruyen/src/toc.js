@@ -3,7 +3,7 @@ load('crypto.js');
 load('config.js');
 
 var DEFAULT_TOC_SIZE = 500;
-var MAX_TOC_PAGES = 20;
+var MAX_TOC_PAGES = 50;
 
 function fetchEncryptedChapterPage(storyId, pageNum, pageSize, storyUrl) {
     var payload = {
@@ -67,10 +67,15 @@ function execute(url) {
     var firstChapterFallback = [];
 
     if (!storyId) {
-        var pageRes = fetch(storyUrl, {
-            method: "GET",
-            headers: buildAuthHeaders()
-        });
+        var pageRes = null;
+        try {
+            pageRes = fetch(storyUrl, {
+                method: "GET",
+                headers: buildAuthHeaders()
+            });
+        } catch (e) {
+            return Response.error("Không thể tải trang truyện để lấy mục lục (lỗi mạng).");
+        }
         if (!pageRes || !pageRes.ok) {
             return Response.error("Không thể tải trang truyện để lấy mục lục.");
         }
@@ -112,10 +117,12 @@ function execute(url) {
         return Response.success(mappedSingle);
     }
 
-    // Truong hop goi truc tiep toc.js voi URL truyen (lap qua cac trang de lay toan bo chuong)
+    // Truong hop goi truc tiep toc.js voi URL truyen (lap qua cac trang de lay toan bo chuong).
+    // Dung reqSize (da clamp 1-1000, mac dinh 500) thay vi cung DEFAULT_TOC_SIZE; cap 50 trang
+    // khop voi page.js (toi da 25.000 chuong).
     var allChapters = [];
     for (var p = 1; p <= MAX_TOC_PAGES; p++) {
-        var pageResult = fetchEncryptedChapterPage(storyId, p, DEFAULT_TOC_SIZE, storyUrl);
+        var pageResult = fetchEncryptedChapterPage(storyId, p, reqSize, storyUrl);
         if (!pageResult.ok) {
             if (p === 1 && firstChapterFallback.length > 0) {
                 return Response.success(mapChapterList(firstChapterFallback));
@@ -131,7 +138,7 @@ function execute(url) {
         for (var i = 0; i < mapped.length; i++) {
             allChapters.push(mapped[i]);
         }
-        if (rows.length < DEFAULT_TOC_SIZE) break;
+        if (rows.length < reqSize) break;
     }
 
     if (allChapters.length === 0) {

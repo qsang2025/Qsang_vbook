@@ -3,16 +3,11 @@ load('config.js');
 
 function cleanDescription(html) {
     if (!html) return "Đang cập nhật mô tả.";
+    // Mo ta tra ve la plain text: bo het tag roi gom khoang trang (ban cu chen <br> roi lai
+    // strip het tag nen doan xu ly <br> la code chet).
     var s = String(html)
-        .replace(/<\/?strong\b[^>]*>/gi, "")
-        .replace(/<\/?em\b[^>]*>/gi, "")
-        .replace(/<p\b[^>]*>/gi, "<br>")
-        .replace(/<\/p>/gi, "<br>")
-        .replace(/<br\s*\/?>/gi, "<br>")
         .replace(/<[^>]+>/g, " ")
-        .replace(/(?:<br>\s*){3,}/gi, "<br><br>")
-        .replace(/^(?:<br>\s*)+/i, "")
-        .replace(/(?:<br>\s*)+$/i, "")
+        .replace(/\s+/g, " ")
         .trim();
     return s || "Đang cập nhật mô tả.";
 }
@@ -71,10 +66,15 @@ function execute(url) {
     var storyUrl = stripQueryAndHash(normalizeUrl(url)).replace(/\/+$/, "");
     if (!storyUrl) return Response.error("URL truyện không hợp lệ.");
 
-    var res = fetch(storyUrl, {
-        method: "GET",
-        headers: buildAuthHeaders()
-    });
+    var res = null;
+    try {
+        res = fetch(storyUrl, {
+            method: "GET",
+            headers: buildAuthHeaders()
+        });
+    } catch (e) {
+        return Response.error("Không thể tải trang chi tiết truyện (lỗi mạng).");
+    }
     if (!res || !res.ok) {
         return Response.error("Không thể tải trang chi tiết truyện.");
     }
@@ -109,7 +109,10 @@ function execute(url) {
     var author = pickAuthor(story);
     var cover = resolveCover(story.image || story.story_image || "");
     var statusText = translateStatus(story.status || story.story_status || "");
-    var ongoing = statusText !== "Hoàn thành";
+    // Suy ongoing tu gia tri status tho (complete/completed/full) thay vi chuoi hien thi da dich,
+    // de status la khong bi coi nham la dang ra.
+    var rawStatus = String(story.status || story.story_status || "").trim().toLowerCase();
+    var ongoing = !(rawStatus === "complete" || rawStatus === "completed" || rawStatus === "full");
     var chapCount = parseInt(story.count_chapter || story.count_chap || pageProps.count_chapter || 0, 10);
     var views = story.view || "";
 
@@ -129,24 +132,32 @@ function execute(url) {
     }
 
     var genres = buildGenres(pageProps, story);
+    // Chip "Truyen cung the loai": input la story_id, gen.js co nhanh rieng goi
+    // /api/stories/similar?story_id=... (truoc day input la JSON chuoi danh sach truyen ma
+    // gen.js khong hieu nen bam chip se loi, va suggests con bi vut khoi ket qua tra ve).
     var suggests = [];
-    var similarList = fetchSimilarStories(story.id);
-    if (similarList.length > 0) {
-        suggests.push({
-            title: "Truyện cùng thể loại",
-            input: JSON.stringify(similarList),
-            script: "gen.js"
-        });
+    if (story.id) {
+        var similarList = fetchSimilarStories(story.id);
+        if (similarList.length > 0) {
+            suggests.push({
+                title: "Truyện cùng thể loại",
+                input: "/api/stories/similar?story_id=" + encodeURIComponent(String(story.id)),
+                script: "gen.js"
+            });
+        }
     }
 
     return Response.success({
         name: name,
+        url: storyUrl,
+        type: "novel",
+        format: "novel",
         cover: cover,
-        host: BASE_URL,
         author: author,
         description: cleanDescription(story.detail || story.description || ""),
         detail: detailLines.join("<br>"),
         ongoing: ongoing,
-        genres: genres
+        genres: genres,
+        suggests: suggests
     });
 }

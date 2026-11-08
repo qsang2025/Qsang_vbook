@@ -2,17 +2,17 @@
   "cases": [
     {
       "name": "API danh sách mới cập nhật",
-      "pattern": "\"data\"\\s*:\\s*\\[",
+      "pattern": "\"data\":\\[\\{\"id\":",
       "url": "https://lacatruyen.site/api/stories/new-updates?page=1&limit=5"
     },
     {
       "name": "API danh sách thể loại",
-      "pattern": "tien-hiep",
+      "pattern": "\"slug\":\"tien-hiep\"",
       "url": "https://lacatruyen.site/api/categories/list"
     },
     {
       "name": "Trang chi tiết truyện Túc Mệnh Chi Hoàn",
-      "pattern": "__NEXT_DATA__",
+      "pattern": "Túc Mệnh Chi Hoàn",
       "url": "https://lacatruyen.site/story/tuc-menh-chi-hoan"
     }
   ]
