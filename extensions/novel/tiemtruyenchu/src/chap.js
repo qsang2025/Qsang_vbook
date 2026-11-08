@@ -37,11 +37,17 @@ function extractChapterFromDoc(doc) {
     var contentEl = doc.select("#chapter-body, .chapter-content, #chapter-content, .content-text, .chapter-c").first();
     if (!contentEl) return "";
     var html = contentEl.html();
-    // Chi can noi dung khong rong la nhan (bo nguong cung 20 ky tu: chuong
-    // ngan that van phai doc duoc); trang interstitial khong co #chapter-body
-    // nen da tra "" o tren.
     if (!html || !cleanText(contentEl.text())) return "";
     return html;
+}
+
+function extractChapterTitleFromDoc(doc) {
+    if (!doc) return "";
+    try {
+        var t = doc.select(".chapter-title, #chapter-title, h1.title, h2.title").text();
+        if (t && String(t).trim()) return String(t).trim();
+    } catch (e) {}
+    return "";
 }
 
 function execute(url) {
@@ -57,10 +63,15 @@ function execute(url) {
     var prefetchUrl = BASE_URL + "/api/prefetch-chapter/" + info.storyId + "/" + info.chapNum;
     var pJson = fetchJson(prefetchUrl, ck);
     var pContent = "";
+    var pTitle = "";
     if (pJson) {
         pContent = pJson.content || (pJson.data && pJson.data.content) || "";
+        pTitle = pJson.title || pJson.chapter_title || (pJson.chapter && pJson.chapter.title) || (pJson.data && (pJson.data.title || pJson.data.chapter_title)) || "";
     }
     if (pContent && String(pContent).trim()) {
+        if (pTitle && String(pTitle).trim()) {
+            return Response.success(formatPlainContent(pContent), String(pTitle).trim());
+        }
         return Response.success(formatPlainContent(pContent));
     }
 
@@ -82,52 +93,75 @@ function execute(url) {
         if (!isInterstitialDoc(doc)) {
             var bodyHtml = extractChapterFromDoc(doc);
             if (bodyHtml) {
+                var docTitle = extractChapterTitleFromDoc(doc);
+                if (docTitle) {
+                    return Response.success(bodyHtml, docTitle);
+                }
                 return Response.success(bodyHtml);
             }
-        }
         }
     }
 
     // 3. Fallback Engine.newBrowser() de lay phien dang nhap tu trinh duyet vBook
-    var browser = null;
-    var bDoc = null;
-    try {
-        browser = Engine.newBrowser();
-        browser.launch(chapUrl, 10000);
+    if (typeof Engine !== "undefined" && Engine && typeof Engine.newBrowser === "function") {
+        var browser = null;
+        var bDoc = null;
         try {
-            var cookieRes = browser.callJs("document.cookie;", 1000);
-            if (cookieRes) {
-                // callJs tra ve HtmlElement — lay chuoi cookie that bang .text(),
-                // khong dung String() (se luu rac).
-                var rawCookie = "";
-                try {
-                    rawCookie = cookieRes.text();
-                } catch (eText) {
-                    rawCookie = String(cookieRes);
-                }
-                if (rawCookie && rawCookie.indexOf("=") !== -1) {
-                    saveCookie(rawCookie);
-                }
-            }
-        } catch (eCookie) {
-        }
-        bDoc = browser.html();
-    } catch (eBrowser) {
-    } finally {
-        if (browser) {
+            browser = Engine.newBrowser();
+            bDoc = browser.launch(chapUrl, 10000);
             try {
-                browser.close();
-            } catch (eClose) {
+                var cookieRes = browser.callJs("document.cookie;", 1000);
+                if (cookieRes) {
+                    var rawCookie = "";
+                    try {
+                        rawCookie = cookieRes.text();
+                    } catch (eText) {
+                        rawCookie = String(cookieRes);
+                    }
+                    if (rawCookie && rawCookie.indexOf("=") !== -1) {
+                        saveCookie(rawCookie);
+                    }
+                }
+            } catch (eCookie) {}
+
+            // Kiem tra lai cookie trong CookieManager sau khi browser launch
+            var freshCookie = getSavedCookie();
+            if (freshCookie && freshCookie !== ck) {
+                var retryJson = fetchJson(prefetchUrl, freshCookie);
+                var rContent = retryJson ? (retryJson.content || (retryJson.data && retryJson.data.content) || "") : "";
+                var rTitle = retryJson ? (retryJson.title || retryJson.chapter_title || (retryJson.chapter && retryJson.chapter.title) || "") : "";
+                if (rContent && String(rContent).trim()) {
+                    if (rTitle && String(rTitle).trim()) {
+                        return Response.success(formatPlainContent(rContent), String(rTitle).trim());
+                    }
+                    return Response.success(formatPlainContent(rContent));
+                }
+            }
+
+            if (!bDoc) {
+                bDoc = browser.html();
+            }
+        } catch (eBrowser) {
+        } finally {
+            if (browser) {
+                try {
+                    browser.close();
+                } catch (eClose) {}
             }
         }
-    }
-    if (bDoc && isChallengeDoc(bDoc)) {
-        return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
-    }
-    if (bDoc && !isInterstitialDoc(bDoc)) {
-        var bHtml = extractChapterFromDoc(bDoc);
-        if (bHtml) {
-            return Response.success(bHtml);
+
+        if (bDoc && isChallengeDoc(bDoc)) {
+            return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
+        }
+        if (bDoc && !isInterstitialDoc(bDoc)) {
+            var bHtml = extractChapterFromDoc(bDoc);
+            if (bHtml) {
+                var bTitle = extractChapterTitleFromDoc(bDoc);
+                if (bTitle) {
+                    return Response.success(bHtml, bTitle);
+                }
+                return Response.success(bHtml);
+            }
         }
     }
 

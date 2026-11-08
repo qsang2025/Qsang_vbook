@@ -124,25 +124,32 @@ function resolveStoryId(url) {
 function getSavedCookie() {
     if (USER_COOKIE) return USER_COOKIE;
     try {
+        if (typeof localCookie !== "undefined" && localCookie && typeof localCookie.getCookie === "function") {
+            var lc = localCookie.getCookie();
+            if (lc && String(lc).trim()) return String(lc).trim();
+        }
+    } catch (e) {}
+    try {
         if (typeof localStorage !== "undefined" && localStorage) {
             var c = localStorage.getItem("ttc_cookie");
             if (c) return String(c).trim();
         }
-    } catch (e) {
-    }
+    } catch (e) {}
     return "";
 }
 
-function saveCookie(c) {
-    if (!c) return;
-    var s = String(c).trim();
-    if (!s) return;
+function saveCookie(cookieStr) {
+    if (!cookieStr) return;
+    try {
+        if (typeof localCookie !== "undefined" && localCookie && typeof localCookie.setCookie === "function") {
+            localCookie.setCookie(cookieStr);
+        }
+    } catch (e) {}
     try {
         if (typeof localStorage !== "undefined" && localStorage) {
-            localStorage.setItem("ttc_cookie", s);
+            localStorage.setItem("ttc_cookie", cookieStr);
         }
-    } catch (e) {
-    }
+    } catch (e) {}
 }
 
 function buildHeaders(extraCookie) {
@@ -150,6 +157,13 @@ function buildHeaders(extraCookie) {
         "Accept": "application/json, text/html, */*;q=0.8",
         "Referer": BASE_URL + "/"
     };
+    var ua = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+    try {
+        if (typeof UserAgent !== "undefined" && UserAgent && typeof UserAgent.android === "function") {
+            ua = UserAgent.android();
+        }
+    } catch (eUa) {}
+    headers["User-Agent"] = ua;
     var ck = extraCookie || getSavedCookie();
     if (ck) {
         headers["Cookie"] = ck;
