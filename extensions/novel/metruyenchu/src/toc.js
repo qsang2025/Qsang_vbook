@@ -2,14 +2,11 @@
 load('config.js');
 
 function execute(url) {
-    if (url.indexOf("http") !== 0) {
-        if (url.charAt(0) !== '/') url = '/' + url;
-        url = BASE_URL + url;
-    }
-    url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
+    if (!url || !String(url).trim()) return Response.error("Thiếu đường dẫn truyện.");
+    url = normalizeUrl(url);
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
+    var response = fetchWithMirrors(url);
+    if (!response || !response.ok) return Response.error("HTTP Error: " + (response ? response.status : "không kết nối được máy chủ"));
     var doc = response.html();
     var data = [];
 
@@ -31,13 +28,18 @@ function execute(url) {
         }
     }
 
-    // Trich xuat storyId tu page(storyId, pageNum) de lay cac trang sau
-    var pageHtml = doc.html();
-    var storyIdMatch = pageHtml.match(/page\((\d+),/);
+    // Trich xuat storyId va tong so trang tu page(storyId, pageNum) — CHI
+    // trong khoi phan trang ".paging" cua muc luc, khong regex tren toan
+    // bo HTML nua (trang qua gioi han ma van lay page() o cho khac se
+    // dem thua trang va lap chuong: AJAX trang vuot gioi han tra lai
+    // noi dung trang 1, kiem chung bang curl 2026-11-08).
+    var pagingEl = doc.select(".paging").first();
+    var pagingHtml = pagingEl ? pagingEl.html() : "";
+    var storyIdMatch = pagingHtml.match(/page\((\d+),/);
     if (storyIdMatch) {
         var storyId = storyIdMatch[1];
         var totalPages = 1;
-        var pageMatches = pageHtml.match(/page\(\d+,\s*(\d+)\)/g);
+        var pageMatches = pagingHtml.match(/page\(\d+,\s*(\d+)\)/g);
         if (pageMatches) {
             for (var p = 0; p < pageMatches.length; p++) {
                 var numMatch = pageMatches[p].match(/page\(\d+,\s*(\d+)\)/);
@@ -50,36 +52,53 @@ function execute(url) {
             }
         }
 
-        // Fetch cac trang tiep theo qua AJAX API
+        // Fetch cac trang tiep theo qua AJAX API. Mot trang loi thi thu
+        // lai 1 lan roi BO QUA trang do va tiep tuc cac trang sau — khong
+        // break toan bo muc luc nua (tru khi trang tra 0 chuong, nghia la
+        // da het danh sach that).
         for (var pNum = 2; pNum <= totalPages; pNum++) {
             var apiUrl = BASE_URL + "/get/listchap/" + storyId + "?page=" + pNum;
-            var apiResponse = fetch(apiUrl);
-            if (apiResponse.ok) {
-                var json = apiResponse.json();
-                if (json && json.data) {
-                    var chapterDoc = Html.parse(json.data);
-                    var chapters = chapterDoc.select("li a");
-                    if (chapters.size() === 0) {
-                        chapters = chapterDoc.select("a");
-                    }
-                    if (chapters.size() === 0) break;
-                    for (var j = 0; j < chapters.size(); j++) {
-                        var c = chapters.get(j);
-                        var cName = c.text().trim();
-                        var cUrl = c.attr("href");
-                        if (cName && cUrl) {
-                            data.push({
-                                name: cName,
-                                url: cUrl,
-                                host: BASE_URL
-                            });
-                        }
-                    }
-                } else {
-                    break;
+            var apiResponse = null;
+            var tries = 0;
+            while (tries < 2 && !(apiResponse && apiResponse.ok)) {
+                try {
+                    apiResponse = fetchWithMirrors(apiUrl);
+                } catch (err) {
+                    apiResponse = null;
                 }
-            } else {
-                break;
+                tries++;
+            }
+            if (!apiResponse || !apiResponse.ok) {
+                console.log("toc.js bo qua trang AJAX " + pNum + " (loi " + (apiResponse ? apiResponse.status : "mang") + "), tiep tuc trang sau.");
+                continue;
+            }
+            var json = null;
+            try {
+                json = apiResponse.json();
+            } catch (err2) {
+                json = null;
+            }
+            if (!json || !json.data) {
+                console.log("toc.js bo qua trang AJAX " + pNum + " (JSON loi/rong), tiep tuc trang sau.");
+                continue;
+            }
+            var chapterDoc = Html.parse(json.data);
+            var chapters = chapterDoc.select("li a");
+            if (chapters.size() === 0) {
+                chapters = chapterDoc.select("a");
+            }
+            if (chapters.size() === 0) break;
+            for (var j = 0; j < chapters.size(); j++) {
+                var c = chapters.get(j);
+                var cName = c.text().trim();
+                var cUrl = c.attr("href");
+                if (cName && cUrl) {
+                    data.push({
+                        name: cName,
+                        url: cUrl,
+                        host: BASE_URL
+                    });
+                }
             }
         }
     }

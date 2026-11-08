@@ -3,10 +3,7 @@ load('config.js');
 
 function execute(url, page) {
     if (!url) return Response.error("Thiếu đường dẫn danh sách.");
-    if (url.indexOf("http") !== 0) {
-        if (url.charAt(0) !== '/') url = '/' + url;
-        url = BASE_URL + url;
-    }
+    url = normalizeUrl(url);
 
     if (page && String(page) !== '1') {
         if (url.indexOf("?") !== -1) {
@@ -16,8 +13,8 @@ function execute(url, page) {
         }
     }
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
+    var response = fetchWithMirrors(url);
+    if (!response || !response.ok) return Response.error("HTTP Error: " + (response ? response.status : "không kết nối được máy chủ"));
     var doc = response.html();
     var novelList = [];
 
@@ -88,19 +85,11 @@ function execute(url, page) {
         return Response.error("Không tìm thấy truyện trên trang.");
     }
 
-    var next = null;
     var currentPage = page ? parseInt(page, 10) : 1;
-    var pageLinks = doc.select(".phan-trang a.btn-page");
-    if (pageLinks.size() > 0) {
-        var lastLink = pageLinks.last();
-        var href = lastLink.attr("href") || "";
-        if (href.indexOf("page=") !== -1) {
-            var match = href.match(/page=(\d+)/);
-            if (match && parseInt(match[1], 10) > currentPage) {
-                next = String(currentPage + 1);
-            }
-        }
-    }
+    if (isNaN(currentPage) || currentPage < 1) currentPage = 1;
+    // nextToken LUON la string: "" khi het trang, khong bao gio null.
+    // Trang chu "/" khong co khoi phan trang nen tab "Moi Cap Nhat" tra "".
+    var next = findNextPage(doc, currentPage);
 
     return Response.success(novelList, next);
 }

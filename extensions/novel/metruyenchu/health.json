@@ -2,7 +2,7 @@
   "cases": [
     {
       "name": "Trang chủ",
-      "pattern": "truyen",
+      "pattern": "itemupdate",
       "url": "https://metruyenchu.com.vn/"
     },
     {
@@ -12,7 +12,7 @@
     },
     {
       "name": "Chi tiết truyện",
-      "pattern": "Mục Thần Ký",
+      "pattern": "label-status",
       "url": "https://metruyenchu.com.vn/muc-than-ky-convert"
     }
   ]

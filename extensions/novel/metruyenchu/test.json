@@ -47,7 +47,7 @@
         ],
         "minItems": 1
       },
-      "input": "https://metruyenchu.com.vn/muc-than-ky-convert/chuong-1",
+      "input": "https://metruyenchu.com.vn/muc-than-ky-convert/chuong-1-8WcMezdZ2aeJ",
       "script": "chap.js"
     },
     {
@@ -61,7 +61,19 @@
       },
       "input": "",
       "script": "genre.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Truyện Hot",
+          "Mới Cập Nhật",
+          "Đã Hoàn Thành"
+        ],
+        "minItems": 3
+      },
+      "input": "",
+      "script": "home.js"
     }
   ],
-  "note": "Golden fixture cho Me Truyen Chu (metruyenchu.com.vn & mirror metruyenchuvn.com)."
+  "note": "Golden fixture cho Me Truyen Chu (metruyenchu.com.vn & mirror metruyenchuvn.com). Case chap.js dung URL chuong that co ID (lay tu TOC/AJAX); URL /chuong-1 khong ID bi site redirect 302 ve trang detail nen khong doc duoc chuong."
 }

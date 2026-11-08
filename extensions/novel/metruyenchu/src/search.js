@@ -11,8 +11,8 @@ function execute(key, page) {
         url = url + "&page=" + page;
     }
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
+    var response = fetchWithMirrors(url);
+    if (!response || !response.ok) return Response.error("HTTP Error: " + (response ? response.status : "không kết nối được máy chủ"));
     var doc = response.html();
     var novelList = [];
 
@@ -49,19 +49,10 @@ function execute(key, page) {
         return Response.error("Không tìm thấy truyện phù hợp.");
     }
 
-    var next = null;
     var currentPage = page ? parseInt(page, 10) : 1;
-    var pageLinks = doc.select(".phan-trang a.btn-page");
-    if (pageLinks.size() > 0) {
-        var lastLink = pageLinks.last();
-        var href = lastLink.attr("href") || "";
-        if (href.indexOf("page=") !== -1) {
-            var match = href.match(/page=(\d+)/);
-            if (match && parseInt(match[1], 10) > currentPage) {
-                next = String(currentPage + 1);
-            }
-        }
-    }
+    if (isNaN(currentPage) || currentPage < 1) currentPage = 1;
+    // nextToken LUON la string: "" khi het trang, khong bao gio null.
+    var next = findNextPage(doc, currentPage);
 
     return Response.success(novelList, next);
 }
