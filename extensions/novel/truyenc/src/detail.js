@@ -1,65 +1,141 @@
 // detail.js — Thong tin chi tiet truyen tren TruyenC
+//
+// Trang chi tiet la SSR. Cac neo that da kiem chung bang curl 2026-11-08
+// (truyen mau Linh Kiem Ton):
+//  - Ten: h1. Tac gia: link /tac-gia/.
+//  - Anh bia: <img alt="ten truyen"> (CloudFront). KHONG lay img dau
+//    trang (ban cu lay img dau tien se trung logo/badge App Store).
+//  - Mo ta: div.prose duy nhat tren trang (duoi tieu de "Tom tat noi
+//    dung"). KHONG gom moi <p> tren trang.
+//  - Trang thai + tong so chuong + the loai: doc tu JSON-LD / RSC nhung
+//    trong HTML (regex tren embedded JSON — hop le theo runtime.md):
+//    "numberOfPages":5418, "status":"COMPLETED", "genre":["Tien Hiep"...].
+//    Du phong: badge trang thai ("Hoan thanh"/"Dang ra"), chu "Xem tat ca
+//    (N chuong)", link the loai dang pill (class rounded-full + uppercase).
+//  - Heuristic cu indexOf("Full") tren toan trang da bo: chu "Full" xuat
+//    hien o nhieu cho khong lien quan (tab "Da Hoan Thanh", badge "Full").
 load('config.js');
 load('fetch-helpers.js');
 
 function execute(url) {
-    if (url.indexOf("http") !== 0) {
-        if (url.charAt(0) !== '/') url = '/' + url;
-        url = BASE_URL + url;
-    }
-    url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
+    if (!url || !String(url).trim()) return Response.error("Thiếu đường dẫn truyện.");
+    url = normalizeUrl(url);
 
-    var doc = fetchDoc(url);
-    if (!doc) {
-        var altUrl = url.replace("https://truyenc.net", "https://www.truyenc.net");
-        doc = fetchDoc(altUrl);
-    }
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
     var name = doc.select("h1").first() ? doc.select("h1").first().text().trim() : "";
     if (!name) return Response.error("Không đọc được tên truyện: " + url);
 
     var cover = "";
-    var imgEl = doc.select("img[src*='cloudfront.net'], img[src*='cover']").first();
-    if (!imgEl) imgEl = doc.select("img").first();
-    if (imgEl) {
-        cover = imgEl.attr("data-src") || imgEl.attr("src") || "";
-        if (cover.indexOf("//") === 0) cover = "https:" + cover;
+    var imgs = doc.select("img[src*='cloudfront.net']");
+    for (var ci = 0; ci < imgs.size(); ci++) {
+        var cand = imgs.get(ci);
+        if ((cand.attr("alt") || "").trim() === name) {
+            cover = cand.attr("data-src") || cand.attr("src") || "";
+            break;
+        }
     }
+    if (!cover && imgs.size() > 0) {
+        var first = imgs.get(0);
+        cover = first.attr("data-src") || first.attr("src") || "";
+    }
+    if (cover.indexOf("//") === 0) cover = "https:" + cover;
 
     var author = "";
     var authorEl = doc.select("a[href*='/tac-gia/']").first();
     if (authorEl) {
         author = authorEl.text().trim();
     } else {
-        var text = doc.text();
-        var aMatch = text.match(/Tác giả\s*:\s*([^\n\r]+)/);
+        var aMatch = doc.text().match(/Tác giả\s*:\s*([^\n\r]+)/);
         if (aMatch) author = aMatch[1].trim();
     }
 
     var description = "";
-    var descEl = doc.select(".tóm-tắt, .summary, .prose, .desc, [class*='description']").first();
+    var descEl = doc.select("div.prose").first();
     if (descEl) description = descEl.html();
-    else {
-        var pList = doc.select("p");
-        for (var i = 0; i < pList.size(); i++) {
-            var pt = pList.get(i).text();
-            if (pt && pt.length > 50) {
-                description += "<p>" + pt + "</p>";
+
+    var html = "";
+    try { html = doc.html(); } catch (e) { html = ""; }
+
+    // Trang thai that: "status":"COMPLETED" (JSON-LD) hoac
+    // \"status\":\"COMPLETED\" (RSC flight, co backslash) — regex nay khop
+    // ca hai dang.
+    var ongoing = true;
+    var statusKnown = false;
+    var stMatch = html.match(/status[^A-Za-z]{0,10}(COMPLETED|ONGOING|HIATUS)/);
+    if (stMatch) {
+        statusKnown = true;
+        ongoing = (stMatch[1] !== "COMPLETED");
+    }
+    if (!statusKnown) {
+        if (doc.select("span:contains(Hoàn thành)").size() > 0) {
+            statusKnown = true;
+            ongoing = false;
+        } else if (doc.select("span:contains(Đang ra)").size() > 0) {
+            statusKnown = true;
+            ongoing = true;
+        }
+    }
+
+    // Tong so chuong that, theo thu tu uu tien: JSON-LD numberOfPages,
+    // RSC "chapters":N, chu "Xem tat ca (N chuong)", badge "Danh sach
+    // chuong N". KHONG dung regex /(\\d+)\\s*Chuong/ tren toan trang
+    // (ban cu): no khop so dau tien gap phai, khong phai tong so.
+    var chapterCount = 0;
+    var npMatch = html.match(/"numberOfPages"\s*:\s*(\d+)/);
+    if (npMatch) {
+        chapterCount = parseInt(npMatch[1], 10);
+    } else {
+        var chMatch = html.match(/chapters[^0-9]{0,10}(\d+)/);
+        if (chMatch) {
+            chapterCount = parseInt(chMatch[1], 10);
+        } else {
+            var allMatch = doc.text().match(/\(\s*(\d+)\s*chương\s*\)/);
+            if (allMatch) {
+                chapterCount = parseInt(allMatch[1], 10);
+            } else {
+                var badgeMatch = doc.text().match(/Danh sách chương\s*(\d+)/);
+                if (badgeMatch) chapterCount = parseInt(badgeMatch[1], 10);
             }
         }
     }
 
-    var fullText = doc.text();
-    var ongoing = true;
-    if (fullText.indexOf("Hoàn thành") !== -1 || fullText.indexOf("Full") !== -1 || fullText.indexOf("ĐÃ HOÀN") !== -1) {
-        ongoing = false;
+    // The loai: uu tien link pill o header truyen (class rounded-full +
+    // uppercase — link the loai o nav khong co class nay). Du phong: ten
+    // the loai trong JSON-LD "genre":[...], doi sang slug qua GENRES.
+    var genres = [];
+    var gSeen = {};
+    var pillLinks = doc.select("a[href*='/the-loai/']");
+    for (var gi = 0; gi < pillLinks.size(); gi++) {
+        var gl = pillLinks.get(gi);
+        var cls = gl.attr("class") || "";
+        if (cls.indexOf("rounded-full") === -1 || cls.indexOf("uppercase") === -1) continue;
+        var gHref = gl.attr("href") || "";
+        var gTitle = gl.text().trim();
+        if (!gHref || !gTitle || gSeen[gHref]) continue;
+        gSeen[gHref] = true;
+        genres.push({ title: gTitle, input: gHref, script: "gen.js" });
     }
-
-    var chapterCount = 0;
-    var chMatch = fullText.match(/(\d+)\s*(?:Chương|chương)/i);
-    if (chMatch) {
-        chapterCount = parseInt(chMatch[1], 10);
+    if (genres.length === 0) {
+        var geMatch = html.match(/"genre"\s*:\s*\[([^\]]*)\]/);
+        if (geMatch) {
+            var rawNames = geMatch[1].match(/"([^"]+)"/g);
+            if (rawNames) {
+                for (var ni = 0; ni < rawNames.length; ni++) {
+                    var gName = rawNames[ni].replace(/"/g, "");
+                    for (var ki = 0; ki < GENRES.length; ki++) {
+                        if (GENRES[ki].title.toLowerCase() === gName.toLowerCase()) {
+                            if (!gSeen[GENRES[ki].slug]) {
+                                gSeen[GENRES[ki].slug] = true;
+                                genres.push({ title: GENRES[ki].title, input: GENRES[ki].slug, script: "gen.js" });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     var detailLines = [];
@@ -73,7 +149,10 @@ function execute(url) {
         author: author,
         description: description,
         detail: detailLines.join("<br>"),
-        host: BASE_URL,
+        genres: genres,
+        url: url,
+        type: "novel",
+        format: "novel",
         ongoing: ongoing
     });
 }

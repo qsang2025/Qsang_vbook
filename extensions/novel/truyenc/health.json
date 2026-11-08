@@ -2,7 +2,7 @@
   "cases": [
     {
       "name": "Trang chủ",
-      "pattern": "TruyenC",
+      "pattern": "danh-sach/truyen-hot",
       "url": "https://truyenc.net/"
     },
     {
@@ -14,6 +14,11 @@
       "name": "Chi tiết truyện",
       "pattern": "Phàm Nhân Tu Tiên",
       "url": "https://truyenc.net/truyen/pham-nhan-tu-tien"
+    },
+    {
+      "name": "API danh sách chương",
+      "pattern": "chapter_number",
+      "url": "https://truyenc.net/api/stories/linh-kiem-ton/chapters?limit=1"
     }
   ]
 }

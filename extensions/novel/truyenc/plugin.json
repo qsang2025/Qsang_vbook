@@ -2,7 +2,7 @@
   "metadata": {
     "name": "TruyenC",
     "author": "Qsang",
-    "version": 2,
+    "version": 3,
     "source": "https://truyenc.net",
     "regexp": "^https?://(www\\.)?truyenc\\.net/truyen/[^/]+/?$",
     "description": "TruyenC — nền tảng đọc truyện chữ online miễn phí chất lượng cao, đầy đủ bản Dịch và Convert hot: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Hệ Thống...",
@@ -19,6 +19,12 @@
         "https://www.truyenc.net"
       ],
       "default": "https://truyenc.net"
+    },
+    "MIRRORS": {
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)",
+      "mode": "input",
+      "format": "text",
+      "default": "https://www.truyenc.net"
     }
   },
   "script": {

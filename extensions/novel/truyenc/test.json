@@ -33,21 +33,22 @@
     {
       "expect": {
         "contains": [
-          "Chương 1"
+          "Chương 1: Sở Gia cầu hôn",
+          "Chương 5424: Đại kết cục (hạ)"
         ],
-        "minItems": 50
+        "minItems": 5418
       },
-      "input": "https://truyenc.net/truyen/pham-nhan-tu-tien",
+      "input": "https://truyenc.net/truyen/linh-kiem-ton",
       "script": "toc.js"
     },
     {
       "expect": {
         "contains": [
-          "tang điền"
+          "Sở Gia cầu hôn"
         ],
         "minItems": 1
       },
-      "input": "https://truyenc.net/truyen/duong-chuyen/chuong-1",
+      "input": "https://truyenc.net/truyen/linh-kiem-ton/chuong-1",
       "script": "chap.js"
     },
     {
@@ -61,7 +62,19 @@
       },
       "input": "",
       "script": "genre.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Truyện Hot",
+          "Mới Cập Nhật",
+          "Đã Hoàn Thành"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "home.js"
     }
   ],
-  "note": "Golden fixture cho TruyenC (https://truyenc.net)."
+  "note": "Golden fixture cho TruyenC (https://truyenc.net). Truyen mau Linh Kiem Ton: 5.418 chuong, chuong 1 'Chuong 1: So Gia cau hon', chuong cuoi (URL /chuong-5418) co tieu de that 'Chuong 5424: Dai ket cuc (ha)'."
 }
