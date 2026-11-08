@@ -64,10 +64,10 @@
       "name": "Tiệm Truyện Chữ",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/plugin.zip",
-      "version": 5,
+      "version": 6,
       "source": "https://tiemtruyenchu.cloud",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/icon.png",
-      "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua Public API v1 (ref: ivanzzz, sonzin, Vearn). Mục lục lấy tiêu đề chương thật từ API. Đọc nội dung chương cần đăng nhập tài khoản trong trình duyệt vBook hoặc điền Cookie phiên.",
+      "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua Mobile API của app chính thức (POST /api/v1/chapters/content, JWT) — nhập tài khoản trong Cài đặt nguồn để tự lấy token; vẫn giữ fallback prefetch + cookie trình duyệt. Mục lục lấy tiêu đề chương thật từ API. (ref: ivanzzz, sonzin, Vearn)",
       "type": "novel",
       "locale": "vi_VN"
     },

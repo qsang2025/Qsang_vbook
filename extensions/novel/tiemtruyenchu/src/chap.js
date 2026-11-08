@@ -1,4 +1,4 @@
-// chap.js — Noi dung chuong Tiem Truyen Chu (API prefetch + Cookie + Engine.newBrowser fallback)
+// chap.js — Noi dung chuong Tiem Truyen Chu (Mobile API + prefetch + Cookie + Engine.newBrowser fallback)
 load('config.js');
 load('challenge-handler.js');
 
@@ -57,7 +57,62 @@ function execute(url) {
     }
     var ck = getSavedCookie();
 
-    // 1. Thu goi API doc chuong nhanh /api/prefetch-chapter (can Cookie neu co).
+    // 1. Uu tien Mobile API (gia lap app): POST /api/v1/chapters/content
+    // voi JWT (tu Cai dat nguon ACCESS_TOKEN, cache localStorage, hoac tu
+    // dang nhap bang USERNAME/PASSWORD trong Cai dat nguon).
+    var mobileLoginMsg = "";
+    var token = getAccessToken();
+    var triedLogin = false;
+    if (!token && TTC_USERNAME && TTC_PASSWORD) {
+        var loginRes = loginMobile(TTC_USERNAME, TTC_PASSWORD);
+        triedLogin = true;
+        if (loginRes.ok) {
+            token = loginRes.token;
+        } else if (loginRes.message) {
+            mobileLoginMsg = loginRes.message;
+        }
+    }
+    if (token) {
+        var mRes = fetchMobileChapter(info.storyId, info.chapNum, token);
+        if (mRes.ok && mRes.json) {
+            var mData = extractChapterContent(mRes.json);
+            if (mData.content && String(mData.content).trim()) {
+                if (mData.title) {
+                    return Response.success(formatPlainContent(mData.content), mData.title);
+                }
+                return Response.success(formatPlainContent(mData.content));
+            }
+        }
+        // Token het han / khong hop le (401): thu dang nhap lai 1 lan neu co
+        // tai khoan trong Cai dat nguon, roi goi lai API 1 lan.
+        if (mRes.status === 401 && TTC_USERNAME && TTC_PASSWORD && !triedLogin) {
+            var relogin = loginMobile(TTC_USERNAME, TTC_PASSWORD);
+            triedLogin = true;
+            if (relogin.ok && relogin.token) {
+                var mRetry = fetchMobileChapter(info.storyId, info.chapNum, relogin.token);
+                if (mRetry.ok && mRetry.json) {
+                    var rData = extractChapterContent(mRetry.json);
+                    if (rData.content && String(rData.content).trim()) {
+                        if (rData.title) {
+                            return Response.success(formatPlainContent(rData.content), rData.title);
+                        }
+                        return Response.success(formatPlainContent(rData.content));
+                    }
+                }
+            } else if (relogin.message) {
+                mobileLoginMsg = relogin.message;
+            }
+        }
+        // Token trong cache co the da het han: xoa de lan sau dang nhap moi.
+        if (mRes.status === 401) {
+            clearAccessToken();
+        }
+        if (!mobileLoginMsg && mRes.message) {
+            mobileLoginMsg = mRes.message;
+        }
+    }
+
+    // 2. Thu goi API doc chuong nhanh /api/prefetch-chapter (can Cookie neu co).
     // Chua dang nhap thi API tra 401 "Vui long dang nhap de tiep tuc!" — roi
     // xuong cac buoc duoi thay vi dung lai o day.
     var prefetchUrl = BASE_URL + "/api/prefetch-chapter/" + info.storyId + "/" + info.chapNum;
@@ -75,7 +130,7 @@ function execute(url) {
         return Response.success(formatPlainContent(pContent));
     }
 
-    // 2. Tai trang HTML chuong truyen
+    // 3. Tai trang HTML chuong truyen
     var chapUrl = BASE_URL + "/doc-truyen/" + info.storyId + "/chuong/" + info.chapNum;
 
     var res = null;
@@ -102,7 +157,7 @@ function execute(url) {
         }
     }
 
-    // 3. Fallback Engine.newBrowser() de lay phien dang nhap tu trinh duyet vBook
+    // 4. Fallback Engine.newBrowser() de lay phien dang nhap tu trinh duyet vBook
     if (typeof Engine !== "undefined" && Engine && typeof Engine.newBrowser === "function") {
         var browser = null;
         var bDoc = null;
@@ -165,5 +220,9 @@ function execute(url) {
         }
     }
 
-    return Response.error(formatLoginError("Tiệm Truyện Chữ", chapUrl));
+    var guide = "Nguồn Tiệm Truyện Chữ yêu cầu tài khoản để tải chương. Vui lòng vào Cài đặt nguồn nhập Tên đăng nhập & Mật khẩu (hoặc mở Trình duyệt đăng nhập) để tiếp tục đọc.";
+    if (mobileLoginMsg) {
+        guide += "\n\nGhi chú: " + mobileLoginMsg;
+    }
+    return Response.error(guide);
 }
