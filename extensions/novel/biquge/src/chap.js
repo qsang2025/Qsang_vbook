@@ -17,6 +17,7 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('challenge-handler.js');
 
 function chapterTitle(doc) {
     var title = "";
@@ -38,11 +39,25 @@ function contentHtml(doc) {
 function execute(url) {
     url = normalizeUrl(url);
     var doc = fetchDoc(url);
+    if (!doc) {
+        var chRes = fetchWithChallengeHandler(url, { siteName: "笔趣阁" });
+        if (chRes && chRes.ok) {
+            if (chRes.doc) doc = chRes.doc;
+            else if (chRes.html) doc = Html.parse(chRes.html);
+        } else if (chRes && chRes.error) {
+            return Response.error(chRes.error);
+        }
+    }
     if (!doc) return Response.error("Không tải được chương: " + url);
 
     var title = chapterTitle(doc);
     var html = contentHtml(doc);
-    if (!html) return Response.error("Không đọc được nội dung chương: " + url);
+    if (!html) {
+        if (isChallengeDoc(doc)) {
+            return Response.error(formatChallengeError("笔趣阁", url));
+        }
+        return Response.error("Không đọc được nội dung chương: " + url);
+    }
 
     // Chuong chia nhieu trang: theo link 下一页, noi them noi dung.
     var h1Text = cleanText(doc.select("h1").text());

@@ -2,7 +2,7 @@
   "metadata": {
     "name": "La Cà Truyện",
     "author": "Qsang",
-    "version": 3,
+    "version": 4,
     "source": "https://lacatruyen.site",
     "regexp": "^https?://(www\\.)?lacatruyen\\.(site|com|live|homes|store|online)/story/[0-9a-zA-Z\\-]+/?$",
     "description": "Đọc truyện chữ trên La Cà Truyện (lacatruyen.site). Hỗ trợ giải mã mục lục và chương tự động; có thể cấu hình TOKEN hoặc đăng nhập trình duyệt vBook để đọc đầy đủ các chương yêu cầu đăng nhập (ref: QuocBao, ivanzzz).",

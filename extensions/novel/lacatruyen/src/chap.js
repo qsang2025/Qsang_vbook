@@ -1,6 +1,6 @@
-// chap.js — Giai ma 2 tang AES noi dung chuong tren La Ca Truyen (kem ho tro TOKEN va fallback previewHtml)
 load('crypto.js');
 load('config.js');
+load('challenge-handler.js');
 
 function decryptChapterContent(pageProps) {
     if (!pageProps) return "";
@@ -88,14 +88,21 @@ function execute(url) {
             "Referer": BASE_URL + "/"
         })
     });
+    var rawHtml = "";
+    try {
+        rawHtml = res ? String(res.text() || "") : "";
+    } catch (e) {
+    }
+
     if (!res || !res.ok) {
+        if (isCloudflareChallenge(rawHtml, res ? res.headers : null)) {
+            return Response.error(formatChallengeError("La Cà Truyện", chapterUrl));
+        }
         return Response.error("Không thể tải trang chương truyện.");
     }
 
-    var rawHtml = "";
-    try {
-        rawHtml = String(res.text() || "");
-    } catch (e) {
+    if (isCloudflareChallenge(rawHtml, res.headers)) {
+        return Response.error(formatChallengeError("La Cà Truyện", chapterUrl));
     }
 
     var nextData = rawHtml ? extractNextData(rawHtml) : null;
@@ -111,6 +118,9 @@ function execute(url) {
         var domOnly = extractDomChapterFallback(res, rawHtml);
         if (domOnly) {
             return Response.success(domOnly);
+        }
+        if (isLoginRequired(rawHtml, chapterUrl)) {
+            return Response.error(formatLoginError("La Cà Truyện", chapterUrl));
         }
         return Response.error("Không đọc được dữ liệu chương từ trang.");
     }
@@ -147,11 +157,11 @@ function execute(url) {
     if (notify === "no_package" || notify === "need_package" || notify === "must_buy") {
         return Response.error("Chương này yêu cầu mua gói đọc hoặc mở khóa trên La Cà Truyện.");
     }
-    if (notify === "not_login") {
+    if (notify === "not_login" || isLoginRequired(rawHtml, chapterUrl)) {
         if (getSavedToken()) {
             return Response.error("Token đăng nhập hết hạn hoặc không hợp lệ. Vui lòng cập nhật lại TOKEN trong cài đặt.");
         }
-        return Response.error("Chương yêu cầu đăng nhập. Vui lòng đăng nhập trên trình duyệt vBook hoặc điền TOKEN trong cài đặt extension.");
+        return Response.error(formatLoginError("La Cà Truyện", chapterUrl));
     }
 
     return Response.error("Không thể giải mã nội dung chương truyện.");

@@ -1,5 +1,6 @@
 // toc.js — Muc luc chuong Sang Tac Viet
 load('config.js');
+load('challenge-handler.js');
 
 function execute(url) {
     var regex = /truyen\/([^\/]+)\/\d+\/(\d+)\/?/;
@@ -11,16 +12,41 @@ function execute(url) {
     var bookId = input[2];
     var tocUrl = BASE_URL + "/index.php?ngmar=chapterlist&sajax=getchapterlist&h=" + hostId + "&bookid=" + bookId;
 
-    var res = fetch(tocUrl, {
-        method: "GET",
-        headers: {
-            "x-stv-transport": "web",
-            "referer": BASE_URL + "/app.v2.php"
-        }
-    });
+    var res = null;
+    var rawText = "";
+    try {
+        res = fetch(tocUrl, {
+            method: "GET",
+            headers: {
+                "x-stv-transport": "web",
+                "referer": BASE_URL + "/app.v2.php"
+            }
+        });
+        if (res) rawText = String(res.text() || "");
+    } catch (e) {
+    }
 
-    if (!res.ok) return Response.error("HTTP Error: " + res.status);
-    var json = res.json();
+    if (!res || !res.ok || isCloudflareChallenge(rawText, res ? res.headers : null)) {
+        var browserDoc = fetchViaBrowser(tocUrl);
+        if (browserDoc) {
+            try {
+                var bText = String(browserDoc.html() || "");
+                if (bText && !isCloudflareChallenge(bText, null)) {
+                    rawText = bText;
+                }
+            } catch (e2) {}
+        }
+    }
+
+    if (isCloudflareChallenge(rawText, res ? res.headers : null)) {
+        return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + hostId + "/1/" + bookId + "/"));
+    }
+
+    if (!res || !res.ok) return Response.error("HTTP Error: " + (res ? res.status : 0));
+    var json = null;
+    try {
+        json = JSON.parse(rawText);
+    } catch (eJson) {}
     if (!json || !json.data) {
         return Response.error("Không lấy được danh sách chương.");
     }

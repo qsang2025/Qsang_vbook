@@ -16,6 +16,7 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('challenge-handler.js');
 load('helper.js');
 load('cleanHtml.js');
 
@@ -149,16 +150,23 @@ function execute(url) {
     url = normalizeUrl(url);
     var response = getPage(url);
     if (!response) {
-        // Thu mirror truoc khi bao loi (fetchWithFallback dung MIRROR_LIST
-        // trong config.js; chi chay khi fetch thuong that bai het).
         var fb = fetchWithFallback(url, MIRROR_LIST);
         if (fb && !fb.browser) {
             response = fb;
         } else if (fb && fb.browser) {
             var doc = fb.doc;
+            if (isChallengeDoc(doc)) {
+                return Response.error(formatChallengeError("App Truyện Chữ", url));
+            }
             var html = "";
             try { html = String(doc.html()); } catch (e) { html = ""; }
             if (html) {
+                if (isCloudflareChallenge(html, null)) {
+                    return Response.error(formatChallengeError("App Truyện Chữ", url));
+                }
+                if (isLoginRequired(html, url)) {
+                    return Response.error(formatLoginError("App Truyện Chữ", url));
+                }
                 var bLines = fromSelectors(html);
                 if (bLines.length > 0) {
                     return Response.success(cleanHtml(bLines.join("<br>")), chapterTitle(html));
@@ -167,9 +175,43 @@ function execute(url) {
             return Response.error("Không tải được chương (lỗi mạng hoặc bị chặn): " + url);
         }
     }
-    if (!response) return Response.error("Không tải được chương (lỗi mạng hoặc bị chặn): " + url);
+    if (!response) {
+        var bDoc = fetchViaBrowser(url);
+        if (bDoc) {
+            var bHtml = "";
+            try { bHtml = String(bDoc.html()); } catch (eB) {}
+            if (isCloudflareChallenge(bHtml, null)) {
+                return Response.error(formatChallengeError("App Truyện Chữ", url));
+            }
+            if (isLoginRequired(bHtml, url)) {
+                return Response.error(formatLoginError("App Truyện Chữ", url));
+            }
+            var bLines2 = fromSelectors(bHtml);
+            if (bLines2.length > 0) {
+                return Response.success(cleanHtml(bLines2.join("<br>")), chapterTitle(bHtml));
+            }
+        }
+        return Response.error("Không tải được chương (lỗi mạng hoặc bị chặn): " + url);
+    }
 
     var raw = String(response.text());
+
+    if (isCloudflareChallenge(raw, response.headers)) {
+        var cfDoc = fetchViaBrowser(url);
+        if (cfDoc) {
+            var cfHtml = String(cfDoc.html() || "");
+            if (!isCloudflareChallenge(cfHtml, null)) {
+                raw = cfHtml;
+            }
+        }
+        if (isCloudflareChallenge(raw, response.headers)) {
+            return Response.error(formatChallengeError("App Truyện Chữ", url));
+        }
+    }
+
+    if (isLoginRequired(raw, url)) {
+        return Response.error(formatLoginError("App Truyện Chữ", url));
+    }
 
     // Trang loi Next.js (vd URL chuong thieu slug ten) tra ve "Application
     // error" thay vi noi dung chuong.
@@ -185,6 +227,12 @@ function execute(url) {
     if (lines.length > 0 && title && lines[0] === title) lines.shift();
 
     if (lines.length === 0) {
+        if (isCloudflareChallenge(raw, response.headers)) {
+            return Response.error(formatChallengeError("App Truyện Chữ", url));
+        }
+        if (isLoginRequired(raw, url)) {
+            return Response.error(formatLoginError("App Truyện Chữ", url));
+        }
         return Response.error("Không đọc được nội dung chương (html " + raw.length + " ký tự): " + url);
     }
 

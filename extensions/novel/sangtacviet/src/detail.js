@@ -1,5 +1,6 @@
 // detail.js — Chi tiet truyen Sang Tac Viet
 load('config.js');
+load('challenge-handler.js');
 
 function execute(url) {
     if (url.indexOf("http") !== 0) {
@@ -9,9 +10,33 @@ function execute(url) {
     url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
     if (url.charAt(url.length - 1) !== '/') url = url + '/';
 
-    var response = fetch(url);
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
-    var text = response.text();
+    var response = null;
+    var text = "";
+    try {
+        response = fetch(url);
+        if (response) {
+            text = String(response.text() || "");
+        }
+    } catch (e) {
+    }
+
+    if (!response || !response.ok || isCloudflareChallenge(text, response ? response.headers : null)) {
+        var browserDoc = fetchViaBrowser(url);
+        if (browserDoc) {
+            try {
+                var bHtml = String(browserDoc.html() || "");
+                if (bHtml && !isCloudflareChallenge(bHtml, null)) {
+                    text = bHtml;
+                }
+            } catch (e2) {}
+        }
+    }
+
+    if (isCloudflareChallenge(text, response ? response.headers : null)) {
+        return Response.error(formatChallengeError("Sáng Tác Việt", url));
+    }
+
+    if (!response || !response.ok) return Response.error("HTTP Error: " + (response ? response.status : 0));
     var doc = Html.parse(text);
 
     var name = "";

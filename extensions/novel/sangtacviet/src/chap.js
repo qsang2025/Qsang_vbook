@@ -1,5 +1,6 @@
 // chap.js — Doc noi dung chuong Sang Tac Viet
 load('config.js');
+load('challenge-handler.js');
 
 function stvMd5(string) {
     function rotateLeft(lValue, iShiftBits) {
@@ -298,6 +299,13 @@ function execute(url) {
             }
         });
         if (directRes && directRes.ok) {
+            var rawDirect = String(directRes.text() || "");
+            if (isCloudflareChallenge(rawDirect, directRes.headers)) {
+                return Response.error(formatChallengeError("Sáng Tác Việt", url));
+            }
+            if (isLoginRequired(rawDirect, url)) {
+                return Response.error(formatLoginError("Sáng Tác Việt", url));
+            }
             var doc = directRes.html();
             var el = doc.select("#content-container, .content, .reading-content").first();
             if (el) {
@@ -321,10 +329,17 @@ function execute(url) {
     });
 
     if (!grantRes || !grantRes.ok) {
+        var rawGrant = grantRes ? String(grantRes.text() || "") : "";
+        if (isCloudflareChallenge(rawGrant, grantRes ? grantRes.headers : null)) {
+            return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/"));
+        }
         return Response.error("Không thể xin quyền đọc từ máy chủ Sáng Tác Việt (HTTP " + (grantRes ? grantRes.status : 0) + ")");
     }
 
     var code = grantRes.text();
+    if (isCloudflareChallenge(code, grantRes.headers)) {
+        return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/"));
+    }
     var readcontextid = extractReadContextId(grantRes);
     var chapterkey = evaluateChapterKey(BASE_URL, code, ua);
 
@@ -360,12 +375,24 @@ function execute(url) {
     });
 
     if (!readRes || !readRes.ok) {
+        var rawReadErr = readRes ? String(readRes.text() || "") : "";
+        if (isCloudflareChallenge(rawReadErr, readRes ? readRes.headers : null)) {
+            return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/"));
+        }
         return Response.error("Không đọc được nội dung chương STV (HTTP " + (readRes ? readRes.status : 0) + ")");
+    }
+
+    var rawRead = String(readRes.text() || "");
+    if (isCloudflareChallenge(rawRead, readRes.headers)) {
+        return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/"));
+    }
+    if (isLoginRequired(rawRead, readUrl)) {
+        return Response.error(formatLoginError("Sáng Tác Việt", BASE_URL));
     }
 
     var json = null;
     try {
-        json = readRes.json();
+        json = JSON.parse(rawRead);
     } catch (eJson) {}
 
     // Neu may chu dang dich hoac dang tai chuong (code 7) -> cho 1.2 giay thu lai 1 lan
@@ -397,7 +424,11 @@ function execute(url) {
             }
             return Response.success(content);
         }
-        return Response.error(json.err || json.info || ("STV báo lỗi mã: " + json.code));
+        var errMsg = json.err || json.info || ("STV báo lỗi mã: " + json.code);
+        if (isLoginRequired(errMsg, readUrl)) {
+            return Response.error(formatLoginError("Sáng Tác Việt", BASE_URL));
+        }
+        return Response.error(errMsg);
     }
 
     return Response.error("Phản hồi nội dung chương không hợp lệ.");

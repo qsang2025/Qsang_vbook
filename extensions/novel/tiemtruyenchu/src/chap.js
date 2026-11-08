@@ -1,5 +1,6 @@
 // chap.js — Noi dung chuong Tiem Truyen Chu (API + Cookie + Engine.newBrowser fallback)
 load('config.js');
+load('challenge-handler.js');
 
 function parseChapterInfo(url) {
     var s = String(url || "").trim();
@@ -63,7 +64,11 @@ function execute(url) {
 
     var res = fetch(chapUrl, { headers: buildHeaders(ck) });
     if (res && res.ok) {
-        var doc = res.html();
+        var rawHtml = String(res.text() || "");
+        if (isCloudflareChallenge(rawHtml, res.headers)) {
+            return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
+        }
+        var doc = Html.parse(rawHtml);
         var bodyHtml = extractChapterFromDoc(doc);
         if (bodyHtml) {
             return Response.success(bodyHtml);
@@ -84,6 +89,9 @@ function execute(url) {
         var bDoc = browser.html();
         browser.close();
 
+        if (isChallengeDoc(bDoc)) {
+            return Response.error(formatChallengeError("Tiệm Truyện Chữ", chapUrl));
+        }
         var bHtml = extractChapterFromDoc(bDoc);
         if (bHtml) {
             return Response.success(bHtml);
@@ -91,5 +99,5 @@ function execute(url) {
     } catch (eBrowser) {
     }
 
-    return Response.error("Tiệm Truyện Chữ yêu cầu đăng nhập tài khoản để đọc nội dung chương. Vui lòng mở Trình duyệt trong vBook truy cập https://tiemtruyenchu.cloud/login để đăng nhập hoặc điền Cookie vào phần Cài đặt nguồn.");
+    return Response.error(formatLoginError("Tiệm Truyện Chữ", chapUrl));
 }
