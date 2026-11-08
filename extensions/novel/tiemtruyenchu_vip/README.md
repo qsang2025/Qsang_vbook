@@ -16,6 +16,11 @@ Trang nguồn `tiemtruyenchu.cloud` yêu cầu tài khoản đăng nhập khi đ
 1. Mở **Trình duyệt** tích hợp trong ứng dụng vBook, truy cập `https://tiemtruyenchu.cloud/login` và đăng nhập tài khoản. Extension sẽ tự động lấy và lưu phiên đăng nhập khi mở chương.
 2. Hoặc dán giá trị Cookie phiên (`connect.sid=...`) vào mục **Cài đặt nguồn** (`COOKIE`) của extension (lưu ý: không bao giờ nhập mật khẩu trực tiếp vào cài đặt plugin).
 
+## Chương VIP — nguyên văn tiếng Trung (v3)
+Khi chương VIP không đọc được qua API của Tiệm Truyện Chữ (chưa đăng nhập tài khoản VIP), extension tự động lấy truyện gốc tiếng Trung từ ixdzs8.com và **hiển thị nguyên văn tiếng Trung, không dịch máy** — người đọc tự dịch cho chuẩn. Chương đọc được qua API chính thức vẫn hiển thị bản dịch tiếng Việt của Tiệm Truyện Chữ như bình thường.
+
+Hiện chỉ mở khóa được các truyện có trong bảng map ở `chap.js` (Quỷ Bí Chi Chủ, Bắt Đầu Trường Sinh Vạn Cổ, Cái Trò Chơi Này Không Thích Hợp...) — tìm kiếm theo tên tiếng Việt trên trang Trung không trả kết quả. Số chương đối chiếu theo số hiển thị trong tiêu đề TTC ("Chương 1462: Niết Bàn") và kiểm chứng bằng tiêu đề thật `<h1>` trên trang Trung, vì số trang bên đó lệch với số chương (Quỷ Bí Chi Chủ lệch +1, Bắt Đầu Trường Sinh lệch +16); không khớp được thì báo lỗi chứ không trả nhầm chương.
+
 ## Attribution
 - Tham khảo cấu trúc API `/api/v1/*` và cơ chế lấy phiên trình duyệt từ `ext_Ivan1hai` (`ivanzzz`).
 - Tham khảo bộ chọn HTML DOM từ `vbook-extension_sonzin` (`sonzin`) và `vbook-ext_Evamirion` (`Vearn`).

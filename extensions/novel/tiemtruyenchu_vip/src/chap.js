@@ -1,10 +1,15 @@
-// chap.js — Nội dung chương Tiệm Truyện Chữ VIP (Web API prefetch + Mobile API Bearer + Auto-Unlock Upstream)
+// chap.js — Nội dung chương Tiệm Truyện Chữ VIP (Web API prefetch + Mobile API Bearer + Auto-Unlock Upstream, trả nguyên văn tiếng Trung)
 load('config.js');
 load('challenge-handler.js');
 
 // Bảng map các truyện VIP phổ biến trên Tiệm Truyện Chữ sang ID kho raw
+// (ixdzs8.com). Chỉ những truyện có trong bảng này mới mở khóa được qua
+// tuyến upstream — tìm kiếm theo tên tiếng Việt trên trang Trung không trả
+// kết quả nên không dựa vào đó được. Đã kiểm chứng bằng curl 2026-11-08.
 var KNOWN_UPSTREAM_STORIES = {
-    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" }
+    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" },
+    "3703": { bookId: "646492", title: "Quỷ Bí Chi Chủ" },
+    "669": { bookId: "492266", title: "Bắt Đầu Trường Sinh Vạn Cổ, Cẩu Đến Thiên Hoang Địa Lão" }
 };
 
 function parseChapterInfo(url) {
@@ -53,32 +58,60 @@ function extractChapterTitleFromDoc(doc) {
     return "";
 }
 
-function translateZhToVi(text) {
-    if (!text || !String(text).trim()) return "";
-    var encoded = encodeURIComponent(String(text).trim());
-    var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=vi&dt=t&q=" + encoded;
+// Lấy số chương trong tiêu đề tiếng Trung "第N章 ..." (-1 nếu không có).
+function chapterNumberFromZhTitle(t) {
+    var m = String(t || "").match(/第\s*(\d+)\s*章/);
+    return m ? parseInt(m[1], 10) : -1;
+}
+
+// Số chương HIỂN THỊ của chương (lấy từ tiêu đề TTC "Chương D: ...").
+// API TTC đánh số chương (chapterNumber) lệch với số trong tiêu đề — ví dụ
+// truyện 669: API 1451 nhưng tiêu đề là "Chương 1462: Niết Bàn", và chương
+// tiếng Trung đúng cũng là 第1462章. Không có số trong tiêu đề thì dùng API.
+function displayChapterNumber(storyId, apiNum) {
     try {
-        var res = fetch(url, {
+        var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
+        var chs = (sInfo && sInfo.chapters) || [];
+        for (var i = 0; i < chs.length; i++) {
+            if (String(chs[i].chapterNumber) === String(apiNum)) {
+                var m = String(chs[i].title || "").match(/Chương\s+0*(\d+)/i);
+                if (m && m[1]) return parseInt(m[1], 10);
+                break;
+            }
+        }
+    } catch (eDisp) {}
+    return parseInt(apiNum, 10);
+}
+
+// Tải một trang chương trên ixdzs8, trả {title, h1Num, paras} hoặc null.
+function fetchUpstreamPage(bookId, pageNum) {
+    var url = "https://ixdzs8.com/read/" + bookId + "/p" + pageNum + ".html";
+    var res = null;
+    try {
+        res = fetch(url, {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             }
         });
-        if (res && res.ok) {
-            var raw = res.text();
-            var json = JSON.parse(raw);
-            if (json && json[0] && json[0].length) {
-                var out = "";
-                for (var i = 0; i < json[0].length; i++) {
-                    if (json[0][i] && json[0][i][0]) {
-                        out += json[0][i][0];
-                    }
-                }
-                return out;
-            }
-        }
-    } catch (eTrans) {
+    } catch (eFetch) {
+        return null;
     }
-    return text;
+    if (!res || !res.ok) return null;
+    var html = res.text();
+    var artMatch = html.match(/<article[^>]*class=[\"']page-content[\"'][^>]*>([\s\S]*?)<\/article>/i);
+    if (!artMatch || !artMatch[1]) return null;
+    var rawArticle = artMatch[1];
+    var titleMatch = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || rawArticle.match(/<h3>([\s\S]*?)<\/h3>/i);
+    var rawTitle = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").trim() : "";
+    var pMatches = rawArticle.match(/<p>([\s\S]*?)<\/p>/gi);
+    if (!pMatches || pMatches.length === 0) return null;
+    var paras = [];
+    for (var i = 0; i < pMatches.length; i++) {
+        var cleanP = pMatches[i].replace(/<[^>]+>/g, "").trim();
+        if (cleanP) paras.push(cleanP);
+    }
+    if (paras.length === 0) return null;
+    return { title: rawTitle, h1Num: chapterNumberFromZhTitle(rawTitle), paras: paras };
 }
 
 function autoUnlockFromUpstream(storyId, chapNum) {
@@ -109,70 +142,46 @@ function autoUnlockFromUpstream(storyId, chapNum) {
 
     if (!bookId) return null;
 
-    var targetUrl = "https://ixdzs8.com/read/" + bookId + "/p" + chapNum + ".html";
-    var cRes = null;
-    try {
-        cRes = fetch(targetUrl, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    // Số chương tiếng Trung đánh theo số HIỂN THỊ trong tiêu đề TTC, và số
+    // trang trên ixdzs8 còn lệch với số chương (truyện 3703 lệch +1, truyện
+    // 669 lệch +16): lấy trang p{D}, đọc số chương thật trong <h1>, lệch
+    // bao nhiêu thì nhảy đúng bấy nhiêu trang rồi kiểm chứng lại. Không
+    // khớp được thì trả null chứ không trả nhầm chương.
+    var dispNum = displayChapterNumber(storyId, chapNum);
+    var page = fetchUpstreamPage(bookId, dispNum);
+    if (!page) return null;
+    if (page.h1Num !== -1 && page.h1Num !== dispNum) {
+        var offset = page.h1Num - dispNum;
+        var corrected = dispNum - offset;
+        var found = null;
+        if (corrected > 0 && corrected !== dispNum) {
+            var c2 = fetchUpstreamPage(bookId, corrected);
+            if (c2 && c2.h1Num === dispNum) found = c2;
+        }
+        if (!found && corrected > 0) {
+            var tries = [corrected - 2, corrected - 1, corrected + 1, corrected + 2];
+            for (var t = 0; t < tries.length; t++) {
+                if (tries[t] <= 0 || tries[t] === dispNum || tries[t] === corrected) continue;
+                var c3 = fetchUpstreamPage(bookId, tries[t]);
+                if (c3 && c3.h1Num === dispNum) { found = c3; break; }
             }
-        });
-    } catch (eFetch) {
-        return null;
-    }
-    if (!cRes || !cRes.ok) return null;
-
-    var html = cRes.text();
-    var artMatch = html.match(/<article[^>]*class=[\"']page-content[\"'][^>]*>([\s\S]*?)<\/article>/i);
-    if (!artMatch || !artMatch[1]) return null;
-
-    var rawArticle = artMatch[1];
-    var titleMatch = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || rawArticle.match(/<h3>([\s\S]*?)<\/h3>/i);
-    var rawTitle = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").trim() : "";
-    var chapTitle = "";
-    if (rawTitle) {
-        chapTitle = translateZhToVi(rawTitle);
-    }
-
-    var pMatches = rawArticle.match(/<p>([\s\S]*?)<\/p>/gi);
-    if (!pMatches || pMatches.length === 0) return null;
-
-    var paras = [];
-    for (var i = 0; i < pMatches.length; i++) {
-        var cleanP = pMatches[i].replace(/<[^>]+>/g, "").trim();
-        if (cleanP) paras.push(cleanP);
-    }
-
-    var chunks = [];
-    var cur = "";
-    for (var j = 0; j < paras.length; j++) {
-        if (cur.length + paras[j].length > 1800) {
-            chunks.push(cur);
-            cur = paras[j];
+        }
+        if (found) {
+            page = found;
         } else {
-            if (cur) cur += "\n" + paras[j];
-            else cur = paras[j];
+            return null;
         }
     }
-    if (cur) chunks.push(cur);
 
+    // Trả nguyên văn tiếng Trung, không dịch máy — người dùng tự dịch cho chuẩn.
     var finalHtml = [];
-    for (var k = 0; k < chunks.length; k++) {
-        var trans = translateZhToVi(chunks[k]);
-        var lines = trans.split("\n");
-        for (var l = 0; l < lines.length; l++) {
-            var line = lines[l].trim();
-            if (line) {
-                finalHtml.push("<p>" + line + "</p>");
-            }
-        }
+    for (var k = 0; k < page.paras.length; k++) {
+        finalHtml.push("<p>" + page.paras[k] + "</p>");
     }
-
-    if (finalHtml.length === 0) return null;
 
     return {
         content: finalHtml.join(""),
-        title: chapTitle || ("Chương " + chapNum)
+        title: page.title || ("Chương " + chapNum)
     };
 }
 
@@ -255,7 +264,7 @@ function execute(url) {
         }
     }
 
-    // 3. TUYẾN TỰ ĐỘNG MỞ KHÓA (Auto-Unlock): Khi web bị khóa VIP hoặc chưa đồng bộ cookie/token
+    // 3. TUYẾN TỰ ĐỘNG MỞ KHÓA (Auto-Unlock): Khi web bị khóa VIP hoặc chưa đồng bộ cookie/token — trả nguyên văn tiếng Trung, không dịch máy.
     if (AUTO_UNLOCK_VIP === "true") {
         var unlocked = autoUnlockFromUpstream(info.storyId, info.chapNum);
         if (unlocked && unlocked.content) {
