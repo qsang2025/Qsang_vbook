@@ -1,6 +1,6 @@
 # STATUS — Trạng thái các nguồn (sinh tự động)
 
-> Cập nhật lần cuối: 2026-11-07 00:39 UTC (CI health-check hàng ngày + chạy tay).
+> Cập nhật lần cuối: 2026-11-08 00:38 UTC (CI health-check hàng ngày + chạy tay).
 > File này **không sửa tay**. GitHub Actions sinh lại file này;
 > muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.
 
@@ -16,8 +16,18 @@
 
 | Nguồn | Loại | Trạng thái testall | Ghi chú |
 |---|---|---|---|
+| NiACG | comic | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | App Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| La Cà Truyện | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Mê Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Sáng Tác Việt | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Tiệm Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| TruyenC | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Truyện Full | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Truyện Hoàn | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 书海阁 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 小說狂人 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 思兔閱讀 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 笔趣阁 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 繁體小說 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | HHKUNGFU | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
