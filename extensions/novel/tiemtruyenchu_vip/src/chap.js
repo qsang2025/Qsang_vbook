@@ -1,6 +1,11 @@
-// chap.js — Nội dung chương Tiệm Truyện Chữ VIP (Web API prefetch + Cookie phiên Full VIP)
+// chap.js — Nội dung chương Tiệm Truyện Chữ VIP (Web API prefetch + Mobile API Bearer + Auto-Unlock Upstream)
 load('config.js');
 load('challenge-handler.js');
+
+// Bảng map các truyện VIP phổ biến trên Tiệm Truyện Chữ sang ID kho raw
+var KNOWN_UPSTREAM_STORIES = {
+    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" }
+};
 
 function parseChapterInfo(url) {
     var s = String(url || "").trim();
@@ -48,6 +53,129 @@ function extractChapterTitleFromDoc(doc) {
     return "";
 }
 
+function translateZhToVi(text) {
+    if (!text || !String(text).trim()) return "";
+    var encoded = encodeURIComponent(String(text).trim());
+    var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=vi&dt=t&q=" + encoded;
+    try {
+        var res = fetch(url, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+        });
+        if (res && res.ok) {
+            var raw = res.text();
+            var json = JSON.parse(raw);
+            if (json && json[0] && json[0].length) {
+                var out = "";
+                for (var i = 0; i < json[0].length; i++) {
+                    if (json[0][i] && json[0][i][0]) {
+                        out += json[0][i][0];
+                    }
+                }
+                return out;
+            }
+        }
+    } catch (eTrans) {
+    }
+    return text;
+}
+
+function autoUnlockFromUpstream(storyId, chapNum) {
+    var bookId = "";
+    if (KNOWN_UPSTREAM_STORIES[String(storyId)]) {
+        bookId = KNOWN_UPSTREAM_STORIES[String(storyId)].bookId;
+    }
+
+    if (!bookId) {
+        try {
+            var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
+            var title = (sInfo && sInfo.story && sInfo.story.title) || "";
+            if (title) {
+                var searchUrl = "https://ixdzs8.com/bsearch?q=" + encodeURIComponent(title);
+                var sRes = fetch(searchUrl, {
+                    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
+                });
+                if (sRes && sRes.ok) {
+                    var sHtml = sRes.text();
+                    var mBook = sHtml.match(/href=[\"']\/read\/(\d+)\/[\"']/i);
+                    if (mBook && mBook[1]) {
+                        bookId = mBook[1];
+                    }
+                }
+            }
+        } catch (eSearch) {}
+    }
+
+    if (!bookId) return null;
+
+    var targetUrl = "https://ixdzs8.com/read/" + bookId + "/p" + chapNum + ".html";
+    var cRes = null;
+    try {
+        cRes = fetch(targetUrl, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+        });
+    } catch (eFetch) {
+        return null;
+    }
+    if (!cRes || !cRes.ok) return null;
+
+    var html = cRes.text();
+    var artMatch = html.match(/<article[^>]*class=[\"']page-content[\"'][^>]*>([\s\S]*?)<\/article>/i);
+    if (!artMatch || !artMatch[1]) return null;
+
+    var rawArticle = artMatch[1];
+    var titleMatch = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || rawArticle.match(/<h3>([\s\S]*?)<\/h3>/i);
+    var rawTitle = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").trim() : "";
+    var chapTitle = "";
+    if (rawTitle) {
+        chapTitle = translateZhToVi(rawTitle);
+    }
+
+    var pMatches = rawArticle.match(/<p>([\s\S]*?)<\/p>/gi);
+    if (!pMatches || pMatches.length === 0) return null;
+
+    var paras = [];
+    for (var i = 0; i < pMatches.length; i++) {
+        var cleanP = pMatches[i].replace(/<[^>]+>/g, "").trim();
+        if (cleanP) paras.push(cleanP);
+    }
+
+    var chunks = [];
+    var cur = "";
+    for (var j = 0; j < paras.length; j++) {
+        if (cur.length + paras[j].length > 1800) {
+            chunks.push(cur);
+            cur = paras[j];
+        } else {
+            if (cur) cur += "\n" + paras[j];
+            else cur = paras[j];
+        }
+    }
+    if (cur) chunks.push(cur);
+
+    var finalHtml = [];
+    for (var k = 0; k < chunks.length; k++) {
+        var trans = translateZhToVi(chunks[k]);
+        var lines = trans.split("\n");
+        for (var l = 0; l < lines.length; l++) {
+            var line = lines[l].trim();
+            if (line) {
+                finalHtml.push("<p>" + line + "</p>");
+            }
+        }
+    }
+
+    if (finalHtml.length === 0) return null;
+
+    return {
+        content: finalHtml.join(""),
+        title: chapTitle || ("Chương " + chapNum)
+    };
+}
+
 function execute(url) {
     var info = parseChapterInfo(url);
     if (!info) {
@@ -71,12 +199,37 @@ function execute(url) {
         return Response.success(formatPlainContent(pContent));
     }
 
-    // Nếu server trả về thông báo lỗi cụ thể (ví dụ chưa mua VIP hoặc tài khoản không đủ hoa)
-    if (pJson && pJson.message && String(pJson.message).indexOf("đăng nhập") === -1) {
-        return Response.error("Chương VIP: " + pJson.message + "\n\nNếu bạn đã mua Full VIP trên web, vui lòng mở Trình duyệt trong vBook và đăng nhập lại đúng tài khoản Google đã mua.");
+    // 1.5. Tuyến Native Mobile API: POST /api/v1/chapters/content kèm Bearer token
+    var token = getSavedToken();
+    if (token) {
+        try {
+            var mRes = fetch(BASE_URL + "/api/v1/chapters/content", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token,
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36"
+                },
+                body: JSON.stringify({
+                    storyId: parseInt(info.storyId, 10),
+                    chapterNumber: parseInt(info.chapNum, 10)
+                })
+            });
+            if (mRes && mRes.ok) {
+                var mJson = mRes.json();
+                var mContent = mJson ? (mJson.content || (mJson.data && mJson.data.content) || "") : "";
+                var mTitle = mJson ? (mJson.title || mJson.chapter_title || (mJson.data && mJson.data.title) || "") : "";
+                if (mContent && String(mContent).trim()) {
+                    if (mTitle && String(mTitle).trim()) {
+                        return Response.success(formatPlainContent(mContent), String(mTitle).trim());
+                    }
+                    return Response.success(formatPlainContent(mContent));
+                }
+            }
+        } catch (eMobile) {}
     }
 
-    // 2. Tải trang HTML chương truyện
+    // 2. Tuyến HTML trực tiếp
     var chapUrl = BASE_URL + "/doc-truyen/" + info.storyId + "/chuong/" + info.chapNum;
     var res = null;
     try {
@@ -102,7 +255,15 @@ function execute(url) {
         }
     }
 
-    // 3. Fallback Engine.newBrowser() để kích hoạt phiên đăng nhập từ Trình duyệt vBook
+    // 3. TUYẾN TỰ ĐỘNG MỞ KHÓA (Auto-Unlock): Khi web bị khóa VIP hoặc chưa đồng bộ cookie/token
+    if (AUTO_UNLOCK_VIP === "true") {
+        var unlocked = autoUnlockFromUpstream(info.storyId, info.chapNum);
+        if (unlocked && unlocked.content) {
+            return Response.success(unlocked.content, unlocked.title);
+        }
+    }
+
+    // 4. Fallback Engine.newBrowser() để kích hoạt phiên đăng nhập nếu có
     if (typeof Engine !== "undefined" && Engine && typeof Engine.newBrowser === "function") {
         var browser = null;
         var bDoc = null;
@@ -120,9 +281,6 @@ function execute(url) {
                         return Response.success(formatPlainContent(rContent), String(rTitle).trim());
                     }
                     return Response.success(formatPlainContent(rContent));
-                }
-                if (retryJson && retryJson.message && String(retryJson.message).indexOf("đăng nhập") === -1) {
-                    return Response.error("Chương VIP: " + retryJson.message + "\n\nNếu bạn đã mua Full VIP trên web, hãy kiểm tra lại tài khoản đăng nhập trên web.");
                 }
             }
 

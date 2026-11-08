@@ -2,10 +2,10 @@
   "metadata": {
     "name": "TiemtruyenchuVIP",
     "author": "Qsang",
-    "version": 1,
+    "version": 2,
     "source": "https://tiemtruyenchu.cloud",
     "regexp": "^https?://(www\\.)?tiemtruyenchu\\.cloud/truyen/[0-9a-zA-Z\\-]+/?$",
-    "description": "Phiên bản VIP chuyên dụng cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tối ưu hóa đọc các chương VIP đã mua trọn bộ (Full VIP) thông qua Cookie phiên tài khoản. Đăng nhập tài khoản Google đã mua VIP qua trình duyệt vBook để đồng bộ quyền đọc.",
+    "description": "Phiên bản VIP tự động mở khóa chương cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tự động mở khóa và tải nội dung chương VIP trọn bộ không cần đăng nhập thủ công.",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"
@@ -19,8 +19,22 @@
       ],
       "default": "https://tiemtruyenchu.cloud"
     },
+    "AUTO_UNLOCK": {
+      "title": "Tự động mở khóa chương VIP (Mặc định: true)",
+      "mode": "select",
+      "values": [
+        "true",
+        "false"
+      ],
+      "default": "true"
+    },
     "COOKIE": {
-      "title": "Cookie phiên đăng nhập (session=s%3A... — lấy từ trình duyệt hoặc đăng nhập bằng browser vBook)",
+      "title": "Cookie phiên đăng nhập (session=s%3A... — tùy chọn nếu có)",
+      "mode": "input",
+      "default": ""
+    },
+    "TOKEN": {
+      "title": "Access Token VIP (Bearer token — tùy chọn nếu có)",
       "mode": "input",
       "default": ""
     }

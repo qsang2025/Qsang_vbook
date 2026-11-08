@@ -1,6 +1,8 @@
-// config.js — Cau hinh chung va ham tien ich cho Tiem Truyen Chu
+// config.js — Cau hinh chung va ham tien ich cho Tiem Truyen Chu VIP
 var BASE_URL = "https://tiemtruyenchu.cloud";
 var USER_COOKIE = "";
+var USER_TOKEN = "";
+var AUTO_UNLOCK_VIP = "true";
 
 try {
     if (typeof DOMAIN !== "undefined" && DOMAIN) {
@@ -12,6 +14,20 @@ try {
 try {
     if (typeof COOKIE !== "undefined" && COOKIE) {
         USER_COOKIE = String(COOKIE).trim();
+    }
+} catch (e) {
+}
+
+try {
+    if (typeof TOKEN !== "undefined" && TOKEN) {
+        USER_TOKEN = String(TOKEN).trim();
+    }
+} catch (e) {
+}
+
+try {
+    if (typeof AUTO_UNLOCK !== "undefined" && AUTO_UNLOCK) {
+        AUTO_UNLOCK_VIP = String(AUTO_UNLOCK).trim();
     }
 } catch (e) {
 }
@@ -152,6 +168,26 @@ function saveCookie(cookieStr) {
     } catch (e) {}
 }
 
+function getSavedToken() {
+    if (USER_TOKEN) return USER_TOKEN;
+    try {
+        if (typeof localStorage !== "undefined" && localStorage) {
+            var tk = localStorage.getItem("ttc_token");
+            if (tk) return String(tk).trim();
+        }
+    } catch (e) {}
+    return "";
+}
+
+function saveToken(tokenStr) {
+    if (!tokenStr) return;
+    try {
+        if (typeof localStorage !== "undefined" && localStorage) {
+            localStorage.setItem("ttc_token", tokenStr);
+        }
+    } catch (e) {}
+}
+
 function buildHeaders(extraCookie) {
     var headers = {
         "Accept": "application/json, text/html, */*;q=0.8",
@@ -167,6 +203,10 @@ function buildHeaders(extraCookie) {
     var ck = extraCookie || getSavedCookie();
     if (ck) {
         headers["Cookie"] = ck;
+    }
+    var token = getSavedToken();
+    if (token) {
+        headers["Authorization"] = "Bearer " + token;
     }
     return headers;
 }

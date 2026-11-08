@@ -64,10 +64,10 @@
       "name": "TiemtruyenchuVIP",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu_vip/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://tiemtruyenchu.cloud",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu_vip/icon.png",
-      "description": "Phiên bản VIP chuyên dụng cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tối ưu hóa đọc các chương VIP đã mua trọn bộ (Full VIP) thông qua Cookie phiên tài khoản. Đăng nhập tài khoản Google đã mua VIP qua trình duyệt vBook để đồng bộ quyền đọc.",
+      "description": "Phiên bản VIP tự động mở khóa chương cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tự động mở khóa và tải nội dung chương VIP trọn bộ không cần đăng nhập thủ công.",
       "type": "novel",
       "locale": "vi_VN"
     },
