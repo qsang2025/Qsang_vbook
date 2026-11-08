@@ -1,8 +1,8 @@
-// toc.js — Danh sach chuong Tiem Truyen Chu (HTML da login hoac sinh tu Public API v1)
+// toc.js — Danh sach chuong Tiem Truyen Chu (HTML da login hoac Public API v1)
 load('config.js');
 
 function execute(url) {
-    var storyId = extractStoryId(url);
+    var storyId = resolveStoryId(url);
     if (!storyId) {
         return Response.error("Không xác định được mã truyện để lấy mục lục.");
     }
@@ -13,46 +13,46 @@ function execute(url) {
     // 1. Neu co Cookie, thu tai trang HTML de lay ten chuong day du trong #chapter-list-container
     if (ck) {
         var pageUrl = BASE_URL + "/truyen/" + storyId;
-        var res = fetch(pageUrl, { headers: buildHeaders(ck) });
-        if (res && res.ok) {
-            var doc = res.html();
-            var links = doc.select("#chapter-list-container a[href*='/doc-truyen/']");
-            for (var i = 0; i < links.size(); i++) {
-                var a = links.get(i);
-                var href = a.attr("href");
-                var title = a.text().trim();
-                if (href) {
-                    list.push({
-                        name: title || ("Chương " + (i + 1)),
-                        url: normalizeUrl(href),
-                        host: BASE_URL
-                    });
+        try {
+            var res = fetch(pageUrl, { headers: buildHeaders(ck) });
+            if (res && res.ok) {
+                var doc = res.html();
+                var links = doc.select("#chapter-list-container a[href*='/doc-truyen/']");
+                for (var i = 0; i < links.size(); i++) {
+                    var a = links.get(i);
+                    var href = a.attr("href");
+                    var title = a.text().trim();
+                    if (href) {
+                        list.push({
+                            name: title || ("Chương " + (i + 1)),
+                            url: normalizeUrl(href),
+                            host: BASE_URL
+                        });
+                    }
+                }
+                if (list.length > 0) {
+                    return Response.success(list);
                 }
             }
-            if (list.length > 0) {
-                return Response.success(list);
-            }
+        } catch (e) {
         }
     }
 
-    // 2. Goi Public API v1 /api/v1/stories/<id> (khong can dang nhap)
+    // 2. Goi Public API v1 /api/v1/stories/<id> (khong can dang nhap).
+    // API tra mang chapters THAT o TOP LEVEL cua JSON (moi item co
+    // chapterNumber + title that), khong nam trong story — dung mang nay,
+    // khong tu sinh ten "Chuong N" nua.
     var apiUrl = BASE_URL + "/api/v1/stories/" + storyId;
     var json = fetchJson(apiUrl);
-    var story = null;
-    if (json) {
-        if (json.story && json.story.id) {
-            story = json.story;
-        } else if (json.data && json.data.id) {
-            story = json.data;
-        } else if (json.id) {
-            story = json;
-        }
-    }
+    var wrapped = unwrapStory(json);
+    var story = wrapped.story;
+    var chapters = wrapped.chapters;
 
-    if (story && story.chapters && story.chapters.length) {
-        for (var j = 0; j < story.chapters.length; j++) {
-            var ch = story.chapters[j];
-            var num = ch.chapter_number || ch.number || (j + 1);
+    if (chapters && chapters.length) {
+        for (var j = 0; j < chapters.length; j++) {
+            var ch = chapters[j];
+            if (!ch) continue;
+            var num = ch.chapterNumber || ch.chapter_number || ch.number || (j + 1);
             var chTitle = ch.title || ("Chương " + num);
             list.push({
                 name: chTitle,
@@ -63,9 +63,16 @@ function execute(url) {
         return Response.success(list);
     }
 
+    // 3. Du phong cuoi: chi biet tong so chuong thi sinh 1..total (ten that
+    // chi co o chuong moi nhat).
     var total = story && story.total_chapters ? parseInt(story.total_chapters, 10) : 0;
     if (total > 0) {
-        var latestTitle = story.latest_chapter_title ? String(story.latest_chapter_title).trim() : "";
+        var latestTitle = "";
+        if (story.latest_chapter && story.latest_chapter.title) {
+            latestTitle = String(story.latest_chapter.title).trim();
+        } else if (story.latest_chapter_title) {
+            latestTitle = String(story.latest_chapter_title).trim();
+        }
         for (var k = 1; k <= total; k++) {
             var chapName = "Chương " + k;
             if (k === total && latestTitle) {

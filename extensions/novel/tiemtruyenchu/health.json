@@ -2,7 +2,7 @@
   "cases": [
     {
       "name": "Trang đăng nhập Tiệm Truyện Chữ",
-      "pattern": "Tiệm Truyện Chữ",
+      "pattern": "Vui lòng đăng nhập để bắt đầu sử dụng",
       "url": "https://tiemtruyenchu.cloud/login"
     },
     {
@@ -13,6 +13,11 @@
     {
       "name": "API chi tiết truyện #100",
       "pattern": "50 Hương Giang Hào Môn",
+      "url": "https://tiemtruyenchu.cloud/api/v1/stories/100"
+    },
+    {
+      "name": "API chi tiết truyện #100 có mảng chapters thật",
+      "pattern": "chapterNumber",
       "url": "https://tiemtruyenchu.cloud/api/v1/stories/100"
     }
   ]

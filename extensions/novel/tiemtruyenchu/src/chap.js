@@ -1,4 +1,4 @@
-// chap.js — Noi dung chuong Tiem Truyen Chu (API + Cookie + Engine.newBrowser fallback)
+// chap.js — Noi dung chuong Tiem Truyen Chu (API prefetch + Cookie + Engine.newBrowser fallback)
 load('config.js');
 
 function parseChapterInfo(url) {
@@ -21,7 +21,13 @@ function formatPlainContent(text) {
     if (s.indexOf("<p>") !== -1 || s.indexOf("<br") !== -1) {
         return s;
     }
-    return s.replace(/\n+/g, "<br><br>");
+    // Doan van cach nhau boi dong trang -> <br><br>, xuong dong don trong
+    // doan chi -> <br> (khong nhan doi moi lan xuong dong nhu truoc).
+    var paras = s.split(/\n\s*\n/);
+    for (var i = 0; i < paras.length; i++) {
+        paras[i] = paras[i].replace(/\n/g, "<br>");
+    }
+    return paras.join("<br><br>");
 }
 
 function extractChapterFromDoc(doc) {
@@ -30,66 +36,91 @@ function extractChapterFromDoc(doc) {
     var contentEl = doc.select("#chapter-body, .chapter-content, #chapter-content, .content-text, .chapter-c").first();
     if (!contentEl) return "";
     var html = contentEl.html();
-    if (!html || cleanText(contentEl.text()).length < 20) return "";
+    // Chi can noi dung khong rong la nhan (bo nguong cung 20 ky tu: chuong
+    // ngan that van phai doc duoc); trang interstitial khong co #chapter-body
+    // nen da tra "" o tren.
+    if (!html || !cleanText(contentEl.text())) return "";
     return html;
 }
 
 function execute(url) {
     var info = parseChapterInfo(url);
+    if (!info) {
+        return Response.error("Không xác định được số chương từ đường dẫn. Hãy mở chương từ mục lục của truyện trên Tiệm Truyện Chữ rồi thử lại.");
+    }
     var ck = getSavedCookie();
 
-    // 1. Thu goi API doc chuong nhanh neu co storyId va chapNum
-    if (info) {
-        var prefetchUrl = BASE_URL + "/api/prefetch-chapter/" + info.storyId + "/" + info.chapNum;
-        var pJson = fetchJson(prefetchUrl, ck);
-        if (pJson && pJson.content && String(pJson.content).trim().length > 20) {
-            return Response.success(formatPlainContent(pJson.content));
-        }
-
-        var apiContentUrl = BASE_URL + "/api/v1/chapters/content?story_id=" + info.storyId + "&chapter_number=" + info.chapNum;
-        var cJson = fetchJson(apiContentUrl, ck);
-        if (cJson) {
-            var rawText = cJson.content || (cJson.data && cJson.data.content) || (cJson.chapter && cJson.chapter.content) || "";
-            if (rawText && String(rawText).trim().length > 20) {
-                return Response.success(formatPlainContent(rawText));
-            }
-        }
+    // 1. Thu goi API doc chuong nhanh /api/prefetch-chapter (can Cookie neu co).
+    // Chua dang nhap thi API tra 401 "Vui long dang nhap de tiep tuc!" — roi
+    // xuong cac buoc duoi thay vi dung lai o day.
+    var prefetchUrl = BASE_URL + "/api/prefetch-chapter/" + info.storyId + "/" + info.chapNum;
+    var pJson = fetchJson(prefetchUrl, ck);
+    var pContent = "";
+    if (pJson) {
+        pContent = pJson.content || (pJson.data && pJson.data.content) || "";
+    }
+    if (pContent && String(pContent).trim()) {
+        return Response.success(formatPlainContent(pContent));
     }
 
     // 2. Tai trang HTML chuong truyen
-    var chapUrl = info
-        ? (BASE_URL + "/doc-truyen/" + info.storyId + "/chuong/" + info.chapNum)
-        : normalizeUrl(url);
+    var chapUrl = BASE_URL + "/doc-truyen/" + info.storyId + "/chuong/" + info.chapNum;
 
-    var res = fetch(chapUrl, { headers: buildHeaders(ck) });
+    var res = null;
+    try {
+        res = fetch(chapUrl, { headers: buildHeaders(ck) });
+    } catch (eFetch) {
+        res = null;
+    }
     if (res && res.ok) {
         var doc = res.html();
-        var bodyHtml = extractChapterFromDoc(doc);
-        if (bodyHtml) {
-            return Response.success(bodyHtml);
+        if (!isInterstitialDoc(doc)) {
+            var bodyHtml = extractChapterFromDoc(doc);
+            if (bodyHtml) {
+                return Response.success(bodyHtml);
+            }
         }
     }
 
     // 3. Fallback Engine.newBrowser() de lay phien dang nhap tu trinh duyet vBook
+    var browser = null;
+    var bDoc = null;
     try {
-        var browser = Engine.newBrowser();
+        browser = Engine.newBrowser();
         browser.launch(chapUrl, 10000);
         try {
             var cookieRes = browser.callJs("document.cookie;", 1000);
-            if (cookieRes && String(cookieRes).indexOf("=") !== -1) {
-                saveCookie(String(cookieRes));
+            if (cookieRes) {
+                // callJs tra ve HtmlElement — lay chuoi cookie that bang .text(),
+                // khong dung String() (se luu rac).
+                var rawCookie = "";
+                try {
+                    rawCookie = cookieRes.text();
+                } catch (eText) {
+                    rawCookie = String(cookieRes);
+                }
+                if (rawCookie && rawCookie.indexOf("=") !== -1) {
+                    saveCookie(rawCookie);
+                }
             }
         } catch (eCookie) {
         }
-        var bDoc = browser.html();
-        browser.close();
-
+        bDoc = browser.html();
+    } catch (eBrowser) {
+    } finally {
+        if (browser) {
+            try {
+                browser.close();
+            } catch (eClose) {
+            }
+        }
+    }
+    if (bDoc && !isInterstitialDoc(bDoc)) {
         var bHtml = extractChapterFromDoc(bDoc);
         if (bHtml) {
             return Response.success(bHtml);
         }
-    } catch (eBrowser) {
     }
 
-    return Response.error("Tiệm Truyện Chữ yêu cầu đăng nhập tài khoản để đọc nội dung chương. Vui lòng mở Trình duyệt trong vBook truy cập https://tiemtruyenchu.cloud/login để đăng nhập hoặc điền Cookie vào phần Cài đặt nguồn.");
+    return Response.error("Chưa đăng nhập Tiệm Truyện Chữ (hoặc phiên đăng nhập đã hết hạn) nên không đọc được nội dung chương. Hãy mở Trình duyệt trong vBook, vào https://tiemtruyenchu.cloud/login để đăng nhập bằng Google hoặc mã OTP 6 số, rồi quay lại mở chương này.");
 }

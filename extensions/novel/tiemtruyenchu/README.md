@@ -7,9 +7,9 @@ Extension đọc truyện chữ từ **Tiệm Truyện Chữ** (`https://tiemtru
   - Danh sách trang chủ (Mới cập nhật, Truyện mới, Truyện Full, Xem nhiều, Truyện Nam/Nữ, 5 Bảng xếp hạng).
   - 19 thể loại truyện đầy đủ.
   - Tìm kiếm theo từ khóa và xem thông tin chi tiết truyện.
-  - Tự động sinh danh sách chương chuẩn (`1..total_chapters`) ngay cả khi chưa đăng nhập, hoặc trích xuất tiêu đề chương đầy đủ từ DOM khi đã có phiên đăng nhập.
-- Tự động chuẩn hóa tên miền cũ (`tiemtruyenchu.com`) sang tên miền mới (`https://tiemtruyenchu.cloud`).
-- Hỗ trợ đọc nội dung chương qua API đọc nhanh (`/api/prefetch-chapter`, `/api/v1/chapters/content`), Cookie cấu hình (`COOKIE`) và tự động đồng bộ phiên đăng nhập từ trình duyệt tích hợp của vBook (`Engine.newBrowser()`).
+  - Tự động lấy danh sách chương với tiêu đề thật từ mảng `chapters` ở top-level của API chi tiết (`/api/v1/stories/<id>`, mỗi item có `chapterNumber` + `title`), hoặc trích xuất tiêu đề chương đầy đủ từ DOM khi đã có phiên đăng nhập.
+- Chỉ dùng tên miền `https://tiemtruyenchu.cloud`. Tên miền cũ `tiemtruyenchu.com` đã ngừng hoạt động (trang thông báo tạm ngừng); các link cũ lưu dưới `.com` được chuẩn hoá về `.cloud` khi xử lý.
+- Hỗ trợ đọc nội dung chương qua API đọc nhanh (`/api/prefetch-chapter`), Cookie cấu hình (`COOKIE`) và tự động đồng bộ phiên đăng nhập từ trình duyệt tích hợp của vBook (`Engine.newBrowser()`). Chip thể loại ở trang chi tiết gửi slug thể loại (`cat=huyen-huyen`), không gửi tên hiển thị.
 
 ## Hướng dẫn đọc nội dung chương
 Trang nguồn `tiemtruyenchu.cloud` yêu cầu tài khoản đăng nhập khi đọc nội dung chương:

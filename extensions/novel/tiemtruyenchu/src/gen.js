@@ -3,9 +3,11 @@ load('config.js');
 
 function parseStoryListFromJson(json) {
     var list = [];
-    if (!json || !json.items || !json.items.length) return list;
-    for (var i = 0; i < json.items.length; i++) {
-        var it = json.items[i];
+    var wrapped = unwrapList(json);
+    var items = wrapped.items;
+    if (!items || !items.length) return list;
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i];
         if (!it || !it.id) continue;
         var cover = it.cover_url || it.poster || "";
         if (cover && cover.indexOf("http") !== 0) {
@@ -59,20 +61,29 @@ function execute(url, page) {
     var apiUrl = BASE_URL + "/api/v1/" + apiPath + sep + "page=" + p + "&limit=30";
 
     var json = fetchJson(apiUrl);
-    if (json && json.items) {
+    var wrapped = unwrapList(json);
+    if (wrapped.items) {
         var list = parseStoryListFromJson(json);
-        var totalPages = json.totalPages ? parseInt(json.totalPages, 10) : 1;
+        var totalPages = wrapped.totalPages ? parseInt(wrapped.totalPages, 10) : 1;
         var next = (p < totalPages && list.length > 0) ? String(p + 1) : "";
         return Response.success(list, next);
     }
 
-    // Fallback HTML neu co cookie
+    // Fallback HTML neu API loi
     var htmlUrl = normalizeUrl(raw);
-    var res = fetch(htmlUrl, { headers: buildHeaders() });
+    var res = null;
+    try {
+        res = fetch(htmlUrl, { headers: buildHeaders() });
+    } catch (eFetch) {
+        res = null;
+    }
     if (!res || !res.ok) {
         return Response.error("Không thể tải danh sách truyện từ Tiệm Truyện Chữ.");
     }
     var doc = res.html();
+    if (isInterstitialDoc(doc)) {
+        return Response.error("Danh sách truyện trên Tiệm Truyện Chữ hiện chỉ mở được trong ứng dụng (trang tải app). Hãy mở Trình duyệt trong vBook để đăng nhập rồi thử lại.");
+    }
     var items = doc.select(".story-item");
     var htmlList = [];
     for (var i = 0; i < items.size(); i++) {
@@ -95,6 +106,9 @@ function execute(url, page) {
             description: meta,
             host: BASE_URL
         });
+    }
+    if (htmlList.length === 0) {
+        return Response.error("Không tải được danh sách truyện từ Tiệm Truyện Chữ.");
     }
     var nextHtml = htmlList.length >= 20 ? String(p + 1) : "";
     return Response.success(htmlList, nextHtml);

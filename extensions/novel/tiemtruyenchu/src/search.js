@@ -12,13 +12,14 @@ function execute(key, page) {
     var apiUrl = BASE_URL + "/api/v1/stories?keyword=" + q + "&page=" + p + "&limit=30";
 
     var json = fetchJson(apiUrl);
-    if (!json || !json.items) {
+    var wrapped = unwrapList(json);
+    if (!wrapped.items) {
         return Response.error("Không thể tìm kiếm truyện trên Tiệm Truyện Chữ.");
     }
 
     var list = [];
-    for (var i = 0; i < json.items.length; i++) {
-        var it = json.items[i];
+    for (var i = 0; i < wrapped.items.length; i++) {
+        var it = wrapped.items[i];
         if (!it || !it.id) continue;
         var cover = it.cover_url || it.poster || "";
         if (cover && cover.indexOf("http") !== 0) {
@@ -39,7 +40,7 @@ function execute(key, page) {
         });
     }
 
-    var totalPages = json.totalPages ? parseInt(json.totalPages, 10) : 1;
+    var totalPages = wrapped.totalPages ? parseInt(wrapped.totalPages, 10) : 1;
     var next = (p < totalPages && list.length > 0) ? String(p + 1) : "";
     return Response.success(list, next);
 }
