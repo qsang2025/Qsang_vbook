@@ -19,7 +19,10 @@ Trang nguồn `tiemtruyenchu.cloud` yêu cầu tài khoản đăng nhập khi đ
 ## Chương VIP — nguyên văn tiếng Trung (v3)
 Khi chương VIP không đọc được qua API của Tiệm Truyện Chữ (chưa đăng nhập tài khoản VIP), extension tự động lấy truyện gốc tiếng Trung từ ixdzs8.com và **hiển thị nguyên văn tiếng Trung, không dịch máy** — người đọc tự dịch cho chuẩn. Chương đọc được qua API chính thức vẫn hiển thị bản dịch tiếng Việt của Tiệm Truyện Chữ như bình thường.
 
-Hiện chỉ mở khóa được các truyện có trong bảng map ở `chap.js` (Quỷ Bí Chi Chủ, Bắt Đầu Trường Sinh Vạn Cổ, Cái Trò Chơi Này Không Thích Hợp...) — tìm kiếm theo tên tiếng Việt trên trang Trung không trả kết quả. Số chương đối chiếu theo số hiển thị trong tiêu đề TTC ("Chương 1462: Niết Bàn") và kiểm chứng bằng tiêu đề thật `<h1>` trên trang Trung, vì số trang bên đó lệch với số chương (Quỷ Bí Chi Chủ lệch +1, Bắt Đầu Trường Sinh lệch +16); không khớp được thì báo lỗi chứ không trả nhầm chương.
+Bảng map ở `chap.js` giờ chỉ là ghi đè cho truyện tên thuần Việt không chuyển được (Quỷ Bí Chi Chủ, Bắt Đầu Trường Sinh Vạn Cổ, Cái Trò Chơi Này Không Thích Hợp...); các truyện khác tự tìm theo tên (xem mục v4 dưới). Số chương đối chiếu theo số hiển thị trong tiêu đề TTC ("Chương 1462: Niết Bàn") và kiểm chứng bằng tiêu đề thật `<h1>` trên trang Trung, vì số trang bên đó lệch với số chương (Quỷ Bí Chi Chủ lệch +1, Bắt Đầu Trường Sinh lệch +16); không khớp được thì báo lỗi chứ không trả nhầm chương.
+
+## Tự tìm truyện gốc theo tên Hán-Việt (v4)
+Từ v4, extension tự đổi tên truyện tiếng Việt sang tên gốc tiếng Trung bằng bảng Hán-Việt trong `src/hanviet.js` (mỗi âm tiết ứng với một chữ Hán, vd. Quỷ Bí Chi Chủ = 诡秘之主), rồi tìm trên ixdzs8.com và đối chiếu tên thật trả về để khỏi lấy nhầm truyện — đọc truyện mới không cần ghi sẵn vào bảng map nữa. Âm đa nghĩa (vd. Kỳ = 奇/棋) thì thử lần lượt các biến thể; tên thuần Việt không đổi được (vd. Cái Trò Chơi Này Không Thích Hợp...) vẫn dùng bảng map ghi sẵn. Kết quả tìm được lưu lại trên máy (localStorage) nên lần sau mở chương cùng truyện không cần tìm lại. Không dùng Google Dịch cho tên truyện (đã kiểm chứng: dịch theo nghĩa nên sai hết).
 
 ## Attribution
 - Tham khảo cấu trúc API `/api/v1/*` và cơ chế lấy phiên trình duyệt từ `ext_Ivan1hai` (`ivanzzz`).

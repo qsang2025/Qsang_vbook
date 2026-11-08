@@ -2,10 +2,10 @@
   "metadata": {
     "name": "TiemtruyenchuVIP",
     "author": "Qsang",
-    "version": 3,
+    "version": 4,
     "source": "https://tiemtruyenchu.cloud",
     "regexp": "^https?://(www\\.)?tiemtruyenchu\\.cloud/truyen/[0-9a-zA-Z\\-]+/?$",
-    "description": "Phiên bản VIP tự động mở khóa chương cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tự động mở khóa và tải nội dung chương VIP trọn bộ không cần đăng nhập thủ công. Chương VIP lấy từ nguồn Trung sẽ hiển thị nguyên văn tiếng Trung (không dịch máy) để tự dịch.",
+    "description": "Phiên bản VIP tự động mở khóa chương cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tự động mở khóa và tải nội dung chương VIP trọn bộ không cần đăng nhập thủ công. Chương VIP lấy từ nguồn Trung sẽ hiển thị nguyên văn tiếng Trung (không dịch máy) để tự dịch. Tự động tìm truyện gốc theo tên Hán-Việt, không cần ghi sẵn từng truyện.",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"

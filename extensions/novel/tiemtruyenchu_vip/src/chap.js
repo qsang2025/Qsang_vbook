@@ -1,11 +1,11 @@
 // chap.js — Nội dung chương Tiệm Truyện Chữ VIP (Web API prefetch + Mobile API Bearer + Auto-Unlock Upstream, trả nguyên văn tiếng Trung)
 load('config.js');
 load('challenge-handler.js');
+load('hanviet.js');
 
-// Bảng map các truyện VIP phổ biến trên Tiệm Truyện Chữ sang ID kho raw
-// (ixdzs8.com). Chỉ những truyện có trong bảng này mới mở khóa được qua
-// tuyến upstream — tìm kiếm theo tên tiếng Việt trên trang Trung không trả
-// kết quả nên không dựa vào đó được. Đã kiểm chứng bằng curl 2026-11-08.
+// Bảng map ghi đè: truyện nào tên thuần Việt không chuyển được sang Hán-Việt
+// (vd. Cái Trò Chơi Này Không Thích Hợp...) thì ghi sẵn ở đây. Các truyện
+// khác tự phân giải qua chuyển tên Hán-Việt + tìm kiếm (xem hanviet.js).
 var KNOWN_UPSTREAM_STORIES = {
     "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" },
     "3703": { bookId: "646492", title: "Quỷ Bí Chi Chủ" },
@@ -58,10 +58,35 @@ function extractChapterTitleFromDoc(doc) {
     return "";
 }
 
-// Lấy số chương trong tiêu đề tiếng Trung "第N章 ..." (-1 nếu không có).
+// Chuyển số chương viết bằng chữ Hán ("一百", "五十二", "一千二百三十四") sang số.
+function zhNumeralToInt(s) {
+    var digit = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "两": 2, "零": 0};
+    var unit = {"十": 10, "百": 100, "千": 1000, "万": 10000};
+    var total = 0;
+    var num = 0;
+    for (var i = 0; i < s.length; i++) {
+        var c = s.charAt(i);
+        if (digit[c] !== undefined) {
+            num = digit[c];
+        } else if (unit[c] !== undefined) {
+            if (num === 0) num = 1;
+            total += num * unit[c];
+            num = 0;
+        }
+    }
+    total += num;
+    return total;
+}
+
+// Lấy số chương trong tiêu đề tiếng Trung ("第N章 ..." hoặc "第...章" viết
+// bằng chữ Hán như "第一百章", "第五十二章") (-1 nếu không có).
 function chapterNumberFromZhTitle(t) {
-    var m = String(t || "").match(/第\s*(\d+)\s*章/);
-    return m ? parseInt(m[1], 10) : -1;
+    var s = String(t || "");
+    var m = s.match(/第\s*(\d+)\s*章/);
+    if (m) return parseInt(m[1], 10);
+    var m2 = s.match(/第\s*([一二三四五六七八九十百千万两零]+)\s*章/);
+    if (m2) return zhNumeralToInt(m2[1]);
+    return -1;
 }
 
 // Số chương HIỂN THỊ của chương (lấy từ tiêu đề TTC "Chương D: ...").
@@ -115,30 +140,14 @@ function fetchUpstreamPage(bookId, pageNum) {
 }
 
 function autoUnlockFromUpstream(storyId, chapNum) {
+    // Phân giải sang bookId ixdzs8: bảng map cứng -> cache -> chuyển tên
+    // Hán-Việt + tìm kiếm có đối chiếu tên thật (xem hanviet.js).
     var bookId = "";
-    if (KNOWN_UPSTREAM_STORIES[String(storyId)]) {
-        bookId = KNOWN_UPSTREAM_STORIES[String(storyId)].bookId;
-    }
-
-    if (!bookId) {
-        try {
-            var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
-            var title = (sInfo && sInfo.story && sInfo.story.title) || "";
-            if (title) {
-                var searchUrl = "https://ixdzs8.com/bsearch?q=" + encodeURIComponent(title);
-                var sRes = fetch(searchUrl, {
-                    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
-                });
-                if (sRes && sRes.ok) {
-                    var sHtml = sRes.text();
-                    var mBook = sHtml.match(/href=[\"']\/read\/(\d+)\/[\"']/i);
-                    if (mBook && mBook[1]) {
-                        bookId = mBook[1];
-                    }
-                }
-            }
-        } catch (eSearch) {}
-    }
+    try {
+        var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
+        var viTitle = (sInfo && sInfo.story && sInfo.story.title) || "";
+        bookId = resolveUpstreamBookId(storyId, viTitle);
+    } catch (eResolve) {}
 
     if (!bookId) return null;
 
