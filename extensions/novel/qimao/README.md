@@ -6,7 +6,7 @@ huyền huyễn, đô thị, lịch sử, khoa huyễn, v.v. Đọc nguyên văn
 
 - Tác giả extension: **MuseAi** (bản của Bẹp, nhánh `feature/qimao-muse` — làm song song
 với bản Antigravity trên nhánh riêng để so sánh sau).
-- Type: `novel`, locale `zh_CN`, version 1.
+- Type: `novel`, locale `zh_CN`, version 2.
 - Vòng đời đầy đủ: `home` (tab tĩnh) / `genre` / `search` / `detail` / `toc` / `chap`
 + list dùng chung `book.js`. Không có `page.js` (mục lục nằm gọn trong một response API).
 
@@ -23,7 +23,7 @@ live từ VM **và** trên máy thật):
 | `search.js` | `GET https://api-bc.wtzw.com/search/v1/words` (ký MD5) — `data.books[]`, `data.meta.next_page` |
 | `detail.js` | `GET https://api-bc.wtzw.com/api/v1/reader/detail?id=<bookid>` (ký MD5) |
 | `toc.js` | `GET https://api-ks.wtzw.com/api/v1/chapter/chapter-list` (ký MD5, `chapter_ver=0`) — sắp xếp theo `chapter_sort` |
-| `chap.js` | `chapterData` (base64, AES-128-CBC) trong `__NUXT__` state của trang chương `/shuku/<bookid>-<chapterid>/`, dự phòng DOM `.chapter-detail-article` |
+| `chap.js` | `GET https://api-ks.wtzw.com/api/v1/chapter/content?id=<bookid>&chapterId=<chapterid>` (ký MD5) → `data.content` giải mã AES-128-CBC; dự phòng `chapterData` DES-ECB trên trang chương (chỉ là bản xem trước ~100 chữ), rồi DOM `.chapter-detail-article` |
 | `book.js` | `__NUXT__` state của trang danh sách/bảng xếp hạng (mảng sách ở key `book_list`/`books`/`list`/…), dự phòng parse DOM anchor |
 
 Ký API (logic công khai của `shing-yu/7mao-novel-downloader`, được `talebook#805` và
@@ -40,10 +40,11 @@ Nội dung chương (theo hàm `_decrypt` của 7mao-novel-downloader và `decry
 của swiftcat-downloader-flutter — hai bên khớp nhau): **AES-128-CBC, key cố định
 `"242ccb8230d709e1"`** (16 byte ASCII; hex `32343263636238323330643730396531`),
 **IV = 16 byte đầu của blob base64**, phần còn lại là ciphertext, padding PKCS#7.
-Giải mã xong là text thường, các đoạn ngăn cách bằng `\r\n`. Code giải mã thuần JS
-nằm ở `src/qimao-crypto.js` (khối AES copy từ `novels` chap.js — S-box tự tính từ
-phép nhân GF(2^8), đã kiểm chứng trên Rhino — chỉ khác IV: novels dùng IV 0,
-qimao lấy IV từ đầu blob).
+Giải mã xong là text thường, **mỗi đoạn một dòng, ngăn cách bằng `\n` đơn** (không phải
+`\r\n\r\n` — bản v1 tách sai nên nếu giải mã thành công cũng chỉ ra một `<p>` duy nhất;
+v2 tách theo `/\r?\n/`). Code giải mã thuần JS nằm ở `src/qimao-crypto.js` (khối AES
+copy từ `novels` chap.js — S-box tự tính từ phép nhân GF(2^8), đã kiểm chứng trên
+Rhino — chỉ khác IV: novels dùng IV 0, qimao lấy IV từ đầu blob).
 
 ## Kết quả khảo sát site (2026-11-09, kiểm chứng live)
 
@@ -57,12 +58,12 @@ chạy được cả từ VM lẫn máy thật — đây là lý do chính để
 - **www.qimao.com giới hạn tốc độ cả IP điện thoại**: sau ~6–10 request nhanh (trong đó
 có 2 request song song) thì toàn bộ host bắt đầu trả **HTTP 405** — cả fetch OkHttp
 của app lẫn WebView browser đều 405 (title trang browser là `405`). Block kéo dài
-**hơn 2 giờ** (bắt đầu tối 2026-11-09, vẫn 405 khi test lại sau đó), chưa rõ cửa sổ
-là bao lâu (có thể 24h hoặc IP bị gắn cờ). **Hậu quả trực tiếp**: `chap.js` (cần trang
-chương www) và `book.js` (cần trang danh sách www) hiện chưa test được trên máy;
-`search`/`detail`/`toc` (API) không bị ảnh hưởng. **Bài học**: đừng test dồn dập trên
-www.qimao.com — một request một lần, cách nhau đủ lâu; nếu thấy 405 thì chờ, đừng retry
-liên tục (retry chỉ kéo dài block).
+**hơn 2 giờ** (bắt đầu tối 2026-11-09, vẫn 405 khi test lại sau đó), **đã hết lúc
+~23:46** (probe trả HTTP 200 lại). **Bài học**: đừng test dồn dập trên
+www.qimao.com — một request một lần, cách nhau ≥60 giây; nếu thấy 405 thì chờ, đừng
+retry liên tục (retry chỉ kéo dài block). Từ v2, `chap.js` dùng API `api-ks` (không
+bị chặn) làm nguồn chính nên không còn phụ thuộc www cho nội dung chương; `book.js`
+vẫn cần www (đã test lại PASS sau khi 405 hết).
 
 ### URL đã xác minh (live 2026-11-09)
 | Trang | URL mẫu |
@@ -101,22 +102,41 @@ chương `/shuku/<bookid>-<chapterid>/` — không tự tính số chương, kh�
 - Catalog API không có cờ `is_vip` — `toc.js` để `lock/pay = false` (nội dung chương
 vẫn đọc được qua `chapterData` giải mã); nếu sau này API thêm `is_vip` thì gắn cờ ở đây.
 
-### Trang chương — `chapterData` mã hóa, nội dung không nằm trong DOM
-- Trang chương `.../10090611-48385031/` (24.779 byte): body text chỉ **412 ký tự**
-(nav + lời nhắc tải App), không có nội dung chương trong DOM text.
-- State có `readerChapterInfo:{nextChapter:{book_id,chapter_id:"48386036",is_final,
-is_vip,is_over}, prevChapter:{chapter_id:"48367739"...}, chapterInfo:{book_id,
-book_title, author, chapter_id:"48385031", words:"2450", title:"第492章 让他们一直陪着孙子",
-update_time:"2026-09-24 08:59:38", is_final, is_vip, is_over, index:"492"},
-bookSummary:{intro, latest_chapter_title:"第510章 双胞胎该喊小舅还是弟弟（完结篇）",
-words_num:"1179655", image_link, book_id, is_over,...}, isLoginStatus, chapterData:"<base64>"}`.
-- `chapterData` giải mã xong (theo code gốc) là text thường; blob bắt đầu bằng byte
-nhị phân ngẫu nhiên sau khi base64-decode (đúng dạng IV + ciphertext).
+### Nội dung chương — API chapter/content (v2) + `chapterData` chỉ là bản xem trước DES
+- **Nguồn chính (v2): `GET https://api-ks.wtzw.com/api/v1/chapter/content`** (host
+`api-ks`, không bị chặn). Tham số ký MD5: `{id: <bookid>, chapterId: <chapterid>}`
+— **chú ý `chapterId` camelCase**: dùng `chapter_id` snake_case thì server trả
+`{"errors": {... "title": "参数错误"}}` (tham số sai). Trả về
+`data: {content, content_md5, id, type}`; `data.content` là blob base64 AES
+(giống hệt file `.txt` trong ZIP tải nguyên cuốn — cùng độ dài từng byte, cùng
+key/IV) — giải mã bằng `qimaoDecryptChapter()` ra toàn chương. Đã kiểm chứng
+thật 2026-11-09: ch.492 (10090611-48385031) `data.content` dài 9.964 ký tự,
+giải ra **2.552 chữ (2.077 chữ Hán)**, khớp file ZIP; ch.1 (10090611-41836422)
+giải ra 2.267 chữ, khớp ZIP; ch.1 của 2055374 (17556698360001) giải ra 2.899
+chữ, 2.459 chữ Hán, khớp 117 đoạn trên máy thật. **Kể cả chương có
+`chapterInfo.is_vip:"1"` (ch.492) API vẫn trả đủ nội dung** — ít nhất với 2
+truyện mẫu này, không có khóa nội dung qua API.
+- **Giả thuyết v1 SAI (đã bác bỏ 2026-11-09): `chapterData` trên trang chương
+KHÔNG phải toàn chương mã hóa AES.** Trang chương `.../10090611-48385031/`
+(24.779 byte): body text chỉ **412 ký tự** (nav + lời nhắc tải App), không có
+nội dung chương trong DOM text. `chapterData` xuất hiện **đúng 1 lần**, dài
+**760 ký tự** (~570 byte) — quá nhỏ cho chương ~2.450 chữ; trang không chứa
+blob dài nào khác (chỉ `intro` 393 ký tự + `chapterData` 760). Giải mã AES
+trả rỗng (570 byte % 16 = 10, decryptor từ chối). **Định dạng thật** (theo bài
+CSDN "七猫小说 chapterdata解密", đã kiểm chứng offline bằng Node crypto +
+trên máy thật bằng `CryptoJS.DES` trong Rhino): `chapterData` =
+`base64(base64(ciphertext-DES))` (728 ký tự đầu) + **key 32 ký tự cuối**;
+khóa DES = **8 byte đầu của chuỗi hex MD5(key) dạng ASCII**; **DES-ECB,
+PKCS#7**; giải ra HTML có tag `<p>`, **~100 chữ** — chỉ là **bản xem trước**
+(mở đầu chương, kết đúng chỗ chương tiếp tục). Code ở `src/qimao-des.js`
+(dùng `CryptoJS.DES` có sẵn trong `lib/crypto.js`).
+- `chap.js` v2: API content trước → nếu API hỏng thì lấy preview DES trên
+trang web (trả kèm ghi chú rõ "[Bản xem trước — mở App 七猫免费小说 để đọc
+đầy đủ chương này]") → cuối cùng mới DOM. Preview **không** áp dụng ngưỡng
+200 chữ / 20% `本章字数` (vì đã ghi chú rõ là xem trước).
 - `Engine.newBrowser()` (WebView) cũng không render được nội dung (`.chapter-detail-article`
 dài 0, `[class*="chapter-detail"]` chỉ 405 ký tự header/info) — nội dung không render
 ngay cả trong trình duyệt của app trong thời gian probe chờ.
-- **Chưa kiểm chứng giải mã thật** (www đang 405): nếu `chap.js` trả rác/rỗng thì kiểm
-tra key trước tiên (site xoay key sẽ làm hỏng toàn bộ chap.js).
 - Tên chương **không** trả qua `data2` (tên trong `<title>` dính kèm tên tác giả, không
 tách được sạch) — app dùng tên chương từ mục lục (API catalog), vốn là tên thật.
 
@@ -126,8 +146,10 @@ và `在APP端开通会员，继续在电脑端无广告免费畅读。（单本
 - Đó là **lời nhắc chung, không phải khóa từng chương** — qimao quảng cáo "miễn phí":
 đọc tiếp thì tải App (miễn phí trong App), hoặc mở 会员 để đọc web không quảng cáo.
 - `chapterInfo.is_vip` tồn tại (ch.492 có `is_vip:"1"`) nhưng **ngữ nghĩa chưa xác minh**
-(không rõ "1" là khóa đọc hay chỉ là chương VIP trong App) — đừng suy đoán; nội dung
-vẫn nhúng sẵn trong `chapterData` của trang công khai.
+(không rõ "1" là khóa đọc hay chỉ là chương VIP trong App) — đừng suy đoán. Thực tế
+kiểm chứng 2026-11-09: **API chapter/content vẫn trả đủ nội dung ch.492** (2.552 chữ)
+dù `is_vip:"1"` — ít nhất với truyện mẫu này, `is_vip` không khóa nội dung qua API.
+Nếu sau này gặp chương API trả rỗng/lỗi thì `chap.js` sẽ rơi về preview DES + DOM.
 - `chap.js` chỉ báo lỗi khóa khi **không có/đủ nội dung** (giải mã rỗng + DOM rỗng/<200
 ký tự) kèm lời nhắc App/会员, hoặc khi nội dung đọc được < 20% số chữ công bố (`本章字数`)
 — kèm hướng dẫn mở App 七猫 / đăng nhập 会员. Không gắn cờ `lock/pay` bừa cho mọi chương.
@@ -207,23 +229,36 @@ ZIP) là không khả thi. Ghi lại để khỏi mất công tìm lại.
 11. **Endpoint detail v4** (`GET https://api-bc.wtzw.com/api/v4/book/detail`, params
 `{id, imei_ip, teeny_mode:"0"}` — theo swiftcat): bản detail mới hơn v1 đang dùng;
 v1 đã đủ dữ liệu nên chưa đổi — chỉ ghi lại nếu v1 bị bỏ.
-12. **Khi 405 hết**: chạy lại `book.js` + `chap.js` trên máy (một request một lần,
+12. ~~**Khi 405 hết**: chạy lại `book.js` + `chap.js` trên máy (một request một lần,
 cách nhau đủ lâu), đọc key mảng thật của `__NUXT__` trang danh sách để thu hẹp
 `extractNuxtBooks`, và kiểm chứng giải mã `chapterData` thật (độ dài ~2450 chữ cho
-ch.492, tiêu đề khớp 第492章 让他们一直陪着孙子).
+ch.492, tiêu đề khớp 第492章 让他们一直陪着孙子).~~ — **XONG 2026-11-09 ~23:46–00:15**:
+405 hết, `book.js` test lại PASS; `chap.js` v2 viết lại theo API chapter/content,
+test trên máy PASS cả 2 chương (ch.492: 2.077 chữ Hán, 102 đoạn; ch.1 của 2055374:
+2.459 chữ Hán, 117 đoạn — khớp ground truth API/ZIP từng byte). `chapterData`
+được xác định chỉ là preview DES ~100 chữ (xem mục "Nội dung chương" trên).
+Key mảng thật của `__NUXT__` trang danh sách vẫn chưa thu hẹp (book.js PASS bằng
+quét key hiện tại — ghi lại nếu sau này cần tối ưu).
 
 ## Test
 - Fixture: `test.json` (2 truyện thật: 10090611 — 510 chương; 2055374 — 475 chương,
 đã 完结; chương 492 id 48385031, 2450 chữ).
 - Health: `health.json` (trang chủ, chi tiết, danh sách, bảng xếp hạng, tìm kiếm).
 - Icon: logo thật của qimao (`cdn-front.qimao.com/.../logo.d026f02.png`, resize 200×200).
-- `validate`: **PASS, 18 nguồn, 0 cảnh báo** (2026-11-09). Zip 55.778 byte (crypto.js inline).
+- `validate`: **PASS, 18 nguồn, 0 cảnh báo** (2026-11-09). Zip 58.014 byte (crypto.js inline).
 - Kết quả test trên máy thật (HONOR PTP-AN10, 2026-11-09 tối) — xem chi tiết ở
 `~/workspace/vbook/work/ext-review/QIMAO-MUSE-PROGRESS.md`:
-  - install: code=200 ✓
+  - install: code=200 ✓ (cả v1 và v2)
   - search.js `错婚四十年`: PASS — 10 kết quả, truyện đúng (10090611) có mặt, next token `"2"` ✓
   - detail.js ×2: PASS — đủ tên/tác giả/mô tả/trạng thái/chương mới nhất ✓
   - toc.js ×2: PASS — 510 + 475 chương, chương đầu/cuối khớp fixture ✓
   - home.js: PASS (7 tab tĩnh) ✓ · genre.js: PASS (5 tab lọc) ✓
-  - book.js: CHƯA PASS — HTTP 405 (www.qimao.com chặn toàn bộ host trên IP máy) ✗
-  - chap.js: CHƯA PASS — HTTP 405 (cùng block; AES decrypt chưa kiểm chứng được) ✗
+  - book.js: PASS (test lại 23:46 sau khi 405 hết — danh sách thật từ `__NUXT__`) ✓
+  - chap.js v2: **PASS** — ch.492 (10090611-48385031): 2.077 chữ Hán, 102 đoạn
+    `<p>`, mở đầu "赵秘书身后跟着两个人。" kết "你们是谁？", khớp ground truth
+    API/ZIP từng byte ✓ · ch.1 của 2055374 (17556698360001): 2.459 chữ Hán,
+    117 đoạn, khớp API ✓ · DES preview: PASS trên máy thật bằng probe tạm
+    (`CryptoJS.DES` trong Rhino giải đúng blob 760 ký tự → 167 ký tự HTML,
+    mở đầu chương) ✓ · search smoke test sau khi cài v2: PASS (code=200) ✓
+  - Không gặp lại HTTP 405 trong toàn bộ test v2 (chap.js dùng API host,
+    không chạm www trừ fallback).
