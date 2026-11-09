@@ -10,6 +10,13 @@
 // (mang sach o mot trong cac key book_list/books/list/... — helper.js
 // extractNuxtBooks thu lan luot). DU PHONG: parse DOM bang anchor
 // (helper.js parseBookRows) — dung khi trang nao do render link that.
+// LUU Y /paihang/: __NUXT__ khong co mang nao trong cac key tren (da kiem
+// chung 2026-11-10 ca tren trang WAF lan trang that) nen DOM la nguon chinh
+// o day; moi sach co 2 anchor cung link (so thu hang + ten) nen parseBookRows
+// GOP lai (ten that + bia that) thay vi giu anchor dau tien.
+// WAF: www.qimao.com dung Aliyun WAF — fetch thuong co the nhan ve trang thu
+// thach HTTP 200 thay cho trang that; book.js phat hien (isAliyunWafPage) va
+// thu lai qua headless browser (fetchRealPageViaBrowser).
 // Phan trang: token trang ke tra ve la PATH cua link "下一页" that,
 // hoac path /shuku/ da tang so trang cuoi; luot goi sau nhan page bat
 // dau bang "/" thi fetch thang path do.
@@ -51,6 +58,18 @@ function execute(query, page) {
         try { raw = String(res.doc.html()); } catch (e) { raw = ""; }
     } else {
         try { raw = String(res.text()); } catch (e2) { raw = ""; }
+    }
+
+    // Trang thu thach Aliyun WAF (HTTP 200, khong phai trang that): thu lai qua
+    // headless browser (chay JS cua WAF). Neu browser cung khong qua thi bao loi ro.
+    if (raw && isAliyunWafPage(raw)) {
+        var realDoc = fetchRealPageViaBrowser(pageUrl);
+        if (realDoc) {
+            doc = realDoc;
+            try { raw = String(realDoc.html()); } catch (e3) { raw = ""; }
+        } else {
+            return Response.error("七猫 đang bật kiểm tra chống bot (tường lửa Aliyun) nên chưa tải được trang này. Hãy mở trang trong Trình duyệt của app rồi quay lại thử lại: " + pageUrl);
+        }
     }
 
     var items = [];

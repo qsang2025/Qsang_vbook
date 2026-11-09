@@ -79,25 +79,35 @@ function isChapterHref(href) {
     return /\/shuku\/\d+-\d+\/?$/.test(href);
 }
 
-// Leo len tu mot element toi container chua anh bia: thu toi da 4 cap cha,
-// lay container dau tien co <img>. Tra ve container (element) hoac null.
+// Tim container chua anh bia: chi chinh element anchor (img nam TRONG anchor).
+// LUU Y runtime vBook: Element KHONG co .parent() (goi se nem TypeError) nen
+// khong leo len cha duoc; anh bia nam ngoai anchor se lay qua buildCoverMap
+// (map alt -> src) o parseBookRows.
 function findCoverContainer(el) {
-    var node = el;
-    var depth = 0;
-    while (node !== null && depth < 5) {
-        try {
-            var img = node.select("img").first();
-            if (img !== null) return node;
-        } catch (e) {
-        }
-        try {
-            node = node.parent();
-        } catch (e2) {
-            return null;
-        }
-        depth = depth + 1;
+    try {
+        var img = el.select("img").first();
+        if (img !== null) return el;
+    } catch (e) {
     }
     return null;
+}
+
+// Map ten sach -> URL bia, lay tu moi <img> co alt (= ten sach) trong doc.
+// Dung de dien bia cho cac dong ma anh khong nam trong anchor (vi khong leo
+// len cha duoc). Bo qua anh mac dinh. Key = alt da cleanText.
+function buildCoverMap(doc) {
+    var map = {};
+    try {
+        doc.select("img").forEach(function (im) {
+            var alt = cleanText(im.attr("alt") || "");
+            if (!alt) return;
+            var src = im.attr("data-src") || im.attr("src") || "";
+            if (!src) return;
+            if (src.indexOf("default-book-cover") !== -1) return;
+            if (!map[alt]) map[alt] = absUrl(src);
+        });
+    } catch (e) {}
+    return map;
 }
 
 // Parse MOT dong truyen tu anchor chi tiet <a href="/shuku/<id>/">.
@@ -152,20 +162,104 @@ function parseBookRowFromAnchor(a) {
     };
 }
 
-// Parse ca danh sach trong doc: quet moi anchor chi tiet, bo trung theo link.
+// Ten chi la so thu hang ("1".."9") — gap o bang xep hang /paihang/: moi sach co
+// 2 anchor cung link (1 anchor so thu hang + anh bia, 1 anchor ten sach).
+function isBareNumber(s) {
+    var t = cleanText(s || "");
+    return /^\d+$/.test(t);
+}
+
+// Gop 2 item cung link: lay ten that (khong phai so thu hang, uu tien ten dai hon),
+// bia that (uu tien bia khong rong), mo ta dai hon, tag dau tien khong rong.
+function mergeBookItems(oldItem, newItem) {
+    var name = oldItem.name;
+    if (isBareNumber(name) && !isBareNumber(newItem.name)) {
+        name = newItem.name;
+    } else if (!isBareNumber(newItem.name) && newItem.name.length > name.length) {
+        name = newItem.name;
+    }
+    var cover = oldItem.cover || newItem.cover;
+    var desc = oldItem.description || "";
+    var desc2 = newItem.description || "";
+    if (desc2.length > desc.length) desc = desc2;
+    var tag = oldItem.tag || newItem.tag;
+    return { name: name, cover: cover, link: oldItem.link, description: desc, tag: tag, host: oldItem.host };
+}
+
+// Parse ca danh sach trong doc: quet moi anchor chi tiet; cung link xuat hien
+// nhieu lan thi GOP lai (ten that + bia that) thay vi giu anchor dau tien.
+// Sau do dien bia con thieu tu map alt -> src (anh bia co the nam ngoai anchor).
 function parseBookRows(doc) {
     var items = [];
-    var seen = {};
+    var indexByLink = {};
     doc.select("a[href]").forEach(function (el) {
         var href = el.attr("href");
         if (!isDetailHref(href)) return;
         var item = parseBookRowFromAnchor(el);
-        if (item && !seen[item.link]) {
-            seen[item.link] = true;
+        if (!item) return;
+        if (indexByLink[item.link] === undefined) {
+            indexByLink[item.link] = items.length;
             items.push(item);
+        } else {
+            items[indexByLink[item.link]] = mergeBookItems(items[indexByLink[item.link]], item);
+        }
+    });
+    var coverMap = buildCoverMap(doc);
+    items.forEach(function (it) {
+        if (!it.cover) {
+            var c = coverMap[cleanText(it.name)];
+            if (c) it.cover = c;
         }
     });
     return items;
+}
+
+// --- Trang thu thach Aliyun WAF ---------------------------------------------
+// www.qimao.com dung Aliyun WAF: fetch thuong (khong chay JS) nhan ve trang
+// thu thach HTTP 200 (meta aliyun_waf_aa + textarea#renderData, khong title/
+// link/anh) thay cho trang that. Chi headless browser (chay JS, dat cookie)
+// moi qua duoc. Phat hien bang dau hieu rieng cua trang WAF (khong trung voi
+// trang that).
+function isAliyunWafPage(raw) {
+    if (!raw) return false;
+    if (raw.indexOf("aliyun_waf_aa") !== -1) return true;
+    if (raw.indexOf('id="renderData"') !== -1) return true;
+    return false;
+}
+
+// Trang da qua WAF: co title hoac co link that.
+function docLooksReal(doc) {
+    try {
+        var t = doc.select("title").text() || "";
+        if (t && t.length > 0) return true;
+        if (doc.select("a[href]").size() > 0) return true;
+    } catch (e) {}
+    return false;
+}
+
+// Thu lay trang that qua headless browser (chay JS cua WAF roi moi doc).
+// Tra ve Document that hoac null. Chi goi khi Engine co san.
+function fetchRealPageViaBrowser(url) {
+    if (typeof Engine === "undefined" || !Engine || typeof Engine.newBrowser !== "function") return null;
+    var browser = null;
+    try {
+        browser = Engine.newBrowser();
+        var doc = browser.launch(url, 20000);
+        var tries = 0;
+        while (doc && tries < 5 && !docLooksReal(doc)) {
+            doc = browser.html(4000);
+            tries = tries + 1;
+        }
+        if (!doc || !docLooksReal(doc)) {
+            if (browser.close) browser.close();
+            return null;
+        }
+        if (browser.close) browser.close();
+        return doc;
+    } catch (e) {
+        try { if (browser && browser.close) browser.close(); } catch (e2) {}
+        return null;
+    }
 }
 
 // Lay duong dan trang ke:
@@ -238,6 +332,10 @@ function parseChapterLinks(doc, bookId) {
 // Ghi chu: key "list" la key chung — chi chap nhan mang co it nhat 1
 // object co id so + title, de tranh vo phai mang khac (vi du danh sach
 // chuong cua trang chi tiet).
+// LUU Y /paihang/ (kiem chung 2026-11-10): __NUXT__ khong co mang nao trong
+// cac key duoi — ca tren trang WAF (khong co __NUXT__ luon) lan trang that
+// (co __NUXT__ nhung khong co key nao trong danh sach) — nen DOM
+// (parseBookRows, gop anchor trung link) la nguon chinh o bang xep hang.
 function unescapeJsonStr(s) {
     if (!s) return "";
     var out = s;

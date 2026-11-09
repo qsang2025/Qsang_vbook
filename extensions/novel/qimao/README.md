@@ -173,12 +173,20 @@ dạng chuỗi.
 Các đoạn còn lại chưa giải mã — nên `genre.js`/`home.js` **chỉ dùng URL đã kiểm chứng
 live**, không tự suy URL lọc mới. Muốn mở rộng cây thể loại thì cần mở `/shuku/` trên
 trình duyệt thật và đọc các link lọc.
-- Parser danh sách **không dựa vào link DOM** (vì SSR gần như không có link thật):
-`book.js` parse mảng sách trong `__NUXT__` state (thử các key `book_list`/`books`/
-`list`/`data_list`/… — lấy mảng đầu tiên có ≥1 object đủ `id` số + `title`), dự phòng
-mới parse anchor DOM. **Chưa kiểm chứng được** (www đang 405) — key mảng thật của
-trang danh sách/bảng xếp hạng vẫn là ẩn số; khi 405 hết, chạy probe đọc key state rồi
-thu hẹp `extractNuxtBooks` theo key thật.
+- Parser danh sách: `book.js` parse mảng sách trong `__NUXT__` state (thử các key `book_list`/`books`/
+`list`/`data_list`/… — lấy mảng đầu tiên có ≥1 object đủ `id` số + `title`) cho trang lọc `/shuku/`
+(đã kiểm chứng tên PASS; nhưng probe browser 2026-11-10 không thấy mảng nào trong 27 key trên
+trang browser — có thể trang fetch (SSR) khác trang browser (đã hydrate), chưa kết luận).
+Bảng xếp hạng `/paihang/` KHÔNG có mảng nào trong các key trên (đã kiểm chứng
+2026-11-10 cả trên trang WAF lẫn trang thật) nên dùng DOM làm nguồn chính: mỗi sách có 2 anchor
+cùng link (số thứ hạng + tên) nên `parseBookRows` GỘP lại (tên thật + bìa thật) thay vì giữ anchor
+đầu tiên (lỗi cũ: tên hiển thị thành "1".."9"). www.qimao.com dùng Aliyun WAF — fetch thường có
+thể nhận trang thách thức HTTP 200 thay cho trang thật; `book.js` phát hiện (meta `aliyun_waf_aa` /
+`textarea#renderData`) và thử lại qua headless browser. Bìa: `findCoverContainer` không dùng
+`.parent()` (runtime không có hàm này) mà chỉ kiểm tra img trong anchor, cộng `buildCoverMap`
+(map alt → src) điền bìa thiếu. **Bìa /shuku/ hiện chỉ 5/14 (9 rỗng)** — nguyên nhân chưa xác
+định (nghi object `__NUXT__` thiếu field bìa cho các mục sau); cần probe HTML fetch. Không phải
+hồi quy (v2 chưa từng kiểm chứng bìa).
 
 ### Mirror
 - Chưa có mirror nào được kiểm chứng. Ứng viên: `wtzw.com` (梧桐中文网 — tiền thân của

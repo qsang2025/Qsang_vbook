@@ -119,10 +119,10 @@
       "name": "七猫免费小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/qimao/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://www.qimao.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/qimao/icon.png",
-      "description": "七猫免费小说 (qimao.com) — truyện chữ tiếng Trung giản thể miễn phí chính thống: ngôn tình, huyền huyễn, đô thị, lịch sử, khoa huyễn... Đọc nguyên văn tiếng Trung, không dịch máy. Tìm kiếm / chi tiết / mục lục lấy từ API chính thức của app 七猫 (có ký MD5); danh sách lấy từ __NUXT__ state; nội dung chương lấy từ API chapter/content rồi giải mã AES-128-CBC (chapterData trên trang web chỉ là bản xem trước DES-ECB ~100 chữ). Chương khóa (cần App hoặc会员) được báo rõ thay vì trả nội dung rỗng.",
+      "description": "七猫免费小说 (qimao.com) — truyện chữ tiếng Trung giản thể miễn phí chính thống: ngôn tình, huyền huyễn, đô thị, lịch sử, khoa huyễn... Đọc nguyên văn tiếng Trung, không dịch máy. Tìm kiếm / chi tiết / mục lục lấy từ API chính thức của app 七猫 (có ký MD5); danh sách lấy từ __NUXT__ state (trang lọc) hoặc DOM gộp anchor trùng link (bảng xếp hạng); trang kiểm tra chống bot (Aliyun WAF) được thử lại qua trình duyệt trong app; nội dung chương lấy từ API chapter/content rồi giải mã AES-128-CBC (chapterData trên trang web chỉ là bản xem trước DES-ECB ~100 chữ). Chương khóa (cần App hoặc会员) được báo rõ thay vì trả nội dung rỗng.",
       "type": "novel",
       "locale": "zh_CN"
     },
