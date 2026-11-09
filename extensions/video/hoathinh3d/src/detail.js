@@ -34,6 +34,16 @@ function execute(url) {
     if (m.lang) info += (info ? " · " : "") + "Ngôn ngữ: " + m.lang;
     if (m.time) info += (info ? " · " : "") + "Thời lượng: " + m.time;
 
+    // Diem danh gia IMDb / TMDB
+    var rateStr = "";
+    if (m.imdb && m.imdb.vote_average) {
+        rateStr = "IMDb: " + m.imdb.vote_average + " ⭐" + (m.imdb.vote_count ? " (" + m.imdb.vote_count + ")" : "");
+    } else if (m.tmdb && m.tmdb.vote_average) {
+        rateStr = "TMDB: " + m.tmdb.vote_average + " ⭐" + (m.tmdb.vote_count ? " (" + m.tmdb.vote_count + ")" : "");
+    }
+    if (rateStr) info += (info ? " · " : "") + rateStr;
+    if (m.view) info += (info ? " · " : "") + "Lượt xem: " + m.view;
+
     var directors = "";
     if (m.director) directors = m.director.join(", ");
     var actors = "";

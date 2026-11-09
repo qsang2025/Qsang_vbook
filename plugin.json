@@ -197,7 +197,7 @@
       "name": "Hoạt Hình 3D Trung Quốc",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://phimapi.com/v1/api/the-loai",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/icon.png",
       "description": "Kho phim hoạt hình 3D Trung Quốc (Donghua 3D) Vietsub & Thuyết minh: Thế Giới Hoàn Mỹ, Tiên Nghịch, Đấu Phá Thương Khung, Linh Cảnh Hành Giả... Link m3u8 trực tiếp, phát mượt trên ExoPlayer.",
