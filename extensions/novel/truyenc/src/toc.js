@@ -14,9 +14,13 @@
 // Luong chinh: lay tung trang API (limit=100), ghep theo chapter_number.
 // Tong so lay tu meta.total_items (neo that) — danh sach cuoi luon dung
 // total muc, khong thua (chuong ma) khong thieu (danh sach cut): trang
-// API nao loi thi bu bang muc tu che "Chuong N" (URL van dung) roi di
-// tiep. Gioi han an toan 120 trang API (12.000 chuong): vuot qua thi
-// tu che phan con lai thay vi goi them request.
+// API nao loi thi thu lai 1 lan sau delay ngan (sleepMs 800ms); neu van
+// loi thi bu bang muc tu che "Chuong N (chua ro ten)" (URL van dung) roi
+// di tiep — danh dau ro day la ten uoc luong, khong phai ten that (so
+// URL lech voi so hien thi, vd. chuong URL 5418 co tieu de that
+// "Chuong 5424"). Gioi han an toan 120 trang API (12.000 chuong): vuot
+// qua thi tu che phan con lai thay vi goi them request (cung danh dau
+// "chua ro ten").
 // Du phong: neu API hong hoan toan thi doc trang chi tiet HTML — tong so
 // tu neo that ("numberOfPages", "chapters":N, "Xem tat ca (N chuong)"),
 // tieu de that cua 4 chuong moi nhat tu link /chuong- tren trang, con
@@ -25,6 +29,10 @@ load('config.js');
 load('fetch-helpers.js');
 
 var TOC_PAGE_SIZE = 100;
+// Cap an toan 120 trang API (12.000 chuong). Ghi chu (review 2026-11-08):
+// truyen dai nhat hien tai 5.418 chuong (55 trang), chua cham cap. Khi
+// gap truyen > 10.000 chuong thi nang cap nay hoac phan trang toc qua
+// page.js — khong sua truoc khi co truyen that vuot nguong.
 var TOC_MAX_API_PAGES = 120;
 
 function execute(url) {
@@ -66,9 +74,18 @@ function apiChapterItem(slug, c) {
     };
 }
 
-function synthChapter(slug, n, realTitles) {
+// Muc tu che khi API/thieu du lieu. markUnknown=true: ten chi la uoc
+// luong theo so URL (so URL lech voi so hien thi) nen danh dau ro
+// "(chua ro ten)" thay vi gia lam ten that. Duong du phong HTML giu ten
+// "Chuong N" tran (toan bo danh sach o do deu la tu che, da ghi ro
+// trong comment dau file).
+function synthChapter(slug, n, realTitles, markUnknown) {
     var name = "Chương " + n;
-    if (realTitles && realTitles[n]) name = realTitles[n];
+    if (realTitles && realTitles[n]) {
+        name = realTitles[n];
+    } else if (markUnknown) {
+        name = "Chương " + n + " (chưa rõ tên)";
+    }
     return {
         name: name,
         url: BASE_URL + "/truyen/" + slug + "/chuong-" + n,
@@ -91,10 +108,15 @@ function buildFromApi(slug, first) {
     collectPage(first, byNumber, slug);
     for (p = 2; p <= pagesToFetch; p++) {
         var data = fetchChaptersPage(slug, p);
+        if (!data || !data.data) {
+            // Thu lai 1 lan sau delay ngan — API co the loi thoang qua.
+            sleepMs(800);
+            data = fetchChaptersPage(slug, p);
+        }
         if (data && data.data) {
             collectPage(data, byNumber, slug);
         } else {
-            console.log("toc: API trang " + p + " loi, bu muc tu che: " + slug);
+            console.log("toc: API trang " + p + " loi (da thu lai 1 lan), bu muc tu che: " + slug);
         }
     }
 
@@ -103,7 +125,7 @@ function buildFromApi(slug, first) {
         if (byNumber[i]) {
             chapters.push(byNumber[i]);
         } else {
-            chapters.push(synthChapter(slug, i, null));
+            chapters.push(synthChapter(slug, i, null, true));
         }
     }
     if (chapters.length === 0) {

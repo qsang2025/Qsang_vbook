@@ -46,18 +46,23 @@ function execute(key, page) {
         if (apiList) {
             return Response.success(apiList.items, apiList.next);
         }
-        return Response.error("Không tìm thấy truyện phù hợp với từ khóa \"" + String(key).trim() + "\".");
+        // Tim-kiem HTML da tai duoc ma tra 0 muc (API du phong hong
+        // hoac cung 0 muc): day la ket qua rong that, khong phai loi
+        // mang — tra success rong thay vi error.
+        return Response.success([], "");
     }
 
     return Response.success(novelList, next);
 }
 
 // Duong du phong qua API tim kiem chinh thuc cua site.
-// Tra ve { items: [...], next: "..." } hoac null khi API hong/0 ket qua.
+// Tra ve { items: [...], next: "..." } — items rong khi API tra 0 ket
+// qua that; chi tra null khi fetch API hong (mang/HTTP/parse).
 function searchApiFallback(keyword, currentPage) {
     var apiUrl = API_BASE + "/stories?q=" + encodeURIComponent(keyword) + "&limit=20&page=" + currentPage;
     var data = fetchJson(apiUrl);
-    if (!data || !data.data || data.data.length === 0) return null;
+    if (!data || !data.data) return null;
+    if (data.data.length === 0) return { items: [], next: "" };
     var items = [];
     for (var i = 0; i < data.data.length; i++) {
         var s = data.data[i];
@@ -69,6 +74,15 @@ function searchApiFallback(keyword, currentPage) {
             desc = desc + s.total_chapters + " chương";
         }
         if (s.status === "COMPLETED") desc = desc + " • Hoàn thành";
+        // API tra is_vip/price cho moi truyen (kiem chung 2026-11-09):
+        // gan tag VIP khi is_vip=true hoac price>0. Luu y: quet 500
+        // truyen qua API (trang 1-10) chua thay truyen VIP that nao
+        // (tat ca is_vip=false, price=0), trang HTML cung khong co
+        // badge VIP — tag nay chua duoc kiem chung hien thi tren mot
+        // muc VIP that; do doc chuong VIP cung chua kiem chung.
+        if (s.is_vip === true || (s.price && s.price > 0)) {
+            desc = desc + " • VIP";
+        }
         items.push({
             name: s.title,
             link: BASE_URL + "/truyen/" + s.slug,
@@ -77,7 +91,7 @@ function searchApiFallback(keyword, currentPage) {
             host: BASE_URL
         });
     }
-    if (items.length === 0) return null;
+    if (items.length === 0) return { items: [], next: "" };
     var next = "";
     if (data.meta && data.meta.total_pages && currentPage < data.meta.total_pages) {
         next = String(currentPage + 1);
