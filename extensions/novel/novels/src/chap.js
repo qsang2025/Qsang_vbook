@@ -19,6 +19,17 @@
 // - MAINTENANCE WATCH: key nam cung trong gfncgd.js — neu site doi key
 //   thi chuong gay toan bo; tai lai gfncgd.js, tim chuoi key o diem goi
 //   ham giai ma la xong (xem README.md).
+// - TRIPWIRE (v4, muc C1): KEY_CHECK_CIPHER la ban ma cua chuoi
+//   "novels-key-check-v1" ma hoa bang CHAP_KEY hien tai (AES-128-CBC,
+//   IV 16 byte 0). verifyChapKey() giai ma mau nay: tra false thi khoa
+//   trong code da hong/lech (vd. ai do sua CHAP_KEY ma quen doi mau),
+//   execute() se bao loi ro thay vi loi giai ma chung chung. Luu y:
+//   tripwire nay KHONG phat hien site xoay key ngoai doi (mau + khoa
+//   deu nam cung trong code); xoay key that chi phat hien duoc qua
+//   case gfncgd.js trong health.json (probe kiem chuoi key trong file
+//   JS cua site). Tao mau moi bang Node crypto:
+//     node -e "var c=require('crypto');var k=Buffer.from('<KEY MOI>');var x=c.createCipheriv('aes-128-cbc',k,Buffer.alloc(16));console.log(Buffer.concat([x.update('novels-key-check-v1'),x.final()]).toString('base64'))"
+//   roi kiem tra giai ma nguoc bang decryptChapter truoc khi thay vao.
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
@@ -28,6 +39,21 @@ load('fetch-helpers.js');
 
 // Key giai ma chuong — co dinh toan site (xem ghi chu o dau file).
 var CHAP_KEY = "WZc0cbzgY3lhz3X6";
+
+// Tripwire CHAP_KEY (v4, muc C1 — tuong tu verifyMasterKey cua lacatruyen):
+// KEY_CHECK_CIPHER = AES-128-CBC(CHAP_KEY, IV 0, "novels-key-check-v1"),
+// tao bang Node crypto, da kiem chung giai nguoc bang decryptChapter
+// trong chinh file nay (MATCH=true; khoa sai tra rac, MATCH=false).
+var KEY_CHECK_PLAIN = "novels-key-check-v1";
+var KEY_CHECK_CIPHER = "1WnREnkVBZVTezmpt6DIIt4GSd5skxz5ZQqORhF9jcc=";
+
+function verifyChapKey() {
+    try {
+        return decryptChapter(KEY_CHECK_CIPHER) === KEY_CHECK_PLAIN;
+    } catch (e) {
+        return false;
+    }
+}
 
 // --- GF(2^8) --------------------------------------------------------------
 function gfMul(a, b) {
@@ -246,6 +272,15 @@ function decryptChapter(blob) {
     var pt = aesCbcDecrypt(ct, keyBytes(CHAP_KEY));
     var text = utf8Decode(pt);
     // Strip byte rac \x01-\x10 va \r o cuoi (site de lai sau padding).
+    // GHI CHU (v4, muc C2 — giu nguyen theo de xuat review, khong thu hep):
+    // regex chay tren chuoi DA giai ma UTF-8 nen chi khop ky tu dieu khien
+    // U+0001-U+0010/\r o cuoi; noi dung chuong that (chu Han, chu Latin,
+    // so, dau cau) khong the ket thuc bang cac ky tu nay — byte cuoi cua
+    // mot ky tu UTF-8 nhieu byte luon la byte tiep tuc 0x80-0xBF, ky tu
+    // ASCII in duoc bat dau tu 0x20. Neu mot chuong nao bi mat ky tu cuoi
+    // thi kiem tra cho nay dau tien. Khong bo regex: sau khi
+    // aesCbcDecrypt strip padding PKCS#7 hop le, site van co the de lai
+    // byte rac \x01-\x10 giua noi dung va padding (khao sat 2026-11-06).
     text = text.replace(/[\x01-\x10\r]+$/, "");
     return text;
 }
@@ -308,7 +343,13 @@ function execute(url) {
     }
 
     var html = decryptChapter(blob);
-    if (!html) return Response.error("Không giải mã được nội dung chương: " + url);
+    if (!html) {
+        // Khoa trong code hong/lech thi bao ro nguyen nhan thay vi loi chung.
+        // (Trang 1 giai ma duoc thi khoa con dung — loi o trang sau khong
+        // the do khoa xoay, nen chi kiem tra tripwire o day.)
+        if (!verifyChapKey()) return Response.error("Khóa giải mã của 繁體小說 đã thay đổi, extension cần được cập nhật: " + url);
+        return Response.error("Không giải mã được nội dung chương: " + url);
+    }
 
     // Fetch + giai ma cac trang con lai, noi vao.
     var pi = 0;
