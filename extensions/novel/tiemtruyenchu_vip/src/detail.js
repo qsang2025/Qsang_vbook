@@ -74,12 +74,55 @@ function execute(url) {
 
             var detailText = "Tên truyện: " + name
                 + "<br>Tác giả: " + author
+                + (story.uploader && story.uploader.display_name ? "<br>Người đăng: " + story.uploader.display_name : "")
                 + "<br>Thể loại: " + categoryText
                 + "<br>Trạng thái: " + statusText
                 + "<br>Số chương: " + totalChaps;
+            if (story.views) detailText += "<br>Lượt xem: " + story.views;
+            if (story.follows) detailText += "<br>Theo dõi: " + story.follows;
+            if (story.avg_rating) detailText += "<br>Đánh giá: " + story.avg_rating + " ⭐ (" + (story.rating_count || 0) + " đánh giá)";
 
             var desc = cleanText(story.description || "").replace(/\n/g, "<br>");
             if (!desc) desc = "Chưa có giới thiệu.";
+
+            var commentConfig = {
+                title: "Bình luận",
+                input: String(storyId),
+                script: "comment.js"
+            };
+
+            var comments = [];
+            try {
+                var cJson = fetchJson(BASE_URL + "/api/v1/stories/" + storyId + "/comments?page=1");
+                if (cJson && cJson.items && cJson.items.length > 0) {
+                    for (var ci = 0; ci < cJson.items.length; ci++) {
+                        var cItem = cJson.items[ci];
+                        var uName = cItem.display_name || cItem.username || "Thành viên";
+                        var uAva = cItem.avatar || "";
+                        if (uAva && uAva.indexOf("http") !== 0) {
+                            uAva = BASE_URL + (uAva.charAt(0) === "/" ? "" : "/") + uAva;
+                        }
+                        var cDesc = cItem.created_at ? cItem.created_at.substring(0, 10) : "";
+                        if (cItem.likes && cItem.likes > 0) {
+                            cDesc += (cDesc ? " • " : "") + cItem.likes + " thích";
+                        }
+                        var cContent = cItem.content || "";
+                        if (cItem.replies && cItem.replies.length > 0) {
+                            for (var ri = 0; ri < cItem.replies.length; ri++) {
+                                var rep = cItem.replies[ri];
+                                var rName = rep.display_name || rep.username || "Thành viên";
+                                cContent += "\n↪ " + rName + ": " + (rep.content || "");
+                            }
+                        }
+                        comments.push({
+                            name: uName,
+                            content: cContent,
+                            avatar: uAva,
+                            description: cDesc
+                        });
+                    }
+                }
+            } catch (eC) {}
 
             return Response.success({
                 name: name,
@@ -92,7 +135,9 @@ function execute(url) {
                 type: "novel",
                 format: "novel",
                 genres: genres,
-                host: BASE_URL
+                host: BASE_URL,
+                comment: commentConfig,
+                comments: comments
             });
         }
     }
@@ -141,6 +186,15 @@ function execute(url) {
         htmlStatus = "Đang ra";
     }
 
+    var htmlCommentConfig = null;
+    if (storyId) {
+        htmlCommentConfig = {
+            title: "Bình luận",
+            input: String(storyId),
+            script: "comment.js"
+        };
+    }
+
     return Response.success({
         name: htmlName,
         url: targetUrl,
@@ -151,6 +205,7 @@ function execute(url) {
         ongoing: htmlOngoing,
         type: "novel",
         format: "novel",
-        host: BASE_URL
+        host: BASE_URL,
+        comment: htmlCommentConfig
     });
 }
