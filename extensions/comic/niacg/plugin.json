@@ -5,12 +5,11 @@
       "mode": "select",
       "title": "Domain",
       "values": [
-        "https://www.niacg.com",
-        "https://www.xpicvid.com"
+        "https://www.niacg.com"
       ]
     },
     "MIRRORS": {
-      "default": "https://www.xpicvid.com",
+      "default": "",
       "format": "text",
       "mode": "input",
       "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
@@ -18,15 +17,15 @@
   },
   "metadata": {
     "author": "Qsang",
-    "description": "NiACG (Xpicvid / 逆次元) — gallery ảnh ACG: COS, CG, 本子, 套图, 日漫, 韩漫. Nội dung 18+ (NSFW). Mỗi tác phẩm là một bộ ảnh, đọc full qua trang moeupup; riêng 日漫/韩漫 có dạng series nhiều chương.",
+    "description": "NiACG (Xpicvid / 逆次元) — gallery ảnh ACG: COS, CG, 本子, 套图, 日漫, 韩漫. Nội dung 18+ (NSFW). Mỗi tác phẩm là một bộ ảnh, đọc full qua trang moeupup; riêng 日漫/韩漫 có dạng series nhiều chương. Lưu ý: xpicvid.com hiện chỉ redirect 301 về niacg.com, không phải mirror dự phòng độc lập.",
     "language": "javascript",
     "locale": "zh_CN",
     "name": "NiACG",
     "nsfw": true,
-    "regexp": "^https://(www\\.niacg\\.com|www\\.xpicvid\\.com)/(moehome-(1|2|3|4|9|12|14|15|22)-[0-9]+\\.html|moeupup-(1|2|3|4|9|12|14|15|22)-[0-9]+\\.html|showinfo-(1|2|3|4|9|12|14|15|16|22)-[0-9]+-0\\.html)$",
+    "regexp": "^https://(www\\.niacg\\.com|www\\.xpicvid\\.com)/(moehome-\\d+-[0-9]+\\.html|moeupup-\\d+-[0-9]+\\.html|showinfo-\\d+-[0-9]+-0\\.html)$",
     "source": "https://www.niacg.com",
     "type": "comic",
-    "version": 3
+    "version": 4
   },
   "script": {
     "book": "book.js",

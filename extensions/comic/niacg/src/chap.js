@@ -34,6 +34,18 @@ load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
 
+// Loc anh noi dung theo chuoi cung (whitelist host + blacklist quang cao /
+// giao dien). Ghi chu bao tri (review 2026-11-08, kiem chung lai 2026-11-09):
+// neu chap tra 0 anh tren gallery van hien binh thuong tren web thi kiem
+// tra ham nay DAU TIEN — site doi CDN anh la moi anh bi loc het. Host noi
+// dung da kiem chung: boom.xunge.cyou (gallery, /hen/...) va
+// comic.xunge.cyou (manga, /m1morepic/...); gamezy.xunge.cyou chi phuc vu
+// icon muc /min/slt/ (da loai) nen chua lot anh quang cao nao qua day.
+// Domain quang cao thay tren trang doc 2026-11-09: a.chmsrv.com,
+// a.realsrv.com, cat.zhen.si (da chan), 02.uno, afengy.com,
+// wankubaoai.xyz, yyai.ink, b.2cy.in — cac domain nay khong xuat hien
+// trong the <img> tren trang doc nen tam chua can them vao blacklist;
+// neu chung xuat hien trong <img> thi them vao day.
 function isContentImage(src) {
     if (!src) return false;
     if (src.indexOf("imgloading") !== -1) return false;

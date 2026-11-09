@@ -1,8 +1,12 @@
 # NiACG — extension gallery ảnh ACG (comic)
 
 - **Nguồn:** https://www.niacg.com/ (thương hiệu **Xpicvid**, tiền thân 逆次元 / 逆ACG)
-- **Mirror:** https://www.xpicvid.com/ (cùng site, cùng nội dung)
-- **Loại:** `comic` (gallery ảnh) · **Locale:** `zh_CN` · **Version:** 2
+- **Mirror:** không có mirror độc lập. `xpicvid.com` (từng là mirror) kiểm chứng
+  bằng curl ngày 2026-11-09 chỉ trả **301 về `niacg.com`** (cả trang chủ và trang
+  chi tiết) nên đã bỏ khỏi danh sách failover từ v4; `suacg.com` cũng 301 về
+  `niacg.com`. Link cũ `xpicvid.com` vẫn route được (giữ trong regexp) và
+  `normalizeUrl()` viết lại host về domain chính.
+- **Loại:** `comic` (gallery ảnh) · **Locale:** `zh_CN` · **Version:** 4
 - **Nội dung:** COS, CG, 本子 (doujinshi), 套图 (bộ ảnh), 日漫, 韩漫, 最新, 画廊, 漫画
 - **⚠️ Nội dung 18+ (NSFW):** toàn site là nội dung người lớn (doujinshi H, manga H, COS gợi cảm). Manifest gắn `nsfw: true` và registry gốc giữ cờ này (quyết định của Anh 2026-11-07: giữ trong catalog chung, có cờ nsfw).
 
@@ -89,6 +93,15 @@ video riêng (ví dụ `niacg-video`). Item video bị lọc khỏi kết quả 
 - **CDN ảnh/video `*.xunge.cyou` bắt buộc `Referer: https://www.niacg.com/`**
   (thiếu → 403). App tự gửi Referer = URL trang chi tiết / chương (cùng
   domain niacg.com) khi tải ảnh bìa và ảnh chương nên đủ điều kiện.
+  Kiểm chứng bằng curl 2026-11-09 trên ảnh thật `boom.xunge.cyou`: không
+  Referer → 403, Referer origin `https://www.niacg.com/` → 200, Referer
+  URL chương đầy đủ → 200, Referer origin lạ → 403. Vì vậy fragment
+  `#referrerpolicy=origin` mà `chap.js` gắn vào URL ảnh là đúng hướng —
+  nhưng **việc app có tôn trọng fragment đó khi tải ảnh hay không vẫn chưa
+  được kiểm chứng bằng mắt trong app**: lần tới Anh mở 1 gallery trong app
+  thì xác nhận ảnh có hiện không. Nếu ảnh không hiện thì bỏ fragment này
+  đi và quay về Referer mặc định của app (URL chương) — cách cũ đã từng
+  chạy được.
 
 ## Lưu ý bảo trì
 
@@ -112,13 +125,40 @@ video riêng (ví dụ `niacg-video`). Item video bị lọc khỏi kết quả 
   mục lục).
 - Ảnh bìa trong danh sách dùng `data-src`; nếu site bỏ lazy-load thì
   `coverOf()` trong `helper.js` sẽ tự fallback sang `src`.
-- Mirror `xpicvid.com` có thể đổi nội dung/đổi chủ; `fetchDocWithFallback()`
-  trong `helper.js` thử domain chính trước rồi mới thử mirror (qua
-  `fetchWithFallback()` trong `fetch-helpers.js`); kiểm tra lại khi
-  chuyển sang mirror.
+- Mirror `xpicvid.com` KHÔNG còn là mirror độc lập (301 về domain chính,
+  kiểm chứng 2026-11-09) nên đã bỏ khỏi failover từ v4; `fetchDocWithFallback()`
+  chỉ thử domain chính trừ khi người dùng nhập mirror khác vào config
+  MIRRORS. Kiểm tra lại khi có domain dự phòng mới.
+- `regexp` trong manifest từ v4 khớp classid dạng số chung (`\d+`) thay vì
+  liệt kê — site thêm mục ảnh mới thì link tự route được. Các mục ngoài
+  danh sách mục ảnh đã kiểm chứng 2026-11-09 và KHÔNG phải gallery ảnh:
+  5 (game download), 6 帖子 (bài forum), 11 (trang tổng hợp), 10 福利
+  (trang tổng hợp trỏ về showinfo-5/11); 19/20/21/23 là video — link
+  showinfo video có route qua regexp nhưng chap sẽ báo lỗi rõ ràng vì
+  không có ảnh nội dung, search vẫn lọc bỏ item video.
+- Nếu `chap.js` trả 0 ảnh trên gallery vẫn hiển thị bình thường trên web
+  thì kiểm tra `isContentImage()` trong `chap.js` ĐẦU TIÊN (xem ghi chú
+  trong code): site đổi CDN ảnh hoặc thêm domain quảng cáo mới là điểm
+  gãy đầu tiên. Host nội dung đã kiểm chứng 2026-11-09: `boom.xunge.cyou`
+  (gallery) và `comic.xunge.cyou` (manga).
 
 ## Lịch sử phiên bản
 
+- **v4 (2026-11-09):** theo báo cáo review 2026-11-08. N1: bỏ mirror giả
+  xpicvid.com khỏi failover (curl: 301 về niacg.com, cả trang chủ lẫn chi
+  tiết; suacg.com cũng 301) — MIRRORS mặc định rỗng, DOMAIN chỉ còn
+  niacg.com, giữ xpicvid trong regexp cho link cũ; ghi chú rõ trong README
+  + description. C1: regexp nới thành classid số chung (`\d+`) cho
+  moehome/moeupup/showinfo; đã kiểm chứng các class ngoài danh sách
+  (5/6/10/11 không phải gallery ảnh, 19/20/21/23 là video). C2: không đổi
+  bộ lọc ảnh (theo đề xuất báo cáo) — thêm ghi chú chẩn đoán trong
+  `chap.js` + README (host nội dung đã kiểm chứng: boom/comic.xunge.cyou).
+  N3: không sửa code — kiểm chứng bằng curl ảnh thật cần Referer origin
+  (không Referer → 403, origin → 200); hiển thị trong app vẫn cần Anh
+  kiểm tra bằng mắt. N2 đã làm ở bước chung trước đó (đồng bộ
+  fetch-helpers.js, md5 khớp lib/).
+- **v3 (2026-11-08):** đồng bộ `src/fetch-helpers.js` = `lib/fetch-helpers.js`
+  (bước chung — thêm phát hiện challenge HTTP 200).
 - **v2 (2026-11-07):** sửa lỗi toc series (lấy chương thật từ
   `<div class="episode">` → showinfo-16, tên thật, đảo thứ tự cũ→mới;
   v1 đọc nhầm carousel tác phẩm liên quan và đặt tên giả "Chương N").
