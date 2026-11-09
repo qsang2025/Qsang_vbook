@@ -1,0 +1,3 @@
+- [x] 2026-11-09: Hoàn thành Cụm bước 1 (Init, plugin.json, icon.png, config.js, crypto.js) cho Qimao extension trên nhánh feature/qimao-ag
+- [x] 2026-11-09: Hoàn thành Cụm bước 2 (home, genre, gen, search) cho Qimao extension trên nhánh feature/qimao-ag (commit be6bbe8)
+- [x] 2026-11-09: Hoàn thành Cụm bước 3 (detail, toc, chap with AES-128-CBC) cho Qimao extension trên nhánh feature/qimao-ag
