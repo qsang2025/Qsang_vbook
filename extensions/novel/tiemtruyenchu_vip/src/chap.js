@@ -3,13 +3,14 @@ load('config.js');
 load('challenge-handler.js');
 load('hanviet.js');
 
-// Bảng map ghi đè: truyện nào tên thuần Việt không chuyển được sang Hán-Việt
-// (vd. Cái Trò Chơi Này Không Thích Hợp...) thì ghi sẵn ở đây. Các truyện
-// khác tự phân giải qua chuyển tên Hán-Việt + tìm kiếm (xem hanviet.js).
+// Bảng map ghi đè: chỉ còn truyện tên thuần Việt không chuyển được sang
+// Hán-Việt (vd. Cái Trò Chơi Này Không Thích Hợp...). Hai truyện 3703
+// (Quỷ Bí Chi Chủ) và 669 (Bắt Đầu Trường Sinh...) đã bỏ khỏi map từ v5 để
+// đường tự tìm theo tên Hán-Việt được kiểm chứng thường xuyên (đã kiểm chứng
+// live: 诡秘之主 → 646492, 长生万古苟到天荒地老 → 492266); nếu tự tìm hỏng thì
+// test sẽ lộ ra thay vì bị map che mất.
 var KNOWN_UPSTREAM_STORIES = {
-    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" },
-    "3703": { bookId: "646492", title: "Quỷ Bí Chi Chủ" },
-    "669": { bookId: "492266", title: "Bắt Đầu Trường Sinh Vạn Cổ, Cẩu Đến Thiên Hoang Địa Lão" }
+    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" }
 };
 
 function parseChapterInfo(url) {
@@ -93,10 +94,15 @@ function chapterNumberFromZhTitle(t) {
 // API TTC đánh số chương (chapterNumber) lệch với số trong tiêu đề — ví dụ
 // truyện 669: API 1451 nhưng tiêu đề là "Chương 1462: Niết Bàn", và chương
 // tiếng Trung đúng cũng là 第1462章. Không có số trong tiêu đề thì dùng API.
-function displayChapterNumber(storyId, apiNum) {
+// Tham số chapters (tùy chọn): mảng chapters đã fetch sẵn (để khỏi fetch lại
+// cùng URL /api/v1/stories/{id} lần nữa — xem autoUnlockFromUpstream).
+function displayChapterNumber(storyId, apiNum, chapters) {
+    var chs = chapters || null;
     try {
-        var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
-        var chs = (sInfo && sInfo.chapters) || [];
+        if (!chs) {
+            var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
+            chs = (sInfo && sInfo.chapters) || [];
+        }
         for (var i = 0; i < chs.length; i++) {
             if (String(chs[i].chapterNumber) === String(apiNum)) {
                 var m = String(chs[i].title || "").match(/Chương\s+0*(\d+)/i);
@@ -128,12 +134,25 @@ function fetchUpstreamPage(bookId, pageNum) {
     var rawArticle = artMatch[1];
     var titleMatch = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || rawArticle.match(/<h3>([\s\S]*?)<\/h3>/i);
     var rawTitle = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").trim() : "";
-    var pMatches = rawArticle.match(/<p>([\s\S]*?)<\/p>/gi);
-    if (!pMatches || pMatches.length === 0) return null;
+    // Regex <p[^>]*> thay vì <p> cứng: site thêm attribute vào <p> thì vẫn khớp.
+    var pMatches = rawArticle.match(/<p[^>]*>([\s\S]*?)<\/p>/gi);
     var paras = [];
-    for (var i = 0; i < pMatches.length; i++) {
-        var cleanP = pMatches[i].replace(/<[^>]+>/g, "").trim();
-        if (cleanP) paras.push(cleanP);
+    if (!pMatches || pMatches.length === 0) {
+        // Fallback: parse DOM thật thay vì regex, phòng khi markup đổi.
+        try {
+            var pDoc = Html.parse(html);
+            var pEls = pDoc.select("article.page-content p");
+            for (var j = 0; j < pEls.size(); j++) {
+                var t = pEls.get(j).text();
+                if (t && String(t).trim()) paras.push(String(t).trim());
+            }
+        } catch (eP) {}
+        if (paras.length === 0) return null;
+    } else {
+        for (var i = 0; i < pMatches.length; i++) {
+            var cleanP = pMatches[i].replace(/<[^>]+>/g, "").trim();
+            if (cleanP) paras.push(cleanP);
+        }
     }
     if (paras.length === 0) return null;
     return { title: rawTitle, h1Num: chapterNumberFromZhTitle(rawTitle), paras: paras };
@@ -143,9 +162,11 @@ function autoUnlockFromUpstream(storyId, chapNum) {
     // Phân giải sang bookId ixdzs8: bảng map cứng -> cache -> chuyển tên
     // Hán-Việt + tìm kiếm có đối chiếu tên thật (xem hanviet.js).
     var bookId = "";
+    var storyChapters = null;
     try {
         var sInfo = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
         var viTitle = (sInfo && sInfo.story && sInfo.story.title) || "";
+        if (sInfo && sInfo.chapters) storyChapters = sInfo.chapters;
         bookId = resolveUpstreamBookId(storyId, viTitle);
     } catch (eResolve) {}
 
@@ -156,7 +177,8 @@ function autoUnlockFromUpstream(storyId, chapNum) {
     // 669 lệch +16): lấy trang p{D}, đọc số chương thật trong <h1>, lệch
     // bao nhiêu thì nhảy đúng bấy nhiêu trang rồi kiểm chứng lại. Không
     // khớp được thì trả null chứ không trả nhầm chương.
-    var dispNum = displayChapterNumber(storyId, chapNum);
+    // Dùng mảng chapters đã fetch ở trên để khỏi fetch lại cùng URL lần nữa.
+    var dispNum = displayChapterNumber(storyId, chapNum, storyChapters);
     var page = fetchUpstreamPage(bookId, dispNum);
     if (!page) return null;
     if (page.h1Num !== -1 && page.h1Num !== dispNum) {
@@ -217,34 +239,65 @@ function execute(url) {
         return Response.success(formatPlainContent(pContent));
     }
 
-    // 1.5. Tuyến Native Mobile API: POST /api/v1/chapters/content kèm Bearer token
+    // 1.5. Tuyến Native Mobile API: meta lấy vipToken rồi POST content.
+    // Đọc chương VIP theo luồng của app: GET /api/v1/stories/{id}/chapters/{n}
+    // -> {canRead, vipToken, isVip, content?} rồi POST chapters/content
+    // {storyId, chapterNumber, vipToken}. Không có vipToken, server trả 200
+    // "Thiếu thông tin" thay vì nội dung (đã gặp 2026-11-08). Nếu meta nói
+    // không đọc được và không cấp vipToken thì bỏ qua tuyến này ngay để đỡ
+    // tốn 1 request, để tuyến tự mở khóa lo.
     var token = getSavedToken();
     if (token) {
+        var vipToken = "";
+        var skipMobile = false;
         try {
-            var mRes = fetch(BASE_URL + "/api/v1/chapters/content", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token,
-                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36"
-                },
-                body: JSON.stringify({
-                    storyId: parseInt(info.storyId, 10),
-                    chapterNumber: parseInt(info.chapNum, 10)
-                })
-            });
-            if (mRes && mRes.ok) {
-                var mJson = mRes.json();
-                var mContent = mJson ? (mJson.content || (mJson.data && mJson.data.content) || "") : "";
-                var mTitle = mJson ? (mJson.title || mJson.chapter_title || (mJson.data && mJson.data.title) || "") : "";
-                if (mContent && String(mContent).trim()) {
-                    if (mTitle && String(mTitle).trim()) {
-                        return Response.success(formatPlainContent(mContent), String(mTitle).trim());
+            var meta = fetchChapterMeta(info.storyId, info.chapNum, token);
+            if (meta && meta.chapter) {
+                if (meta.chapter.vipToken) vipToken = String(meta.chapter.vipToken);
+                var metaContent = meta.chapter.content || "";
+                var metaTitle = meta.chapter.title || "";
+                if (metaContent && String(metaContent).trim()) {
+                    if (metaTitle && String(metaTitle).trim()) {
+                        return Response.success(formatPlainContent(metaContent), String(metaTitle).trim());
                     }
-                    return Response.success(formatPlainContent(mContent));
+                    return Response.success(formatPlainContent(metaContent));
                 }
+                if (meta.chapter.canRead === false && !vipToken) skipMobile = true;
             }
-        } catch (eMobile) {}
+        } catch (eMeta) {}
+        if (!skipMobile) {
+            try {
+                // UA Chrome giữ nguyên cho lệnh content (chưa có bằng chứng
+                // nó bị chặn UA như endpoint meta; chỉ endpoint meta dùng
+                // UA okhttp — xem buildMetaHeaders trong config.js).
+                var mRes = fetch(BASE_URL + "/api/v1/chapters/content", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token,
+                        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36"
+                    },
+                    body: JSON.stringify({
+                        storyId: parseInt(info.storyId, 10),
+                        chapterNumber: parseInt(info.chapNum, 10),
+                        // Luôn gửi vipToken kể cả khi null (như app): thiếu
+                        // field này server trả "Thiếu thông tin".
+                        vipToken: vipToken || null
+                    })
+                });
+                if (mRes && mRes.ok) {
+                    var mJson = mRes.json();
+                    var mContent = mJson ? (mJson.content || (mJson.data && mJson.data.content) || "") : "";
+                    var mTitle = mJson ? (mJson.title || mJson.chapter_title || (mJson.data && mJson.data.title) || "") : "";
+                    if (mContent && String(mContent).trim()) {
+                        if (mTitle && String(mTitle).trim()) {
+                            return Response.success(formatPlainContent(mContent), String(mTitle).trim());
+                        }
+                        return Response.success(formatPlainContent(mContent));
+                    }
+                }
+            } catch (eMobile) {}
+        }
     }
 
     // 2. Tuyến HTML trực tiếp

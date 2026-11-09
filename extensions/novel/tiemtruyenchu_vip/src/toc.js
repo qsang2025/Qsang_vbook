@@ -54,19 +54,33 @@ function execute(url) {
             if (!ch) continue;
             var num = ch.chapterNumber || ch.chapter_number || ch.number || (j + 1);
             var chTitle = ch.title || ("Chương " + num);
-            list.push({
+            var item = {
                 name: chTitle,
                 url: BASE_URL + "/doc-truyen/" + storyId + "/chuong/" + num,
                 host: BASE_URL
-            });
+            };
+            // Đánh dấu chương VIP theo chapter_price của API (0 = miễn phí).
+            // Người dùng nhìn mục lục là biết chương nào sẽ trả tiếng Trung
+            // qua tuyến tự mở khóa (chưa mua) và chương nào trả tiếng Việt.
+            // Không có đăng nhập nên không biết chương nào tài khoản đã mua
+            // (isPurchased chỉ có khi đăng nhập) — chỉ đánh dấu theo giá.
+            var price = ch.chapter_price || ch.price || 0;
+            if (price > 0) {
+                item.lock = true;
+                item.pay = "VIP · " + price + " hoa";
+            }
+            list.push(item);
         }
         return Response.success(list);
     }
 
     // 3. Du phong cuoi: chi biet tong so chuong thi sinh 1..total (ten that
-    // chi co o chuong moi nhat).
+    // chi co o chuong moi nhat). Chi dung khi total nho (<= 50): so API lech
+    // voi so hien thi (vd. 669: API 1451 = "Chương 1462") nen danh sach sinh
+    // hàng loạt cho truyện dài có thể trỏ nhầm chương — thà báo lỗi để thử
+    // lại còn hơn trả 1.000 mục sai.
     var total = story && story.total_chapters ? parseInt(story.total_chapters, 10) : 0;
-    if (total > 0) {
+    if (total > 0 && total <= 50) {
         var latestTitle = "";
         if (story.latest_chapter && story.latest_chapter.title) {
             latestTitle = String(story.latest_chapter.title).trim();

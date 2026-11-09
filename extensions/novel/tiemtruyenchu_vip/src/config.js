@@ -174,6 +174,10 @@ function getSavedToken() {
         if (typeof localStorage !== "undefined" && localStorage) {
             var tk = localStorage.getItem("ttc_token");
             if (tk) return String(tk).trim();
+            // Dự phòng: token JWT từng lưu bởi bản chính cũ (đăng nhập OTP
+            // 2026-11-08 lưu vào ttc_jwt) — vẫn dùng được tới khi hết hạn.
+            var jwt = localStorage.getItem("ttc_jwt");
+            if (jwt) return String(jwt).trim();
         }
     } catch (e) {}
     return "";
@@ -193,13 +197,11 @@ function buildHeaders(extraCookie) {
         "Accept": "application/json, text/html, */*;q=0.8",
         "Referer": BASE_URL + "/"
     };
-    var ua = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
-    try {
-        if (typeof UserAgent !== "undefined" && UserAgent && typeof UserAgent.android === "function") {
-            ua = UserAgent.android();
-        }
-    } catch (eUa) {}
-    headers["User-Agent"] = ua;
+    // Không đặt User-Agent cứng: dùng UA mặc định của runtime để cookie
+    // cf_clearance của Cloudflare còn hiệu lực (quy tắc 10 — chưa có bằng
+    // chứng site này yêu cầu UA Chrome cho API công khai; curl không UA vẫn
+    // trả 200). Chỉ endpoint meta của Mobile API dùng UA okhttp riêng
+    // (xem buildMetaHeaders bên dưới).
     var ck = extraCookie || getSavedCookie();
     if (ck) {
         headers["Cookie"] = ck;
@@ -209,6 +211,61 @@ function buildHeaders(extraCookie) {
         headers["Authorization"] = "Bearer " + token;
     }
     return headers;
+}
+
+// Header riêng cho endpoint meta của Mobile API: không gửi Cookie (cookie cũ
+// xung đột với token mới gây 403), UA okhttp của app (endpoint meta trả 403
+// với UA trình duyệt, chỉ trả 200 với UA okhttp — kiểm chứng live 2026-11-08
+// trên nhánh v7-test). Chỉ dùng UA này cho lệnh meta, không xoay UA mặc định.
+function buildMetaHeaders(token) {
+    var headers = {
+        "Accept": "application/json",
+        "User-Agent": "okhttp/4.12.0"
+    };
+    if (token) headers["Authorization"] = "Bearer " + token;
+    return headers;
+}
+
+// Lấy meta 1 chương theo luồng của app: GET /api/v1/stories/{id}/chapters/{n}
+// + Bearer. Trả {ok, status, chapter, message}; chapter là
+// {chapterNumber, title, canRead, isVip, vipToken?, content?}.
+// Không auth/token hết hạn thì server trả 403/401 — chap.js tự fallback.
+function fetchChapterMeta(storyId, chapNum, token) {
+    var out = { ok: false, status: 0, chapter: null, message: "" };
+    var res = null;
+    try {
+        res = fetch(BASE_URL + "/api/v1/stories/" + storyId + "/chapters/" + chapNum, {
+            headers: buildMetaHeaders(token)
+        });
+    } catch (e) {
+        out.message = "Không kết nối được máy chủ.";
+        return out;
+    }
+    if (!res) {
+        out.message = "Không kết nối được máy chủ.";
+        return out;
+    }
+    out.status = res.status || 0;
+    var json = null;
+    try {
+        json = res.json();
+    } catch (eJ) {
+        try {
+            json = JSON.parse(res.text());
+        } catch (eJ2) {
+            json = null;
+        }
+    }
+    if (json && typeof json === "object") {
+        if (json.message) out.message = String(json.message);
+        else if (json.error) out.message = String(json.error);
+        var ch = json.chapter || (json.data && json.data.chapter) || null;
+        if (ch && typeof ch === "object") out.chapter = ch;
+        else if (json.canRead !== undefined || json.vipToken !== undefined || json.content !== undefined) out.chapter = json;
+    }
+    out.ok = !!res.ok && !!out.chapter;
+    if (!out.ok && !out.message) out.message = "Không lấy được thông tin chương (HTTP " + out.status + ").";
+    return out;
 }
 
 function fetchJson(url, extraCookie) {

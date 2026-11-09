@@ -70,6 +70,10 @@ function execute(url, page) {
     }
 
     // Fallback HTML neu API loi
+    // Lưu ý: selector .story-item chưa kiểm chứng từ 2026-11-08 (trang web
+    // hiện là interstitial "tải app" khi chưa đăng nhập nên fallback này gần
+    // như luôn rơi vào isInterstitialDoc). Nếu site đổi giao diện thì xóa
+    // fallback thay vì sửa mù.
     var htmlUrl = normalizeUrl(raw);
     var res = null;
     try {

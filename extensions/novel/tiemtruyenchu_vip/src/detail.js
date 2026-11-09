@@ -47,10 +47,25 @@ function execute(url) {
                 }
             }
             if (isArray(story.sub_categories)) {
+                var mainSlug = slug || "";
+                var seenSlugs = {};
+                if (mainSlug) seenSlugs[mainSlug] = true;
                 for (var i = 0; i < story.sub_categories.length; i++) {
                     var subName = categoryName(story.sub_categories[i]);
                     if (subName) {
                         catNames.push(subName);
+                        // Thể loại phụ cũng tạo chip bấm được như thể loại
+                        // chính (gửi slug); tên nào không có trong bảng slug
+                        // thì chỉ hiện trong chuỗi thể loại, không tạo chip.
+                        var subSlug = categorySlug(subName);
+                        if (subSlug && !seenSlugs[subSlug]) {
+                            seenSlugs[subSlug] = true;
+                            genres.push({
+                                title: subName,
+                                input: "stories?cat=" + subSlug,
+                                script: "gen.js"
+                            });
+                        }
                     }
                 }
             }

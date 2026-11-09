@@ -64,21 +64,10 @@
       "name": "TiemtruyenchuVIP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu_vip/plugin.zip",
-      "version": 4,
+      "version": 5,
       "source": "https://tiemtruyenchu.cloud",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu_vip/icon.png",
-      "description": "Phiên bản VIP tự động mở khóa chương cho Tiệm Truyện Chữ (tiemtruyenchu.cloud). Tự động mở khóa và tải nội dung chương VIP trọn bộ không cần đăng nhập thủ công. Chương VIP lấy từ nguồn Trung sẽ hiển thị nguyên văn tiếng Trung (không dịch máy) để tự dịch. Tự động tìm truyện gốc theo tên Hán-Việt, không cần ghi sẵn từng truyện.",
-      "type": "novel",
-      "locale": "vi_VN"
-    },
-    {
-      "name": "Tiệm Truyện Chữ",
-      "author": "MuseAi",
-      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/plugin.zip",
-      "version": 6,
-      "source": "https://tiemtruyenchu.cloud",
-      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/icon.png",
-      "description": "Đọc truyện trên Tiệm Truyện Chữ (tiemtruyenchu.cloud) qua Mobile API của app chính thức (POST /api/v1/chapters/content, JWT) — nhập tài khoản trong Cài đặt nguồn để tự lấy token; vẫn giữ fallback prefetch + cookie trình duyệt. Mục lục lấy tiêu đề chương thật từ API. (ref: ivanzzz, sonzin, Vearn)",
+      "description": "Bản gộp duy nhất cho Tiệm Truyện Chữ (tiemtruyenchu.cloud) — thay thế cả ext Tiệm Truyện Chữ v6 và bản VIP v4. Không còn đăng nhập tự động (không tài khoản/mật khẩu/OTP); chương miễn phí đọc qua prefetch + cookie, chương VIP đã mua đọc qua Mobile API với vipToken (dán token tay vào TOKEN), chương VIP chưa mua tự lấy truyện gốc tiếng Trung từ ixdzs8 hiển thị nguyên văn (không dịch máy) để tự dịch. Tự tìm truyện gốc theo tên Hán-Việt.",
       "type": "novel",
       "locale": "vi_VN"
     },

@@ -132,7 +132,7 @@ bất kỳ phần nào từ đó.
 | `clean.py` (prune site chết + viết lại registry) + `test.json` theo nguồn | lethituyen | Tooling bảo trì |
 | `repository.json` (registry-of-registries) | longvuu | Danh sách 19 registry ngoài mẫu ban đầu |
 | Tài liệu, README tutorial, hướng dẫn cài "paste URL registry thô vào VBook" | SoulGod, duongden, BaoBao | README 290 dòng làm tài liệu hợp đồng (SoulGod/duongden/BaoBao) |
-| `extensions/novel/tiemtruyenchu` (API `/api/v1/*`, browser/cookie fallback & HTML selectors) | ivanzzz (`ext_Ivan1hai`), sonzin (`vbook-extension_sonzin`), Vearn (`vbook-ext_Evamirion`) | Kết hợp Public API v1 + session fallback cho `tiemtruyenchu.cloud` |
+| `extensions/novel/tiemtruyenchu_vip` (API `/api/v1/*`, browser/cookie fallback & HTML selectors; gộp từ bản chính v6 + bản VIP v4 từ v5) | ivanzzz (`ext_Ivan1hai`), sonzin (`vbook-extension_sonzin`), Vearn (`vbook-ext_Evamirion`) | Kết hợp Public API v1 + session fallback cho `tiemtruyenchu.cloud` |
 | `extensions/novel/lacatruyen` (API `/api/stories/*`, `/api/chapters/list-chapters` & giải mã AES 2 tầng) | QuocBao (`ext-vbook-w_BaoBao666888`), ivanzzz (`ext_Ivan1hai`) | Giải mã mục lục & chương AES-256-CBC + hỗ trợ `TOKEN` & fallback `previewHtml` cho `lacatruyen.site` |
 
 ## Đóng góp
