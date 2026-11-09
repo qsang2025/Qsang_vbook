@@ -5,7 +5,13 @@
 // nhu trang the loai — xem helper.js parseSearchItem).
 // DAC BIET: tu khoa khop dung 1 truyen se redirect thang ve trang chi
 // tiet /book/{id}.html — nhan ra bang meta og:novel:book_name va tra
-// ve 1 item duy nhat lay tu OG meta.
+// ve 1 item duy nhat lay tu OG meta. Dieu kien kich hoat (kiem chung live
+// 2026-11-09): site redirect khi tu khoa KHOP CHINH XAC ten 1 truyen
+// (vd "夜無疆" -> /book/671.html, "聖墟" -> /book/12067.html); tim theo
+// tac gia ("辰東") hay tu khoa mo thi tra trang ket qua binh thuong,
+// khong co meta og:novel:book_name nen khong vao nhanh nay. Item tra ve
+// la truyen duy nhat site redirect toi — dung ket qua tot nhat theo site,
+// khong phai lua chon cua extension.
 // Phan trang: nut ke la <a class="next"> (chu ">"); token trang ke tra
 // ve la PATH cua link ke, luot sau nhan page bat dau bang "/" thi fetch
 // thang path do.
@@ -35,7 +41,9 @@ function execute(query, page) {
     var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được kết quả tìm kiếm: " + url);
 
-    // Redirect ve trang chi tiet (tu khoa khop dung 1 truyen):
+    // Redirect ve trang chi tiet (site chi redirect khi tu khoa khop chinh
+    // xac ten 1 truyen — da kiem chung live: "夜無疆", "聖墟" redirect,
+    // "辰東" thi khong):
     // trang detail co meta og:novel:book_name, trang ket qua thi khong.
     var ogName = doc.select('meta[property="og:novel:book_name"]').first();
     if (ogName !== null) {

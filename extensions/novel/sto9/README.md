@@ -45,13 +45,18 @@ Khảo sát ngày 2026-11-07 (kiểm chứng live bằng curl từ VM):
   fragment `<ul>` đủ 873 `<li data-num="1..873">`). `toc.js` fetch endpoint
   AJAX này; trang index chỉ làm fallback. ID chương là số mờ
   (83151 cho chương 1) — KHÔNG sort theo số trong URL, giữ đúng thứ tự DOM.
-  Không cần `page.js`.
+  `toc.js` lọc bỏ mục ghi chú của tác giả không phải chương (cảm ơn /
+  nghỉ / xin phép / xin phiếu /抽獎 /感言 / sách mới — chỉ lọc mục không
+  đánh số "第…章", mục 番外/終章/後記… luôn giữ). Không cần `page.js`.
 - Chương: `/txt/{id}/{cid}.html` — tiêu đề `div.txtnav > h1`; nội dung là
   text node trực tiếp trong `div.txtnav`, đoạn cách nhau `<br /><br />`,
   thụt đầu dòng `&emsp;&emsp;`, KHÔNG có thẻ `<p>`. `chap.js` bỏ h1 +
   div quảng cáo (`div.txtright`, `div.txtad`, `div.txtcenter`) và lọc
-  3 dòng rác: "🍍sto9.com提醒您查看最新內容", "(還有更新耶)",
-  "閱讀更多內容，盡在𝐬𝐭𝐨𝟗.𝐜𝐨𝐦". Không chia nhiều trang chương
+  dòng quảng cáo theo tên miền: chuẩn hóa đoạn (bỏ ký tự không phải
+  chữ/số, loại cả emoji chèn giữa "st☕o9"/"sto9🍀.com") rồi tìm "sto9" /
+  "o9com" — câu quảng cáo đổi liên tục nhưng đoạn nào cũng chứa tên miền;
+  3 chuỗi cũ ("提醒您查看最新內容", "(還有更新耶)", "閱讀更多內容")
+  giữ lại làm phòng thủ thêm. Không chia nhiều trang chương
   (không có link 下一页 / 下一頁 trên trang chương — chỉ có 下一章
   là chương kế — nên `chap.js` không có nhánh theo trang phụ).
 - Danh sách thể loại: `/novels/class/{id}_{page}.html`, item
