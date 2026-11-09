@@ -1,0 +1,60 @@
+{
+  "cases": [
+    {
+      "script": "home.js",
+      "input": "",
+      "expect": {
+        "contains": ["男频人气", "女频人气"],
+        "minItems": 6
+      }
+    },
+    {
+      "script": "genre.js",
+      "input": "",
+      "expect": {
+        "contains": ["男 · 历史", "女 · 现代言情"],
+        "minItems": 50
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "剑来",
+      "expect": {
+        "contains": ["剑来", "烽火戏诸侯"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://www.qimao.com/shuku/1803136/",
+      "expect": {
+        "contains": ["第一凤女", "十二妖"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://www.qimao.com/shuku/1803136/",
+      "expect": {
+        "contains": ["卑贱庶子才是她的亲生孩子"],
+        "minItems": 1000
+      }
+    },
+    {
+      "script": "chap.js",
+      "input": "https://www.qimao.com/shuku/1803136/17084124930001/",
+      "expect": {
+        "contains": ["时安夏醒来后"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "gen.js",
+      "input": "0-a-a-a-a-a-a-click",
+      "expect": {
+        "minItems": 5
+      }
+    }
+  ],
+  "note": "Golden fixture cho 七猫免费小说 (qimao.com, khao sat 2026-11-09). Truyen mau 第一凤女 (id 1803136, tac gia 十二妖, 全本 1130 chuong): detail/toc dung URL that, toc 1130 chuong lay tu Native API api-ks.wtzw.com, chap 1 (17084124930001) giai ma AES-128-CBC ra text bat dau '时安夏醒来后'. Search '剑来' tra ket qua co dau sach 剑来 cua Phong Hoa Hi Chu Hau (id 143170). Genre 122 the loai; home 6 tab tinh. Type chinese_novel, locale zh_CN."
+}

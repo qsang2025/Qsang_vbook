@@ -107,12 +107,12 @@ Xây dựng hoàn chỉnh extension vBook nguồn truyện chữ tiếng Trung *
 
 ## 5. Tiêu chí Hoàn thành (Definition of Done)
 
-- [ ] Nhánh git hiện tại là `feature/qimao-ag`.
-- [ ] Cấu trúc thư mục `extensions/chinese_novel/qimao/` đầy đủ 6 script + `config.js` + `crypto.js` + `icon.png` + `test.json` + `health.json` + `plugin.zip` + `README.md`.
-- [ ] `plugin.json` có `"author": "MuseAi"`, `"version": 1`.
-- [ ] `node scripts/cli.js validate` trả về **PASS (0 cảnh báo)**.
-- [ ] `node scripts/cli.js build-catalog --check` khớp 100%.
-- [ ] Tiến độ được ghi lại đầy đủ trong file này.
+- [x] Nhánh git hiện tại là `feature/qimao-ag`.
+- [x] Cấu trúc thư mục `extensions/chinese_novel/qimao/` đầy đủ 6 script + `config.js` + `crypto.js` + `icon.png` + `test.json` + `health.json` + `plugin.zip` + `README.md`.
+- [x] `plugin.json` có `"author": "MuseAi"`, `"version": 1`.
+- [x] `node scripts/cli.js validate` trả về **PASS (0 cảnh báo)**.
+- [x] `node scripts/cli.js build-catalog --check` khớp 100%.
+- [x] Tiến độ được ghi lại đầy đủ trong file này.
 
 ---
 
@@ -124,6 +124,7 @@ Xây dựng hoàn chỉnh extension vBook nguồn truyện chữ tiếng Trung *
 - **2026-11-09 (Cluster 1)**: Hoàn thành Step 0, Step 1, Step 2. Đã commit Plan trên branch `feature/qimao-ag`. Đã khởi tạo thư mục `extensions/chinese_novel/qimao/`, tạo `plugin.json` chuẩn (`author: "MuseAi"`, `version: 1`), sao chép `icon.png` chính thức, tạo `src/config.js` chuẩn (không có `load()`, hỗ trợ `signQuery` & `buildHeaders`), và inline `src/crypto.js` từ `lib/crypto.js`. Đã kiểm định linter Rhino ES6 sạch 0 lỗi.
 - **2026-11-09 (Cluster 2)**: Hoàn thành Step 3, Step 4, Step 5. Đã triển khai đầy đủ `src/home.js` (6 tab tĩnh: Nam sinh, Nữ sinh, Mới cập nhật, Xuất bản), `src/genre.js` (122 thể loại Nam/Nữ/Xuất bản trích xuất từ NUXT categories chính thức), `src/gen.js` (phân trang danh mục chuẩn từ thư viện web `qimao.com/shuku/`, bóc tách sách sạch, hỗ trợ phân trang `next`), và `src/search.js` (tích hợp Native App API v7, ký `signQuery` MD5, lọc bỏ show_type lạ, bóc tách sách, hỗ trợ phân trang). Đã kiểm thử độc lập thành công trong sandbox tương thích Rhino ES6, linter 0 cảnh báo.
 - **2026-11-09 (Cluster 3)**: Hoàn thành Step 6, Step 7, Step 8. Đã triển khai đầy đủ `src/detail.js` (lấy chi tiết truyện sạch từ Native API v5 `api-bc.wtzw.com`, ánh xạ đầy đủ tên, tác giả, ảnh bìa, tóm tắt, trạng thái ongoing, thể loại/số chữ), `src/toc.js` (lấy toàn bộ mục lục chương thật qua API v1 `api-ks.wtzw.com`, trích xuất ID chương thật dạng 17084124930001, test book 1803136 đạt 1.130 chương, book 143170 đạt 1.279 chương), và `src/chap.js` (giải mã AES-128-CBC với key `32343263636238323330643730396531`, IV lấy từ 32 ký tự Hex đầu, xử lý sạch sẽ đoạn văn bọc `<p>...</p>`, loại bỏ rác/quảng cáo, bắt lỗi và thông báo tiếng Việt khi cần mở khóa VIP). Kiểm thử sandbox độc lập chạy trơn tru cả 2 đầu sách mẫu, linter Rhino ES6 sạch 0 cảnh báo.
+- **2026-11-09 (Cluster 4)**: Hoàn thành Step 9, Step 10, Step 11. Đã tạo `test.json` (Golden fixture 7 case cho toàn bộ script dựa trên dữ liệu thật của 第一凤女 và 剑来), tạo `health.json` (CI probe nhẹ 3 case kiểm tra domain qimao.com và danh mục), chạy build `plugin.zip` tự động (30.752 bytes), cập nhật registry `plugin.json` ở root repo (19 nguồn), kiểm định `validate` đạt PASS tuyệt đối (0 cảnh báo), `build-catalog --check` khớp 100% với đĩa. Đã soạn thảo tài liệu kỹ thuật chuyên sâu và ý tưởng sáng tạo trong `extensions/chinese_novel/qimao/README.md` (giải trình MD5 signing, AES-128-CBC dynamic IV, cơ chế fallback kho raw mở cho chương VIP/khóa, cơ chế failover mirror, và phân tích các rào cản kỹ thuật). Sẵn sàng đẩy code lên remote branch `feature/qimao-ag`.
 
 ---
 

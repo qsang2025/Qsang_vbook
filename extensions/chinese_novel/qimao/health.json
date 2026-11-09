@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "url": "https://www.qimao.com/",
+      "pattern": "七猫"
+    },
+    {
+      "name": "Trang chi tiết truyện 第一凤女",
+      "url": "https://www.qimao.com/shuku/1803136/",
+      "pattern": "第一凤女"
+    },
+    {
+      "name": "Thư viện danh mục web",
+      "url": "https://www.qimao.com/shuku/0-a-a-a-a-a-a-click-1/",
+      "pattern": "qm-cover-text-item"
+    }
+  ]
+}
