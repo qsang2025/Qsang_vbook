@@ -11,6 +11,13 @@
 //   /{id}/{cid}_{k+1}.html (vd _2.html…_5.html; _1 khong ton tai, trang
 //   dau la .html goc); "下一章" -> href /{id}/end.html la SENTINEL GIA —
 //   DUNG, KHONG fetch no. chap.js loop toi da 10 trang con, noi du noi dung.
+//   GIOI HAN TRANG CON (kiem chung live 2026-11-09, C1): mau 49 chuong rai
+//   khap 《大道主》 (3094 chuong) co toi da 5 trang con/chuong; chuong 3094
+//   di het chuoi 1/5 -> 5/5 roi pager doi thanh "下一章" -> /{id}/end.html
+//   (sentinel, dung). Cap 10 la luoi an toan gap doi so lon nhat quan sat
+//   duoc; neu site tra vong lap vo han thi loop van dung o 10 (co log canh
+//   bao) chu khong treo. Neu chuong nao vuot 10 trang thi noi dung tra ve
+//   se thieu phan sau — can tang cap khi gap truong hop do.
 // - Loc rac trong #content theo NOI DUNG (khong theo so luong co dinh):
 //   bo <p> dau tien (DMCA "如果此书侵犯了您的权益…") va cac dong cuoi:
 //   "小主子，这个章节后面还有哦 ^.^，请点击下一页继续阅读，后面更精彩！",
@@ -111,6 +118,11 @@ function execute(url) {
         var nm = nextHref.match(/\/(\d+)\/(\d+)_(\d+)\.html$/);
         if (!nm) break;
         pageUrl = absUrl(nextHref);
+    }
+    // Canh bao neu dung cap 10 ma van con "下一页" (chuong dai hon cap):
+    // noi dung tra ve se thieu phan sau — can tang cap neu gap.
+    if (k > 10 && typeof nextText !== "undefined" && nextText.indexOf("下一页") !== -1) {
+        console.log("chap.js: chuong " + url + " vuot qua cap 10 trang con, noi dung co the thieu");
     }
 
     if (!fullHtml) return Response.error("Không đọc được nội dung chương: " + url);

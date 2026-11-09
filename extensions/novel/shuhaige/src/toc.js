@@ -11,6 +11,14 @@
 // thu tu DOM ([12 chuong moi giam dan] + [toan bo tang dan]), dedupe GIU
 // LAN XUAT HIEN CUOI (quet nguoc tu cuoi len roi dao lai) — phan duoi
 // trang la danh sach day du tang dan nen ket qua dung thu tu chuong 1..N.
+// KIEM CHUNG LIVE 2026-11-09 (C2): TOC la 1 <dl> duy nhat voi 2 <dt>:
+// dt[0] "…的结局" = 12 chuong moi nhat GIAM DAN (3094->3083), dt[1]
+// "…章节列表" = toan bo 3094 chuong TANG DAN (1->3094). 12 href lap lai
+// chinh la 12 chuong moi nhat (3083-3094), xuat hien o dau (giam dan)
+// roi lap lai o cuoi danh sach day du (tang dan). Vi vay dedupe GIU LAN
+// CUOI moi dung: giu lan dau se cho thu tu sai (3094…3083, 1…3082).
+// Neu muc luc hien sai thu tu thi kiem tra thu tu 2 khoi <dt> tren trang
+// TOC truoc — hanh vi nay phu thuoc vao thu tu DOM do.
 // Khong co chuong khoa VIP.
 // Vi du: /649/ 《大道主》 3.094 chuong, chuong 1 第1章 青蝉献身,
 // chuong cuoi 第3094章 见识 -> /649/7566186.html.
