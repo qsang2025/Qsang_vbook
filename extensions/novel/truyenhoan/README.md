@@ -17,3 +17,11 @@ Extension đọc truyện chữ tiếng Việt miễn phí từ **Truyện Hoàn
 ## Lưu ý về danh sách thể loại
 - Link thể loại thật của site có hậu tố `/hoan` (ví dụ `/truyen-tien-hiep/hoan/`), đã sửa trong extension.
 - Danh sách thể loại của site **chỉ liệt kê truyện ĐÃ HOÀN THÀNH** — đây là đặc tính của site, không phải lỗi.
+
+## Thay đổi v3 (review 2026-11-08)
+- **N1 — Xử lý Cloudflare challenge**: nối `fetch-helpers.js` + `challenge-handler.js` (copy từ `lib/`, md5 khớp) vào cả 6 script fetch qua `helper.js` mới (`fetchPageDoc()` dùng `fetchDoc`, retry 429, quét marker challenge cả khi HTTP 200, thử browser fallback; gặp challenge/login thì trả `Response.error` tiếng Việt có hướng dẫn vượt qua). KHÔNG dùng failover mirror: mã truyện khác nhau giữa 2 host nên đổi host sẽ trả nhầm truyện. Site hiện chưa bật challenge (kiểm chứng bằng curl 2026-11-09: các trang đều 200, không marker) nên đây là phòng thủ.
+- **N2 — 0 kết quả trả success rỗng**: `search.js`/`gen.js` trả `Response.success([], "")` khi fetch thành công mà 0 mục (chỉ dùng error cho lỗi mạng/HTTP/parse).
+- **N3 — Cap mục lục**: `page.js` cap an toàn 200 trang (10.000 chương); truyện dài nhất kiểm chứng live 2026-11-09 là Vạn Cổ Thần Đế 4.590 chương = 92 trang, chưa chạm cap.
+- **C1 — Ngưỡng chương**: `chap.js` đếm text thuần sau khi strip tag, dưới 10 ký tự text mới coi là rỗng (thay ngưỡng HTML thô 30 ký tự).
+- **C2 — Trạng thái detail**: giữ nguyên selector duyệt `.info > div` tìm h3 "Trạng thái" (đã kiểm chứng live 2026-11-09: `<span class="text-success">Full</span>`); nếu trạng thái sai trên truyện nào thì kiểm tra selector này đầu tiên.
+- **C3 — Regexp**: nới slug thành `[A-Za-z0-9\-_]` (chữ hoa + gạch dưới); chưa tìm được URL thật có ký tự hoa/gạch dưới trên site (slug hiện toàn chữ thường + gạch ngang) nên đây là phòng thủ.
