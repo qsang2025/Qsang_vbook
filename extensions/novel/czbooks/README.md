@@ -15,8 +15,15 @@ tại https://czbooks.net — 120k+ truyện, đọc miễn phí, không khóa V
 - **Detail:** `div.info-wrap > div.info > h1.title` (tên gồm cả 《》),
   `span.author > a`, `div.thumbnail > img`, `div.info-wrap > div.description`,
   bảng trạng thái `div.state > table` (連載狀態 / 收藏數 / 觀看數 / 更新時間 /
-  分類 `a#novel-category`). Không có trường số chương riêng — số chương =
-  đếm link TOC. Age-gate overlay `#__ageGate_overlay__` luôn hidden, không chặn.
+  分類 `a#novel-category`). Số chương = đếm link TOC ngay trong trang chi
+  tiết (`ul#chapter-list > li > a`, cùng selector với `toc.js`, không tốn
+  thêm request), hiển thị thành dòng `章節數：N` trong detail — trang chi
+  tiết không có trường số chương riêng ("共 N 章" không tồn tại, đã kiểm
+  chứng 2026-11-09). URL chi tiết có dấu `/` cuối bị site trả 404
+  (`/n/s6pbed/` → 404, `/n/s6pbed` → 200) nên `detail.js`/`toc.js`/
+  `chap.js` và link trong danh sách đều strip dấu `/` cuối của URL `/n/...`
+  trước khi fetch (xem `helper.js` `stripNovelTrailingSlash()`).
+  Age-gate overlay `#__ageGate_overlay__` luôn hidden, không chặn.
 - **TOC:** nằm ngay trong trang sách, không endpoint riêng, không phân trang
   (kể cả 1.411 chương). `ul#chapter-list > li > a[href="//czbooks.net/n/{book}/{slug}?chapterNumber={N}"]`.
   `li.volume` là tiêu đề quyển (dữ liệu quyển có lỗi sẵn trên site) — bỏ qua.
@@ -24,7 +31,10 @@ tại https://czbooks.net — 120k+ truyện, đọc miễn phí, không khóa V
   `div.chapter-detail > div.content` — chỉ text + `<br />`, không script/quảng
   cáo, đoạn tách bằng `<br /><br />`, đầu đoạn thụt 2 ký tự toàn giác.
   Không phân trang chương.
-- **Thể loại:** 25 mục hard-code trong `genre.js` (slug lệch tên hiển thị,
+- **Thể loại:** `genre.js` lấy ĐỘNG từ menu thể loại trên trang chủ
+  (`ul.site-desktop-menu`, link `//czbooks.net/c/{slug}`) — kiểm chứng
+  2026-11-09: đủ 25 mục; nếu fetch hỏng hoặc parse được < 10 mục thì
+  fallback về bảng cứng 25 mục trong `genre.js` (slug lệch tên hiển thị,
   không suy từ tên). Trang thể loại `/c/{slug}` mặc định sort 最新,
   phân trang `/c/{slug}/{page}`; sort `/new /day /week /total /finish`,
   phân trang `/c/{slug}/{sort}/{page}`. Bảng xếp hạng
