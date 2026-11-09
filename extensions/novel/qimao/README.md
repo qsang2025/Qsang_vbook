@@ -6,7 +6,8 @@ huyền huyễn, đô thị, lịch sử, khoa huyễn, v.v. Đọc nguyên văn
 
 - Tác giả extension: **MuseAi** (bản của Bẹp, nhánh `feature/qimao-muse` — làm song song
 với bản Antigravity trên nhánh riêng để so sánh sau).
-- Type: `novel`, locale `zh_CN`, version 2.
+- Type: `novel`, locale `zh_CN`, version 4 (v4, 2026-11-10: cây 122 thể loại +
+3 tab home từ bản Antigravity — xem mục "So sánh với bản Antigravity" cuối file).
 - Vòng đời đầy đủ: `home` (tab tĩnh) / `genre` / `search` / `detail` / `toc` / `chap`
 + list dùng chung `book.js`. Không có `page.js` (mục lục nằm gọn trong một response API).
 
@@ -164,15 +165,22 @@ trước khi hiển thị, dùng `original_title`/`original_author` (sạch) khi
 - Phân trang: `data.meta.next_page` (`"2"`, …; hết thì rỗng) — token trang kế là số trang
 dạng chuỗi.
 
-### Danh sách /shuku/ — 7 đoạn lọc chưa giải mã hết
+### Danh sách /shuku/ — cây lọc 9 đoạn, đã giải mã (v4, 2026-11-10)
+- URL lọc có 9 đoạn: `<kênh>-<cat1>-<cat2>-<words>-<updateTime>-<isVip>-<isOver>-<sort>-<page>/`.
+  Đoạn 1 = kênh (0 男 / 1 女 / 2 出版 / a tất cả); đoạn 2 = thể loại lớn;
+  đoạn 3 = thể loại nhỏ (a = tất cả); đoạn 7 = trạng thái (0 连载中 / 1 已完结 /
+  a tất cả); đoạn 8 = sắp xếp (click / update_time).
+- **Cây 122 thể loại** lấy từ bản Antigravity (`feature/qimao-ag`, genre.js):
+  đã kiểm chứng mẫu trên máy thật 2026-11-10 (input `1-1-278` = Nữ · Hiện đại
+  ngôn tình · Niên đại trùng sinh → 15 sách đúng thể loại; 2 mã 278=年代重生,
+  21=玄幻仙侠 khớp URL lọc Muse đã kiểm chứng từ trước). `genre.js` của Muse
+  đổi input 3 đoạn của AG thành URL đầy đủ 9 đoạn cho `book.js` (thêm
+  `-a-a-a-a-click-1/`), giữ 5 bộ lọc trạng thái đã kiểm chứng của Muse ở đầu —
+  tổng 127 mục. Chỉ kiểm chứng mẫu; thể loại nào trả rỗng thì báo lại để sửa mã.
 - Ví dụ: `a-a-a-a-a-a-0-update_time-1` (连载中), `a-a-a-a-a-a-1-click-1` (已完结),
 `1-a-a-a-2-a-0-update_time-1` (7天内更新·连载中),
 `a-4-21-1-2-a-a-click-1` (玄幻仙侠·7天内更新·30万以下),
 `a-1-278-4-3-a-1-update_time-1` (年代重生·30天内更新·100-200万字·已完结).
-- Suy đoán (chưa chắc): đoạn 7 = trạng thái (0 连载中 / 1 已完结 / a tất cả).
-Các đoạn còn lại chưa giải mã — nên `genre.js`/`home.js` **chỉ dùng URL đã kiểm chứng
-live**, không tự suy URL lọc mới. Muốn mở rộng cây thể loại thì cần mở `/shuku/` trên
-trình duyệt thật và đọc các link lọc.
 - Parser danh sách: `book.js` parse mảng sách trong `__NUXT__` state (thử các key `book_list`/`books`/
 `list`/`data_list`/… — lấy mảng đầu tiên có ≥1 object đủ `id` số + `title`) cho trang lọc `/shuku/`
 (đã kiểm chứng tên PASS; nhưng probe browser 2026-11-10 không thấy mảng nào trong 27 key trên
@@ -184,9 +192,10 @@ cùng link (số thứ hạng + tên) nên `parseBookRows` GỘP lại (tên th�
 thể nhận trang thách thức HTTP 200 thay cho trang thật; `book.js` phát hiện (meta `aliyun_waf_aa` /
 `textarea#renderData`) và thử lại qua headless browser. Bìa: `findCoverContainer` không dùng
 `.parent()` (runtime không có hàm này) mà chỉ kiểm tra img trong anchor, cộng `buildCoverMap`
-(map alt → src) điền bìa thiếu. **Bìa /shuku/ hiện chỉ 5/14 (9 rỗng)** — nguyên nhân chưa xác
-định (nghi object `__NUXT__` thiếu field bìa cho các mục sau); cần probe HTML fetch. Không phải
-hồi quy (v2 chưa từng kiểm chứng bìa).
+(map alt → src) điền bìa thiếu. **Bìa /shuku/: test 2026-11-10 trên
+`/shuku/1-1-278-a-a-a-a-click-1/` trả 15/15 bìa thật qua `__NUXT__`** (trước đó
+ghi 5/14 — gap cũ không còn tái hiện trên trang này; nếu trang khác vẫn thiếu bìa thì
+probe lại field bìa trong `__NUXT__`).
 
 ### Mirror
 - Chưa có mirror nào được kiểm chứng. Ứng viên: `wtzw.com` (梧桐中文网 — tiền thân của
@@ -223,8 +232,10 @@ hoặc một script `action` riêng, không nhét vào `chap.js`.
 7. **Dùng cổng đọc `/reader/index/{bookid}/`** làm nguồn dự phòng cho `chap.js`:
 đã kiểm tra — cũng là shell, không có `chapterData`/`chapter_list` nên **không dùng
 được** (ghi lại để khỏi thử lại).
-8. **Giải mã cây lọc `/shuku/` đầy đủ** (7 đoạn) để `genre.js` có cây thể loại thật
-thay vì 5 bộ lọc curated như hiện tại — cần mở trang lọc trên trình duyệt thật.
+8. ~~**Giải mã cây lọc `/shuku/` đầy đủ** (7 đoạn) để `genre.js` có cây thể loại thật
+thay vì 5 bộ lọc curated như hiện tại — cần mở trang lọc trên trình duyệt thật.~~ —
+**XONG v4 (2026-11-10)**: cây 122 thể loại lấy từ bản Antigravity, đã kiểm chứng
+mẫu trên máy thật (xem mục "Danh sách /shuku/" trên).
 9. **Kiểm tra font-obfuscation**: nếu `chap.js` trả text garbled, cần xác định cơ chế
 (custom webfont đổi glyph) — hướng xử lý có thể là tải font + đọc cmap, nhưng nặng
 và chưa chắc làm được trong runtime Rhino; ghi nhận là rủi ro mở, không đoán mò.
@@ -253,14 +264,22 @@ quét key hiện tại — ghi lại nếu sau này cần tối ưu).
 đã 完结; chương 492 id 48385031, 2450 chữ).
 - Health: `health.json` (trang chủ, chi tiết, danh sách, bảng xếp hạng, tìm kiếm).
 - Icon: logo thật của qimao (`cdn-front.qimao.com/.../logo.d026f02.png`, resize 200×200).
-- `validate`: **PASS, 18 nguồn, 0 cảnh báo** (2026-11-09). Zip 58.014 byte (crypto.js inline).
+- `validate`: **PASS, 18 nguồn, 0 cảnh báo** (v4, 2026-11-10). Zip 62.030 byte.
+- Kết quả test v4 trên máy thật (2026-11-10 ~01:30, HONOR PTP-AN10):
+  - genre.js: **PASS — 127 mục** (5 bộ lọc Muse + 122 thể loại AG) ✓
+  - home.js: **PASS — 10 tab** (3 cũ + 男频人气/女频人气/最新入库 + 4 xếp hạng) ✓
+  - book.js thể loại mới chưa từng test `/shuku/0-202-37-a-a-a-a-click-1/`
+    (男·玄幻奇幻·东方玄幻): **PASS — 15 mục đúng thể loại, 15/15 bìa thật** ✓
+  - install v4: code=200 ✓
+  - So sánh AG gen.js cùng URL `/shuku/1-1-278-…/`: AG 15 mục nhưng chỉ 6/15
+    bìa thật; book.js Muse 15/15 bìa thật — xem QIMAO-COMPARE.md §5.
 - Kết quả test trên máy thật (HONOR PTP-AN10, 2026-11-09 tối) — xem chi tiết ở
 `~/workspace/vbook/work/ext-review/QIMAO-MUSE-PROGRESS.md`:
   - install: code=200 ✓ (cả v1 và v2)
   - search.js `错婚四十年`: PASS — 10 kết quả, truyện đúng (10090611) có mặt, next token `"2"` ✓
   - detail.js ×2: PASS — đủ tên/tác giả/mô tả/trạng thái/chương mới nhất ✓
   - toc.js ×2: PASS — 510 + 475 chương, chương đầu/cuối khớp fixture ✓
-  - home.js: PASS (7 tab tĩnh) ✓ · genre.js: PASS (5 tab lọc) ✓
+  - home.js: PASS (10 tab tĩnh, v4) ✓ · genre.js: PASS (127 mục, v4) ✓
   - book.js: PASS (test lại 23:46 sau khi 405 hết — danh sách thật từ `__NUXT__`) ✓
   - chap.js v2: **PASS** — ch.492 (10090611-48385031): 2.077 chữ Hán, 102 đoạn
     `<p>`, mở đầu "赵秘书身后跟着两个人。" kết "你们是谁？", khớp ground truth
@@ -270,3 +289,22 @@ quét key hiện tại — ghi lại nếu sau này cần tối ưu).
     mở đầu chương) ✓ · search smoke test sau khi cài v2: PASS (code=200) ✓
   - Không gặp lại HTTP 405 trong toàn bộ test v2 (chap.js dùng API host,
     không chạm www trừ fallback).
+
+## So sánh với bản Antigravity (v4, 2026-11-10)
+
+Chi tiết đầy đủ: `~/workspace/vbook/work/ext-review/QIMAO-COMPARE.md`.
+Bản AG (`feature/qimao-ag`, tip `d6959e7`) tách từ main cũ (2026-11-08) nên
+"19 nguồn PASS" của nó gồm cả Tiệm Truyện Chữ v6 + HHKUNGFU v3 đã xóa — không
+merge nguyên trạng được. AG **chưa từng test trên máy thật** (không nối được
+dev server), nên lỗi detail của nó không bị phát hiện: **detail API v5 trả
+`data.title = "作品"`, tên thật nằm trong `data.book`** — code AG đọc sai nên
+trả tên "作品". Bản Muse giữ detail v1 (trả book phẳng, đủ field hơn).
+"6 tầng fallback VIP" của AG không có trong code (chỉ 2 ý tưởng tương lai
+trong README); mirror `api-*-backup.wtzw.com` DNS resolve nhưng HTTPS chết.
+IV "32 hex đầu" (AG) và "16 byte đầu blob" (Muse) là cùng một thứ — đã giải mã
+kiểm chứng cùng blob. **v4 áp dụng 2 ý đã kiểm chứng của AG**: cây 122 thể
+loại (genre.js 5 → 127 mục, đổi input 3 đoạn thành URL 9 đoạn cho book.js) và
+3 tab home 男频人气/女频人气/最新入库 (home 7 → 10 tab). Parser danh sách,
+chap, toc, search, detail giữ của Muse (book.js cho bìa 15/15 thật so với
+regex của AG 6/15; chap.js có fallback DES preview + DOM; search v1 phân
+trang sạch hơn v7).
