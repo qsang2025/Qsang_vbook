@@ -148,6 +148,55 @@ function execute(url) {
     detailLines.push("<b>Trạng thái:</b> " + (ongoing ? "Đang ra" : "Hoàn thành"));
     if (chapterCount > 0) detailLines.push("<b>Số chương:</b> " + chapterCount);
 
+    // Luot xem
+    var viewMatch = html.match(/class="[^"]*font-bold[^"]*truncate">([^<]+)<\/div><div[^>]*>Lượt xem<\/div>/i);
+    if (viewMatch) {
+        var views = viewMatch[1].trim();
+        if (views) detailLines.push("<b>Lượt xem:</b> " + views);
+    }
+
+    // Danh gia
+    var rateMatch = html.match(/class="[^"]*font-bold[^"]*truncate">([^<]+)<!-- -->\s*<span[^>]*>★<\/span><\/div><div[^>]*>([0-9]+)<!-- -->\s*đánh giá<\/div>/i);
+    if (rateMatch) {
+        var score = rateMatch[1].trim();
+        var votes = rateMatch[2].trim();
+        if (score && score !== "0" && votes && votes !== "0") {
+            detailLines.push("<b>Đánh giá:</b> " + score + " ⭐ (" + votes + " đánh giá)");
+        }
+    }
+
+    // StoryId dung cho API comments
+    var storyId = "";
+    var sidMatch = html.match(/"storyId"\s*:\s*"([a-f0-9\-]{36})"/i);
+    if (sidMatch) storyId = sidMatch[1];
+
+    var commentConfig = {
+        title: "Bình luận",
+        input: storyId || url,
+        script: "comment.js"
+    };
+
+    var comments = [];
+    if (storyId) {
+        try {
+            var cData = fetchJson(BASE_URL + "/api/comments?target_type=story&target_id=" + storyId + "&sort=newest&page=1&limit=10");
+            if (cData && cData.data && cData.data.length > 0) {
+                for (var ci = 0; ci < cData.data.length; ci++) {
+                    var cItem = cData.data[ci];
+                    var uName = (cItem.user && (cItem.user.username || cItem.user.name)) || "Thành viên";
+                    var uAva = (cItem.user && cItem.user.avatar_url) || "";
+                    if (uAva && uAva.indexOf("//") === 0) uAva = "https:" + uAva;
+                    comments.push({
+                        name: uName,
+                        content: cItem.content || "",
+                        avatar: uAva,
+                        description: cItem.created_at ? cItem.created_at.substring(0, 10) : ""
+                    });
+                }
+            }
+        } catch (eComments) {}
+    }
+
     return Response.success({
         name: name,
         cover: cover,
@@ -158,6 +207,8 @@ function execute(url) {
         url: url,
         type: "novel",
         format: "novel",
-        ongoing: ongoing
+        ongoing: ongoing,
+        comment: commentConfig,
+        comments: comments
     });
 }
