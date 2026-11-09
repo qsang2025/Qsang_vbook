@@ -26,6 +26,6 @@ function execute(query, page) {
     if (!json) return Response.error("Không tải được kết quả tìm kiếm: " + url);
 
     var parsed = listItems(json);
-    if (parsed.items.length === 0) return Response.error("Không tìm thấy phim nào: " + query);
+    if (parsed.items.length === 0) return Response.success([], "");
     return Response.success(parsed.items, parsed.next);
 }

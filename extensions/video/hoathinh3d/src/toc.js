@@ -33,7 +33,7 @@ function execute(url) {
             chapters.push({
                 name: ep.name || ep.slug,
                 url: detailUrl + "?ep=" + ep.slug,
-                description: multiServer ? (server.server_name || "") : (server.server_name || ""),
+                description: multiServer ? (server.server_name || "") : "",
                 lock: false,
                 pay: false
             });
