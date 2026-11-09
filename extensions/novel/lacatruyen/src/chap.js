@@ -241,5 +241,10 @@ function execute(url) {
         return Response.error(formatLoginError("La Cà Truyện", chapterUrl));
     }
 
+    // Loi cuoi: khong giai ma duoc, khong preview, khong phai banned/no_package/not_login.
+    // Neu chinh khoa MASTER_KEY da hong thi bao ro nguyen nhan thay vi loi chung chung.
+    if (!verifyMasterKey()) {
+        return Response.error("Khóa giải mã của La Cà Truyện đã thay đổi, extension cần được cập nhật.");
+    }
     return Response.error("Không thể giải mã nội dung chương truyện.");
 }

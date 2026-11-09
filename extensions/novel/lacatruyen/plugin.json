@@ -2,7 +2,7 @@
   "metadata": {
     "name": "La Cà Truyện",
     "author": "Qsang",
-    "version": 5,
+    "version": 6,
     "source": "https://lacatruyen.site",
     "regexp": "^https?://(www\\.)?lacatruyen\\.(site|com|live|homes|store|online)/story/[0-9a-zA-Z\\-]+/?$",
     "description": "Đọc truyện chữ trên La Cà Truyện (lacatruyen.site). Hỗ trợ giải mã mục lục và chương tự động; có thể cấu hình TOKEN hoặc đăng nhập trình duyệt vBook để đọc đầy đủ các chương yêu cầu đăng nhập (ref: QuocBao, ivanzzz).",
@@ -12,15 +12,10 @@
   },
   "config": {
     "DOMAIN": {
-      "title": "Domain chính",
+      "title": "Domain chính (các domain phụ .com/.live/.homes/.store/.online đều redirect về .site — kiểm chứng 2026-11-09)",
       "mode": "select",
       "values": [
-        "https://lacatruyen.site",
-        "https://lacatruyen.com",
-        "https://lacatruyen.live",
-        "https://lacatruyen.homes",
-        "https://lacatruyen.store",
-        "https://lacatruyen.online"
+        "https://lacatruyen.site"
       ],
       "default": "https://lacatruyen.site"
     },
