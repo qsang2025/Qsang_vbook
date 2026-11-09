@@ -159,8 +159,9 @@ function parseListPage(doc, currentPage) {
 
 // Lay Document, thu mirror neu domain chinh chet (dung MIRROR_LIST trong
 // config.js qua fetchWithFallback trong fetch-helpers.js). Tra ve Document
-// hoac null. Dung thay cho fetchDoc() o cac script cua extension nay de
-// mirror xpicvid.com da khai bao thuc su hoat dong (them 2026-11-07).
+// hoac null. Hien khong co mirror mac dinh (xpicvid.com chi 301 ve domain
+// chinh — xem config.js); fetchWithFallback van thu MIRRORS neu nguoi dung
+// nhap them.
 
 // Ghe so trang app (bat dau tu 1) vao URL danh sach dang
 // /listinfo-<class>-<N>.html hoac /tags-<kw>-<N>.html (site bat dau tu 0).

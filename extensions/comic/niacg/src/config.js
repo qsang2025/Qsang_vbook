@@ -8,10 +8,14 @@
 //
 // MIRRORS: danh sach mirror theo thu tu uu tien, app inject tu config
 // MIRRORS trong plugin.json duoi dang CHUOI cach nhau bang dau phay.
-// Mirror mac dinh: xpicvid.com (cung site, cung noi dung — kiem chung
-// 2026-11-07: trang chu tra ve cung tieu de va dung luong).
+// KHONG CON mirror mac dinh (2026-11-09): xpicvid.com — tung la mirror —
+// kiem chung bang curl ngay 2026-11-09 chi tra 301 ve niacg.com (ca trang
+// chu va trang chi tiet), khong co noi dung rieng nen khong phai failover
+// that; suacg.com cung 301 ve niacg.com. Khi nao co mirror doc lap that
+// thi them lai vao day + config MIRRORS trong plugin.json.
 // fetchWithFallback() trong fetch-helpers.js dung MIRROR_LIST de thu lan
-// luot cac mirror khi domain chinh chet.
+// luot cac mirror khi domain chinh chet; danh sach rong thi chi thu
+// domain chinh.
 // Chu y: DOMAIN / CONFIG_URL / MIRRORS la bien do app inject — chi duoc
 // THAM CHIEU trong try/catch, KHONG duoc khai bao var trung ten
 // (se xung dot voi bien inject). Ten noi bo dung o day la MIRROR_LIST.
@@ -61,10 +65,9 @@ function parseMirrorList(value) {
     return list;
 }
 
-// Danh sach mirror mac dinh (khop voi config MIRRORS trong plugin.json).
-var MIRROR_LIST = [
-    "https://www.xpicvid.com"
-];
+// Danh sach mirror mac dinh: rong (khong co mirror doc lap — xem ghi chu
+// o tren). Nguoi dung van co the nhap mirror vao config MIRRORS.
+var MIRROR_LIST = [];
 
 try {
     if (MIRRORS) {
@@ -91,6 +94,15 @@ try {
 // video rieng (xem README).
 //   1 COS · 2 CG · 3 本子 · 4 套图 · 9 最新 · 12 漫画 (tong hop 14+15)
 //   14 日漫 · 15 韩漫 · 22 画廊
+// Regexp trong plugin.json tu v4 khop classid dang so chung (\d+) thay vi
+// liet ke — site them muc anh moi thi link tu route duoc ma khong can doi
+// regexp. Cac muc NGOAI danh sach tren da kiem chung 2026-11-09 KHONG
+// phai gallery anh nen khong them vao day: 5 (game download), 6 帖子
+// (bai forum tong hop, trang moeupup chi co thumbnail /slthh/ cua item
+// khac), 11 (trang tong hop, tuong tu), 10 福利 (trang tong hop tro ve
+// showinfo-5/11); 19/20/21/23 la video (ngoai pham vi, search van loc
+// bo; link showinfo video co route qua regexp nhung chap se bao loi ro
+// rang vi khong co anh noi dung).
 // ---------------------------------------------------------------------------
 var IMAGE_CLASSES = [1, 2, 3, 4, 9, 12, 14, 15, 22];
 
