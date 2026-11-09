@@ -9,8 +9,14 @@ load('hanviet.js');
 // đường tự tìm theo tên Hán-Việt được kiểm chứng thường xuyên (đã kiểm chứng
 // live: 诡秘之主 → 646492, 长生万古苟到天荒地老 → 492266); nếu tự tìm hỏng thì
 // test sẽ lộ ra thay vì bị map che mất.
+// NGOẠI LỆ 2026-11-09: 3703 phải ghi lại vào map — ixdzs8 đã đổi tên hiển thị
+// của sách 646492 thành "[诡秘之主]乌鸦童话" nên đối chiếu tên thật luôn trượt
+// (không còn kết quả nào khớp ≥60%), dù nội dung chương vẫn đúng (đã kiểm chứng
+// live: p50 = 第51章, đúng nội dung "我深吸了一口气..."). Map ghi đè chính là
+// để xử lý trường hợp này.
 var KNOWN_UPSTREAM_STORIES = {
-    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" }
+    "3094": { bookId: "644862", title: "Cái Trò Chơi Này Không Thích Hợp, Ta Đào Quáng Thành Thần!" },
+    "3703": { bookId: "646492", title: "Quỷ Bí Chi Chủ" }
 };
 
 function parseChapterInfo(url) {

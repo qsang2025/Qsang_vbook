@@ -31,6 +31,28 @@ function execute(url) {
                     }
                 }
                 if (list.length > 0) {
+                    // Gắn thêm dấu VIP từ Public API (chapter_price): nhánh HTML
+                    // dùng href thật trên trang nên URL luôn đúng số hiển thị
+                    // (API có thể lệch số hiển thị, vd. 669: API 1451 = "Chương
+                    // 1462"), nhưng HTML không có giá. Gộp theo THỨ TỰ: cả hai
+                    // danh sách đều là toàn bộ chương xếp tăng dần từ chương 1
+                    // nên mục thứ i của HTML ứng với chương thứ i của API.
+                    // API hỏng hoặc độ dài lệch thì trả danh sách HTML như cũ.
+                    try {
+                        var priceJson = fetchJson(BASE_URL + "/api/v1/stories/" + storyId);
+                        var priceChapters = unwrapStory(priceJson).chapters;
+                        if (priceChapters && priceChapters.length >= list.length) {
+                            for (var p = 0; p < list.length; p++) {
+                                var pc = priceChapters[p];
+                                var pprice = pc ? (pc.chapter_price || pc.price || 0) : 0;
+                                if (pprice > 0) {
+                                    list[p].lock = true;
+                                    list[p].pay = "VIP · " + pprice + " hoa";
+                                }
+                            }
+                        }
+                    } catch (e2) {
+                    }
                     return Response.success(list);
                 }
             }

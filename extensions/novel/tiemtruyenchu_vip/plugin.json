@@ -2,7 +2,7 @@
   "metadata": {
     "name": "TiemtruyenchuVIP",
     "author": "MuseAi",
-    "version": 5,
+    "version": 6,
     "source": "https://tiemtruyenchu.cloud",
     "regexp": "^https?://(www\\.)?tiemtruyenchu\\.cloud/truyen/[0-9a-zA-Z\\-]+/?$",
     "description": "Bản gộp duy nhất cho Tiệm Truyện Chữ (tiemtruyenchu.cloud) — thay thế cả ext Tiệm Truyện Chữ v6 và bản VIP v4. Không còn đăng nhập tự động (không tài khoản/mật khẩu/OTP); chương miễn phí đọc qua prefetch + cookie, chương VIP đã mua đọc qua Mobile API với vipToken (dán token tay vào TOKEN), chương VIP chưa mua tự lấy truyện gốc tiếng Trung từ ixdzs8 hiển thị nguyên văn (không dịch máy) để tự dịch. Tự tìm truyện gốc theo tên Hán-Việt.",
