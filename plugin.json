@@ -142,7 +142,7 @@
       "name": "思兔閱讀",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sto9/plugin.zip",
-      "version": 3,
+      "version": 4,
       "source": "https://sto9.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sto9/icon.png",
       "description": "思兔閱讀 (sto9.com) — truyện chữ phồn thể miễn phí: huyền huyễn, võ hiệp, đô thị, khoa huyễn, ngôn tình. Chương đọc miễn phí, không khóa VIP, nội dung nằm trong HTML SSR.",

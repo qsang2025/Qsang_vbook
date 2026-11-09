@@ -12,6 +12,14 @@
 // chuong cuoi 第870章 -> /txt/671/9247693.html. ID chuong la so mo
 // (83151 cho chuong 1) — KHONG sort theo so trong URL, giu dung thu
 // tu DOM. Khong can page.js.
+// LOC MUC KHONG PHAI CHUONG (v4, kiem chung live 2026-11-09 tren 5 truyen:
+// 671, 1, 12067, 12058, 2192, 2234): muc luc lan ca ghi chu cua tac gia
+// (vd 聖墟 25/1696 muc: 求月票, 請假, 抽獎, 感言, 新書...). Chi loc muc
+// KHONG danh so "第…章" (chuong danh so luon giu); muc chua 番外/終章/
+// 後記/楔子/序章/... la noi dung doc duoc that nen luon giu, ke ca khi
+// ten co lan tu khoa rac (vd "月票番外與九月抽獎"). Muc khong phan biet
+// chac chan duoc (vd "說幾句？", "你太沒禮貌了", "結束於10月") thi GIU
+// (loc thieu an toan hon loc nham). Xem isNonChapterNote() trong addChapter.
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
 // helper.js vao src/.
@@ -20,6 +28,16 @@ load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
+
+// Muc khong phai chuong = ghi chu cua tac gia (xin nghi, xin phieu,
+// cam on, quang cao sach moi...). Chi xet muc KHONG danh so "第…章".
+// Muc la noi dung doc duoc that (番外, 終章, 後記, 楔子, 序章, 引子,
+// 前言, 大結局, 尾聲) luon giu — ke ca khi ten co lan tu khoa rac.
+function isNonChapterNote(name) {
+    if (/^第/.test(name)) return false;
+    if (/(番外|終章|终章|後記|后记|楔子|序章|引子|前言|大結局|大结局|尾聲|尾声)/.test(name)) return false;
+    return /(感謝|感谢|休息|請假|请假|月票|抽獎|抽奖|中獎|中奖|名單|名单|感言|新書|新书|打賞|打赏|投票|推薦票|推荐票|呼喚|呼唤|上架)/.test(name);
+}
 
 function execute(url) {
     url = normalizeUrl(url);
@@ -35,6 +53,7 @@ function execute(url) {
         var name = cleanText(el.text());
         if (!href || !name) return;
         if (href.indexOf("/txt/") === -1) return;
+        if (isNonChapterNote(name)) return;
         var link = absUrl(href);
         if (seen[link]) return;
         seen[link] = true;
