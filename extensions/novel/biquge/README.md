@@ -59,6 +59,18 @@ Khảo sát ngày 2026-11-06 (kiểm chứng live bằng curl từ VM):
 
 ## Maintenance watch
 
+- **v4 (2026-11-09, review 2026-11-08)**: `toc.js` / `search.js` /
+  `book.js` fetch qua `fetchPageDoc()` mới trong `helper.js`
+  (`fetchDocWithFallback` + `fetchWithChallengeHandler`, lỗi tiếng Việt
+  có hướng dẫn khi gặp Cloudflare/login); `chap.js` / `detail.js` /
+  `toc.js` phân biệt trang lỗi "出错了" (HTTP 200) của site và báo
+  "Chương/Truyện không tồn tại (link có thể đã đổi)"; link 下一页 /
+  下一頁 tìm bằng `findLinkByText()` (duyệt `a` rồi so text) thay cho
+  selector `a:contains(...)` chưa có bằng chứng runtime hỗ trợ. C2 đã
+  kiểm chứng live: `/sort/wuxia/` (27 item, có link 下一页) và
+  `/sort/wuxia/2.html` (27 item) đều 200 nên `detail.js` genres
+  `input: /sort/<slug>/` + `book.js` không đổi. `src/fetch-helpers.js`
+  đã md5 khớp `lib/` (N1 xong từ bước chung).
 - **Thể loại của truyện có thể sai trên site**: `og:novel:category` và
   breadcrumb của 凡人修仙传 (id 199376) ghi 女生耽美 trong khi đó là
   truyện tu tiên — đây là lỗi dữ liệu của site (có nhiều bản copy cùng
