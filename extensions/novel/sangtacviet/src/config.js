@@ -10,8 +10,11 @@
 //
 // Domain dns1.stv-appdomain-<so>.org chi co trong regexp cua plugin.json
 // (de app van mo duoc link thu vien cu); tu VM khong ket noi duoc toi no
-// (resolve ra IP dai CGNAT 198.18.x, ket noi timeout) nen KHONG dua vao
-// MIRROR_LIST — khong che failover gia.
+// (resolve ra IP dai CGNAT 198.18.x, ket noi timeout — kiem chung lai
+// 2026-11-09: dns1.stv-appdomain-1.org resolve 198.18.112.197, curl
+// HTTP 000) nen KHONG dua vao MIRROR_LIST — khong che failover gia.
+// Giu nguyen regexp; chi can nhac them vao mirror neu co bao cao link
+// thu vien cu mo duoc tren may that.
 //
 // LUU Y load(): file nay duoc load() boi cac script khac, nen KHONG duoc
 // load() them file nao khac o day.
@@ -82,6 +85,10 @@ function parseMirrorList(value) {
 }
 
 // Danh sach mirror mac dinh (khop voi config MIRRORS trong plugin.json).
+// Do tre tu VM: 2026-11-08 .com cham bat thuong (7,8s) trong khi .pro
+// 2,0s; do lai 2026-11-09: .app 0,9s, .vip 3,9s, .com 2,1s, .pro 2,1s
+// — .com khong cham on dinh nen GIU NGUYEN thu tu .vip -> .com -> .pro,
+// tiep tuc theo doi, chua doi thu tu chi vi mot lan do cham.
 var MIRROR_LIST = ["https://sangtacviet.vip", "https://sangtacviet.com", "https://sangtacviet.pro"];
 
 try {

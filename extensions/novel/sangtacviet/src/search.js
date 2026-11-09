@@ -1,5 +1,6 @@
 // search.js — Tim kiem truyen tren Sang Tac Viet
 load('config.js');
+load('helper.js');
 
 function execute(key, page) {
     if (!key || !String(key).trim()) {
@@ -20,44 +21,8 @@ function execute(key, page) {
     if (!response || !response.ok) return Response.error("Không tải được kết quả tìm kiếm (HTTP " + (response ? response.status : 0) + ")");
     var doc = response.html();
 
-    var el = doc.select("a.booksearch");
-    var data = [];
-
-    el.forEach(function(e) {
-        var imgEl = e.select("img").first();
-        var img = imgEl ? (imgEl.attr("data-src") || imgEl.attr("src") || "") : "";
-        if (img.indexOf("//") === 0) img = "https:" + img;
-
-        var titleEl = e.select(".searchbooktitle").first();
-        var name = titleEl ? titleEl.text().trim() : "";
-        var link = e.attr("href") || (e.select("a").first() ? e.select("a").first().attr("href") : "");
-        var tagEl = e.select(".searchtag").first();
-        var desc = tagEl ? tagEl.text().trim() : "";
-
-        if (name && link) {
-            data.push({
-                name: name,
-                link: link,
-                cover: img,
-                description: desc,
-                host: BASE_URL
-            });
-        }
-    });
-
-    if (data.length === 0) {
-        return Response.error("Không tìm thấy truyện phù hợp.");
-    }
-
-    // Trang ket qua cua STV khong co phan tu phan trang trong HTML (da
-    // kiem chung bang curl 2026-11-08: khong co chuoi "pagination" nao;
-    // moi trang tra dung 48 muc). Con trang sau khi trang hien tai tra
-    // du 48 muc, het khi tra it hon. nextToken LUON la string, khong
-    // bao gio null (hop dong runtime).
-    var next = "";
-    if (data.length >= PAGE_SIZE) {
-        next = String(pageNum + 1);
-    }
-
-    return Response.success(data, next);
+    // Parse chung voi gen.js (helper.js). 0 ket qua la ket qua binh
+    // thuong, khong phai loi: tra success rong thay vi error (C2).
+    var result = parseSearchPage(doc, pageNum);
+    return Response.success(result.data, result.next);
 }
