@@ -11,13 +11,14 @@
 //   link 下一页 (toi da 10 trang) roi noi noi dung lai.
 // - Tieu de chuong lay tu H1, bo hau to （N / M）.
 //
-// Load: build se copy config.js, config-helpers.js, fetch-helpers.js
-// vao src/.
+// Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
+// challenge-handler.js, helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('challenge-handler.js');
+load('helper.js');
 
 function chapterTitle(doc) {
     var title = "";
@@ -56,6 +57,12 @@ function execute(url) {
         if (isChallengeDoc(doc)) {
             return Response.error(formatChallengeError("笔趣阁", url));
         }
+        // N2 (v4): trang loi cua site tra HTTP 200, tieu de "出错了" —
+        // chuong khong ton tai (vd /book/199376/1.html), khong phai loi
+        // parse. Kiem chung bang curl 2026-11-09.
+        if (isErrorPage(doc)) {
+            return Response.error("Chương không tồn tại (link có thể đã đổi): " + url);
+        }
         return Response.error("Không đọc được nội dung chương: " + url);
     }
 
@@ -67,8 +74,12 @@ function execute(url) {
         var total = parseInt(m[2], 10);
         var guard = 0;
         while (cur < total && guard < 10) {
-            var nextLink = doc.select("a:contains(下一页)").first();
-            if (nextLink === null) nextLink = doc.select("a:contains(下一頁)").first();
+            // C1 (v4): tim link 下一页 bang findLinkByText() (duyet a roi so
+            // text) thay cho a:contains(...) — chua co bang chung runtime
+            // vBook ho tro pseudo-selector :contains; cac chuong da kiem
+            // tra deu (1 / 1) va trang chuong khong co link 下一页 nao nen
+            // nhanh nay hien chua tung chay that.
+            var nextLink = findLinkByText(doc, ["下一页", "下一頁"]);
             if (nextLink === null) break;
             var nextUrl = absUrl(nextLink.attr("href"));
             if (!nextUrl || nextUrl === url) break;

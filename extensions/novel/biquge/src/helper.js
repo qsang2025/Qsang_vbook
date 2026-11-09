@@ -138,3 +138,79 @@ function parseSearchItem(el) {
         host: siteOrigin()
     };
 }
+
+// --- Dung chung cho v4 (N2/N3/C1, review 2026-11-08) ----------------------
+// LUU Y load(): helper.js KHONG load() them file nao (load khong de quy).
+// Script nao dung cac ham duoi day phai load truoc theo thu tu:
+//     load('config.js');
+//     load('config-helpers.js');
+//     load('fetch-helpers.js');
+//     load('challenge-handler.js');
+//     load('helper.js');
+// (fetchPageDoc dung fetchDocWithFallback + fetchWithChallengeHandler;
+// findLinkByText/isErrorPage chi dung select()/text() co ban.)
+
+// Trang loi cua site tra HTTP 200 (N2): tieu de "出错了_笔趣阁", khong co
+// #chaptercontent / .list-chapter / h1 ten truyen. Kiem chung bang curl
+// 2026-11-09: /book/199376/1.html, /book/99999999.html va
+// /book/99999999/ deu tra 200 voi title nay. Dung de phan biet "truyen /
+// chuong khong ton tai (link co the da doi)" voi loi parse / doi giao dien.
+function isErrorPage(doc) {
+    if (!doc) return false;
+    var t = "";
+    try { t = cleanText(doc.select("title").text()); } catch (e) { t = ""; }
+    return t.indexOf("出错了") !== -1;
+}
+
+// Tim link <a> theo text hien thi (C1): thay cho selector a:contains(...).
+// :contains la selector jsoup nhung chua co bang chung runtime vBook ho tro
+// pseudo-selector nay; duyet a roi so text chi dung select("a") / text() /
+// attr() da kiem chung khac. Tra ve element dau tien co text chua mot trong
+// cac chuoi can tim, hoac null. Chu y: :contains cung khop substring nen
+// hanh vi giong ban cu (khop link dau tien theo thu tu DOM).
+function findLinkByText(doc, texts) {
+    var links = doc.select("a");
+    var i = 0;
+    var j = 0;
+    for (i = 0; i < links.size(); i++) {
+        var t = cleanText(links.get(i).text());
+        if (!t) continue;
+        for (j = 0; j < texts.length; j++) {
+            if (t.indexOf(texts[j]) !== -1) return links.get(i);
+        }
+    }
+    return null;
+}
+
+// Fetch trang HTML co failover mirror + xu ly Cloudflare challenge (N3).
+//
+// Duong chinh: fetchDocWithFallback(url, MIRROR_LIST) tu fetch-helpers.js
+// (retry 429, quet marker challenge ca khi HTTP 200, thu browser fallback
+// truoc khi bo cuoc) — khong parse trang challenge nhu trang that nua.
+// Site hien chua bat challenge (kiem chung bang curl 2026-11-09: trang
+// chu / detail / toc / chap / search deu 200, khong co marker challenge);
+// helper nay la phong thu cho ngay site bat challenge.
+//
+// Tra ve { doc: Document } khi thanh cong, hoac { error: "thong bao tieng
+// Viet" } khi that bai. Caller dung:
+//     var r = fetchPageDoc(url, "Không tải được mục lục");
+//     if (r.error) return Response.error(r.error);
+//     var doc = r.doc;
+//
+// Khi duong chinh that bai, fetch lai 1 lan bang fetchWithChallengeHandler()
+// (chi chay tren duong that bai, khong ton them request khi trang tai binh
+// thuong): gap challenge thi tra huong dan vuot qua cua
+// formatChallengeError(), gap trang yeu cau dang nhap thi tra
+// formatLoginError(), con lai thi bao loi tai trang chung.
+function fetchPageDoc(url, failMessage) {
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
+    if (doc) return { doc: doc };
+
+    var chRes = fetchWithChallengeHandler(url, { siteName: "笔趣阁" });
+    if (chRes && chRes.ok) {
+        if (chRes.doc) return { doc: chRes.doc };
+        if (chRes.html) return { doc: Html.parse(chRes.html) };
+    }
+    if (chRes && chRes.error) return { error: chRes.error };
+    return { error: (failMessage || "Không tải được trang") + ": " + url };
+}

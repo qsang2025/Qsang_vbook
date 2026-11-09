@@ -7,11 +7,14 @@
 // thi tra String(n+1), khong thi "".
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
-// helper.js vao src/.
+// challenge-handler.js, helper.js vao src/.
+// N3 (v4): fetch qua fetchPageDoc() (fetchDocWithFallback + kiem
+// challenge, tra loi tieng Viet co huong dan khi gap Cloudflare/login).
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('challenge-handler.js');
 load('helper.js');
 
 function execute(query, page) {
@@ -24,8 +27,9 @@ function execute(query, page) {
     var url = BASE_URL + "/search/?searchkey=" + encodeURIComponent(query);
     if (n > 1) url += "&page=" + n;
 
-    var doc = fetchDoc(url);
-    if (!doc) return Response.error("Không tải được kết quả tìm kiếm: " + url);
+    var r = fetchPageDoc(url, "Không tải được kết quả tìm kiếm");
+    if (r.error) return Response.error(r.error);
+    var doc = r.doc;
 
     var items = [];
     var seen = {};
@@ -38,8 +42,9 @@ function execute(query, page) {
     });
 
     var next = "";
-    var nextLink = doc.select("a:contains(下一頁)").first();
-    if (nextLink === null) nextLink = doc.select("a:contains(下一页)").first();
+    // C1 (v4): tim link trang ke bang findLinkByText() (duyet a roi so
+    // text) thay cho a:contains(...) — xem ghi chu o helper.js.
+    var nextLink = findLinkByText(doc, ["下一頁", "下一页"]);
     if (nextLink !== null) next = String(n + 1);
 
     return Response.success(items, next);

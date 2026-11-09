@@ -153,7 +153,7 @@
       "name": "笔趣阁",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/biquge/plugin.zip",
-      "version": 3,
+      "version": 4,
       "source": "https://www.biquge.tw",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/biquge/icon.png",
       "description": "笔趣阁 (www.biquge.tw) — truyện chữ giản thể miễn phí: tu tiên/huyền huyễn, đô thị, võng du. Chương đọc miễn phí, không khóa VIP, nội dung nằm trong HTML SSR.",

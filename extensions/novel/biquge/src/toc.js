@@ -8,19 +8,28 @@
 // link dang /book/<id>/<so>.html roi dedupe theo URL.
 // Ten chuong = text cua link (vd "第一章 山边小村").
 //
-// Load: build se copy config.js, config-helpers.js, fetch-helpers.js
-// vao src/.
+// Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
+// challenge-handler.js, helper.js vao src/.
+// N3 (v4): fetch qua fetchPageDoc() (fetchDocWithFallback + kiem
+// challenge, tra loi tieng Viet co huong dan khi gap Cloudflare/login).
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('challenge-handler.js');
+load('helper.js');
 
 function execute(url) {
     url = normalizeUrl(url);
     var tocUrl = url.replace(/\.html$/, "/");
     if (tocUrl === url) tocUrl = url.replace(/\/$/, "") + "/";
-    var doc = fetchDoc(tocUrl);
-    if (!doc) return Response.error("Không tải được mục lục: " + tocUrl);
+    var r = fetchPageDoc(tocUrl, "Không tải được mục lục");
+    if (r.error) return Response.error(r.error);
+    var doc = r.doc;
+
+    // N2 (v4): trang loi cua site tra HTTP 200, tieu de "出错了" —
+    // truyen khong ton tai (vd /book/99999999/), khong phai doi giao dien.
+    if (isErrorPage(doc)) return Response.error("Truyện không tồn tại (link có thể đã đổi): " + tocUrl);
 
     var chapters = [];
     var seen = {};

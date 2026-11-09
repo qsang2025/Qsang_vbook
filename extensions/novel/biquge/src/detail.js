@@ -34,6 +34,10 @@ function execute(url) {
     }
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
+    // N2 (v4): trang loi cua site tra HTTP 200, tieu de "出错了" — truyen
+    // khong ton tai (vd /book/99999999.html). Kiem chung bang curl 2026-11-09.
+    if (isErrorPage(doc)) return Response.error("Truyện không tồn tại (link có thể đã đổi): " + url);
+
     var name = cleanText(doc.select("h1").text());
     if (!name) {
         var ogTitle = doc.select('meta[property="og:title"]').first();
