@@ -26,9 +26,30 @@ var CURATED_QUERIES = [
     { title: "Tu Tiên", input: "tu tiên thuyết minh" }
 ];
 
+// Nhan dien trang challenge cua Cloudflare (mau lib/fetch-helpers.js):
+// trang challenge co the tra ve HTTP 200 nen KHONG duoc tin res.ok —
+// phai kiem marker challenge trong body TRUOC khi parse JSON.
+function isChallengeText(text) {
+    if (!text) return false;
+    var t = String(text);
+    if (t.indexOf("challenges.cloudflare.com") !== -1) return true;
+    if (t.indexOf("__cf_chl") !== -1) return true;
+    if (t.indexOf("cf-challenge") !== -1) return true;
+    if (t.indexOf("cf-turnstile") !== -1) return true;
+    if (t.indexOf("turnstile") !== -1 && t.indexOf("cloudflare") !== -1) return true;
+    if (t.indexOf("Attention Required") !== -1) return true;
+    if (t.indexOf("Please verify you are a human") !== -1) return true;
+    if (/checking your browser/i.test(t)) return true;
+    if (t.indexOf("cf-error-code") !== -1) return true;
+    return false;
+}
+
 // GET JSON tu API Dailymotion. Tra ve doi tuong JSON da parse, hoac null
-// neu HTTP loi / khong parse duoc. Khong xoay User-Agent (AGENTS.md §6
-// quy tac 10): chi gui Accept JSON + Referer mac dinh.
+// neu HTTP loi / gap trang challenge / khong parse duoc. Doc body dang
+// text truoc roi moi kiem challenge (mau fetchJson trong
+// lib/fetch-helpers.js), thay vi .json() truc tiep nhu truoc.
+// Khong xoay User-Agent (AGENTS.md §6 quy tac 10): chi gui Accept JSON
+// + Referer mac dinh.
 function dmApiGet(url) {
     var res = null;
     try {
@@ -41,10 +62,22 @@ function dmApiGet(url) {
         console.log("dmApiGet HTTP " + (res ? res.status : 0) + ": " + url);
         return null;
     }
+    var text = "";
     try {
-        return res.json();
-    } catch (e) {
-        console.log("dmApiGet loi parse JSON: " + url + " (" + e + ")");
+        text = res.text();
+    } catch (e2) {
+        console.log("dmApiGet loi doc body: " + url + " (" + e2 + ")");
+        return null;
+    }
+    if (!text) return null;
+    if (isChallengeText(text)) {
+        console.log("dmApiGet: trang challenge Cloudflare (HTTP 200): " + url);
+        return null;
+    }
+    try {
+        return JSON.parse(text);
+    } catch (e3) {
+        console.log("dmApiGet loi parse JSON: " + url + " (" + e3 + ")");
         return null;
     }
 }

@@ -36,7 +36,7 @@ function execute(query, page) {
         }
     }
 
-    if (items.length === 0) return Response.error("Không tìm thấy video nào cho từ khóa: " + query);
+    if (items.length === 0) return Response.success([], "");
     var next = data.has_more ? String(num + 1) : "";
     return Response.success(items, next);
 }

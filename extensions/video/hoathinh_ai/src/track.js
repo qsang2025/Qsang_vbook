@@ -5,6 +5,9 @@
 //     (vd https://cdndirector.dailymotion.com/cdn/manifest/video/x98x90i.m3u8?...)
 // (da kiem chung 2026-11-06: metadata tra 200, co auto[0].url).
 // Tra ve type "native" + mimeType HLS + Referer la goc Dailymotion.
+// host lay tu origin cua chinh URL stream that (vd.
+// https://cdndirector.dailymotion.com), khong phai domain xem video —
+// stream nam tren CDN khac; Referer van la domain nguon BASE_URL + "/".
 // KHONG dung streamfree.vip, khong xoay User-Agent (AGENTS.md §6 quy
 // tac 10) — chi gui Referer, de runtime dung UA mac dinh.
 //
@@ -19,6 +22,14 @@ load('config.js');
 load('config-helpers.js');
 load('helper.js');
 
+// Origin cua URL (vd. "https://cdndirector.dailymotion.com") — dung lam
+// host de app gan cookie/Referer theo dung host phat stream. Fallback ve
+// BASE_URL neu khong tach duoc origin (mau hoathinh3d).
+function originOf(url) {
+    var m = String(url || "").match(/^(https?:\/\/[^\/]+)/i);
+    return m ? m[1] : BASE_URL;
+}
+
 function execute(data) {
     var id = videoIdFromUrl(data);
     if (!id) return Response.error("Không đọc được id video: " + data);
@@ -32,7 +43,7 @@ function execute(data) {
     return Response.success({
         type: "native",
         data: m3u8,
-        host: BASE_URL,
+        host: originOf(m3u8),
         mimeType: "application/x-mpegURL",
         headers: { "Referer": BASE_URL + "/" },
         timeSkip: []
