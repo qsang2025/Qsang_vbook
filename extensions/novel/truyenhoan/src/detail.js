@@ -37,6 +37,7 @@ function execute(url) {
         cover = doc.select("div.book img").attr("src") || "";
     }
     if (cover.indexOf("//") === 0) cover = "https:" + cover;
+    cover = cover.replace(/^http:\/\//i, "https://");
 
     var author = doc.select("div.info a[itemprop=author]").first();
     var authorText = author ? author.text().trim() : "";
@@ -44,6 +45,23 @@ function execute(url) {
         var authDiv = doc.select("div.info div").first();
         if (authDiv) authorText = authDiv.text().replace(/Tác giả:\s*/i, "").trim();
     }
+
+    // The loai cua truyen
+    var genres = [];
+    var seenGenre = {};
+    doc.select(".info a[itemprop=genre]").forEach(function(el) {
+        var gTitle = el.text().trim();
+        var gHref = el.attr("href") || "";
+        var gSlug = gHref.replace(/^https?:\/\/[^\/]+\//, "").replace(/\/+$/, "");
+        if (gTitle && gSlug && !seenGenre[gSlug]) {
+            seenGenre[gSlug] = true;
+            genres.push({
+                title: gTitle,
+                input: gSlug,
+                script: "gen.js"
+            });
+        }
+    });
 
     // Trang thai: duyet .info > div tim h3 "Trạng thái" (C2, GIU NGUYEN
     // theo de xuat review — khong sua mu). Da kiem chung live 2026-11-09
@@ -62,6 +80,16 @@ function execute(url) {
     if (!statusText) {
         var spStatus = doc.select(".info span.text-success").first();
         if (spStatus) statusText = spStatus.text().trim();
+    }
+
+    // Diem danh gia neu co
+    var rateScore = "";
+    var rateVal = doc.select(".rate [itemprop=ratingValue]").first();
+    var rateCnt = doc.select(".rate [itemprop=ratingCount]").first();
+    if (rateVal && rateVal.text().trim()) {
+        var rVal = rateVal.text().trim();
+        var rCnt = rateCnt ? rateCnt.text().trim() : "";
+        rateScore = rVal + "/10" + (rCnt ? " (" + rCnt + " lượt)" : "");
     }
 
     var stLower = statusText.toLowerCase();
@@ -95,6 +123,16 @@ function execute(url) {
         (statusText || (ongoing ? "Đang ra" : "Hoàn thành")) +
         "</p>";
 
+    if (rateScore) {
+        detail += "<p><strong>Đánh giá:</strong> " + rateScore + "</p>";
+    }
+
+    if (genres.length > 0) {
+        var gList = [];
+        for (var gi = 0; gi < genres.length; gi++) gList.push(genres[gi].title);
+        detail += "<p><strong>Thể loại:</strong> " + gList.join(", ") + "</p>";
+    }
+
     return Response.success({
         name: name,
         cover: cover,
@@ -105,6 +143,7 @@ function execute(url) {
         url: detailUrl,
         type: "novel",
         format: "novel",
-        ongoing: ongoing
+        ongoing: ongoing,
+        genres: genres
     });
 }
