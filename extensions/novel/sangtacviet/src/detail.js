@@ -102,6 +102,26 @@ function execute(url) {
         detail += "<br>" + e.text().trim();
     });
 
+    // The loai: site ghi trong <meta property="og:novel:category">, vi du
+    // "He thong" hoac "Do thi ngon tinh". Chi map khi chuoi category
+    // chua dung ten mot the loai trong bang GENRES (config.js) — vi du
+    // "Do thi ngon tinh" chua "Do Thi" -> chip Do Thi (category=dt).
+    // "He thong" khong thuoc bang thi khong gan genre, khong tu che
+    // the loai moi (da kiem chung tren 2 trang that 2026-11-09).
+    var genres = [];
+    var ogCat = doc.select("meta[property='og:novel:category']").first();
+    if (ogCat) {
+        var catText = (ogCat.attr("content") || "").trim().toLowerCase();
+        if (catText) {
+            for (var gi = 0; gi < GENRES.length; gi++) {
+                if (catText.indexOf(GENRES[gi].title.toLowerCase()) !== -1) {
+                    genres.push({ title: GENRES[gi].title, input: GENRES[gi].slug, script: "gen.js" });
+                    break;
+                }
+            }
+        }
+    }
+
     return Response.success({
         name: name,
         cover: cover,
@@ -109,6 +129,10 @@ function execute(url) {
         description: description,
         detail: detail,
         ongoing: ongoing,
-        host: BASE_URL
+        host: BASE_URL,
+        url: url,
+        type: "novel",
+        format: "novel",
+        genres: genres
     });
 }
