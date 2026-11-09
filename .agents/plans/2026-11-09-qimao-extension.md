@@ -121,6 +121,8 @@ Xây dựng hoàn chỉnh extension vBook nguồn truyện chữ tiếng Trung *
 *Executor cập nhật phần này sau mỗi bước thực hiện:*
 
 - **2026-11-09**: Recon hoàn tất (bước 1 & 1.5). Đã tạo branch `feature/qimao-ag`. Master đã lập và duyệt kế hoạch.
+- **2026-11-09 (Cluster 1)**: Hoàn thành Step 0, Step 1, Step 2. Đã commit Plan trên branch `feature/qimao-ag`. Đã khởi tạo thư mục `extensions/chinese_novel/qimao/`, tạo `plugin.json` chuẩn (`author: "MuseAi"`, `version: 1`), sao chép `icon.png` chính thức, tạo `src/config.js` chuẩn (không có `load()`, hỗ trợ `signQuery` & `buildHeaders`), và inline `src/crypto.js` từ `lib/crypto.js`. Đã kiểm định linter Rhino ES6 sạch 0 lỗi.
+- **2026-11-09 (Cluster 2)**: Hoàn thành Step 3, Step 4, Step 5. Đã triển khai đầy đủ `src/home.js` (6 tab tĩnh: Nam sinh, Nữ sinh, Mới cập nhật, Xuất bản), `src/genre.js` (122 thể loại Nam/Nữ/Xuất bản trích xuất từ NUXT categories chính thức), `src/gen.js` (phân trang danh mục chuẩn từ thư viện web `qimao.com/shuku/`, bóc tách sách sạch, hỗ trợ phân trang `next`), và `src/search.js` (tích hợp Native App API v7, ký `signQuery` MD5, lọc bỏ show_type lạ, bóc tách sách, hỗ trợ phân trang). Đã kiểm thử độc lập thành công trong sandbox tương thích Rhino ES6, linter 0 cảnh báo.
 
 ---
 
