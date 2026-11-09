@@ -58,7 +58,7 @@ function execute(url) {
     }
 
     // Series manga: doc danh sach chuong THAT trong <div class="episode">.
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được mục lục: " + url);
 
     // Xoa span timestamp trong moi link chuong truoc khi lay ten.

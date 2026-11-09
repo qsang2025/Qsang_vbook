@@ -32,7 +32,7 @@ function execute(query, page) {
         url = BASE_URL + "/search/" + encodeURIComponent(query) + "/" + n + ".html";
     }
 
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được kết quả tìm kiếm: " + url);
 
     // Redirect ve trang chi tiet (tu khoa khop dung 1 truyen):

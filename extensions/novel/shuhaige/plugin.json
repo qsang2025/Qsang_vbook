@@ -1,1 +1,39 @@
-{"config":{"DOMAIN":{"default":"https://www.shuhaige.tw","mode":"select","title":"Domain","values":["https://www.shuhaige.tw"]},"MIRRORS":{"default":"","format":"text","mode":"input","title":"Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"}},"metadata":{"author":"Qsang","description":"书海阁 (www.shuhaige.tw) — truyện chữ giản thể miễn phí: huyền huyễn, võ hiệp, đô thị, lịch sử, khoa huyễn, ngôn tình. Chương đọc miễn phí, nội dung nằm trong HTML SSR.","encrypt":false,"language":"javascript","locale":"zh_CN","name":"书海阁","regexp":"^https://www\\.shuhaige\\.tw/\\d+\\.html$","source":"https://www.shuhaige.tw","type":"novel","version":1},"script":{"book":"book.js","chap":"chap.js","detail":"detail.js","genre":"genre.js","home":"home.js","search":"search.js","toc":"toc.js"}}
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://www.shuhaige.tw",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://www.shuhaige.tw"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "Qsang",
+    "description": "书海阁 (www.shuhaige.tw) — truyện chữ giản thể miễn phí: huyền huyễn, võ hiệp, đô thị, lịch sử, khoa huyễn, ngôn tình. Chương đọc miễn phí, nội dung nằm trong HTML SSR.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "zh_CN",
+    "name": "书海阁",
+    "regexp": "^https://www\\.shuhaige\\.tw/\\d+\\.html$",
+    "source": "https://www.shuhaige.tw",
+    "type": "novel",
+    "version": 2
+  },
+  "script": {
+    "book": "book.js",
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js"
+  }
+}

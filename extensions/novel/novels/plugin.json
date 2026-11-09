@@ -1,1 +1,39 @@
-{"config":{"DOMAIN":{"default":"https://www.novels.com.tw","mode":"select","title":"Domain","values":["https://www.novels.com.tw"]},"MIRRORS":{"default":"","format":"text","mode":"input","title":"Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"}},"metadata":{"author":"Qsang","description":"繁體小說 - 小說閱讀網 (www.novels.com.tw). Truyện chữ phồn thể: huyền huyễn, võ hiệp, đô thị, lịch sử, khoa huyễn, trò chơi, nữ sinh, truyện ngắn. Nội dung chương mã hóa AES-128-CBC, key cố định toàn site.","encrypt":false,"language":"javascript","locale":"zh_TW","name":"繁體小說","regexp":"^https://www\\.novels\\.com\\.tw/novels/no[^/]+/?(\\?aid=\\d+)?$","source":"https://www.novels.com.tw","type":"novel","version":2},"script":{"book":"book.js","chap":"chap.js","detail":"detail.js","genre":"genre.js","home":"home.js","search":"search.js","toc":"toc.js"}}
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://www.novels.com.tw",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://www.novels.com.tw"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "Qsang",
+    "description": "繁體小說 - 小說閱讀網 (www.novels.com.tw). Truyện chữ phồn thể: huyền huyễn, võ hiệp, đô thị, lịch sử, khoa huyễn, trò chơi, nữ sinh, truyện ngắn. Nội dung chương mã hóa AES-128-CBC, key cố định toàn site.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "zh_TW",
+    "name": "繁體小說",
+    "regexp": "^https://www\\.novels\\.com\\.tw/novels/no[^/]+/?(\\?aid=\\d+)?$",
+    "source": "https://www.novels.com.tw",
+    "type": "novel",
+    "version": 3
+  },
+  "script": {
+    "book": "book.js",
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js"
+  }
+}

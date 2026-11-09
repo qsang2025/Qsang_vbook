@@ -92,7 +92,7 @@ function execute(url) {
     var pageUrl = BASE_URL + "/" + bookId + "/" + chapId + ".html";
     var k = 0;
     for (k = 1; k <= 10; k++) {
-        var doc = fetchDocWithFallback(pageUrl);
+        var doc = fetchDocWithFallback(pageUrl, MIRROR_LIST);
         if (!doc) {
             if (k === 1) return Response.error("Không tải được chương: " + url);
             break;

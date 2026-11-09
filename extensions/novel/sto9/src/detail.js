@@ -30,7 +30,7 @@ function ogContent(doc, prop) {
 
 function execute(url) {
     url = normalizeUrl(url);
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
     var name = ogContent(doc, "og:novel:book_name");

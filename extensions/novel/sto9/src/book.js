@@ -78,7 +78,7 @@ function execute(query, page) {
         }
     }
 
-    var doc = fetchDocWithFallback(pageUrl);
+    var doc = fetchDocWithFallback(pageUrl, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang danh sách: " + pageUrl);
 
     var items = [];

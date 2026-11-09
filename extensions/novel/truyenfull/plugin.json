@@ -1,1 +1,39 @@
-{"config":{"DOMAIN":{"default":"https://truyenfull.link","mode":"select","title":"Domain","values":["https://truyenfull.link","https://truyenfull.live"]},"MIRRORS":{"default":"https://truyenfull.live","format":"text","mode":"input","title":"Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"}},"metadata":{"author":"Qsang","description":"Truyện Full — truyện chữ tiếng Việt miễn phí, không khóa chương VIP: Tiên Hiệp, Đô Thị, Võng Du, Huyền Huyễn, Kiếm Hiệp... Đọc full chương, cập nhật mỗi ngày.","language":"javascript","locale":"vi_VN","name":"Truyện Full","regexp":"^https://truyenfull\\.link/(truyen|chuong)/[^/]+/?$","source":"https://truyenfull.link","type":"novel","version":1},"script":{"book":"book.js","chap":"chap.js","detail":"detail.js","genre":"genre.js","home":"home.js","search":"search.js","toc":"toc.js"}}
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://truyenfull.link",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://truyenfull.link",
+        "https://truyenfull.live"
+      ]
+    },
+    "MIRRORS": {
+      "default": "https://truyenfull.live",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "Qsang",
+    "description": "Truyện Full — truyện chữ tiếng Việt miễn phí, không khóa chương VIP: Tiên Hiệp, Đô Thị, Võng Du, Huyền Huyễn, Kiếm Hiệp... Đọc full chương, cập nhật mỗi ngày.",
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "Truyện Full",
+    "regexp": "^https://truyenfull\\.link/(truyen|chuong)/[^/]+/?$",
+    "source": "https://truyenfull.link",
+    "type": "novel",
+    "version": 2
+  },
+  "script": {
+    "book": "book.js",
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js"
+  }
+}

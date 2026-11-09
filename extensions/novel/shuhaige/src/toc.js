@@ -30,7 +30,7 @@ function execute(url) {
     var bookId = m[1];
 
     var tocUrl = BASE_URL + "/" + bookId + "/";
-    var doc = fetchDocWithFallback(tocUrl);
+    var doc = fetchDocWithFallback(tocUrl, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được mục lục: " + tocUrl);
 
     var links = [];

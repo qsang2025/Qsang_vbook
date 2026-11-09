@@ -34,7 +34,7 @@ function execute(query, page) {
         if (n > 1) url = url + "/" + n;
     }
 
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được kết quả tìm kiếm: " + url);
 
     var items = [];
