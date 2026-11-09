@@ -1,1 +1,39 @@
-{"config":{"DOMAIN":{"default":"https://www.dailymotion.com","mode":"select","title":"Domain","values":["https://www.dailymotion.com"]},"MIRRORS":{"default":"","format":"text","mode":"input","title":"Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"}},"metadata":{"author":"Qsang","description":"Hoạt Hình AI Trung Quốc — phim hoạt hình AI, truyện tranh động (漫剧) và short drama Trung Quốc thuyết minh qua Dailymotion: tìm kiếm theo từ khóa, phát trực tiếp bằng link .m3u8 gốc, không qua streamfree.","encrypt":false,"language":"javascript","locale":"vi_VN","name":"Hoạt Hình AI Trung Quốc","regexp":"^https://www\\.dailymotion\\.com/video/[a-zA-Z0-9]+/?$","source":"https://www.dailymotion.com","type":"video","version":1},"script":{"chap":"chap.js","detail":"detail.js","genre":"genre.js","home":"home.js","search":"search.js","toc":"toc.js","track":"track.js"}}
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://www.dailymotion.com",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://www.dailymotion.com"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "Qsang",
+    "description": "Hoạt Hình AI Trung Quốc — phim hoạt hình AI, truyện tranh động (漫剧) và short drama Trung Quốc thuyết minh qua Dailymotion: tìm kiếm theo từ khóa, phát trực tiếp bằng link .m3u8 gốc, không qua streamfree.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "Hoạt Hình AI Trung Quốc",
+    "regexp": "^https://www\\.dailymotion\\.com/video/[a-zA-Z0-9]+/?$",
+    "source": "https://www.dailymotion.com",
+    "type": "video",
+    "version": 2
+  },
+  "script": {
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "track": "track.js"
+  }
+}

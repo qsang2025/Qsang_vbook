@@ -63,7 +63,11 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
     async/await, template literal, `?.`, `??`, spread, `.flat()` (runtime
     vBook chỉ chạy Rhino ES6); kiểm tra `function execute(...)` tồn tại
     trong mỗi script và file được `load()` không `load()` thêm file khác
-    (load không đệ quy — xem mục 9).
+    (load không đệ quy — xem mục 9). Từ 2026-11-09, `validate` còn chạy
+    `node --check` cho mọi file `src/*.js` và `lib/*.js` (bắt lỗi cú pháp JS
+    thật — lỗi thừa dấu `}` ở tiemtruyenchu v4 từng lọt qua validate) và
+    kiểm tra md5 của file lib đã inline trong `src/` khớp bản gốc ở `lib/`
+    (drift fetch-helpers.js từng lệch 9/10 ext).
 
 ## 6. Quy tắc bắt buộc với mọi extension
 
@@ -201,7 +205,9 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   async/await, template literal, `?.`, `??`, spread, `.flat()` trong
   `src/*.js` và `lib/*.js`; script chạy được phải có `function execute(...)`;
   file được `load()` không được `load()` tiếp. Linter bỏ qua `load('...')`
-  nằm trong comment/chuỗi (chỉ tính lệnh thật).
+  nằm trong comment/chuỗi (chỉ tính lệnh thật). Từ 2026-11-09, `validate`
+  còn chạy `node --check` cho mọi file `src/*.js` và `lib/*.js` và kiểm tra
+  md5 file lib đã inline trong `src/` khớp bản gốc ở `lib/` (xem mục 5).
 - Workflow `validate.yml` chạy mỗi push/PR vào main (`validate` +
   `build-catalog --check` + `git diff --exit-code plugin.json`).
 - Workflow `health-check.yml` chạy **hàng ngày 00:00 UTC** + chạy tay.

@@ -25,6 +25,10 @@
 //       chỉ chạy Rhino ES6); script chạy được phải có function execute(...);
 //       file được load() không được load() tiếp; load() không chứa đường
 //       dẫn (chỉ tên file ở top level của src/).
+//       Thêm từ 2026-11-09 (lỗi brace tiemtruyenchu v4 từng lọt qua validate):
+//       node --check cho mọi file src/*.js và lib/*.js để bắt lỗi cú pháp JS
+//       thật, và kiểm tra md5 của file lib đã inline trong src/ khớp với bản
+//       gốc ở lib/ (drift fetch-helpers.js 9/10 ext, 2026-11-08).
 //   (j) health.json (nếu có) đúng định dạng fixture nhẹ
 //       {"cases": [{"name", "url", "pattern"}]}.
 //   (+) branch trong URL registry phải là "main" (theo AGENTS.md mục 5).
@@ -35,6 +39,8 @@
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
+const crypto = require("crypto");
+const childProcess = require("child_process");
 
 const REPO = "qsang2025/Qsang_vbook";
 const BRANCH = "main";
@@ -58,7 +64,9 @@ function printHelp() {
       "chuẩn, test.json đúng định dạng golden fixture, mỗi nguồn có plugin.zip\n" +
       "đã commit kèm và khớp nội dung src/ hiện tại, không có file .zip lạ\n" +
       "trong extensions/, branch trong URL registry là \"main\", linter Rhino\n" +
-      "ES6 cho src/*.js và lib/*.js, health.json đúng định dạng fixture nhẹ.\n" +
+      "ES6 cho src/*.js và lib/*.js, node --check cho mọi file src/*.js và\n" +
+      "lib/*.js, md5 file lib đã inline trong src/ khớp bản gốc ở lib/,\n" +
+      "health.json đúng định dạng fixture nhẹ.\n" +
       "\n" +
       "Exit code: 0 khi pass (kể cả khi chưa có extension nào),\n" +
       "1 khi có lỗi. Cảnh báo không làm fail."
@@ -340,6 +348,24 @@ function validateTestJson(source, file) {
   });
 }
 
+// md5 của một file (Buffer) — dùng so src/<lib-file> với lib/<lib-file>.
+function md5Hex(data) {
+  return crypto.createHash("md5").update(data).digest("hex");
+}
+
+// node --check: bắt lỗi cú pháp JS thật (linter Rhino ở trên chỉ bắt
+// pattern cú pháp cấm, không parse code — lỗi thừa dấu } từng lọt qua).
+// Trả về null khi parse được, hoặc dòng lỗi đầu tiên khi không parse được.
+function nodeCheckError(file) {
+  try {
+    childProcess.execFileSync(process.execPath, ["--check", file], { stdio: "pipe", encoding: "utf8" });
+    return null;
+  } catch (e) {
+    var out = (e.stderr || e.stdout || e.message || "").trim();
+    return out.split("\n")[0] || "lỗi cú pháp (node --check)";
+  }
+}
+
 // (i) Linter Rhino ES6: runtime vBook chỉ chạy Rhino ES6 (xem
 // extension-api.md) — cấm arrow function, async/await, template literal,
 // ?., ??, spread, .flat(). Trả về mảng lỗi dạng "Dòng N: ...".
@@ -570,6 +596,26 @@ function main() {
       lintRhinoES6(code).forEach(function (e) {
         err(label + " src/" + f + ": " + e);
       });
+      // (i+) node --check: bắt lỗi cú pháp JS thật — linter Rhino chỉ bắt
+      // pattern, không parse code (lỗi thừa dấu } ở tiemtruyenchu v4 từng
+      // lọt qua validate vì thiếu bước này).
+      const syntaxError = nodeCheckError(path.join(srcDir, f));
+      if (syntaxError) {
+        err(label + " src/" + f + ": lỗi cú pháp JS — " + syntaxError);
+      }
+      // (i+) file lib đã inline trong src/ phải khớp md5 với bản gốc ở
+      // lib/ — drift âm thầm (fetch-helpers.js từng lệch 9/10 ext).
+      if (libNames.has(f)) {
+        const libPath = path.join(root, "lib", f);
+        if (fs.existsSync(libPath)) {
+          const srcHash = md5Hex(fs.readFileSync(path.join(srcDir, f)));
+          const libHash = md5Hex(fs.readFileSync(libPath));
+          if (srcHash !== libHash) {
+            err(label + " src/" + f + ": lệch với lib/" + f + " (md5 src " + srcHash.slice(0, 8) +
+              " ≠ lib " + libHash.slice(0, 8) + ") — đồng bộ lại từ lib/ rồi rebuild zip.");
+          }
+        }
+      }
       // Script chạy được phải có function execute(...); bỏ qua helper
       // (config.js/helper.js) và file lib đã inline vào src/.
       if (HELPER_NAMES.indexOf(f) === -1 && !libNames.has(f)) {
@@ -611,6 +657,10 @@ function main() {
       lintRhinoES6(code).forEach(function (e) {
         err("[lib] " + f + ": " + e);
       });
+      const syntaxError = nodeCheckError(path.join(libDir, f));
+      if (syntaxError) {
+        err("[lib] " + f + ": lỗi cú pháp JS — " + syntaxError);
+      }
       if (findLoadCalls(code).length > 0) {
         err("[lib] " + f + ": chứa lệnh load() — file lib được load lúc chạy " +
           "nên không được load thêm file khác.");
