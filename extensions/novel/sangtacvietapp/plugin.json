@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "name": "SangtacvietApp",
+    "author": "MuseAi",
+    "version": 1,
+    "source": "https://sangtacviet.app",
+    "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
+    "description": "Sáng Tác Việt App — phiên bản tối ưu hóa tốc độ cao mô phỏng Sáng Tác Việt Mobile Reader (/mobile/bookinfo.php, smart key caching, instant chapter reading).",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain Sáng Tác Việt",
+      "mode": "select",
+      "values": [
+        "https://sangtacviet.app",
+        "https://sangtacviet.vip",
+        "https://sangtacviet.com",
+        "https://sangtacviet.pro"
+      ],
+      "default": "https://sangtacviet.app"
+    },
+    "MIRRORS": {
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)",
+      "mode": "input",
+      "format": "text",
+      "default": "https://sangtacviet.vip,https://sangtacviet.com,https://sangtacviet.pro"
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js",
+    "comment": "comment.js"
+  }
+}
