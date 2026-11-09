@@ -46,11 +46,12 @@ function execute(url) {
 
     var cover = "";
     var img = doc.select("img[itemprop=\"image\"]").first();
-    if (img !== null) cover = absUrl(img.attr("src"));
+    if (img !== null) cover = absUrl(img.attr("src") || img.attr("data-src") || "");
     if (!cover) {
         var img2 = doc.select(".book-cover img, .cover img").first();
-        if (img2 !== null) cover = absUrl(img2.attr("src"));
+        if (img2 !== null) cover = absUrl(img2.attr("src") || img2.attr("data-src") || "");
     }
+    if (cover) cover = cover.replace(/^http:\/\//i, "https://");
 
     var info = doc.select(".info").first();
     var infoText = info === null ? "" : cleanText(info.text());
@@ -63,6 +64,17 @@ function execute(url) {
     // Trang thai cua site nay: "Full" = hoan thanh, "Đang cập nhật" = dang ra.
     var statusText = labelValue(infoText, "Trạng thái", ["Theo dõi", "Thể loại"]);
     var ongoing = statusText.indexOf("Full") === -1;
+
+    // Diem danh gia neu co
+    var rateEl = doc.select(".rate").first();
+    var rateScore = "";
+    if (rateEl !== null) {
+        var score = cleanText(rateEl.select("[data-rating]").text());
+        var votes = cleanText(rateEl.select("[data-votes]").text());
+        if (score && score !== "0") {
+            rateScore = score + "/10" + (votes && votes !== "0" ? " (" + votes + " lượt)" : "");
+        }
+    }
 
     var genres = [];
     var seenGenre = {};
@@ -89,12 +101,39 @@ function execute(url) {
     var detailHtml = "";
     if (author) detailHtml += "Tác giả: " + author + "<br>";
     detailHtml += "Trạng thái: " + (ongoing ? "Đang cập nhật" : "Full") + "<br>";
+    if (rateScore) detailHtml += "Đánh giá: " + rateScore + "<br>";
     if (genres.length > 0) {
         var gnames = [];
         var gi = 0;
         for (gi = 0; gi < genres.length; gi++) gnames.push(genres[gi].title);
         detailHtml += "Thể loại: " + gnames.join(", ");
     }
+
+    // Binh luan truyen tren trang
+    var commentList = [];
+    doc.select("#comments .comment-list > .item").forEach(function (el) {
+        var aName = cleanText(el.select(".authorname").first() !== null ? el.select(".authorname").first().text() : "");
+        var aDate = cleanText(el.select(".comment-date").first() !== null ? el.select(".comment-date").first().text() : "");
+        var aContent = cleanText(el.select(".comment-content").first() !== null ? el.select(".comment-content").first().text() : "");
+        var aAvatar = "";
+        var avImg = el.select(".avatar-wrap img").first();
+        if (avImg !== null) aAvatar = absUrl(avImg.attr("src") || avImg.attr("data-src") || "");
+        if (aAvatar) aAvatar = aAvatar.replace(/^http:\/\//i, "https://");
+        if (aContent) {
+            commentList.push({
+                name: aName || "Vô danh",
+                content: aContent,
+                avatar: aAvatar,
+                description: aDate
+            });
+        }
+    });
+
+    var commentConfig = {
+        title: "Bình luận",
+        input: url,
+        script: "comment.js"
+    };
 
     // Goi y: cac truyen khac tren trang (link /truyen/<slug>, tru trang nay).
     // Link tren trang la URL tuyet doi nen chuan hoa truoc khi khop mau.
@@ -126,6 +165,8 @@ function execute(url) {
         format: "novel",
         ongoing: ongoing,
         genres: genres,
-        suggests: suggests.slice(0, 10)
+        suggests: suggests.slice(0, 10),
+        comment: commentConfig,
+        comments: commentList
     });
 }
