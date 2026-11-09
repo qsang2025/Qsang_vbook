@@ -24,7 +24,7 @@ load('helper.js');
 
 function execute(url) {
     url = normalizeUrl(url);
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được mục lục: " + url);
 
     var chapters = [];

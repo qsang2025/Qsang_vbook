@@ -44,7 +44,7 @@ function execute(query, page) {
         if (n > 1) pageUrl = pageUrl + "/" + n;
     }
 
-    var doc = fetchDocWithFallback(pageUrl);
+    var doc = fetchDocWithFallback(pageUrl, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang danh sách: " + pageUrl);
 
     var items = [];

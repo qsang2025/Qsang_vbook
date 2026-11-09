@@ -146,13 +146,3 @@ function parseSearchItem(el) {
 // Lay Document, thu mirror neu domain chinh chet (dung MIRROR_LIST trong
 // config.js qua fetchWithFallback trong fetch-helpers.js). Tra ve Document
 // hoac null. Dung thay cho fetchDoc() o cac script cua extension nay.
-function fetchDocWithFallback(url) {
-    var res = fetchWithFallback(url, MIRROR_LIST);
-    if (!res) return null;
-    if (res.browser) return res.doc;
-    try {
-        return res.html();
-    } catch (e) {
-        return null;
-    }
-}

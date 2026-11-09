@@ -91,7 +91,7 @@ function execute(url) {
     var id = itemIdOf(url);
     if (!classid || !id) return Response.error("Không đọc được mục/id từ URL: " + url);
 
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang chi tiết: " + url);
 
     var isMoehome = url.indexOf("/moehome-") !== -1;

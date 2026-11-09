@@ -49,7 +49,7 @@ function execute(url) {
 
     // Nguon chinh: endpoint AJAX tra full list (gi du thu tu DOM).
     var ajaxUrl = BASE_URL + "/ajax_novels/chapterlist/" + bookId + ".html";
-    var doc = fetchDocWithFallback(ajaxUrl);
+    var doc = fetchDocWithFallback(ajaxUrl, MIRROR_LIST);
     if (doc) {
         doc.select("li a").forEach(addChapter);
     }
@@ -57,7 +57,7 @@ function execute(url) {
     // Fallback: trang index (chi 36 link dau/cuoi).
     if (chapters.length === 0) {
         var indexUrl = BASE_URL + "/book/" + bookId + "/index.html";
-        var doc2 = fetchDocWithFallback(indexUrl);
+        var doc2 = fetchDocWithFallback(indexUrl, MIRROR_LIST);
         if (doc2) {
             doc2.select("ul.row a").forEach(addChapter);
             if (chapters.length === 0) {

@@ -85,7 +85,7 @@ function execute(query, page) {
     if (query.indexOf("/") === 0 || query.indexOf("http") === 0) {
         var baseUrl = query.indexOf("http") === 0 ? query : BASE_URL + query;
         var url = listPageUrl(baseUrl, page);
-        var doc = fetchDocWithFallback(url);
+        var doc = fetchDocWithFallback(url, MIRROR_LIST);
         if (!doc) return Response.error("Không tải được trang danh sách: " + url);
         var parsed = parseListPage(doc, page);
         if (parsed.items.length === 0) {
@@ -112,12 +112,12 @@ function execute(query, page) {
     if (searchId) {
         // Trang ke: toi thang trang ket qua theo searchid.
         var pageUrl = BASE_URL + "/e/search/result/index.php?page=" + sitePage + "&searchid=" + searchId;
-        resultDoc = fetchDocWithFallback(pageUrl);
+        resultDoc = fetchDocWithFallback(pageUrl, MIRROR_LIST);
         if (!resultDoc) return Response.error("Không tải được trang kết quả tìm kiếm: " + pageUrl);
     } else {
         // Trang dau: goi URL tim kiem, server 302 toi trang ket qua.
         var searchUrl = BASE_URL + "/e/search/?searchget=1&keyboard=" + encodeURIComponent(query) + "&show=title";
-        resultDoc = fetchDocWithFallback(searchUrl);
+        resultDoc = fetchDocWithFallback(searchUrl, MIRROR_LIST);
         if (!resultDoc) return Response.error("Không tải được kết quả tìm kiếm: " + searchUrl);
         searchId = extractSearchId(resultDoc);
     }

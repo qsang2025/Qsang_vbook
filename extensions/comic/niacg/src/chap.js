@@ -88,7 +88,7 @@ function execute(url) {
     if (url.indexOf("/moehome-") !== -1) {
         if (isSeriesClass(classid)) {
             // Chuong truyen tranh: tim nut "开始阅读" tren trang moehome.
-            var doc = fetchDocWithFallback(url);
+            var doc = fetchDocWithFallback(url, MIRROR_LIST);
             if (!doc) return Response.error("Không tải được chương: " + url);
             var reading = doc.select("a.reading").first();
             var href = reading ? (reading.attr("href") || "") : "";
@@ -106,7 +106,7 @@ function execute(url) {
         }
     }
 
-    var readDoc = fetchDocWithFallback(readUrl);
+    var readDoc = fetchDocWithFallback(readUrl, MIRROR_LIST);
     if (!readDoc) return Response.error("Không tải được trang đọc: " + readUrl);
 
     var images = extractImages(readDoc);

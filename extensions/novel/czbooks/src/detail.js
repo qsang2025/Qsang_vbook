@@ -25,7 +25,7 @@ load('helper.js');
 
 function execute(url) {
     url = normalizeUrl(url);
-    var doc = fetchDocWithFallback(url);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
     var titleEl = doc.select("div.info-wrap div.info h1.title").first();
