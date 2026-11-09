@@ -155,9 +155,20 @@ function execute(url) {
     var fm = String(follows).match(/^[\d.,]+[KkMm]?/);
     if (fm) follows = fm[0];
 
+    // Diem danh gia cua doc gia (vd: "4,3 ⭐ (12 danh gia)")
+    var rating = "";
+    var rm = mainText.match(/(\d+[.,]\d+)\s*\(\s*(\d+)\s*đánh giá\s*\)/i);
+    if (rm) {
+        rating = rm[1] + " ⭐ (" + rm[2] + " đánh giá)";
+    }
+
+    if (cover && cover.indexOf("//") === 0) cover = "https:" + cover;
+    if (cover && cover.indexOf("http://") === 0) cover = "https://" + cover.substring(7);
+
     var detailHtml = "";
     if (author) detailHtml += "Tác giả: " + author + "<br>";
     detailHtml += "Trạng thái: " + (ongoing ? "Đang ra" : "Hoàn thành") + "<br>";
+    if (rating) detailHtml += "Đánh giá: " + rating + "<br>";
     if (chapters > 0) detailHtml += "Chương: " + chapters + "<br>";
     if (views) detailHtml += "Lượt đọc: " + views + "<br>";
     if (follows) detailHtml += "Theo dõi: " + follows + "<br>";

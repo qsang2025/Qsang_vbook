@@ -24,7 +24,7 @@
     "regexp": "^https?://(www\\.)?apptruyenchu\\.pro/truyen/[^/]+/?$",
     "source": "https://apptruyenchu.pro",
     "type": "novel",
-    "version": 7
+    "version": 8
   },
   "script": {
     "book": "book.js",
