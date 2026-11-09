@@ -54,7 +54,11 @@ Khảo sát ngày 2026-11-07 (kiểm chứng live bằng curl từ VM + test tr�
   `children()` / `tagName()` / `parent()` trên Element nên `toc.js` KHÔNG
   đếm `<dt>` được — thay vào đó lấy tất cả `dl dd a` theo thứ tự DOM rồi
   dedupe GIỮ LẦN XUẤT HIỆN CUỐI (quét ngược từ cuối lên rồi đảo lại), vì
-  phần dưới trang là danh sách đầy đủ tăng dần. App strip trailing `/`
+  phần dưới trang là danh sách đầy đủ tăng dần. (Kiểm chứng 2026-11-09:
+  đúng 1 `<dl>` với 2 `<dt>`; 12 href lặp lại chính là 12 chương mới nhất
+  3083–3094; giữ lần đầu sẽ cho thứ tự sai 3094…3083, 1…3082, nên giữ lần
+  cuối là đúng. Nếu mục lục hiện sai thứ tự thì kiểm tra thứ tự 2 khối
+  `<dt>` trên trang TOC trước.) App strip trailing `/`
   khỏi URL arg nên `toc.js` nhận `/649` vẫn phải tự thêm `/` trước khi fetch.
 - Chương: `/{id}/{cid}.html` — tiêu đề `div.bookname > h1` dạng
   "第3094章 见识  1/5" (strip phần "  N/M"); nội dung `div#content`, các
@@ -62,7 +66,12 @@ Khảo sát ngày 2026-11-07 (kiểm chứng live bằng curl từ VM + test tr�
   `a#pager_next` — text quyết định: "下一页" → trang con tiếp
   `/{id}/{cid}_{k+1}.html` (`_2.html`…`_5.html`; `_1` không tồn tại);
   "下一章" → href `/{id}/end.html` là SENTINEL GIẢ — DỪNG, KHÔNG fetch nó.
-  `chap.js` loop tối đa 10 trang con, nối đủ nội dung. Lọc rác trong
+  `chap.js` loop tối đa 10 trang con, nối đủ nội dung. (Kiểm chứng
+  2026-11-09: mẫu 49 chương rải khắp 《大道主》 tối đa 5 trang con/chương,
+  chương 3094 đi hết chuỗi 1/5 → 5/5 rồi pager đổi thành 下一章 →
+  `end.html`; cap 10 là lưới an toàn gấp đôi số lớn nhất quan sát được,
+  vòng lặp dừng ở sentinel nên không treo; nếu chương vượt 10 trang thì
+  log cảnh báo và nội dung thiếu phần sau.) Lọc rác trong
   `#content` theo NỘI DUNG: `<p>` DMCA đầu tiên, "小主子，这个章节后面还有哦
   ^.^，请点击下一页继续阅读，后面更精彩！", "本小章还未完~.~，请点击下一页
   继续阅读后面精彩内容！", "无错的章节将持续在…", "请大家收藏：(shuhaige.tw)".
@@ -99,6 +108,18 @@ Khảo sát ngày 2026-11-07 (kiểm chứng live bằng curl từ VM + test tr�
   quả — KHÔNG tự ý drop search, KHÔNG bịa selector. Cần kiểm tra lại bằng
   trình duyệt thật (POST form tay) hoặc khi site sửa backend; fixture
   `search.js` trong `test.json` sẽ FAIL cho tới lúc đó.
+- **Kiểm tra lại 2026-11-09: vẫn hỏng.** Thử lại toàn bộ biến thể: GET
+  `searchtype=articlename/all/author`, POST `all`/`articlename`, GET qua
+  `m.shuhaige.tw`, từ khóa ngắn `剑`, tìm theo tác giả `飘荡的云` — tất cả
+  trả HTTP 200 nhưng chỉ là vỏ trang (title `sodu小说搜索`, ~6,0KB GET /
+  ~5,8KB POST, 0 kết quả, không chứa từ khóa). Form tìm kiếm trên trang chủ
+  không đổi (POST `/search.html`, `searchtype=all` ẩn + ô `369koolearn`);
+  trang kết quả không có JS nào tải kết quả (chỉ jQuery, `common.js`,
+  `App.js`). Kết luận: backend tìm kiếm của site vẫn chưa sửa — `search.js`
+  giữ nguyên 3 tầng thử và lỗi tiếng Việt rõ ràng, KHÔNG giả vờ sửa; case
+  search trong `test.json` vẫn FAIL cho tới khi site sửa backend. Hướng
+  fallback qua nguồn khác (tìm slug truyện rồi map về shuhaige.tw) cần
+  quyết định của Anh vì đổi kiến trúc tìm kiếm — chưa làm.
 - **Mirror `.net` CHẾT (2026-11-07, test trên điện thoại thật)**:
   `https://www.shuhaige.net/` và `https://m.shuhaige.net/` đều trả HTTP 504
   (từ VM: 000/exit 52). `MIRRORS` giữ mặc định `""` (như sto9); nếu sau này

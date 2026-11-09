@@ -11,6 +11,11 @@
 // va tra 1 item duy nhat lay tu OG meta (nhu sto9).
 // Neu ca 3 cach deu khong tra ket qua thi tra loi ro rang (khong tu y
 // drop search, khong bia selector ket qua).
+// Kiem tra lai 2026-11-09: VAN HONG — thu them GET articlename/all/author,
+// POST all/articlename, m.shuhaige.tw, tu khoa ngan "剑", tac gia
+// "飘荡的云": tat ca tra 200 nhung chi la vo "sodu小说搜索", khong ket qua,
+// form khong doi, khong co JS tai ket qua. Giu nguyen loi tieng Viet ro
+// rang, khong gia vo sua; xem README (Maintenance watch).
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
 // helper.js vao src/.
