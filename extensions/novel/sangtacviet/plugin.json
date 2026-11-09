@@ -2,7 +2,7 @@
   "metadata": {
     "name": "Sáng Tác Việt",
     "author": "MuseAi",
-    "version": 6,
+    "version": 7,
     "source": "https://sangtacviet.app",
     "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
     "description": "Sáng Tác Việt — nền tảng đọc và nhúng truyện dịch máy / convert từ nguồn Trung Quốc (Qidian, Fanqie, 69shu, uukanshu...).",
@@ -36,6 +36,7 @@
     "search": "search.js",
     "toc": "toc.js",
     "chap": "chap.js",
-    "gen": "gen.js"
+    "gen": "gen.js",
+    "comment": "comment.js"
   }
 }

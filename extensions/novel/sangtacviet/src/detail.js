@@ -88,6 +88,7 @@ function execute(url) {
     }
 
     if (cover && cover.indexOf("//") === 0) cover = "https:" + cover;
+    if (cover && cover.indexOf("http://") === 0) cover = "https://" + cover.substring(7);
 
     // Selector :has() da kiem chung chay duoc trong jsoup cua runtime
     // (trang chi tiet that co .blk chua .fa-water va .blk-body).
@@ -102,12 +103,6 @@ function execute(url) {
         detail += "<br>" + e.text().trim();
     });
 
-    // The loai: site ghi trong <meta property="og:novel:category">, vi du
-    // "He thong" hoac "Do thi ngon tinh". Chi map khi chuoi category
-    // chua dung ten mot the loai trong bang GENRES (config.js) — vi du
-    // "Do thi ngon tinh" chua "Do Thi" -> chip Do Thi (category=dt).
-    // "He thong" khong thuoc bang thi khong gan genre, khong tu che
-    // the loai moi (da kiem chung tren 2 trang that 2026-11-09).
     var genres = [];
     var ogCat = doc.select("meta[property='og:novel:category']").first();
     if (ogCat) {
@@ -116,11 +111,16 @@ function execute(url) {
             for (var gi = 0; gi < GENRES.length; gi++) {
                 if (catText.indexOf(GENRES[gi].title.toLowerCase()) !== -1) {
                     genres.push({ title: GENRES[gi].title, input: GENRES[gi].slug, script: "gen.js" });
-                    break;
                 }
             }
         }
     }
+
+    var commentConfig = {
+        title: "Bình luận",
+        input: url,
+        script: "comment.js"
+    };
 
     return Response.success({
         name: name,
@@ -133,6 +133,8 @@ function execute(url) {
         url: url,
         type: "novel",
         format: "novel",
-        genres: genres
+        genres: genres,
+        comment: commentConfig,
+        comments: [commentConfig]
     });
 }
