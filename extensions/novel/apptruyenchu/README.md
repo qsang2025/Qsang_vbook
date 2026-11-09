@@ -64,13 +64,25 @@ fallback về link chương trong DOM (chương 1 + chương mới nhất) thay 
 báo lỗi ngay.
 
 **Lưu ý bảo trì:** `Next-Action` ID là hash sinh lúc build website, cố
-định ở bản build hiện tại. Nếu site deploy bản mới và đổi ID (dấu hiệu:
-toc chỉ trả 2 chương, log báo Server Action thất bại), lấy ID mới bằng
-cách tải file chunk JS chứa chuỗi `fetchChaptersOfBook` (tìm trong HTML
-thẻ `<script src="/_next/static/chunks/...js">`) rồi regex
-`createServerReference\("([a-f0-9]{40})"[^)]*"fetchChaptersOfBook"\)`.
+định ở bản build hiện tại. Từ v7, nếu site deploy bản mới và đổi ID,
+`toc.js` tự trích ID mới từ file chunk JS chứa chuỗi
+`fetchChaptersOfBook` (tìm trong HTML thẻ `<script
+src="/_next/static/chunks/...js">`, tối đa 10 file) rồi POST lại 1 lần,
+đồng thời log ID mới ra console để cập nhật `CHAPTER_ACTION_ID` trong
+code — toc không còn "chết lặng" chỉ trả 2 chương. Regex trích ID phải
+khớp dạng minified thật
+`createServerReference\)\("([a-f0-9]{32,64})"[^)]*"fetchChaptersOfBook"`
+(ID thật dài 42 ký tự hex — lấy `{40}` sẽ cắt cụt ID).
 Firebase của site chỉ dùng cho Auth (đăng nhập), không dùng để lấy chương
 nên extension không cần cấu hình Firebase.
+
+**Chương khóa (xác minh 2026-11-09):** truyện có chương `isLock`
+(vd `dich-bang-tu-hanh-thang-toan-cua-ta`: 100/150 chương khóa) — mở
+chương khóa khi chưa đăng nhập chỉ hiện đoạn mở đầu + "Chương này đã
+khoá, bạn cần mở khoá để đọc nội dung chương này! Vui lòng đăng nhập...".
+Không có giá tiền hay chữ mua/thanh toán: khóa = cần đăng nhập/mở khóa,
+không phải chương trả phí, nên `toc.js` giữ `pay: false`; `chap.js` trả
+lỗi đăng nhập tiếng Việt thay vì trả đoạn mở đầu.
 
 **Bẫy runtime vBook (gặp 2026-11-06, sửa ở v3):** Element trả về từ
 `select()` chỉ có các hàm đã ghi trong `extension-api.md` (`text()`,

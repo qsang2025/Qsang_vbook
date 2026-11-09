@@ -11,11 +11,16 @@
 //      [{value, label, slugId, number, isLock}, ...]. URL chuong =
 //      /truyen/<slug>/<slugId>.
 // Next-Action ID la hash sinh luc build website (co dinh hien tai); neu
-// site deploy ban moi va doi ID thi lay lai ID moi tu file chunk JS chua
-// chuoi "fetchChaptersOfBook" (xem README cua extension).
-// Neu Server Action that bai (het bookId, POST loi, response khong co
-// dong 1:[) thi fallback ve link chuong trong DOM (chuong 1 + chuong moi
-// nhat) thay vi bao loi ngay.
+// site deploy ban moi va doi ID thi toc.js TU TRICH ID moi tu file chunk
+// JS chua chuoi "fetchChaptersOfBook" (xem findFreshActionId) roi POST lai
+// 1 lan, thay vi am tham tra fallback 2 chuong — neu trich duoc ID moi thi
+// log ra console de nguoi sua cap nhat CHAPTER_ACTION_ID trong code.
+// Luu y: ID that la 42 ky tu hex (khong phai 40); dang minified that trong
+// chunk la createServerReference)("ID",...,"fetchChaptersOfBook") — giua
+// createServerReference va ID co ")(", regex cu thieu doan nay nen khong
+// khop. Neu Server Action that bai (het bookId, POST loi, response khong
+// co dong 1:[) thi fallback ve link chuong trong DOM (chuong 1 + chuong
+// moi nhat) thay vi bao loi ngay.
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
 // helper.js vao src/.
@@ -41,15 +46,15 @@ function extractBookId(raw) {
     return "";
 }
 
-// Goi Server Action fetchChaptersOfBook, tra ve mang chuong tho
-// [{label, slugId, number, isLock}] hoac null neu that bai.
-function fetchChaptersViaAction(bookUrl, bookId) {
+// Goi Server Action fetchChaptersOfBook voi actionId cho truoc, tra ve
+// mang chuong tho [{label, slugId, number, isLock}] hoac null neu that bai.
+function fetchChaptersViaAction(bookUrl, bookId, actionId) {
     var res = null;
     try {
         res = fetch(bookUrl, {
             method: "POST",
             headers: {
-                "Next-Action": CHAPTER_ACTION_ID,
+                "Next-Action": actionId,
                 "Content-Type": "text/plain;charset=UTF-8",
                 "Accept": "text/x-component"
             },
@@ -85,6 +90,47 @@ function fetchChaptersViaAction(bookUrl, bookId) {
     }
     console.log("toc: response Server Action khong co dong 1:[");
     return null;
+}
+
+// Trich Server Action ID moi tu noi dung 1 file chunk JS.
+// Dang that trong chunk (kiem chung bang curl 2026-11-09):
+//   (0,l.createServerReference)("40846d9a...a7",l.callServer,void 0,
+//   l.findSourceMapURL,"fetchChaptersOfBook")
+// ID la 42 ky tu hex — regex phai lay [a-f0-9]{32,64} (lay {40} se cat
+// cut ID) va phai khop ")(" giua createServerReference va dau ngoac mo
+// cua ID. Tra ve "" neu khong tim thay.
+function extractActionIdFromChunk(jsText) {
+    var m = String(jsText || "").match(/createServerReference\)\("([a-f0-9]{32,64})"[^)]*"fetchChaptersOfBook"/);
+    if (m) return m[1];
+    return "";
+}
+
+// Tu phuc hoi khi CHAPTER_ACTION_ID het han: quet cac file chunk JS
+// trong HTML trang chi tiet (toi da 10 file, dung khi gap chuoi
+// "fetchChaptersOfBook"), trich ID moi. Chi chay khi POST voi ID cu
+// that bai nen khong ton them request o duong chay thuong. Tra ve ""
+// neu khong trich duoc.
+function findFreshActionId(raw) {
+    var re = /src="(\/_next\/static\/chunks\/[^"]+\.js)"/g;
+    var m = null;
+    var seen = {};
+    var tried = 0;
+    while ((m = re.exec(String(raw || ""))) !== null) {
+        var src = m[1];
+        if (seen[src]) continue;
+        seen[src] = true;
+        if (tried >= 10) break;
+        tried++;
+        try {
+            var res = fetch(BASE_URL + src);
+            if (!res || !res.ok) continue;
+            var id = extractActionIdFromChunk(res.text());
+            if (id) return id;
+        } catch (e) {
+            console.log("toc doc chunk " + src + " loi: " + e);
+        }
+    }
+    return "";
 }
 
 // Ten chuong tu text cua link (dung cho duong fallback): uu tien phan
@@ -178,13 +224,33 @@ function execute(url) {
     // Duong chinh: Server Action fetchChaptersOfBook.
     var bookId = extractBookId(raw);
     if (bookId) {
-        var data = fetchChaptersViaAction(url, bookId);
+        var data = fetchChaptersViaAction(url, bookId, CHAPTER_ACTION_ID);
+        if (!data) {
+            // ID cu co the het han (site deploy ban moi): tu trich ID moi
+            // tu chunk JS roi POST lai 1 lan; chi khi van that bai moi
+            // roi xuong fallback DOM, khong tra lang 2 chuong.
+            var freshId = findFreshActionId(raw);
+            if (freshId && freshId !== CHAPTER_ACTION_ID) {
+                console.log("toc Action ID moi: " + freshId + " — cap nhat CHAPTER_ACTION_ID trong toc.js");
+                data = fetchChaptersViaAction(url, bookId, freshId);
+            }
+        }
         if (data && data.length > 0) {
             var chapters = [];
             var i = 0;
             for (i = 0; i < data.length; i++) {
                 var item = data[i];
                 if (!item || !item.slugId) continue;
+                // lock/pay (xac minh 2026-11-09, truyen
+                // dich-bang-tu-hanh-thang-toan-cua-ta: 100/150 chuong
+                // isLock): mo chuong khoa khi chua dang nhap, trang chi
+                // hien doan mo dau + "Chuong nay da khoa, ban can mo khoa
+                // de doc noi dung chuong nay! Vui long dang nhap de xem
+                // tiep noi dung" — khong co gia tien hay chu "mua/thanh
+                // toan/tra phi". Vay lock = can dang nhap/mo khoa, KHONG
+                // phai chuong tra phi: giu pay: false. Mo chuong khoa
+                // trong chap.js se tra loi dang nhap tieng Viet (qua
+                // isLoginRequired) thay vi tra doan mo dau.
                 chapters.push({
                     name: cleanText(item.label || ("Chương " + item.number)),
                     url: absUrl("/truyen/" + slug + "/" + item.slugId),

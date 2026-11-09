@@ -20,8 +20,10 @@ load('challenge-handler.js');
 load('helper.js');
 load('cleanHtml.js');
 
+// Header phu cho request chuong (KHONG dat User-Agent: dung UA mac dinh
+// cua runtime theo quy tac 10 — UA hardcode Pixel 7 Chrome/124 da bo
+// 2026-11-09, kiem chung bang curl khong UA van tra 200 + <article>).
 var CHAP_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "vi-VN,vi;q=0.9,en;q=0.8"
 };

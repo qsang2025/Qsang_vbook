@@ -1,4 +1,9 @@
-// helper.js — ham phu cua extension App Truyen Chu (apptruyenchu.pro).
+// helper.js — ham phu RIENG cua extension App Truyen Chu
+// (apptruyenchu.pro). KHONG phai lib dung chung: cac ham duoi day
+// (parseBookCard, parseListPage, unwrapCover, dedupeTitle...) chi dung
+// cho giao dien rieng cua site nay, nen chi ton tai trong src/ cua ext
+// nay, khong co ban goc trong lib/ o root repo. Neu ext khac muon dung
+// lai thi copy co chon loc, khong dong bo md5 nhu file lib.
 //
 // Giu cac ham goc cua template (queryBuilder, htmlDecode, slugify) va them
 // cac ham rieng cho site nay: boc anh qua proxy /_next/image, parse the
