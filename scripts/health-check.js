@@ -13,9 +13,11 @@
 //     hoa/thường) trong body. Case lỗi -> DEGRADED.
 //
 // Trạng thái: HEALTHY / MOVED / DEGRADED / BROKEN / NO_SOURCE / UNKNOWN / BLOCKED.
-// BLOCKED = HTTP 403: site chặn truy cập từ IP của CI (tường lửa Cloudflare
-// chặn dải IP datacenter của GitHub Actions — đã xác minh 2026-11-06: cùng
-// request từ máy này trả HTTP 200, từ runner GitHub trả 403 trong ~90ms).
+// BLOCKED = HTTP 403 hoặc 405: site chặn truy cập từ IP của CI (tường lửa
+// Cloudflare chặn dải IP datacenter của GitHub Actions — đã xác minh 2026-11-06:
+// cùng request từ máy này trả HTTP 200, từ runner GitHub trả 403 trong ~90ms;
+// 405 là WAF rate-limit theo IP — đã gặp ở qimao.com 2026-11-09: ~6–10 request
+// nhanh khiến WAF chặn IP bằng HTTP 405 hơn 2 giờ, trong khi site vẫn sống).
 // BLOCKED còn gồm trường hợp site/WAF cắt TLS handshake của probe Node
 // ("Client network socket disconnected before secure TLS connection was
 // established" — đã gặp ở biquge.tw và truyenfull.link ngày 2026-11-07:
@@ -303,10 +305,11 @@ async function checkOne(source, root) {
   base.latency = probe.latency + "ms";
 
   if (!probe.ok) {
-    if (probe.status === 403) {
-      // Site chặn IP của CI (Cloudflare) — không kết luận được sống/chết.
+    if (probe.status === 403 || probe.status === 405) {
+      // Site chặn IP của CI (Cloudflare 403) hoặc WAF rate-limit theo IP
+      // (405 — đã gặp ở qimao.com 2026-11-09) — không kết luận được sống/chết.
       base.status = "BLOCKED";
-      base.detail = "HTTP 403 — site chặn truy cập từ IP của CI (tường lửa Cloudflare); chưa kết luận được site sống hay chết — kiểm tra tay.";
+      base.detail = "HTTP " + probe.status + " — site chặn truy cập từ IP của CI (tường lửa Cloudflare / WAF rate-limit); chưa kết luận được site sống hay chết — kiểm tra tay.";
     } else if (isTlsHandshakeDrop(probe.error)) {
       // Site/WAF cắt TLS handshake của probe Node — không kết luận được sống/chết.
       base.status = "BLOCKED";
@@ -343,9 +346,9 @@ async function checkOne(source, root) {
       const label = c.name || ("case " + (i + 1));
       const cp = await probeUrl(c.url);
       if (!cp.ok) {
-        if (cp.status === 403) {
+        if (cp.status === 403 || cp.status === 405) {
           base.status = "BLOCKED";
-          base.detail += " | Fixture \"" + label + "\" bị chặn: HTTP 403 từ IP của CI (" + c.url + ") — kiểm tra tay.";
+          base.detail += " | Fixture \"" + label + "\" bị chặn: HTTP " + cp.status + " từ IP của CI (" + c.url + ") — kiểm tra tay.";
         } else if (isTlsHandshakeDrop(cp.error)) {
           base.status = "BLOCKED";
           base.detail += " | Fixture \"" + label + "\" bị chặn: TLS handshake bị site/WAF từ chối (" + c.url + ") — kiểm tra tay.";
