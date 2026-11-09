@@ -6,16 +6,23 @@
 // dung truc tiep. Dua vao MIRROR_LIST van co ich khi domain chinh bi chan
 // o muc DNS/tuyen duong nhung mirror van mo duoc (redirect se dan ve
 // domain chinh); neu domain chinh chet han thi mirror cung khong cuu
-// duoc. wikidichvn.com bi Cloudflare chan tu VM (HTTP 403, kiem chung
-// 2026-11-08) nen KHONG dua vao MIRROR_LIST — chi giu trong DOMAIN.values
-// de Anh tu chon tren may that (o do cookie cf_clearance cua trinh duyet
-// da qua xac minh co the mo duoc); can kiem chung tren dien thoai truoc
-// khi dua no vao failover tu dong.
+// duoc. wikidichvn.com bi Cloudflare chan tu VM (HTTP 403, trang
+// challenge "Just a moment...", kiem chung lai 2026-11-09) nen KHONG dua
+// vao MIRROR_LIST — chi giu trong DOMAIN.values de Anh tu chon tren may
+// that (o do cookie cf_clearance cua trinh duyet da qua xac minh co the
+// mo duoc); can kiem chung tren dien thoai truoc khi dua no vao failover
+// tu dong (C1).
 //
-// fetchWithMirrors() KHONG gan lai BASE_URL nhu ban sangtacviet: o day
-// khong co co che grant/key gan voi origin (chap chi la GET HTML don
-// gian), va mirror chi redirect ve domain chinh nen giu BASE_URL on dinh
-// se tranh request nao cung phai redirect them mot vong.
+// Duong fetch chinh tu v4 (N1): fetchPageDoc() trong helper.js goi
+// fetchDocWithFallback(url, MIRROR_LIST) cua fetch-helpers.js (retry 429,
+// quet marker challenge ca khi HTTP 200, thu browser fallback). LUU Y:
+// fetchWithFallback() cua lib SE gan lai BASE_URL ve mirror khi mirror
+// tiep quan (khac voi fetchWithMirrors() o day von giu BASE_URL on
+// dinh); chi xay ra khi domain chinh da chet, va mirror cung chi
+// redirect ve domain chinh nen anh huong thuc te khong dang ke.
+// fetchWithMirrors() van giu lai lam duong chan doan (probe phan biet
+// challenge/login voi loi mang) trong helper.js va cho vong lap AJAX
+// cua toc.js.
 //
 // LUU Y load(): file nay duoc load() boi cac script khac, nen KHONG duoc
 // load() them file nao khac o day.
