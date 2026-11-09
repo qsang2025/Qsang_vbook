@@ -31,6 +31,10 @@ function execute(url) {
         cover = coverEl.attr("data-src") || coverEl.attr("src") || "";
         if (cover.indexOf("logo") !== -1) cover = "";
     }
+    if (cover) {
+        if (cover.indexOf("//") === 0) cover = "https:" + cover;
+        cover = cover.replace(/^http:\/\//i, "https://");
+    }
 
     var author = "";
     var authorEl = doc.select("a[href*='/tac-gia/']").first();
@@ -84,15 +88,22 @@ function execute(url) {
         }
     });
 
-    // So chuong: doc trong tung <li> cua khoi ".book-info-text", khong
-    // regex tren toan bo text cua trang.
+    // So chuong, Luot xem, Nguon: doc trong tung <li> cua khoi ".book-info-text".
     var chapterCount = "";
+    var viewCount = "";
+    var sourceText = "";
     var infoItems = doc.select(".book-info-text li");
     for (var k = 0; k < infoItems.size(); k++) {
         var liText = infoItems.get(k).text();
         if (liText.indexOf("Số chương") !== -1) {
             var cm = liText.match(/(\d[\d.]*)/);
             if (cm) chapterCount = cm[1];
+        } else if (liText.indexOf("Lượt xem") !== -1) {
+            var vm = liText.match(/:\s*([0-9\.]+)/);
+            if (vm) viewCount = vm[1].trim();
+        } else if (liText.indexOf("Nguồn") !== -1) {
+            var sm = liText.replace(/^Nguồn\s*:\s*/i, "").trim();
+            if (sm) sourceText = sm;
         }
     }
 
@@ -100,6 +111,8 @@ function execute(url) {
     if (author) detailLines.push("<b>Tác giả:</b> " + author);
     if (statusText) detailLines.push("<b>Trạng thái:</b> " + statusText);
     if (chapterCount) detailLines.push("<b>Số chương:</b> " + chapterCount);
+    if (viewCount) detailLines.push("<b>Lượt xem:</b> " + viewCount);
+    if (sourceText) detailLines.push("<b>Nguồn:</b> " + sourceText);
     if (genres.length > 0) {
         var gNames = [];
         for (var i = 0; i < genres.length; i++) gNames.push(genres[i].title);
