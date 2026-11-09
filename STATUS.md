@@ -1,6 +1,6 @@
 # STATUS — Trạng thái các nguồn (sinh tự động)
 
-> Cập nhật lần cuối: 2026-11-08 00:38 UTC (CI health-check hàng ngày + chạy tay).
+> Cập nhật lần cuối: 2026-11-09 00:41 UTC (CI health-check hàng ngày + chạy tay).
 > File này **không sửa tay**. GitHub Actions sinh lại file này;
 > muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.
 
@@ -21,6 +21,7 @@
 | La Cà Truyện | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Mê Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Sáng Tác Việt | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| TiemtruyenchuVIP | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Tiệm Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | TruyenC | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Truyện Full | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
