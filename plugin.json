@@ -31,7 +31,7 @@
       "name": "La Cà Truyện",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
-      "version": 5,
+      "version": 6,
       "source": "https://lacatruyen.site",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/icon.png",
       "description": "Đọc truyện chữ trên La Cà Truyện (lacatruyen.site). Hỗ trợ giải mã mục lục và chương tự động; có thể cấu hình TOKEN hoặc đăng nhập trình duyệt vBook để đọc đầy đủ các chương yêu cầu đăng nhập (ref: QuocBao, ivanzzz).",

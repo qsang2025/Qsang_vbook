@@ -48,6 +48,13 @@ function mapChapterList(rows) {
             name: title,
             url: BASE_URL + "/chapter/" + slug,
             host: BASE_URL,
+            // N1: chuong tra phi vua la chuong khoa (lock) vua la chuong tra phi (pay) theo
+            // hop dong toc trong extension-api.md; chi dat pay truoc day app co the khong
+            // hien icon khoa. Kiem chung live 2026-11-09: API list-chapters khong tra
+            // locked/is_locked/not_free/fee tren 7 truyen (~3.000 chuong) nen hien tai
+            // isPay luon false — them lock khong doi hanh vi hien tai, chi de app hien
+            // dung icon khi site bat dau danh dau chuong tra phi.
+            lock: isPay,
             pay: isPay
         });
     }
@@ -101,6 +108,14 @@ function execute(url) {
         }
     }
 
+    // Tripwire MASTER_KEY (N2): khoa xoay thi fetchEncryptedChapterPage giai ma ra rong
+    // mot cach lang le (ok:false). Kiem tra som bang mau da biet, bao loi ro rang thay vi
+    // tra muc luc rong / loi chung chung. Chi chay sau khi da co storyId de loi mang khi
+    // tai trang truyen van duoc bao dung truoc.
+    if (!verifyMasterKey()) {
+        return Response.error("Khóa giải mã của La Cà Truyện đã thay đổi, extension cần được cập nhật.");
+    }
+
     // Truong hop duoc goi tu page.js voi tham so page cu the
     if (!isNaN(reqPage) && reqPage > 0) {
         var singleRes = fetchEncryptedChapterPage(storyId, reqPage, reqSize, storyUrl);
@@ -141,8 +156,10 @@ function execute(url) {
         if (rows.length < reqSize) break;
     }
 
+    // Fetch thanh cong nhung truyen chua co chuong nao: tra danh sach rong, khong bao loi
+    // (quy uoc 0 ket qua — chi dung Response.error cho loi mang/HTTP/parse).
     if (allChapters.length === 0) {
-        return Response.error("Truyện chưa có chương nào.");
+        return Response.success([]);
     }
 
     return Response.success(allChapters);

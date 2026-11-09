@@ -8,6 +8,9 @@ var CDN_URL = "https://cms.metruyen.com/storage/uploads/";
 var MASTER_KEY = "T5Vv41K5zJBHhtODBnOTdrl3shZVEPqzb16Hzfuh4J5tWrb0";
 var USER_TOKEN = "";
 
+// GHI CHU (C3): cac catch rong trong file nay la CO Y — load cau hinh khong bao gio duoc
+// fail ca extension (DOMAIN/TOKEN sai, localStorage/localCookie khong co thi chi bo qua
+// va dung gia tri mac dinh / token rong). Giu nguyen, khong "sua" thanh bao loi.
 try {
     if (typeof CONFIG_URL !== "undefined" && CONFIG_URL) {
         BASE_URL = String(CONFIG_URL).replace(/\/+$/, "");
@@ -335,8 +338,21 @@ function aesDecryptObject(obj, pass) {
     return out;
 }
 
-function formatCommentSeed(cc) {
-    if (cc === undefined || cc === null) return "";
-    if (Array.isArray(cc)) return cc.join(",");
-    return String(cc);
+// Tripwire MASTER_KEY (N2): mau kiem tra khoa giai ma con dung duoc hay khong.
+// KEY_CHECK_CIPHER la ban ma cua chuoi "lacatruyen-key-check-v1" ma hoa bang MASTER_KEY
+// hien tai (CryptoJS AES passphrase, salt ngau nhien luc tao — ban ma nay giai dung khoa
+// se tra dung chuoi goc; sai khoa thi aesDecrypt tra "" do bat loi Malformed UTF-8).
+// Site xoay khoa thi ham nay tra false va toc.js/chap.js bao loi ro rang thay vi tra
+// rong lang le. Tao mau moi bang:
+//   node -e "var C=require('./src/crypto.js');console.log(C.AES.encrypt('lacatruyen-key-check-v1','<MASTER_KEY moi>').toString())"
+// roi kiem tra giai ma nguoc truoc khi thay vao day.
+var KEY_CHECK_PLAIN = "lacatruyen-key-check-v1";
+var KEY_CHECK_CIPHER = "U2FsdGVkX1/U1d8H/GQAvZr/LFIUuBVqZMkXR0Qwp7F3JC43+jH26OLpMoTUZLBW";
+
+function verifyMasterKey() {
+    try {
+        return aesDecrypt(KEY_CHECK_CIPHER, MASTER_KEY) === KEY_CHECK_PLAIN;
+    } catch (e) {
+        return false;
+    }
 }
