@@ -4,8 +4,8 @@ Extension truyện chữ tiếng Việt cho vBook — chuyên **Tiên Hiệp, Đ
 đọc **miễn phí, không khóa chương VIP**.
 
 - **Site:** https://truyenfull.link (WordPress, theme tv6)
-- **Loại:** novel — **Locale:** vi_VN — **Tác giả:** Qsang — **Phiên bản:** 1
-- **Ngày khảo sát / xây dựng:** 2026-11-06
+- **Loại:** novel — **Locale:** vi_VN — **Tác giả:** Qsang — **Phiên bản:** 3
+- **Ngày khảo sát / xây dựng:** 2026-11-06; kiểm tra lại kho + mirror ngày 2026-11-09 (v3)
 
 ## Vì sao chọn nguồn này
 
@@ -39,6 +39,13 @@ một số bộ dài hiện chỉ có các chương đầu (Cực Đạo Thiên 
 thực tế bộ này dài hơn nhiều). Đây là **thiếu nội dung, không phải khóa VIP**:
 không có thông báo khóa, không yêu cầu đăng nhập hay trả phí ở chương cuối.
 
+**Kiểm tra lại kho ngày 2026-11-09** (curl từ VM, v3): Cực Đạo Thiên Ma vẫn
+48 chương qua AJAX; Đạo Kiếm Thần Hoàng vẫn 1.594 chương; phân trang thể loại
+không đổi (Tiên Hiệp 25 trang, Đô Thị 229 trang, 30 truyện/trang). Kho chưa
+tăng thêm trong 3 ngày qua — hẹn kiểm tra lại sau ~1 tháng (khoảng 2026-12-09):
+nếu site ngừng nhập thì đây là nguồn "kho nhỏ", không nên ưu tiên giới thiệu
+truyện dài.
+
 ## Ứng viên bị loại
 
 | Ứng viên | Lý do loại |
@@ -48,7 +55,14 @@ không có thông báo khóa, không yêu cầu đăng nhập hay trả phí ở
 | metruyencv.com | HTTP 403; metruyenchu.net chết (000) |
 | truyenyy.com / truyenyy.xyz | Chết (000) |
 | truyenfull.vn / .vision / .today | HTTP 521 (origin sập); truyenfull.io / .net chết; truyenfull.bio 521 |
-| truyenfull.live | HTTP 403 — Cloudflare chặn IP datacenter của VM (giữ làm mirror dự phòng trong config; trên điện thoại có thể qua được) |
+| truyenfull.live | Mirror **không đồng nhất** với truyenfull.link nên KHÔNG đưa vào
+  regexp/DOMAIN (kiểm chứng curl 2026-11-09, v3): trang chủ trả 200 nhưng tiêu đề +
+  giao diện khác hẳn (thương hiệu TruyenFull.vn); `/truyen/<slug>/` 301 về
+  `/<slug>/` (không có tiền tố `/truyen/`); trang chi tiết không có
+  `comment_post_ID`/`nonce` nên đường AJAX TOC không dùng được; link chương dạng
+  `/<slug>/chuong-N/`. Giữ `.live` trong config MIRRORS chỉ làm đường dự phòng
+  cuối cùng khi `.link` chết hẳn — không route link `.live` sang ext này. Trước
+  đó (2026-11-06) `.live` trả 403 do Cloudflare chặn IP datacenter của VM |
 | truyenfull.lat | Không có thể loại Tiên Hiệp / Võng Du; SvelteKit SPA (nội dung qua JS, không SSR) |
 | truyencv.io | Không có hệ thống thể loại (không có /the-loai, /category, /tag); link chi tiết trên trang chủ trả 404; có dấu hiệu kinh tế xu/VIP ("Kiếm Xu", "Vòng quay may mắn", có chữ VIP trên trang) |
 
@@ -86,13 +100,20 @@ không có thông báo khóa, không yêu cầu đăng nhập hay trả phí ở
 ## Maintenance watch
 
 1. **Domain hay đổi:** họ "Truyện Full" có nhiều domain (.live, .vn, .vision,
-   .today, .lat, .link...). Nếu `truyenfull.link` chết, thử `truyenfull.live`
-   (đã có trong config làm mirror) rồi cập nhật `BASE_URL` + `metadata.source`.
+   .today, .lat, .link...). Nếu `truyenfull.link` chết, **đừng** đổi `BASE_URL`
+   sang `truyenfull.live` mù — kiểm chứng 2026-11-09 cho thấy `.live` là site
+   khác (URL `/<slug>/`, không có storyId/nonce, không dùng được AJAX TOC),
+   đổi sang sẽ gãy toc/detail. Tìm domain nào cùng theme tv6 + cùng
+   storyId/nonce rồi mới cập nhật `BASE_URL` + `metadata.source`.
 2. **Nonce AJAX:** nếu toc.js chỉ trả 50 chương (fallback DOM) thì kiểm tra xem
    site có đổi tên task `chapters`, tham số `action=tv6_client` hay cấu trúc
-   biến `tv6` không.
+   biến `tv6` không. Khi rơi vào fallback đủ 50 chương, chương cuối có
+   `description` cảnh báo "Danh sách có thể chưa đủ (chỉ tải được 50 chương
+   đầu)" — kiểm tra xem app có hiển thị description của mục toc không.
 3. **Kho truyện đang nhập dần:** số chương của một bộ có thể tăng theo thời gian
-   — đó là bình thường, không phải lỗi.
+   — đó là bình thường, không phải lỗi. Kiểm tra lại 2026-11-09: chưa tăng
+   (Cực Đạo Thiên Ma 48, Đạo Kiếm Thần Hoàng 1.594). Hẹn kiểm tra lại khoảng
+   2026-12-09.
 4. **Cloudflare:** hiện site không chặn VM; nếu sau này bị 403 thì test trên máy
    thật mới là kết quả cuối (dev-server test có thể 403 theo, app thật đã qua
    challenge trong trình duyệt của app thì chạy được — xem bài học novels.com.tw).

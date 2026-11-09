@@ -73,6 +73,13 @@ function fetchChaptersViaAjax(storyId, nonce) {
 }
 
 // Duong fallback: link chuong SSR trong #list-chapter (50 chuong dau).
+// Trang chi tiet chi render SSR toi da 50 chuong dau, nen khi fallback
+// dung 50 chuong thi danh sach co the chua du (truyen dai hon 50 chuong).
+// Truong hop do ghi ro o description cua chuong cuoi (theo hop dong
+// extension-api.md, toc item co truong description) de nguoi dung biet
+// va thu lai sau; truyen ngan hon 50 chuong thi fallback la du nen
+// khong ghi chu. (N3, 2026-11-09; hien thi description trong app chua
+// kiem chung truc quan — can xem tren may khi test.)
 function collectDomChapters(doc) {
     var chapters = [];
     var seen = {};
@@ -172,6 +179,13 @@ function execute(url) {
     var fallback = collectDomChapters(doc);
     if (fallback.length === 0) {
         return Response.error("Không đọc được mục lục (AJAX lỗi và trang không có link chương): " + url);
+    }
+    // SSR chi render toi da 50 chuong dau: dung 50 chuong thi danh sach co
+    // the chua du — ghi ro o description cua chuong cuoi (hop dong toc
+    // item co truong description); truyen ngan hon 50 chuong thi fallback
+    // la du nen khong ghi chu.
+    if (fallback.length >= 50) {
+        fallback[fallback.length - 1].description = "Danh sách có thể chưa đủ (chỉ tải được 50 chương đầu) — mục lục đầy đủ lỗi, thử lại sau để xem đủ chương.";
     }
     console.log("toc fallback DOM: chi tim duoc " + fallback.length + " chuong dau — xem README.");
     return Response.success(fallback);
