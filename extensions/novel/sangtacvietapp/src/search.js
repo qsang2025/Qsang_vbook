@@ -24,8 +24,13 @@ function execute(key, page) {
         return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
     }
     if (!response || !response.ok) return Response.error("Không tải được kết quả tìm kiếm (HTTP " + (response ? response.status : 0) + ")");
-    var doc = response.html();
+    var rawText = "";
+    try {
+        rawText = response.text();
+    } catch (eText) {
+        rawText = "";
+    }
 
-    var result = parseSearchPage(doc, pageNum);
+    var result = parseSearchPage(rawText || response.html(), pageNum);
     return Response.success(result.data, result.next);
 }
