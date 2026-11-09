@@ -108,7 +108,7 @@
       "name": "Truyện Hoàn",
       "author": "Qsang",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoan/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://truyenhoan.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoan/icon.png",
       "description": "Truyện Hoàn — kho truyện chữ tiếng Việt miễn phí, truyện full dài tập: Tiên Hiệp, Huyền Huyễn, Đô Thị, Võng Du, Kiếm Hiệp... Lưu ý: mã truyện khác nhau giữa truyenhoan.com và wetruyen.com nên mỗi truyện chỉ đọc trên đúng host của link gốc, không đổi host tự động.",

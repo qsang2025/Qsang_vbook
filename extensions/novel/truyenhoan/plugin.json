@@ -5,10 +5,10 @@
     "language": "javascript",
     "locale": "vi_VN",
     "name": "Truyện Hoàn",
-    "regexp": "^https?://(www\\.)?(truyenhoan\\.com|wetruyen\\.com)/([a-z0-9\\-]+\\.\\d+/?|[a-z0-9\\-]+/chuong-\\d+\\.html)$",
+    "regexp": "^https?://(www\\.)?(truyenhoan\\.com|wetruyen\\.com)/([A-Za-z0-9\\-_]+\\.\\d+/?|[A-Za-z0-9\\-_]+/chuong-\\d+\\.html)$",
     "source": "https://truyenhoan.com",
     "type": "novel",
-    "version": 2
+    "version": 3
   },
   "config": {
     "DOMAIN": {

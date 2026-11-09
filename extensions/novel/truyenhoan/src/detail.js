@@ -3,7 +3,14 @@
 // truyen tim duoc o host nao thi chi doc tren host do (xem config.js).
 // Trang detail cua site khong expose the loai rieng cua truyen nen khong
 // tra genres/suggests.
+//
+// Load fetch-helpers.js + challenge-handler.js + helper.js (v3, N1):
+// fetch qua fetchPageDoc() (fetchDoc + kiem challenge, tra loi tieng Viet
+// co huong dan khi gap Cloudflare/login).
 load('config.js');
+load('fetch-helpers.js');
+load('challenge-handler.js');
+load('helper.js');
 
 function execute(url) {
     var detailUrl = normalizeSiteUrl(url);
@@ -12,10 +19,9 @@ function execute(url) {
     }
     if (detailUrl.charAt(detailUrl.length - 1) !== "/") detailUrl = detailUrl + "/";
 
-    var response = safeFetch(detailUrl);
-    if (!response) return Response.error("Không kết nối được tới trang truyện.");
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
-    var doc = response.html();
+    var r = fetchPageDoc(detailUrl);
+    if (r.error) return Response.error(r.error);
+    var doc = r.doc;
 
     var name = doc.select("div.col-info-desc h1.title[itemprop=name]").text().trim();
     if (!name) {
@@ -39,6 +45,12 @@ function execute(url) {
         if (authDiv) authorText = authDiv.text().replace(/Tác giả:\s*/i, "").trim();
     }
 
+    // Trang thai: duyet .info > div tim h3 "Trạng thái" (C2, GIU NGUYEN
+    // theo de xuat review — khong sua mu). Da kiem chung live 2026-11-09
+    // tren /pham-nhan-tu-tien.14/: khoi <div><h3>Trạng thái:</h3><span
+    // class="text-success">Full</span></div>; fallback .info
+    // span.text-success. Neu trang thai sai tren truyen nao thi kiem tra
+    // selector nay dau tien.
     var statusText = "";
     doc.select(".info > div").forEach(function(div) {
         var h3 = div.select("h3");

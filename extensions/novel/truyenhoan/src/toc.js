@@ -1,6 +1,13 @@
 // toc.js — Danh sach chuong Truyen Hoan (50 chuong/trang, xem page.js)
 // KHONG doi host cua link goc (xem config.js).
+//
+// Load fetch-helpers.js + challenge-handler.js + helper.js (v3, N1):
+// fetch qua fetchPageDoc() (fetchDoc + kiem challenge, tra loi tieng Viet
+// co huong dan khi gap Cloudflare/login).
 load('config.js');
+load('fetch-helpers.js');
+load('challenge-handler.js');
+load('helper.js');
 
 function normalizeChapterHref(href, origin) {
     if (!href) return "";
@@ -17,10 +24,9 @@ function execute(url) {
     if (pageUrl.charAt(pageUrl.length - 1) !== "/") pageUrl = pageUrl + "/";
     var origin = siteOrigin(pageUrl);
 
-    var response = safeFetch(pageUrl);
-    if (!response) return Response.error("Không kết nối được tới trang truyện.");
-    if (!response.ok) return Response.error("HTTP Error: " + response.status);
-    var doc = response.html();
+    var r = fetchPageDoc(pageUrl);
+    if (r.error) return Response.error(r.error);
+    var doc = r.doc;
 
     var chapters = [];
     var seen = {};
