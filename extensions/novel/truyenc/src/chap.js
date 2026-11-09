@@ -49,7 +49,17 @@ function execute(url) {
         contentEl.select("script, iframe, .ads, .quangcao, nav, header, footer").remove();
         if (contentEl.html()) content = contentEl.html();
     }
-    if (!content || content.length < 30) {
+    // Nguong noi dung theo TEXT THUAN (strip tag roi dem), khong theo
+    // do dai HTML tho: chuong rat ngan that (chi mot cau) co HTML duoi
+    // 30 ky tu van la noi dung that. Duoi 10 ky tu text thi coi nhu
+    // rong. Luu y: chua tim duoc chuong ngan that de kiem chung nguong
+    // nay tren may (chuong mau deu > 6.000 ky tu) — nguong 10 ky tu
+    // text la phong thu, chat hon nguong HTML 30 ky tu cu.
+    var plainText = "";
+    if (content) {
+        plainText = content.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+    }
+    if (!content || plainText.length < 10) {
         return Response.error("Không tìm thấy nội dung chương.");
     }
 

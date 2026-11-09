@@ -25,10 +25,12 @@ function execute(url, page) {
     if (!doc) return Response.error("Không thể kết nối đến TruyenC. Vui lòng kiểm tra lại mạng hoặc bấm Trang nguồn để xác minh.");
 
     var novelList = parseNovelCards(doc);
+    var next = findNextPage(doc, currentPage);
     if (novelList.length === 0) {
-        return Response.error("Không tìm thấy truyện trên trang (bấm Trang nguồn để kiểm tra).");
+        // Trang tai duoc ma khong co muc: tra success rong thay vi
+        // error (loi mang/HTTP da bao o tren khi fetchDoc that bai).
+        return Response.success([], "");
     }
 
-    var next = findNextPage(doc, currentPage);
     return Response.success(novelList, next);
 }

@@ -157,6 +157,13 @@ function findNextPage(doc, currentPage) {
     return "";
 }
 
+// Bang the loai tinh — CHI dung o du phong detail.js (map ten the loai
+// trong JSON-LD "genre" sang slug /the-loai/...). Duong chinh lay link
+// pill that tren trang chi tiet, khong dung bang nay.
+// Kiem tra 2026-11-09: site /the-loai co 55 the loai, bang nay chi co
+// 16 the loai pho bien — ten nao khong co trong bang (vd. "Co Dai")
+// se bi roi o nhanh du phong (khong che slug). Kiem tra dinh ky bang
+// nay voi /the-loai; neu site doi ten/slug the loai thi cap nhat o day.
 var GENRES = [
     { title: "Tiên Hiệp", slug: "/the-loai/tien-hiep" },
     { title: "Kiếm Hiệp", slug: "/the-loai/kiem-hiep" },

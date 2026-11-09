@@ -118,6 +118,11 @@ function execute(url) {
         genres.push({ title: gTitle, input: gHref, script: "gen.js" });
     }
     if (genres.length === 0) {
+        // Khong co link pill the loai: dung du phong JSON-LD "genre" map
+        // qua bang GENRES tinh. Log de biet tan suat roi vao nhanh nay
+        // (bang tinh co the lech khi site them/bot the loai — kiem tra
+        // dinh ky voi /the-loai; xem ghi chu tren bang GENRES).
+        console.log("detail: khong co link pill the loai, dung du phong JSON-LD genre: " + url);
         var geMatch = html.match(/"genre"\s*:\s*\[([^\]]*)\]/);
         if (geMatch) {
             var rawNames = geMatch[1].match(/"([^"]+)"/g);
