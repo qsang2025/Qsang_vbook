@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "name": "Qimao",
+    "author": "MuseAi",
+    "version": 1,
+    "source": "https://www.qimao.com",
+    "regexp": "^https?:\\/\\/(www\\.)?qimao\\.com\\/shuku\\/\\d+\\/?$",
+    "description": "七猫免费小说 (Qimao) — Nguồn truyện chữ miễn phí chất lượng cao tiếng Trung.",
+    "locale": "zh_CN",
+    "language": "javascript",
+    "type": "chinese_novel"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "gen": "gen.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  }
+}
