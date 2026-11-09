@@ -1,13 +1,24 @@
 // toc.js — Danh sach chuong Me Truyen Chu (ho tro phan trang AJAX /get/listchap)
+//
+// Load fetch-helpers.js + challenge-handler.js + helper.js (v4, N1):
+// trang 1 fetch qua fetchPageDoc() (fetchDocWithFallback + kiem
+// challenge, tra loi tieng Viet co huong dan khi gap Cloudflare/login).
+// Cac trang AJAX doc text 1 lan roi JSON.parse (khong goi ca .text() va
+// .json() tren cung response): neu body la trang challenge Cloudflare
+// (isChallengeText) thi dung vong lap va tra phan muc luc da gom duoc,
+// khong tiep tuc goi cac trang sau nua.
 load('config.js');
+load('fetch-helpers.js');
+load('challenge-handler.js');
+load('helper.js');
 
 function execute(url) {
     if (!url || !String(url).trim()) return Response.error("Thiếu đường dẫn truyện.");
     url = normalizeUrl(url);
 
-    var response = fetchWithMirrors(url);
-    if (!response || !response.ok) return Response.error("HTTP Error: " + (response ? response.status : "không kết nối được máy chủ"));
-    var doc = response.html();
+    var r = fetchPageDoc(url);
+    if (r.error) return Response.error(r.error);
+    var doc = r.doc;
     var data = [];
 
     // Parse trang 1 tu HTML ban dau
@@ -52,10 +63,17 @@ function execute(url) {
             }
         }
 
-        // Fetch cac trang tiep theo qua AJAX API. Mot trang loi thi thu
-        // lai 1 lan roi BO QUA trang do va tiep tuc cac trang sau — khong
-        // break toan bo muc luc nua (tru khi trang tra 0 chuong, nghia la
-        // da het danh sach that).
+        // Fetch cac trang tiep theo qua AJAX API, TUAN TU tung trang (C2):
+        // giu nguyen chu khong chay song song — site chua biet gioi han
+        // toc do, truyen 1.844 chuong da chay xong tren may that
+        // 2026-11-08; khong co delay giua cac trang. Neu Anh bao muc luc
+        // truyen dai tai cham thi moi can nhac do thoi gian tung trang /
+        // tang items_per_page cua API (neu API cho), khong toi uu mu.
+        // Mot trang loi thi thu lai 1 lan roi BO QUA trang do va tiep tuc
+        // cac trang sau — khong break toan bo muc luc nua (tru khi trang
+        // tra 0 chuong, nghia la da het danh sach that). Rieng khi gap
+        // trang challenge Cloudflare thi DUNG vong lap (cac trang sau
+        // cung se challenge) va tra phan muc luc da gom duoc.
         for (var pNum = 2; pNum <= totalPages; pNum++) {
             var apiUrl = BASE_URL + "/get/listchap/" + storyId + "?page=" + pNum;
             var apiResponse = null;
@@ -72,9 +90,19 @@ function execute(url) {
                 console.log("toc.js bo qua trang AJAX " + pNum + " (loi " + (apiResponse ? apiResponse.status : "mang") + "), tiep tuc trang sau.");
                 continue;
             }
+            var apiText = "";
+            try {
+                apiText = String(apiResponse.text() || "");
+            } catch (errT) {
+                apiText = "";
+            }
+            if (apiText && isChallengeText(apiText)) {
+                console.log("toc.js gap trang challenge Cloudflare o trang AJAX " + pNum + ", dung vong lap, tra " + data.length + " chuong da gom.");
+                break;
+            }
             var json = null;
             try {
-                json = apiResponse.json();
+                json = JSON.parse(apiText);
             } catch (err2) {
                 json = null;
             }

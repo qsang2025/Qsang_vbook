@@ -1,13 +1,20 @@
 // detail.js — Thong tin chi tiet truyen Me Truyen Chu
+//
+// Load fetch-helpers.js + challenge-handler.js + helper.js (v4, N1):
+// fetch qua fetchPageDoc() (fetchDocWithFallback + kiem challenge, tra
+// loi tieng Viet co huong dan khi gap Cloudflare/login).
 load('config.js');
+load('fetch-helpers.js');
+load('challenge-handler.js');
+load('helper.js');
 
 function execute(url) {
     if (!url || !String(url).trim()) return Response.error("Thiếu đường dẫn truyện.");
     url = normalizeUrl(url);
 
-    var response = fetchWithMirrors(url);
-    if (!response || !response.ok) return Response.error("HTTP Error: " + (response ? response.status : "không kết nối được máy chủ"));
-    var doc = response.html();
+    var r = fetchPageDoc(url);
+    if (r.error) return Response.error(r.error);
+    var doc = r.doc;
 
     var name = "";
     var titleEl = doc.select("h1[itemprop='name']").first();
