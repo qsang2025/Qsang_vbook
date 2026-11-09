@@ -17,7 +17,7 @@ const path = require("path");
 const REPO = "qsang2025/Qsang_vbook";
 const BRANCH = "main";
 const RAW_BASE = "https://raw.githubusercontent.com/" + REPO + "/" + BRANCH;
-const REGISTRY_AUTHOR = "Qsang";
+const REGISTRY_AUTHOR = "MuseAi";
 const DEFAULT_DESCRIPTION =
   "Tuyển tập extension vBook của Qsang — đọc truyện, truyện tranh, video, " +
   "audio, dịch, TTS và AI. Registry sinh tự động từ extensions/, không sửa tay.";
@@ -38,7 +38,7 @@ function printHelp() {
       "  node tools/cli/build-catalog.js [--check] [đường-dẫn-repo]\n" +
       "\n" +
       "Quét mọi nguồn trong extensions/<loại>/<tên>/ (mỗi nguồn có plugin.json)\n" +
-      "và sinh registry gốc plugin.json ở root repo với metadata author \"Qsang\".\n" +
+      "và sinh registry gốc plugin.json ở root repo với metadata author \"MuseAi\".\n" +
       "Đường dẫn zip trong registry dùng branch main:\n" +
       "  " + RAW_BASE + "/extensions/<loại>/<tên>/plugin.zip\n" +
       "\n" +

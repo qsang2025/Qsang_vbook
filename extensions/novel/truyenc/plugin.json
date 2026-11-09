@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "TruyenC",
-    "author": "Qsang",
+    "author": "MuseAi",
     "version": 4,
     "source": "https://truyenc.net",
     "regexp": "^https?://(www\\.)?truyenc\\.net/truyen/[^/]+/?$",

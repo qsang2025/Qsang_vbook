@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "Mê Truyện Chữ",
-    "author": "Qsang",
+    "author": "MuseAi",
     "version": 4,
     "source": "https://metruyenchu.com.vn",
     "regexp": "^https?://(www\\.)?(metruyenchu\\.com\\.vn|metruyenchuvn\\.com|metruyenchuvn\\.org|wikidichvn\\.com)/[^/]+(/chuong-[^/]+)?/?$",

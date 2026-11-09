@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "La Cà Truyện",
-    "author": "Qsang",
+    "author": "MuseAi",
     "version": 6,
     "source": "https://lacatruyen.site",
     "regexp": "^https?://(www\\.)?lacatruyen\\.(site|com|live|homes|store|online)/story/[0-9a-zA-Z\\-]+/?$",

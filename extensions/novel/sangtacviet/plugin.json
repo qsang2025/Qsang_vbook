@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "Sáng Tác Việt",
-    "author": "Qsang",
+    "author": "MuseAi",
     "version": 6,
     "source": "https://sangtacviet.app",
     "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",

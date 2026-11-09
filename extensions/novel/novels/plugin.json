@@ -16,7 +16,7 @@
     }
   },
   "metadata": {
-    "author": "Qsang",
+    "author": "MuseAi",
     "description": "繁體小說 - 小說閱讀網 (www.novels.com.tw). Truyện chữ phồn thể: huyền huyễn, võ hiệp, đô thị, lịch sử, khoa huyễn, trò chơi, nữ sinh, truyện ngắn. Nội dung chương mã hóa AES-128-CBC, key cố định toàn site.",
     "encrypt": false,
     "language": "javascript",

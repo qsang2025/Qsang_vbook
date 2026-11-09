@@ -470,8 +470,8 @@ function main() {
     console.error("LỖI: plugin.json ở root sai định dạng: thiếu mảng \"data\".");
     process.exit(1);
   }
-  if (!registry.metadata || registry.metadata.author !== "Qsang") {
-    warn("plugin.json root: metadata.author không phải \"Qsang\" (đúng ra registry do build-catalog sinh phải có author Qsang).");
+  if (!registry.metadata || registry.metadata.author !== "MuseAi") {
+    warn("plugin.json root: metadata.author không phải \"MuseAi\" (đúng ra registry do build-catalog sinh phải có author MuseAi).");
   }
 
   // Tên các file lib dùng chung ở root (được chấp nhận làm helper trong src/).

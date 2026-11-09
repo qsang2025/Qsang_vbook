@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "author": "Qsang",
+    "author": "MuseAi",
     "description": "Tuyển tập extension vBook của Qsang — đọc truyện, truyện tranh, video, audio, dịch, TTS và AI. Registry sinh tự động từ extensions/, không sửa tay."
   },
   "data": [
     {
       "name": "NiACG",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/niacg/plugin.zip",
       "version": 4,
       "source": "https://www.niacg.com",
@@ -18,7 +18,7 @@
     },
     {
       "name": "App Truyện Chữ",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/apptruyenchu/plugin.zip",
       "version": 7,
       "source": "https://apptruyenchu.pro",
@@ -29,7 +29,7 @@
     },
     {
       "name": "La Cà Truyện",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
       "version": 6,
       "source": "https://lacatruyen.site",
@@ -40,7 +40,7 @@
     },
     {
       "name": "Mê Truyện Chữ",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu/plugin.zip",
       "version": 4,
       "source": "https://metruyenchu.com.vn",
@@ -51,7 +51,7 @@
     },
     {
       "name": "Sáng Tác Việt",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacviet/plugin.zip",
       "version": 6,
       "source": "https://sangtacviet.app",
@@ -62,7 +62,7 @@
     },
     {
       "name": "TiemtruyenchuVIP",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu_vip/plugin.zip",
       "version": 4,
       "source": "https://tiemtruyenchu.cloud",
@@ -73,7 +73,7 @@
     },
     {
       "name": "Tiệm Truyện Chữ",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu/plugin.zip",
       "version": 6,
       "source": "https://tiemtruyenchu.cloud",
@@ -84,7 +84,7 @@
     },
     {
       "name": "TruyenC",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc/plugin.zip",
       "version": 4,
       "source": "https://truyenc.net",
@@ -95,7 +95,7 @@
     },
     {
       "name": "Truyện Full",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/plugin.zip",
       "version": 3,
       "source": "https://truyenfull.link",
@@ -106,7 +106,7 @@
     },
     {
       "name": "Truyện Hoàn",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoan/plugin.zip",
       "version": 3,
       "source": "https://truyenhoan.com",
@@ -117,7 +117,7 @@
     },
     {
       "name": "书海阁",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/shuhaige/plugin.zip",
       "version": 3,
       "source": "https://www.shuhaige.tw",
@@ -128,7 +128,7 @@
     },
     {
       "name": "小說狂人",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/czbooks/plugin.zip",
       "version": 3,
       "source": "https://czbooks.net",
@@ -140,7 +140,7 @@
     },
     {
       "name": "思兔閱讀",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sto9/plugin.zip",
       "version": 4,
       "source": "https://sto9.com",
@@ -151,7 +151,7 @@
     },
     {
       "name": "笔趣阁",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/biquge/plugin.zip",
       "version": 4,
       "source": "https://www.biquge.tw",
@@ -162,7 +162,7 @@
     },
     {
       "name": "繁體小說",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novels/plugin.zip",
       "version": 4,
       "source": "https://www.novels.com.tw",
@@ -173,7 +173,7 @@
     },
     {
       "name": "Hoạt Hình 3D Trung Quốc",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/plugin.zip",
       "version": 2,
       "source": "https://phimapi.com/v1/api/the-loai",
@@ -184,7 +184,7 @@
     },
     {
       "name": "Hoạt Hình AI Trung Quốc",
-      "author": "Qsang",
+      "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh_ai/plugin.zip",
       "version": 3,
       "source": "https://www.dailymotion.com",

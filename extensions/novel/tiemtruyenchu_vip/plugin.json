@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "TiemtruyenchuVIP",
-    "author": "Qsang",
+    "author": "MuseAi",
     "version": 4,
     "source": "https://tiemtruyenchu.cloud",
     "regexp": "^https?://(www\\.)?tiemtruyenchu\\.cloud/truyen/[0-9a-zA-Z\\-]+/?$",
