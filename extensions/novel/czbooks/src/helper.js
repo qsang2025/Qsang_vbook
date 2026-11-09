@@ -81,6 +81,18 @@ function resolveHref(href) {
     return absUrl(href);
 }
 
+// C1 (2026-11-09): site tra 404 khi URL truyen/chuong co dau "/" cuoi
+// (kiem chung live: /n/s6pbed/ -> 404, /n/s6pbed -> 200) — bo dau "/"
+// cuoi cua URL /n/... truoc khi fetch. Chi ap dung cho path /n/...
+// (khong dung cho /c/... hay /s/... chua kiem chung).
+function stripNovelTrailingSlash(url) {
+    var s = String(url || "");
+    if (s.charAt(s.length - 1) === "/" && s.indexOf("/n/") !== -1 && s.indexOf("?") === -1 && s.indexOf("#") === -1) {
+        return s.substring(0, s.length - 1);
+    }
+    return s;
+}
+
 // Parse MOT the truyen o trang danh sach / tim kiem:
 //   li.novel-item-wrapper > div.novel-item
 //   link: div.novel-item-cover-wrapper > a[href="//czbooks.net/n/{slug}"]
@@ -107,6 +119,7 @@ function parseNovelItem(el) {
     }
     if (!link) return null;
     link = resolveHref(link);
+    link = stripNovelTrailingSlash(link);
 
     var titleEl = el.select("div.novel-item-title").first();
     var name = "";

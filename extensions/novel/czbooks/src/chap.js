@@ -76,7 +76,7 @@ function contentHtml(doc, title) {
 }
 
 function execute(url) {
-    url = normalizeUrl(url);
+    url = stripNovelTrailingSlash(normalizeUrl(url));
     var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được chương: " + url);
 

@@ -9,7 +9,11 @@
 //     連載狀態 (已完結/連載中), 收藏數, 觀看數, 更新時間,
 //     分類 a#novel-category[href="//czbooks.net/c/{slug}"]
 //   hashtag: ul.hashtag > li.item > a (chi lam tags, khong hien thi)
-//   KHONG co truong so chuong rieng — so chuong = dem link TOC.
+//   so chuong: trang chi tiet KHONG hien so chuong rieng (khong co
+//     "共 N 章" — da kiem chung live 2026-11-09) nen dem link TOC nam
+//     ngay trong trang chi tiet (ul#chapter-list > li > a, cung
+//     selector voi toc.js, khong ton them request) va hien thanh dong
+//     "章節數：N" trong detail (vd s6pbed: 1411).
 //   Age-gate overlay #__ageGate_overlay__ luon o trang thai hidden,
 //   khong chan.
 // Vi du: /n/s6pbed 《誰讓他修仙的！》 tac gia 最白的烏鴉, 已完結,
@@ -24,7 +28,7 @@ load('fetch-helpers.js');
 load('helper.js');
 
 function execute(url) {
-    url = normalizeUrl(url);
+    url = stripNovelTrailingSlash(normalizeUrl(url));
     var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
@@ -91,9 +95,15 @@ function execute(url) {
         genres.push({ title: genreText, input: "/c/" + genreSlug, script: "book.js" });
     }
 
+    // C2: so chuong = dem link TOC trong chinh trang chi tiet (TOC nam
+    // ngay trong trang, khong them request). Neu TOC doi giao dien
+    // (dem duoc 0) thi bo qua dong nay chu khong hien 0.
+    var chapterCount = doc.select("ul#chapter-list > li > a").size();
+
     var detailHtml = "";
     if (author) detailHtml += "作者：" + author + "<br>";
     if (statusText) detailHtml += "連載狀態：" + statusText + "<br>";
+    if (chapterCount > 0) detailHtml += "章節數：" + chapterCount + "<br>";
     if (favCount) detailHtml += "收藏數：" + favCount + "<br>";
     if (viewCount) detailHtml += "觀看數：" + viewCount + "<br>";
     if (genreText) detailHtml += "分類：" + genreText + "<br>";
