@@ -45,6 +45,11 @@ function execute(query, page) {
     var parsed = parseListPage(doc, String(cur));
     if (!parsed.next && parsed.items.length >= 20) {
         // Khong thay link phan trang ma trang du muc: do thu trang ke.
+        // Ghi chu bao tri (review 2026-11-09): nhanh do thu nay chay cho
+        // moi tim kiem dung boi so cua 20 muc, nhung giu nguyen vi dung
+        // hon la doan "du 20 muc thi chac con trang". Chi bo nhanh nay khi
+        // site them link phan trang ?page=N vao trang ket qua tim kiem —
+        // luc do parseListPage da tu tinh duoc next tu link pager.
         var nextDoc = fetchDoc(pagedUrl(baseUrl, String(cur + 1)));
         if (nextDoc) {
             var seenNow = {};

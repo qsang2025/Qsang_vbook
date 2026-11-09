@@ -2,15 +2,16 @@
 //
 // BASE_URL mac dinh la domain chinh; nguoi dung doi domain trong cai dat
 // (config DOMAIN trong plugin.json) thi gia tri do se override qua bien
-// DOMAIN duoc app inject. CONFIG_URL (neu co trong plugin.json) override
-// sau cung. Ca hai phep override deu nam trong try/catch: neu app khong
-// inject bien do thi BASE_URL mac dinh van dung duoc.
+// DOMAIN duoc app inject. Phep override nam trong try/catch: neu app
+// khong inject bien do thi BASE_URL mac dinh van dung duoc.
+// (CONFIG_URL tung co o day nhung plugin.json khong co setting do nen
+// khoi try/catch cua no khong bao gio chay — da xoa o v7, review C3.)
 //
 // MIRRORS: danh sach mirror theo thu tu uu tien, app inject tu config
 // MIRRORS trong plugin.json duoi dang CHUOI cach nhau bang dau phay.
 // Hien chua biet mirror nao cua site nay nen mac dinh la rong; nguoi dung
 // co the nhap them trong cai dat extension.
-// Chu y: DOMAIN / CONFIG_URL / MIRRORS la bien do app inject — chi duoc
+// Chu y: DOMAIN / MIRRORS la bien do app inject — chi duoc
 // THAM CHIEU trong try/catch, KHONG duoc khai bao var trung ten
 // (se xung dot voi bien inject). Ten noi bo dung o day la MIRROR_LIST.
 // fetchWithFallback() trong fetch-helpers.js dung MIRROR_LIST de thu lan
@@ -27,13 +28,6 @@ var BASE_URL = "https://apptruyenchu.pro";
 try {
     if (DOMAIN) {
         BASE_URL = DOMAIN;
-    }
-} catch (e) {
-}
-
-try {
-    if (CONFIG_URL) {
-        BASE_URL = CONFIG_URL;
     }
 } catch (e) {
 }

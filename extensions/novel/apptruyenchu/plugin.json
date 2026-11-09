@@ -21,10 +21,10 @@
     "language": "javascript",
     "locale": "vi_VN",
     "name": "App Truyện Chữ",
-    "regexp": "^https://apptruyenchu\\.pro/truyen/[^/]+/?$",
+    "regexp": "^https?://(www\\.)?apptruyenchu\\.pro/truyen/[^/]+/?$",
     "source": "https://apptruyenchu.pro",
     "type": "novel",
-    "version": 6
+    "version": 7
   },
   "script": {
     "book": "book.js",
