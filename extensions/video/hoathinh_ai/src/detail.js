@@ -21,7 +21,7 @@ function execute(url) {
     if (!id) return Response.error("Không đọc được id video từ URL: " + url);
 
     var apiUrl = API_BASE + "/video/" + id +
-        "?fields=id,title,description,thumbnail_720_url,owner.screenname,duration,created_time,views_total,tags";
+        "?fields=id,title,description,thumbnail_720_url,owner.screenname,duration,created_time,views_total,bookmarks_total,tags";
     var v = dmApiGet(apiUrl);
     if (!v || !v.title) return Response.error("Không tải được thông tin video: " + url);
 
@@ -35,6 +35,7 @@ function execute(url) {
     if (dur) detail = "Thời lượng: " + dur;
     if (owner) detail = detail ? detail + " • Kênh: " + owner : "Kênh: " + owner;
     if (views) detail = detail ? detail + " • Lượt xem: " + views : "Lượt xem: " + views;
+    if (v.bookmarks_total) detail += " • Yêu thích: " + v.bookmarks_total;
 
     // Chip the loai chi tu tags THAT cua video (khu trung, toi da 8 chip).
     // Tag nao bam vao cung tro ve search.js voi chinh tag do lam tu khoa
@@ -54,6 +55,12 @@ function execute(url) {
         }
     }
 
+    var commentConfig = {
+        title: "Bình luận",
+        input: id,
+        script: "comment.js"
+    };
+
     var result = {
         name: cleanText(v.title),
         author: owner,
@@ -63,7 +70,8 @@ function execute(url) {
         url: watchUrl(id),
         type: "video",
         format: "stream",
-        ongoing: false
+        ongoing: false,
+        comment: commentConfig
     };
     if (genres.length > 0) result.genres = genres;
 
