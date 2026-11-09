@@ -4,7 +4,9 @@ Extension vBook cho site truyện chữ phồn thể **https://www.novels.com.tw
 (nguồn: 繁體小說). Type `novel`, locale `zh_TW`, UTF-8.
 
 - Author: Qsang
-- Version: 1
+- Version: 4 (2026-11-09, theo review ext: tripwire key AES C1,
+  health.json case gfncgd.js + note WAF N2, ghi chú strip byte rác C2;
+  N3 chương trả phí chưa xác minh được — xem mục Chương trả phí)
 - Encrypt: false
 - Khảo sát site: `~/workspace/vbook/novels-survey.md` (2026-11-06)
 
@@ -72,6 +74,56 @@ từng trang → nối lại. Tiêu đề chương từ H1, bỏ hậu tố `（
 thấy ở đó). Triệu chứng key đổi: chap.js giải mã ra rác / lỗi padding.
 Lúc đó cập nhật key trong `chap.js` (hằng `AES_KEY`) và test lại với blob
 chương 1 truyện 龍族 (phải ra `<p>嗯，終於要上架了……`).
+
+**Tripwire key (v4, C1):** `chap.js` có `verifyChapKey()` — giải mã mẫu
+`KEY_CHECK_CIPHER` (bản mã của `"novels-key-check-v1"` bằng key hiện
+tại); nếu mẫu giải sai thì trang 1 chương nào cũng sẽ báo rõ "Khóa giải
+mã … đã thay đổi, extension cần được cập nhật" thay vì lỗi chung. Đã
+kiểm chứng bằng Node với chính code AES trong file (giải đúng mẫu,
+khóa sai trả rác). Giới hạn: tripwire này chỉ phát hiện key trong code
+bị hỏng/lệch, không phát hiện site xoay key ngoài đời — việc đó do
+case `gfncgd.js` trong `health.json` đảm nhiệm: probe tìm chuỗi key
+(dạng literal hoặc `\uXXXX` escape) trong file JS của site; mất chuỗi
+mà các case khác vẫn 200 thì key đã xoay. Key còn đúng tính đến
+2026-11-09 (đã đối chiếu với file `gfncgd.js` live).
+
+**Strip byte rác (v4, C2 — giữ nguyên):** regex `[\x01-\x10\r]+$` sau
+khi strip padding PKCS#7 được giữ nguyên theo đề xuất review. Nó chạy
+trên chuỗi đã giải mã UTF-8 nên chỉ khợp ký tự điều khiển U+0001–
+U+0010/`\r` ở cuối; nội dung chương thật (chữ Hán/Latin, số, dấu câu)
+không thể kết thúc bằng các ký tự này. Nếu một chương nào bị mất ký tự
+cuối thì kiểm tra chỗ này đầu tiên.
+
+### Chương trả phí (N3) — chưa xác minh được, chưa đánh dấu `pay`
+
+Trong mục lục truyện 龍族：重啟人生 chỉ có 3 chương ghi `免費章節`
+(ch.99, ch.110, ch.159) và chương mới nhất ghi `免費章`; các chương
+khác không ghi nhãn. Truyện có chương `(周五上架)` (ch.87) nên sau
+điểm đó các chương không nhãn nhiều khả năng là trả phí — nhưng
+**chưa chứng minh được**: crawler không chạy JS giải mã của site nên
+mọi trang chương (kể cả chương 1 miễn phí chắc chắn) đều chỉ hiện
+placeholder `請前往www.novels.com.tw網站繼續全文閱讀`; test trên máy
+qua dev server thì cả chương miễn phí (ch.99) lẫn chương không nhãn
+(ch.100) đều lỗi giống hệt nhau ở bước fetch (HTTP 403, WAF chặn IP
+máy qua đường dev server) — chưa tới được bước đọc blob. Vì vậy
+**không đánh dấu `pay`/`lock` cho chương nào** (đánh dấu mù sẽ sai:
+chương 1–87 trước 上架 là miễn phí). Cách xác minh đúng: trong app
+thật sau khi qua Cloudflare, mở ch.100 (không nhãn) so với ch.99
+(nhãn miễn phí); nếu ch.100 lỗi "không thấy dữ liệu mã hóa" trong khi
+ch.99 đọc được thì mới đánh `pay: true` cho chương sau điểm 上架
+không có nhãn miễn phí + đổi lỗi chap.js thành "Chương trả phí, cần
+mua trên web".
+
+### Health-check / WAF (N2)
+
+Probe health-check đã gửi User-Agent trình duyệt (Chrome 124) và xếp
+HTTP 403 thành `BLOCKED` (không tính là hỏng) — phần đề xuất về probe
+đã có sẵn trong workflow chung, ext này không sửa thêm. Phần còn lại
+ghi trong `health.json` (`note`): WAF từng trả cả 404 cho site này
+(issue #2, false positive) nên 404 từ CI cũng chưa kết luận được
+hỏng; sức khỏe thật của site chỉ kiểm chứng được bằng trình duyệt/máy
+thật. Khi CI bị 403 ở trang chủ thì probe dừng ở `BLOCKED`, không
+chạy các case (kể cả case tripwire key).
 
 ### Tìm kiếm (search)
 
@@ -191,6 +243,11 @@ code 0 nhưng dữ liệu rỗng khi test qua dev server); bản này nhận c�
   trong app, nên 403 ở đây không kết luận được trong app thật — extension
   của mizhm chạy được trong app thật cùng máy, cùng lúc (xem mục
   Cloudflare). Cần test v2 trực tiếp trên app.
+- **2026-11-09 (v4):** test qua dev server trên máy HONOR PTP-AN10 vẫn
+  403: `chap.js` ch.99 (nhãn 免費章節) và ch.100 (không nhãn) lỗi giống
+  hệt nhau ở bước fetch (`fetchPage HTTP 403`) — chưa kết luận được
+  chương trả phí (N3) hay tình trạng đọc chương trong app thật; cần
+  test trong app sau khi qua Cloudflare (xem mục Chương trả phí).
 - **Verify ngoài máy:** AES thuần-JS khớp WebCrypto trên cả 5 blob chương
   thật + vector test FIPS-197; selector đối chiếu với HTML đã lưu;
   regexp plugin.json kiểm chứng bằng Python `re`; toàn bộ src qua
