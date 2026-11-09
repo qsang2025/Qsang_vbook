@@ -25,7 +25,7 @@
     "regexp": "^https://truyenfull\\.link/(truyen|chuong)/[^/]+/?$",
     "source": "https://truyenfull.link",
     "type": "novel",
-    "version": 2
+    "version": 3
   },
   "script": {
     "book": "book.js",

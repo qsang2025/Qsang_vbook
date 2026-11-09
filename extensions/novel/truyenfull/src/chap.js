@@ -8,8 +8,13 @@
 //   </div><hr class="chapter-end">
 //   <div class="chapter-nav">...</div>  (nam NGOAI #chapter-c)
 // Tieu de chuong trong <h1> ("Chương 1: Đạo pháp vô tình").
-// Cach lay: thu cac selector, giu ket qua dai nhat; loc dong rac
-// (dong quang cao "Đọc truyện full tại", nav "Chương trước/sau").
+// Cach lay: #chapter-c la duong chinh (da kiem chung live 2026-11-09:
+// khoi duy nhat chua noi dung chuong, ~16k ky tu; cac selector khac
+// khong co tren trang chuong that). Cac selector du phong chi chay khi
+// #chapter-c trong, va chi nhan khoi co text dai that (> 200 ky tu) de
+// tranh gom nham nav/binh luan/quang cao khi site doi theme.
+// Loc dong rac (dong quang cao "Đọc truyện full tại", nav
+// "Chương trước/sau").
 // KHONG xoay User-Agent (quy tac 10): dung header mac dinh cua
 // fetch-helpers.js (Accept/Accept-Language/Referer, khong set UA).
 //
@@ -23,10 +28,9 @@ load('config-helpers.js');
 load('fetch-helpers.js');
 load('cleanHtml.js');
 
-// Selector noi dung chuong, thu theo thu tu; cach du phong chon ket qua
-// dai nhat trong cac selector nay. "#chapter-c" la dung that cua site nay.
-var CHAP_SELECTORS = [
-    "#chapter-c",
+// Selector noi dung chuong. "#chapter-c" la duong chinh cua site nay;
+// cac selector du phong chi dung khi duong chinh trong.
+var CHAP_FALLBACK_SELECTORS = [
     ".chapter-c",
     "#chapter-content",
     ".chapter-content",
@@ -106,22 +110,30 @@ function toLines(fragment) {
     return out;
 }
 
-// Thu cac selector, giu lai ket qua dai nhat.
+// Lay cac dong sach trong khoi dau tien khop selector (tra [] neu khong co).
+function linesFromSelector(doc, selector) {
+    try {
+        var els = doc.select(selector);
+        if (els.isEmpty()) return [];
+        return toLines(String(els.first().html()));
+    } catch (e) {
+        console.log("selector " + selector + " loi: " + e);
+        return [];
+    }
+}
+
+// Lay noi dung chuong: #chapter-c truoc; neu trong moi thu cac selector
+// du phong theo thu tu, chi nhan khoi co text dai that (> 200 ky tu).
 function fromSelectors(raw) {
     var doc = Html.parse(raw);
-    var best = [];
+    var lines = linesFromSelector(doc, "#chapter-c");
+    if (lines.length > 0) return lines;
     var i = 0;
-    for (i = 0; i < CHAP_SELECTORS.length; i++) {
-        try {
-            var els = doc.select(CHAP_SELECTORS[i]);
-            if (els.isEmpty()) continue;
-            var lines = toLines(String(els.first().html()));
-            if (lines.length > best.length) best = lines;
-        } catch (e) {
-            console.log("selector " + CHAP_SELECTORS[i] + " loi: " + e);
-        }
+    for (i = 0; i < CHAP_FALLBACK_SELECTORS.length; i++) {
+        var fb = linesFromSelector(doc, CHAP_FALLBACK_SELECTORS[i]);
+        if (fb.length > 0 && fb.join("").length > 200) return fb;
     }
-    return best;
+    return [];
 }
 
 // Ten chuong trong <h1> (vd "Chương 1: Đạo pháp vô tình").
