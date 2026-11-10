@@ -4,6 +4,7 @@
 // Tu dong fallback ve HTML parser neu can.
 
 load('config.js');
+load('rate-limit.js');
 load('challenge-handler.js');
 
 function execute(url) {
@@ -45,14 +46,30 @@ function execute(url) {
                         if (bCover && bCover.indexOf("//") === 0) bCover = "https:" + bCover;
                         if (bCover && bCover.indexOf("http://") === 0) bCover = "https://" + bCover.substring(7);
 
+                        // Trang thai that tu bookinfo.php (API cua Mobile App):
+                        // so "0"/"1"/"2"/"3" (search API tra so) hoac chu
+                        // "Không xác định"/"Còn tiếp"/"Tạm ngưng"/"Hoàn thành".
+                        // Khao sat 10 truyen 10/11: search so va bookinfo chu
+                        // khop nhau 9/9 (0=Khong xac dinh, 1=Con tiep,
+                        // 2=Tam ngung, 3=Hoan thanh). "Tạm ngưng" van la
+                        // ongoing=true + ghi chu, khong doan la hoan thanh.
                         var bOngoing = true;
-                        var bStatus = String(b.status || "");
-                        if (bStatus === "3" || bStatus.indexOf("Hoàn thành") !== -1 || bStatus.toLowerCase().indexOf("complete") !== -1) {
+                        var bStatus = String(b.status || "").trim();
+                        var bStatusNote = "";
+                        var bStatusLow = bStatus.toLowerCase();
+                        if (bStatus === "3" || bStatus.indexOf("Hoàn thành") !== -1 || bStatusLow.indexOf("complete") !== -1) {
                             bOngoing = false;
+                        } else if (bStatus === "2" || bStatus.indexOf("Tạm ngưng") !== -1) {
+                            bStatusNote = "Tạm ngưng";
+                        } else if (bStatus !== "" && bStatus !== "1" && bStatus.indexOf("Còn tiếp") === -1) {
+                            // "0"/"Không xác định" hoac gia tri la: ghi lai
+                            // dung gia tri goc, khong doan ongoing=false.
+                            bStatusNote = bStatus;
                         }
 
                         var bDesc = b.info || "";
                         var bDetail = "Lượt đọc: " + (b.view || 0) + "<br>Số chương: " + (b.chaptercount || 0) + "<br>Cập nhật: " + (b.lastupdate || "");
+                        if (bStatusNote) bDetail += "<br>Trạng thái: " + bStatusNote;
 
                         var bGenres = [];
                         if (b.category) {
@@ -116,6 +133,8 @@ function execute(url) {
     }
 
     if (!response || !response.ok || isCloudflareChallenge(text, response ? response.headers : null)) {
+        var blockedMsg = stvBlockedMessage();
+        if (blockedMsg) return Response.error(blockedMsg);
         var browserDoc = fetchViaBrowser(url);
         if (browserDoc) {
             try {
@@ -140,12 +159,21 @@ function execute(url) {
     var description = "";
     var detail = "";
 
+    // Fallback HTML: og:novel:status KHONG dang tin nhu bookinfo.php
+    // (khao sat 10 truyen 10/11: og "Hoàn thành" khop voi bookinfo
+    // "Tạm ngưng" 4/4; og "Còn tiếp" khop ca "Còn tiếp"/"Hoàn thành"/
+    // "Không xác định"). Nen og "Hoàn thành" = TAM NGUNG (van ongoing,
+    // ghi chu), khong bao gio doan ongoing=false o day.
     var ongoing = true;
+    var statusNote = "";
     var statusMeta = doc.select("meta[property='og:novel:status']").first();
     if (statusMeta) {
         var statusText = (statusMeta.attr("content") || "").trim();
-        if (statusText.indexOf("Hoàn thành") !== -1 || statusText.toLowerCase().indexOf("complete") !== -1) {
-            ongoing = false;
+        if (statusText) {
+            statusNote = statusText;
+            if (statusText.indexOf("Hoàn thành") !== -1 || statusText.toLowerCase().indexOf("complete") !== -1) {
+                statusNote = "Tạm ngưng (web ghi: " + statusText + ")";
+            }
         }
     }
 
@@ -184,6 +212,7 @@ function execute(url) {
     doc.select(".blk-body.ib-100").forEach(function(e) {
         detail += "<br>" + e.text().trim();
     });
+    if (statusNote) detail += "<br>Trạng thái: " + statusNote;
 
     var genres = [];
     var ogCat = doc.select("meta[property='og:novel:category']").first();

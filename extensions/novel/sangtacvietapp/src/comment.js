@@ -3,6 +3,7 @@
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 
 load('config.js');
+load('rate-limit.js');
 load('challenge-handler.js');
 
 function parseCommentInput(input) {
@@ -91,6 +92,8 @@ function execute(input, page) {
     }
 
     if (!res || !res.ok) {
+        var blockedMsg = stvBlockedMessage();
+        if (blockedMsg) return Response.error(blockedMsg);
         if (isCloudflareChallenge(rawText, res ? res.headers : null)) {
             return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + hostId + "/1/" + bookId + "/"));
         }

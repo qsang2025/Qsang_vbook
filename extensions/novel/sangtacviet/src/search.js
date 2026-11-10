@@ -1,5 +1,6 @@
 // search.js — Tim kiem truyen tren Sang Tac Viet
 load('config.js');
+load('rate-limit.js');
 load('helper.js');
 
 function execute(key, page) {
@@ -18,7 +19,11 @@ function execute(key, page) {
     } catch (e) {
         return Response.error("Không kết nối được tới Sáng Tác Việt: " + e);
     }
-    if (!response || !response.ok) return Response.error("Không tải được kết quả tìm kiếm (HTTP " + (response ? response.status : 0) + ")");
+    if (!response || !response.ok) {
+        var blockedMsg = stvBlockedMessage();
+        if (blockedMsg) return Response.error(blockedMsg);
+        return Response.error("Không tải được kết quả tìm kiếm (HTTP " + (response ? response.status : 0) + ")");
+    }
     var doc = response.html();
 
     // Parse chung voi gen.js (helper.js). 0 ket qua la ket qua binh

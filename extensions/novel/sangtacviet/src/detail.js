@@ -1,5 +1,6 @@
 // detail.js — Chi tiet truyen Sang Tac Viet
 load('config.js');
+load('rate-limit.js');
 load('challenge-handler.js');
 
 function execute(url) {
@@ -22,6 +23,8 @@ function execute(url) {
     }
 
     if (!response || !response.ok || isCloudflareChallenge(text, response ? response.headers : null)) {
+        var blockedMsg = stvBlockedMessage();
+        if (blockedMsg) return Response.error(blockedMsg);
         var browserDoc = fetchViaBrowser(url);
         if (browserDoc) {
             try {
@@ -46,15 +49,26 @@ function execute(url) {
     var description = "";
     var detail = "";
 
-    // Trang thai that cua truyen, doc tu meta og:novel:status cua site
-    // (da kiem chung: "Còn tiếp" / "Hoàn thành" / "Tạm ngưng").
-    // ongoing = true tru khi site bao "Hoàn thành".
+    // Trang thai that cua truyen, doc tu meta og:novel:status cua site.
+    // LUU Y (khao sat 10 truyen 10/11): og meta KHONG dang tin nhu
+    // bookinfo.php — og "Hoàn thành" khop voi bookinfo "Tạm ngưng" 4/4
+    // (faloo/1020583, faloo/1035593, qidian/1030529305, uukanshu/176266),
+    // og "Còn tiếp" khop ca "Còn tiếp" (3), "Hoàn thành" (2) va
+    // "Không xác định" (1). Nen: og "Hoàn thành" = TAM NGUNG (van ongoing,
+    // ghi chu), khong phai hoan thanh; og "Còn tiếp" = ongoing (mo ho).
+    // v7 khong co bookinfo nen khong the biet truyen nao that su hoan thanh
+    // (biqubu/68918, uukanshu/176313 bi bao ongoing) — ghi ro gia tri goc
+    // trong detail de nguoi doc tu doi chieu. Khong bao gio doan false.
     var ongoing = true;
+    var statusNote = "";
     var statusMeta = doc.select("meta[property='og:novel:status']").first();
     if (statusMeta) {
         var statusText = (statusMeta.attr("content") || "").trim();
-        if (statusText.indexOf("Hoàn thành") !== -1 || statusText.toLowerCase().indexOf("complete") !== -1) {
-            ongoing = false;
+        if (statusText) {
+            statusNote = statusText;
+            if (statusText.indexOf("Hoàn thành") !== -1 || statusText.toLowerCase().indexOf("complete") !== -1) {
+                statusNote = "Tạm ngưng (web ghi: " + statusText + ")";
+            }
         }
     }
 
@@ -102,6 +116,7 @@ function execute(url) {
     doc.select(".blk-body.ib-100").forEach(function(e) {
         detail += "<br>" + e.text().trim();
     });
+    if (statusNote) detail += "<br>Trạng thái: " + statusNote;
 
     var genres = [];
     var ogCat = doc.select("meta[property='og:novel:category']").first();

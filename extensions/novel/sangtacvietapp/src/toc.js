@@ -1,5 +1,6 @@
 // toc.js — Muc luc chuong SangtacvietApp
 load('config.js');
+load('rate-limit.js');
 load('challenge-handler.js');
 
 function execute(url) {
@@ -29,6 +30,8 @@ function execute(url) {
     }
 
     if (!res || !res.ok || isCloudflareChallenge(rawText, res ? res.headers : null)) {
+        var blockedMsg = stvBlockedMessage();
+        if (blockedMsg) return Response.error(blockedMsg);
         var browserDoc = fetchViaBrowser(tocUrl);
         if (browserDoc) {
             try {
@@ -58,6 +61,7 @@ function execute(url) {
     var toc = json.data;
     var chapters = [];
     var parts = toc.split("-//-");
+    var skipped = 0;
 
     for (var i = 0; i < parts.length; i++) {
         var item = parts[i];
@@ -72,8 +76,15 @@ function execute(url) {
                     url: "/?bookid=" + bookId + "&c=" + cid + "&h=" + hostId,
                     host: BASE_URL
                 });
+                continue;
             }
         }
+        // Khong bo lang chuong parse loi: dem lai va ghi log ro doan nao
+        // hong de sua sau, thay vi im lang mat chuong (nhu v7 toc.js).
+        skipped++;
+        try {
+            console.log("toc.js bo qua muc luc khong parse duoc (truyen " + bookId + "): " + item.substring(0, 80));
+        } catch (eLog) {}
     }
 
     // App mobile chuan: uukanshu sap xep nguoc (chuong moi nhat o dau), can dao lai
@@ -83,6 +94,11 @@ function execute(url) {
 
     if (chapters.length === 0) {
         return Response.error("Mục lục trống hoặc chưa có chương.");
+    }
+    if (skipped > 0) {
+        try {
+            console.log("toc.js truyen " + bookId + ": " + chapters.length + " chuong doc duoc, " + skipped + " muc loi da bo qua (xem log tren).");
+        } catch (eLog2) {}
     }
 
     return Response.success(chapters);

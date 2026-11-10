@@ -1,1 +1,1 @@
-{"cases":[{"name":"Trang chủ","pattern":"static\\.sangtacvietcdn\\.xyz","url":"https://sangtacviet.app/"},{"name":"API mục lục (truyện mẫu faloo/1020583)","pattern":"nhân vật phản diện quá ngu","url":"https://sangtacviet.app/index.php?ngmar=chapterlist&sajax=getchapterlist&h=faloo&bookid=1020583"}]}
+{"cases":[{"name":"Trang chủ","pattern":"static\\.sangtacvietcdn\\.xyz","url":"https://sangtacviet.app/"},{"name":"API chi tiết (bookinfo.php faloo/1020583)","pattern":"\"code\":100","url":"https://sangtacviet.app/mobile/bookinfo.php?host=faloo&hid=1020583"}]}

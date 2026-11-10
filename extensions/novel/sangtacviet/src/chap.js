@@ -1,6 +1,7 @@
 // chap.js — Doc noi dung chuong Sang Tac Viet
 load('crypto.js');
 load('config.js');
+load('rate-limit.js');
 load('challenge-handler.js');
 
 // stvMd5 — Ham MD5 dung de ky request doc chuong (x-stv-sign).
@@ -178,6 +179,8 @@ function requestGrantAndKey(host, bookid) {
     }
 
     if (!grantRes || !grantRes.ok) {
+        var blockedGrant = stvBlockedMessage();
+        if (blockedGrant) return { error: blockedGrant };
         var rawGrant = grantRes ? String(grantRes.text() || "") : "";
         if (isCloudflareChallenge(rawGrant, grantRes ? grantRes.headers : null)) {
             return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
@@ -231,6 +234,8 @@ function readChapterOnce(host, bookid, cid, chapterkey, readcontextid) {
     }
 
     if (!readRes || !readRes.ok) {
+        var blockedRead = stvBlockedMessage();
+        if (blockedRead) return { error: blockedRead };
         var rawReadErr = readRes ? String(readRes.text() || "") : "";
         if (isCloudflareChallenge(rawReadErr, readRes ? readRes.headers : null)) {
             return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
@@ -273,6 +278,8 @@ function execute(url) {
         } catch (eDirect) {
             return Response.error("Không tải được trang chương Sáng Tác Việt: " + eDirect);
         }
+        var blockedDirect = stvBlockedMessage();
+        if (blockedDirect) return Response.error(blockedDirect);
         if (directRes && directRes.ok) {
             var rawDirect = String(directRes.text() || "");
             if (isCloudflareChallenge(rawDirect, directRes.headers)) {

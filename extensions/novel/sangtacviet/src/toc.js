@@ -1,5 +1,6 @@
 // toc.js — Muc luc chuong Sang Tac Viet
 load('config.js');
+load('rate-limit.js');
 load('challenge-handler.js');
 
 function execute(url) {
@@ -28,6 +29,8 @@ function execute(url) {
     }
 
     if (!res || !res.ok || isCloudflareChallenge(rawText, res ? res.headers : null)) {
+        var blockedMsg = stvBlockedMessage();
+        if (blockedMsg) return Response.error(blockedMsg);
         var browserDoc = fetchViaBrowser(tocUrl);
         if (browserDoc) {
             try {
