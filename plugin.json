@@ -183,6 +183,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "稷下書院",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novel543/plugin.zip",
+      "version": 1,
+      "source": "https://www.novel543.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novel543/icon.png",
+      "description": "稷下書院 (novel543.com) — truyện chữ phồn thể miễn phí: huyền huyễn, tu chân, đô thị, lịch sử, đồng nhân... Chương đọc miễn phí, không khóa VIP, nội dung nằm trong HTML SSR. Lưu ý: đường tìm kiếm /search/ có thể bị Cloudflare challenge với một số IP — extension sẽ thử qua trình duyệt trong app, nếu vẫn chặn thì làm theo hướng dẫn trong thông báo lỗi.",
+      "type": "novel",
+      "locale": "zh_TW"
+    },
+    {
       "name": "笔趣阁",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/biquge/plugin.zip",
