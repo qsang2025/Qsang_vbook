@@ -97,6 +97,8 @@ function execute(input, page) {
         if (isCloudflareChallenge(rawText, res ? res.headers : null)) {
             return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + hostId + "/1/" + bookId + "/"));
         }
+        var gwMsg = stvGatewayErrorMessage(res ? res.status : 0);
+        if (gwMsg) return Response.error(gwMsg);
         return Response.error("Không tải được bình luận (HTTP " + (res ? res.status : 0) + ")");
     }
 

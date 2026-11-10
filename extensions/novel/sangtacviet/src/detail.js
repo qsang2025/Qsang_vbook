@@ -40,7 +40,11 @@ function execute(url) {
         return Response.error(formatChallengeError("Sáng Tác Việt", url));
     }
 
-    if (!response || !response.ok) return Response.error("Không tải được trang truyện (HTTP " + (response ? response.status : 0) + ")");
+    if (!response || !response.ok) {
+        var gwMsg = stvGatewayErrorMessage(response ? response.status : 0);
+        if (gwMsg) return Response.error(gwMsg);
+        return Response.error("Không tải được trang truyện (HTTP " + (response ? response.status : 0) + ")");
+    }
     var doc = Html.parse(text);
 
     var name = "";

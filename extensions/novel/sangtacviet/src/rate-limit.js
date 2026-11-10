@@ -210,7 +210,8 @@ function rateLimitErrorMessage(siteName, host, remainingMs) {
 //   options.cooldownMs, hoac Retry-After neu co); 503 thi khong ghi cooldown
 //   (503 thuong la loi server nhat thoi).
 // options: {method, body, headers, referer, minDelayMs, maxDelayMs,
-//           maxRetries (mac dinh 3), cooldownMs}
+//           maxRetries (mac dinh 3), cooldownMs, timeout (ms, truyen thang
+//           vao fetch — dung cho Smart Quick-Retry cua STV, vd. 6000)}
 
 // Tach host (viet thuong) tu URL; tra "" neu khong tach duoc.
 function pacedHostOf(url) {
@@ -303,6 +304,7 @@ function pacedFetch(url, options) {
         try {
             var reqOpts = { headers: headers, method: method };
             if (options.body !== undefined && options.body !== null) reqOpts.body = options.body;
+            if (typeof options.timeout === "number" && !isNaN(options.timeout) && options.timeout > 0) reqOpts.timeout = Math.floor(options.timeout);
             res = fetch(url, reqOpts);
         } catch (e) {
             fetchError = String(e);

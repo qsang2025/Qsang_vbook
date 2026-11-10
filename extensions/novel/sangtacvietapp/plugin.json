@@ -2,7 +2,7 @@
   "metadata": {
     "name": "SangtacvietApp",
     "author": "MuseAi",
-    "version": 4,
+    "version": 5,
     "source": "https://sangtacviet.app",
     "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
     "description": "Sáng Tác Việt App — phiên bản tối ưu hóa tốc độ cao mô phỏng Sáng Tác Việt Mobile Reader (/mobile/bookinfo.php, smart key caching, instant chapter reading).",
@@ -13,6 +13,7 @@
   "config": {
     "DOMAIN": {
       "title": "Domain Sáng Tác Việt",
+      "subtitle": "Nếu gặp lỗi 504 khi đọc truyện trên mạng 4G/5G, hãy thử đổi sang https://sangtacviet.pro.",
       "mode": "select",
       "values": [
         "https://sangtacviet.app",
@@ -26,7 +27,7 @@
       "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)",
       "mode": "input",
       "format": "text",
-      "default": "https://sangtacviet.vip,https://sangtacviet.com,https://sangtacviet.pro"
+      "default": "https://sangtacviet.pro,https://sangtacviet.vip,https://sangtacviet.com"
     }
   },
   "script": {

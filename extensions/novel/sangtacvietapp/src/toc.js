@@ -47,7 +47,11 @@ function execute(url) {
         return Response.error(formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + hostId + "/1/" + bookId + "/"));
     }
 
-    if (!res || !res.ok) return Response.error("Không tải được mục lục (HTTP " + (res ? res.status : 0) + ")");
+    if (!res || !res.ok) {
+        var gwMsg = stvGatewayErrorMessage(res ? res.status : 0);
+        if (gwMsg) return Response.error(gwMsg);
+        return Response.error("Không tải được mục lục (HTTP " + (res ? res.status : 0) + ")");
+    }
     var json = null;
     try {
         json = JSON.parse(rawText);

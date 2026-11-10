@@ -199,6 +199,8 @@ function requestGrantAndKey(host, bookid) {
         if (isCloudflareChallenge(rawGrant, grantRes ? grantRes.headers : null)) {
             return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
         }
+        var gwGrant = stvGatewayErrorMessage(grantRes ? grantRes.status : 0);
+        if (gwGrant) return { error: gwGrant };
         return { error: "Không thể xin quyền đọc từ máy chủ Sáng Tác Việt (HTTP " + (grantRes ? grantRes.status : 0) + ")" };
     }
 
@@ -252,6 +254,8 @@ function readChapterOnce(host, bookid, cid, chapterkey, readcontextid) {
         if (isCloudflareChallenge(rawReadErr, readRes ? readRes.headers : null)) {
             return { error: formatChallengeError("Sáng Tác Việt", BASE_URL + "/truyen/" + host + "/1/" + bookid + "/") };
         }
+        var gwRead = stvGatewayErrorMessage(readRes ? readRes.status : 0);
+        if (gwRead) return { error: gwRead };
         return { error: "Không đọc được nội dung chương STV (HTTP " + (readRes ? readRes.status : 0) + ")" };
     }
 

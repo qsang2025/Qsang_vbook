@@ -2,7 +2,7 @@
   "metadata": {
     "name": "Sáng Tác Việt",
     "author": "MuseAi",
-    "version": 9,
+    "version": 10,
     "source": "https://sangtacviet.app",
     "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
     "description": "Sáng Tác Việt — nền tảng đọc và nhúng truyện dịch máy / convert từ nguồn Trung Quốc (Qidian, Fanqie, 69shu, uukanshu...).",
@@ -13,6 +13,7 @@
   "config": {
     "DOMAIN": {
       "title": "Domain Sáng Tác Việt",
+      "subtitle": "Nếu gặp lỗi 504 khi đọc truyện trên mạng 4G/5G, hãy thử đổi sang https://sangtacviet.pro.",
       "mode": "select",
       "values": [
         "https://sangtacviet.app",
@@ -26,7 +27,7 @@
       "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)",
       "mode": "input",
       "format": "text",
-      "default": "https://sangtacviet.vip,https://sangtacviet.com,https://sangtacviet.pro"
+      "default": "https://sangtacviet.pro,https://sangtacviet.vip,https://sangtacviet.com"
     }
   },
   "script": {

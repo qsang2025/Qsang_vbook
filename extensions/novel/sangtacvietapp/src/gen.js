@@ -24,6 +24,8 @@ function execute(param, page) {
     if (!response || !response.ok) {
         var blockedMsg = stvBlockedMessage();
         if (blockedMsg) return Response.error(blockedMsg);
+        var gwMsg = stvGatewayErrorMessage(response ? response.status : 0);
+        if (gwMsg) return Response.error(gwMsg);
         return Response.error("Không tải được danh sách truyện (HTTP " + (response ? response.status : 0) + ")");
     }
     var rawText = "";
