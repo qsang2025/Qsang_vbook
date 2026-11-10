@@ -284,7 +284,41 @@ function execute(url) {
     var cid = parsed.cid;
 
     if (!host || !bookid || !cid) {
-        return Response.error("URL chương không đúng định dạng Sáng Tác Việt: " + url);
+        // Direct-read fallback (port tu ban Web Sang Tac Viet v10, P3
+        // 2026-11-10): neu la URL web truc tiep khong parse duoc tham so
+        // bookid/c/h thi doc thang trang chuong va boc noi dung tu
+        // #content-container (loai script/iframe/quang cao) thay vi bao
+        // loi URL khong hop le ngay.
+        if (url.indexOf("http") !== 0) {
+            if (url.charAt(0) !== '/') url = '/' + url;
+            url = BASE_URL + url;
+        }
+        var directRes = null;
+        try {
+            directRes = fetchWithMirrors(url);
+        } catch (eDirect) {
+            return Response.error("Không tải được trang chương Sáng Tác Việt: " + eDirect);
+        }
+        var blockedDirect = stvBlockedMessage();
+        if (blockedDirect) return Response.error(blockedDirect);
+        if (directRes && directRes.ok) {
+            var rawDirect = String(directRes.text() || "");
+            if (isCloudflareChallenge(rawDirect, directRes.headers)) {
+                return Response.error(formatChallengeError("Sáng Tác Việt", url));
+            }
+            if (isLoginRequired(rawDirect, url)) {
+                return Response.error(formatLoginError("Sáng Tác Việt", url));
+            }
+            var doc = directRes.html();
+            var el = doc.select("#content-container, .content, .reading-content").first();
+            if (el) {
+                el.select("script, iframe, .ads").remove();
+                return Response.success(cleanChapterContent(el.html(), host));
+            }
+        }
+        var gwDirect = stvGatewayErrorMessage(directRes ? directRes.status : 0);
+        if (gwDirect) return Response.error(gwDirect);
+        return Response.error("URL chương Sáng Tác Việt không hợp lệ: " + url);
     }
 
     var chapterkey = "";
@@ -324,10 +358,17 @@ function execute(url) {
 
     var json = attempt1.json;
 
-    // Xu ly loi code 7 (thiet bi / timing) bang cach cho 1.2s roi thu lai 1 lan
-    if (json && String(json.code) === "7") {
+    // Xu ly loi code 7 (may chu dang dich / dang tai chuong): cho 1,2s roi
+    // thu lai TOI DA 1 LAN — va lan retry PHAI xin lai grant + key moi
+    // truoc khi doc (key cu co the het han theo phien dich), khong doc lai
+    // bang key cu nhu ban cu (port tu ban Web Sang Tac Viet v10, P3 2026-11-10).
+    if (json && (String(json.code) === "7" || json.code === 7)) {
         waitBounded(1200);
-        var attempt2 = readChapterOnce(host, bookid, cid, chapterkey, readcontextid);
+        var grant2 = requestGrantAndKey(host, bookid);
+        if (grant2.error) {
+            return Response.error(grant2.error);
+        }
+        var attempt2 = readChapterOnce(host, bookid, cid, grant2.key, grant2.readcontextid);
         if (attempt2.error) return Response.error(attempt2.error);
         json = attempt2.json;
     }

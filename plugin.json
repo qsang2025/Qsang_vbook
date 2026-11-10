@@ -50,24 +50,13 @@
       "locale": "vi_VN"
     },
     {
-      "name": "Sáng Tác Việt",
-      "author": "MuseAi",
-      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacviet/plugin.zip",
-      "version": 10,
-      "source": "https://sangtacviet.app",
-      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacviet/icon.png",
-      "description": "Sáng Tác Việt — nền tảng đọc và nhúng truyện dịch máy / convert từ nguồn Trung Quốc (Qidian, Fanqie, 69shu, uukanshu...).",
-      "type": "novel",
-      "locale": "vi_VN"
-    },
-    {
-      "name": "SangtacvietApp",
+      "name": "Sáng Tác Việt APP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacvietapp/plugin.zip",
-      "version": 5,
+      "version": 6,
       "source": "https://sangtacviet.app",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacvietapp/icon.png",
-      "description": "Sáng Tác Việt App — phiên bản tối ưu hóa tốc độ cao mô phỏng Sáng Tác Việt Mobile Reader (/mobile/bookinfo.php, smart key caching, instant chapter reading).",
+      "description": "Sáng Tác Việt APP — nguồn gộp duy nhất (gộp SangtacvietApp v5 + Sáng Tác Việt v10, P3 2026-11-10): JSON-first + HTML fallback, smart key caching, direct-read fallback; đọc truyện dịch máy / convert từ Qidian, Fanqie, 69shu, uukanshu...",
       "type": "novel",
       "locale": "vi_VN"
     },
