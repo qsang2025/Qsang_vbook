@@ -149,6 +149,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "和图书",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/hetushu/plugin.zip",
+      "version": 1,
+      "source": "https://www.hetushu.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/hetushu/icon.png",
+      "description": "和图书 (hetushu.com) — truyện chữ giản thể miễn phí: huyền huyễn, tiên hiệp, đô thị, lịch sử, võ hiệp... Chương đọc miễn phí, không khóa VIP, toàn bộ HTML tĩnh. Mục lục nằm ngay trên trang chi tiết (1.235 chương với Kiếm Lai).",
+      "type": "novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "小說狂人",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/czbooks/plugin.zip",
