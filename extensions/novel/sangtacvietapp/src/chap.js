@@ -83,9 +83,11 @@ function evaluateChapterKey(base, code) {
                 + "window.document = window.document || {};"
                 + "window.document.hidden = false;"
                 + "window.app = {" + STV_GRANT_FLAG_APP + ":true, reader:{}};"
-                + "var res = '';"
-                + "try{ res = (0,eval)(" + JSON.stringify(code) + "); }catch(e){}"
-                + "var k = String(res || (window.app && window.app.reader && (window.app.reader.chapterkey || window.app.reader.chapterKey || window.app.reader.key)) || '');"
+                // Chi doc chapterkey tu window.app.reader — KHONG dung gia tri tra ve
+                // cua eval() lam key: ma grant tra undefined (chung minh bang chay
+                // that trong Node, nghien cuu APK 10/11), dung no chi them rui ro.
+                + "try{ (0,eval)(" + JSON.stringify(code) + "); }catch(e){}"
+                + "var k = String((window.app && window.app.reader && (window.app.reader.chapterkey || window.app.reader.chapterKey || window.app.reader.key)) || '');"
                 + "if (!k) { k = String((fw.app && fw.app.reader && (fw.app.reader.chapterkey || fw.app.reader.chapterKey || fw.app.reader.key)) || ''); }"
                 + "try{document.getElementById('stv_key_out').innerText = k;}catch(_){}"
                 + "return k;"
@@ -286,8 +288,10 @@ function execute(url) {
         readcontextid = cached.readcontextid || "";
 
         // Thu doc ngay voi key da cache (TOC DO TUC THI, KHONG CAN WEBVIEW)
+        // STV tra code 0 (= thanh cong, chung minh tu code site stv.ui.js)
+        // hoac 1 khi doc duoc; chi code khac moi coi la key hong.
         var fastAttempt = readChapterOnce(host, bookid, cid, chapterkey, readcontextid);
-        if (fastAttempt.json && fastAttempt.json.code == 1 && fastAttempt.json.data) {
+        if (fastAttempt.json && (String(fastAttempt.json.code) === "0" || String(fastAttempt.json.code) === "1") && fastAttempt.json.data) {
             return Response.success(cleanChapterContent(fastAttempt.json.data, host));
         }
 
@@ -304,9 +308,6 @@ function execute(url) {
     }
     chapterkey = grant.key;
     readcontextid = grant.readcontextid;
-
-    // Luu key moi vao cache cho cac chuong ke tiep
-    setStoredKey(host, bookid, chapterkey, readcontextid);
 
     // 3. Doc chuong voi key moi
     var attempt1 = readChapterOnce(host, bookid, cid, chapterkey, readcontextid);
@@ -326,7 +327,11 @@ function execute(url) {
         return Response.error("Không nhận được phản hồi từ Sáng Tác Việt.");
     }
 
-    if (json.code != 1) {
+    // STV tra code 0 khi thanh cong (code site stv.ui.js: x.code == "0" thi
+    // hien thi x.data) — giu code 1 phong thu neu server co luc tra 1.
+    // Chi code khac 0/1 moi la loi that su (vd. 7 da retry o tren, 10002 key
+    // het han/moi truong khong khop).
+    if (String(json.code) !== "0" && String(json.code) !== "1") {
         clearStoredKey(host, bookid);
         var msg = json.err || json.info || ("Mã phản hồi STV không hợp lệ: " + json.code);
         return Response.error("Lỗi từ Sáng Tác Việt: " + msg);
@@ -335,6 +340,11 @@ function execute(url) {
     if (!json.data) {
         return Response.error("Chương không có nội dung.");
     }
+
+    // Chi cache key SAU KHI doc chuong thanh cong lan dau (I6): key hong
+    // thi khong bao gio duoc cache, chuong sau se xin grant moi thay vi
+    // doc bang key hong trong cache.
+    setStoredKey(host, bookid, chapterkey, readcontextid);
 
     return Response.success(cleanChapterContent(json.data, host));
 }

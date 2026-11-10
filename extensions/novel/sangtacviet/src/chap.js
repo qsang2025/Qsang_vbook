@@ -5,14 +5,14 @@ load('challenge-handler.js');
 
 // stvMd5 — Ham MD5 dung de ky request doc chuong (x-stv-sign).
 //
-// CryptoJS co san qua load('crypto.js') o dau file (built-in cua runtime:
+// CryptoJS co san qua file crypto.js o dau file (built-in cua runtime:
 // extension-api.md "crypto.js always resolves to bundled CryptoJS", va
-// load('crypto.js') uu tien ban bundle thay vi file crypto.js cua rieng
+// file crypto.js uu tien ban bundle thay vi file crypto.js cua rieng
 // minh). Ban MD5 inline RFC 1321 cu (~150 dong, kieu md5.js cua Paul
 // Johnston) da duoc xoa o v6: no chi chay khi CryptoJS vang mat, ma tren
 // runtime that dieu do khong xay ra — chap doc OK tren may that
 // 2026-11-08, va lacatruyen trong cung repo dung dung mau nay
-// (load('crypto.js') + src/crypto.js md5 khop lib/crypto.js).
+// (file crypto.js + src/crypto.js md5 khop lib/crypto.js).
 function stvMd5(string) {
     return CryptoJS.MD5(string).toString();
 }

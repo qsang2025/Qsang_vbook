@@ -2,7 +2,7 @@
   "metadata": {
     "name": "SangtacvietApp",
     "author": "MuseAi",
-    "version": 2,
+    "version": 3,
     "source": "https://sangtacviet.app",
     "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
     "description": "Sáng Tác Việt App — phiên bản tối ưu hóa tốc độ cao mô phỏng Sáng Tác Việt Mobile Reader (/mobile/bookinfo.php, smart key caching, instant chapter reading).",
