@@ -25,7 +25,7 @@
     "regexp": "^https://www\\.shuhaige\\.tw/\\d+\\.html$",
     "source": "https://www.shuhaige.tw",
     "type": "novel",
-    "version": 3
+    "version": 4
   },
   "script": {
     "book": "book.js",

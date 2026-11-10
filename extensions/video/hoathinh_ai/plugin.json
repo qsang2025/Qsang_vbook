@@ -25,7 +25,7 @@
     "regexp": "^https://www\\.dailymotion\\.com/video/[a-zA-Z0-9]+/?$",
     "source": "https://www.dailymotion.com",
     "type": "video",
-    "version": 4
+    "version": 5
   },
   "script": {
     "chap": "chap.js",

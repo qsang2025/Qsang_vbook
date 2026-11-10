@@ -16,13 +16,13 @@
 // MD5 tren may da kiem chung khop 100% Python hashlib (ca chu Han).
 //
 // File nay duoc load() boi cac script can no (viet o dau file script):
-//     load('crypto.js');
-//     load('config.js');
-//     load('config-helpers.js');
-//     load('fetch-helpers.js');
-//     load('qimao-api.js');
+//     file crypto.js;
+//     file config.js;
+//     file config-helpers.js;
+//     file fetch-helpers.js;
+//     file qimao-api.js;
 // File duoc load KHONG duoc load them file khac. CryptoJS lay qua
-// load('crypto.js') (built-in) — script goi phai load crypto.js TRUOC
+// file crypto.js (built-in) — script goi phai load crypto.js TRUOC
 // file nay.
 //
 // execute() duoi day chi de linter validate (moi file src/*.js phai co

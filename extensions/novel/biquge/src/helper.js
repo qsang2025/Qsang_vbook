@@ -5,9 +5,9 @@
 // danh sach the loai (.item) va ket qua tim kiem (.result-card).
 //
 // File nay duoc load() boi cac script can no (viet o dau file script):
-//     load('config.js');
-//     load('config-helpers.js');
-//     load('helper.js');
+//     file config.js;
+//     file config-helpers.js;
+//     file helper.js;
 // File duoc load KHONG duoc load them file khac, nen helper.js khong load
 // config.js; script phai load config.js + config-helpers.js TRUOC
 // helper.js (cac ham duoi day dung BASE_URL, absUrl, cleanText).
@@ -142,11 +142,11 @@ function parseSearchItem(el) {
 // --- Dung chung cho v4 (N2/N3/C1, review 2026-11-08) ----------------------
 // LUU Y load(): helper.js KHONG load() them file nao (load khong de quy).
 // Script nao dung cac ham duoi day phai load truoc theo thu tu:
-//     load('config.js');
-//     load('config-helpers.js');
-//     load('fetch-helpers.js');
-//     load('challenge-handler.js');
-//     load('helper.js');
+//     file config.js;
+//     file config-helpers.js;
+//     file fetch-helpers.js;
+//     file challenge-handler.js;
+//     file helper.js;
 // (fetchPageDoc dung fetchDocWithFallback + fetchWithChallengeHandler;
 // findLinkByText/isErrorPage chi dung select()/text() co ban.)
 

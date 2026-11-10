@@ -6,10 +6,10 @@
 // (div.pagei a[title*="下一页"]).
 //
 // File nay duoc load() boi cac script can no (viet o dau file script):
-//     load('config.js');
-//     load('config-helpers.js');
-//     load('fetch-helpers.js');
-//     load('helper.js');
+//     file config.js;
+//     file config-helpers.js;
+//     file fetch-helpers.js;
+//     file helper.js;
 // File duoc load KHONG duoc load them file khac, nen helper.js khong load
 // config.js; script phai load config.js + config-helpers.js +
 // fetch-helpers.js TRUOC helper.js (cac ham duoi day dung BASE_URL,

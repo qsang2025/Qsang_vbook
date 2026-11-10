@@ -5,8 +5,8 @@
 // extension truoc khi dong plugin.zip, vi load() cua vBook chi load file o
 // top level src/ trong cung extension, khong de quy, va file duoc load
 // khong duoc load them file khac. Trong script dung no, viet o dau file:
-//     load('config.js');
-//     load('fetch-helpers.js');
+//     file config.js;
+//     file fetch-helpers.js;
 // (Chi can config.js khi muon Referer mac dinh la BASE_URL; neu khong co
 // BASE_URL thi Referer duoc bo qua, ham van chay.)
 //

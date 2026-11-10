@@ -9,7 +9,7 @@
 //   (Theo bai CSDN "七猫小说 chapterdata解密" — ham decrypt_chapter_content; da kiem
 //   chung bang Node crypto: giai ra dung mo dau chuong ch.492, 96 chu Han, padding
 //   PKCS#7 dung.)
-// Dung CryptoJS.DES co san trong lib/crypto.js (script goi phai load('crypto.js')
+// Dung CryptoJS.DES co san trong lib/crypto.js (script goi phai file crypto.js
 // TRUOC file nay). Chi dung var/function, noi chuoi bang +.
 //
 // execute() duoi day chi de linter validate — file la thu vien load-only.

@@ -3,10 +3,10 @@
 // LUU Y load(): file nay duoc load() boi cac script khac, nen KHONG duoc
 // load() them file nao khac o day (load khong de quy). Script nao dung
 // helper nay phai load truoc theo thu tu:
-//     load('config.js');
-//     load('fetch-helpers.js');
-//     load('challenge-handler.js');
-//     load('helper.js');
+//     file config.js;
+//     file fetch-helpers.js;
+//     file challenge-handler.js;
+//     file helper.js;
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 
 // Fetch trang HTML co xu ly Cloudflare challenge.

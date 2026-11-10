@@ -10,8 +10,8 @@
 // truyen trong trang danh sach, tach so chuong/tong so chuong tu URL/text.
 //
 // File nay duoc load() boi cac script can no (viet o dau file script):
-//     load('config.js');
-//     load('helper.js');
+//     file config.js;
+//     file helper.js;
 // File duoc load KHONG duoc load them file khac, nen helper.js khong load
 // config.js; script phai load config.js TRUOC helper.js vi cac ham duoi
 // day dung BASE_URL (absUrl) va cleanText (config-helpers.js phai duoc

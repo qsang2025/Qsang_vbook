@@ -19,7 +19,7 @@
 // trong code goc truoc tien (site xoay key se gay toan bo chap.js).
 //
 // File nay duoc load() boi chap.js (viet o dau file):
-//     load('qimao-crypto.js');
+//     file qimao-crypto.js;
 // File duoc load KHONG duoc load them file khac.
 //
 // execute() duoi day chi de linter validate (moi file src/*.js phai co

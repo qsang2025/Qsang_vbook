@@ -5,7 +5,7 @@
 // extension truoc khi dong plugin.zip, vi load() cua vBook chi load file o
 // top level src/ trong cung extension, khong de quy, va file duoc load
 // khong duoc load them file khac. Trong script dung no, viet o dau file:
-//     load('cleanHtml.js');
+//     file cleanHtml.js;
 // Khong load file nay tu trong config.js hay bat ky file lib nao khac.
 //
 // Y tuong: cleanHtml trong truyenfull (Darkrai9x) + cleanHtml trong libs.js

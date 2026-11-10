@@ -1,7 +1,7 @@
 // config.js — Cau hinh chung va ham tien ich cho La Ca Truyen (lacatruyen.site)
 // QUY TAC: File nay duoc load() vao cac script khac nen TUYET DOI KHONG goi load() o day.
-// -> Script nao goi aesEncrypt/aesDecrypt (toc.js, chap.js, page.js) PHAI load('crypto.js')
-//    TRUOC load('config.js') (load() cua runtime khong de quy nen config.js khong tu load duoc).
+// -> Script nao goi aesEncrypt/aesDecrypt (toc.js, chap.js, page.js) PHAI file crypto.js
+//    TRUOC file config.js (load() cua runtime khong de quy nen config.js khong tu load duoc).
 
 var BASE_URL = "https://lacatruyen.site";
 var CDN_URL = "https://cms.metruyen.com/storage/uploads/";

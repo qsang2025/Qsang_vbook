@@ -2,7 +2,7 @@
   "metadata": {
     "name": "Mê Truyện Chữ",
     "author": "MuseAi",
-    "version": 5,
+    "version": 6,
     "source": "https://metruyenchu.com.vn",
     "regexp": "^https?://(www\\.)?(metruyenchu\\.com\\.vn|metruyenchuvn\\.com|metruyenchuvn\\.org|wikidichvn\\.com)/[^/]+(/chuong-[^/]+)?/?$",
     "description": "Mê Truyện Chữ VN — truyện chữ tiếng Việt miễn phí, kho convert & dịch lớn: Tiên Hiệp, Huyền Huyễn, Đô Thị, Dị Giới, Võng Du... Cập nhật liên tục.",

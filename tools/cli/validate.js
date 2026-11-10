@@ -24,7 +24,9 @@
 //       ?., ??, spread, .flat() trong src/*.js và lib/*.js (runtime vBook
 //       chỉ chạy Rhino ES6); script chạy được phải có function execute(...);
 //       file được load() không được load() tiếp; load() không chứa đường
-//       dẫn (chỉ tên file ở top level của src/).
+//       dẫn (chỉ tên file ở top level của src/); load('...') trong comment
+//       cũng bị báo lỗi (quy tắc 12 — runtime vBook và build scanner quét
+//       cả comment, xem findCommentLoadCalls()).
 //       Thêm từ 2026-11-09 (lỗi brace tiemtruyenchu v4 từng lọt qua validate):
 //       node --check cho mọi file src/*.js và lib/*.js để bắt lỗi cú pháp JS
 //       thật, và kiểm tra md5 của file lib đã inline trong src/ khớp với bản
@@ -64,7 +66,8 @@ function printHelp() {
       "chuẩn, test.json đúng định dạng golden fixture, mỗi nguồn có plugin.zip\n" +
       "đã commit kèm và khớp nội dung src/ hiện tại, không có file .zip lạ\n" +
       "trong extensions/, branch trong URL registry là \"main\", linter Rhino\n" +
-      "ES6 cho src/*.js và lib/*.js, node --check cho mọi file src/*.js và\n" +
+      "ES6 cho src/*.js và lib/*.js, load('...') trong comment bị báo lỗi\n" +
+      "(quy tắc 12), node --check cho mọi file src/*.js và\n" +
       "lib/*.js, md5 file lib đã inline trong src/ khớp bản gốc ở lib/,\n" +
       "health.json đúng định dạng fixture nhẹ.\n" +
       "\n" +
@@ -127,6 +130,9 @@ function walkFiles(dir, base) {
 // ký tự — vd. comment hướng dẫn "load('config.js');" hay thông báo lỗi
 // "can load('config.js')..." không phải lệnh load thật). Dùng cho cả
 // findLoads() lẫn kiểm tra load() đệ quy ở dưới.
+// (Riêng load() trong comment được bắt riêng bằng findCommentLoadCalls()
+// ở dưới — runtime vBook và build scanner quét cả comment nên đó là lỗi,
+// xem quy tắc 12, AGENTS.md mục 6.)
 function findLoadCalls(code) {
   const found = [];
   let i = 0;
@@ -164,6 +170,81 @@ function findLoadCalls(code) {
         i += m[0].length;
         continue;
       }
+    }
+    i++;
+  }
+  return found;
+}
+
+// Tìm mọi chuỗi load('xxx.js') / load("xxx.js") nằm trong COMMENT
+// (cả // và /* */) — ngược với findLoadCalls() ở trên (chỉ tính lệnh
+// thật, bỏ qua comment). Trả về mảng {line, name}.
+// Lý do (quy tắc 12, AGENTS.md mục 6): runtime vBook quét cả comment và
+// xử lý load('...') trong comment như lệnh load() thật — entry script dính
+// kiểu đó lỗi "UniqueTag cannot be cast to Function" (STV v7, 2026-11-10);
+// build scanner tools/cli/build.js (findLoads) cũng quét comment nên sẽ
+// inline nhầm file lib (lib/rate-limit.js, P1/P2). Vì vậy bất kỳ file nào
+// trong src/ hay lib/ cũng không được viết load('...') trong comment —
+// chỉ load() trong code thật mới hợp lệ, load() trong chuỗi thì bỏ qua
+// (không phải comment, runtime không quét chuỗi).
+// Cách quét: cùng máy trạng thái với findLoadCalls() (bỏ qua chuỗi "..." /
+// '...' / `...`, kể cả "//" nằm trong chuỗi như "https://..."), nhưng khi
+// gặp comment thì quét chuỗi load('...') bên trong nó thay vì bỏ qua.
+function findCommentLoadCalls(code) {
+  const found = [];
+  let i = 0;
+  const n = code.length;
+  let line = 1;
+  const LOAD_RE = /^load\s*\(\s*(['"])([^'"]+)\1/;
+  while (i < n) {
+    const c = code.charAt(i);
+    if (c === "\n") { line++; i++; continue; }
+    // Chuỗi "..." / '...' / `...` (có escape \) — bỏ qua.
+    if (c === '"' || c === "'" || c === "`") {
+      const q = c;
+      i++;
+      while (i < n && code.charAt(i) !== q) {
+        if (code.charAt(i) === "\n") line++;
+        if (code.charAt(i) === "\\") i++;
+        i++;
+      }
+      i++;
+      continue;
+    }
+    // Comment // tới cuối dòng.
+    if (c === "/" && code.charAt(i + 1) === "/") {
+      const start = i;
+      while (i < n && code.charAt(i) !== "\n") i++;
+      const span = code.slice(start, i);
+      const re = /load\s*\(\s*(['"])([^'"]+)\1/g;
+      let m;
+      while ((m = re.exec(span)) !== null) {
+        // Không tính hậu tố của tên khác (vd. "unload('x')", "download('x')").
+        if (m.index > 0 && /[a-zA-Z0-9_$]/.test(span.charAt(m.index - 1))) continue;
+        found.push({ line: line, name: m[2] });
+      }
+      continue;
+    }
+    // Comment /* ... */ (có thể nhiều dòng).
+    if (c === "/" && code.charAt(i + 1) === "*") {
+      const start = i;
+      const startLine = line;
+      i += 2;
+      while (i + 1 < n && !(code.charAt(i) === "*" && code.charAt(i + 1) === "/")) {
+        if (code.charAt(i) === "\n") line++;
+        i++;
+      }
+      i += 2;
+      const span = code.slice(start, i);
+      const re = /load\s*\(\s*(['"])([^'"]+)\1/g;
+      let m;
+      while ((m = re.exec(span)) !== null) {
+        if (m.index > 0 && /[a-zA-Z0-9_$]/.test(span.charAt(m.index - 1))) continue;
+        const before = span.slice(0, m.index);
+        const extraLines = (before.match(/\n/g) || []).length;
+        found.push({ line: startLine + extraLines, name: m[2] });
+      }
+      continue;
     }
     i++;
   }
@@ -630,6 +711,14 @@ function main() {
             "load() của runtime vBook chỉ load file ở top level của src/.");
         }
       });
+      // (i+) load('...') trong comment — quy tắc 12 (AGENTS.md mục 6):
+      // runtime vBook và build scanner quét cả comment nên file dính kiểu
+      // đó sẽ lỗi UniqueTag / build inline nhầm file.
+      findCommentLoadCalls(code).forEach(function (v) {
+        err(label + " src/" + f + ": dòng " + v.line + ": load('" + v.name + "') trong comment — " +
+          "runtime vBook quét cả comment nên file lỗi UniqueTag, build cũng inline nhầm file " +
+          "(quy tắc 12, AGENTS.md mục 6): viết tên file trần, vd. \"file " + v.name + "\".");
+      });
     });
     // File được load() không được load() tiếp (runtime không đệ quy).
     loaded.forEach(function (name) {
@@ -665,6 +754,13 @@ function main() {
         err("[lib] " + f + ": chứa lệnh load() — file lib được load lúc chạy " +
           "nên không được load thêm file khác.");
       }
+      // (i+) load('...') trong comment — quy tắc 12 (AGENTS.md mục 6):
+      // build scanner quét cả comment nên sẽ inline nhầm file.
+      findCommentLoadCalls(code).forEach(function (v) {
+        err("[lib] " + f + ": dòng " + v.line + ": load('" + v.name + "') trong comment — " +
+          "build scanner quét cả comment nên sẽ inline nhầm file " +
+          "(quy tắc 12, AGENTS.md mục 6): viết tên file trần, vd. \"file " + v.name + "\".");
+      });
     });
   }
 

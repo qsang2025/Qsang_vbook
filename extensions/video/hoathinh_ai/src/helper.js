@@ -8,9 +8,9 @@
 //                   -> .qualities.auto[0].url (link .m3u8 goc cua CDN)
 //
 // File nay duoc load() boi cac script can no (viet o dau file script):
-//     load('config.js');
-//     load('config-helpers.js');
-//     load('helper.js');
+//     file config.js;
+//     file config-helpers.js;
+//     file helper.js;
 // File duoc load KHONG duoc load them file khac, nen helper.js khong load
 // config.js; script phai load config.js + config-helpers.js TRUOC
 // helper.js (cac ham duoi day dung BASE_URL, API_BASE, META_BASE, absUrl,
