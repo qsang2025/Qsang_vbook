@@ -9,7 +9,8 @@ Extension đọc và nhúng truyện dịch máy / convert từ **Sáng Tác Vi�
 
 ## Mirror / failover (v4, đo lại v6)
 - Cả 4 domain `.app` / `.vip` / `.com` / `.pro` đều là mirror thật của cùng một site (đã kiểm chứng bằng curl 2026-11-08: cả 4 đều trả HTTP 200 và phục vụ được API mục lục).
-- Extension tự thử lần lượt các mirror khi domain chính lỗi (`fetchWithMirrors()` trong `src/config.js`, danh sách trong config `MIRRORS` của `plugin.json`); mirror nào chạy được sẽ dùng cho các bước sau trong cùng một lần gọi.
+- Extension chỉ thử mirror khác khi domain chính LỖI MẠNG (fetch ném exception hoặc không có response) — từ v9 (P1/P2, 2026-11-10): đã nhận HTTP response (kể cả 4xx/5xx) thì trả ngay cho caller báo đúng mã, không thử mirror tiếp (mirror nào cũng trả lời như nhau; trước đây thử hết 4 mirror khi gặp 504 nên mất tới 138s). `fetchWithMirrors()` trong `src/config.js`, danh sách trong config `MIRRORS` của `plugin.json`; mirror nào chạy được sẽ dùng cho các bước sau trong cùng một lần gọi.
+- Chống chặn theo IP (v9): mỗi request qua `pacedFetch()` (`src/rate-limit.js`, copy từ `lib/`): nghỉ jitter 0,5–1,5s trước request, 1 request/lần/host; gặp 405/429 thì ghi cooldown 60 phút, lần gọi sau trong cooldown fail nhanh không gửi request, và báo lỗi tiếng Việt "tạm chặn, thử lại sau X phút" thay vì mã HTTP chung chung.
 - Độ trễ đo từ VM: 2026-11-08 `.com` chậm bất thường (7,8s) trong khi `.pro` 2,0s; đo lại 2026-11-09: `.app` 0,9s, `.vip` 3,9s, `.com` 2,1s, `.pro` 2,1s — `.com` không chậm ổn định nên giữ nguyên thứ tự `.vip` → `.com` → `.pro`, tiếp tục theo dõi.
 - Domain `dns1.stv-appdomain-<số>.org` chỉ còn trong `regexp` của `plugin.json` (để app vẫn mở được link thư viện cũ); từ VM không kết nối được tới nó nên **không** đưa vào danh sách failover — không có mirror độc lập nào khác ngoài 4 domain trên. Kiểm chứng lại 2026-11-09: `dns1.stv-appdomain-1.org` resolve ra `198.18.112.197` (dải CGNAT), curl HTTP 000.
 
@@ -31,10 +32,10 @@ Extension đọc và nhúng truyện dịch máy / convert từ **Sáng Tác Vi�
 - `search.js` / `gen.js`: parse kết quả chung vào `src/helper.js` (`parseSearchPage`), cả hai cùng `load()` — sửa selector một chỗ.
 - 0 kết quả / trang list trống giờ trả `Response.success([], "")` thay vì `Response.error` (chỉ dùng error cho lỗi mạng/HTTP/parse).
 
-## Trạng thái truyện (detail.js, v4)
-- `ongoing` đọc thật từ `<meta property="og:novel:status">` của trang chi tiết (`Còn tiếp` → true, `Hoàn thành` → false); trước đây hardcode `true`.
+## Trạng thái truyện (detail.js, v4; sửa mapping v9)
+- `ongoing` đọc từ `<meta property="og:novel:status">` của trang chi tiết. LƯU Ý (khảo sát 10 truyện 2026-11-10, xem `work/ext-review/STV-P1P2-STATUS-SURVEY.md`): og meta KHÔNG đáng tin như `bookinfo.php` — og "Hoàn thành" khớp với bookinfo "Tạm ngưng" 4/4, og "Còn tiếp" khớp cả "Còn tiếp"/"Hoàn thành"/"Không xác định". Nên từ v9: og "Hoàn thành" → ongoing=true + ghi chú "Tạm ngưng (web ghi: Hoàn thành)", og "Còn tiếp" → ongoing=true + ghi giá trị gốc; không bao giờ đoán ongoing=false từ og nữa. v7 không có bookinfo nên không biết truyện nào thật sự hoàn thành (vd. biqubu/68918, uukanshu/176313 bị báo ongoing) — xem ghi chú trong detail để đối chiếu.
 - Tên truyện lấy `namevi` (tiếng Việt, khớp tên hiển thị trên site và trong kết quả tìm kiếm) thay vì `name` (tiếng Trung gốc); tác giả ưu tiên `og:novel:author` (đã chuyển sang tiếng Việt).
 
 ## Fixture
-- `test.json`: case cho gen, genre, search, detail, toc, chap. Truyện mẫu `faloo/1020583` ("Ta bởi vì chửi bậy!..."), Hoàn thành, 33 chương. Chap chương 1 đã test trên máy thật 2026-11-08 (code 0, nội dung mở đầu "Dựa vào! Có tiền như vậy...").
-- `health.json`: probe trang chủ (marker CDN riêng `static.sangtacvietcdn.xyz` — trang chủ không có meta `og:site_name`, marker này mới là dấu riêng của site) + API mục lục truyện mẫu (marker tên chương 1).
+- `test.json`: case cho gen, genre, search, detail, toc, chap. Truyện mẫu `faloo/1020583` ("Ta bởi vì chửi bậy!..."), Tạm ngưng theo bookinfo.php (trước đây ghi Hoàn thành theo og meta — sai, xem mục Trạng thái truyện), 33 chương. Chap chương 1 đã test trên máy thật 2026-11-08 (code 0, nội dung mở đầu "Dựa vào! Có tiền như vậy...").
+- `health.json`: probe trang chủ (marker CDN riêng `static.sangtacvietcdn.xyz` — trang chủ không có meta `og:site_name`, marker này mới là dấu riêng của site) + API chi tiết `bookinfo.php` truyện mẫu (pattern `"code":100`). Case API mục lục cũ đã bỏ ở v9: chapterlist bắt buộc header `Referer` theo truyện mà probe health-check không gửi được (plain GET trả HTTP 200 0 byte) nên case đó không bao giờ PASS; đường mục lục vẫn được kiểm bằng `test.json` trên máy thật.
