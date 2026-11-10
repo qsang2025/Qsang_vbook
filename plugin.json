@@ -105,6 +105,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "XTruyện",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xtruyen/plugin.zip",
+      "version": 1,
+      "source": "https://xtruyen.vn",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xtruyen/icon.png",
+      "description": "XTruyện (xtruyen.vn) — truyện chữ tiếng Việt: tiên hiệp, kiếm hiệp, ngôn tình, đô thị, huyền huyễn... Nội dung chương giải nén từ biến data_x (Base64+Deflate); mục lục qua API api-chapters.php của site.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "七猫免费小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/qimao/plugin.zip",
