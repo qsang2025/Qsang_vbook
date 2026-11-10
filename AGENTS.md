@@ -98,6 +98,7 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
 9. **`home.js` chỉ trả tab tĩnh, không fetch.** App chạy tab đầu tiên ngay khi mở extension — fetch lỗi ở đó sẽ chặn cả trang chủ. Tab trỏ về `book.js` / `search.js` với input là đường dẫn danh sách (`/nosort/...`, `/quanben/nosort/...`) để list script tải dữ liệu; không parse mục trang chủ `/` trong tab đầu tiên. (Bài học novels.com.tw 2026-11-06: v1 fetch trang chủ `/` nên lỗi ngay ở ngoài, trong khi tab tĩnh trỏ về `/nosort/` chạy bình thường.)
 10. **Không xoay User-Agent mặc định.** Fetch dùng UA mặc định của runtime để cookie `cf_clearance` của Cloudflare còn hiệu lực (Cloudflare gắn cookie với UA của trình duyệt đã qua xác minh). Chỉ xoay UA khi một site cụ thể chứng minh là cần, và không bao giờ xoay trên site sau Cloudflare challenge. (Bài học novels.com.tw 2026-11-06: xoay UA bị 403 ngay cả khi đã qua xác minh trong trình duyệt của app; extension của mizhm dùng UA mặc định thì chạy được.)
 11. **Pacing request chống rate-limit (bài học qimao 405, 2026-11-09).** 1 request/lần/host, gọi `rateLimitDelay()` (lib/rate-limit.js) trước mỗi request, không request song song trên cùng host; muốn mã HTTP thì dùng `pacedFetch()` thay cho `fetchPage()` (trả về `{ok, status, res, ...}` để phân biệt 405 với lỗi mạng). Gặp 429/405/503 thì backoff hàm mũ + jitter tối đa 3 lần rồi dừng; gặp 405/429 thì ghi cooldown (`setCooldown`) và KHÔNG dùng browser fallback (cùng IP, vô ích). Lỗi trả về phải nói rõ "đang tạm chặn, thử lại sau X phút" (xem `rateLimitErrorMessage`). Test trên máy: 1 request/lần, cách nhau ≥ 2–3 giây với host nhạy cảm. (Bài học qimao.com 2026-11-09: ~6–10 request nhanh, có 2 song song, khiến WAF chặn IP bằng HTTP 405 hơn 2 giờ; API host wtzw.com không bị chặn.)
+12. **Không viết `load('...')` trong comment của entry script.** Runtime vBook quét cả comment và xử lý `load('...')` trong comment như lệnh `load()` thật — file dính kiểu đó sẽ không load được `execute` và lỗi `UniqueTag cannot be cast to Function` (code 403). Muốn nhắc tới file lib trong comment thì viết tên file trần (vd. `file crypto.js`), không viết dạng `load('crypto.js')`. (Bài học Sáng Tác Việt v7 2026-11-10: 3 dòng comment `load('crypto.js')` trong khối chú thích `stvMd5` làm hỏng chap.js dù code thật không đổi; linter hiện bỏ qua `load()` trong comment nên không bắt được lỗi này — follow-up: dạy linter quét cả comment.)
 
 ## 7. Kỷ luật repo (sonzin)
 
@@ -206,7 +207,9 @@ Mọi việc tạo, sửa, test, kiểm tra (audit), refactor hay build/cài ext
   async/await, template literal, `?.`, `??`, spread, `.flat()` trong
   `src/*.js` và `lib/*.js`; script chạy được phải có `function execute(...)`;
   file được `load()` không được `load()` tiếp. Linter bỏ qua `load('...')`
-  nằm trong comment/chuỗi (chỉ tính lệnh thật). Từ 2026-11-09, `validate`
+  nằm trong comment/chuỗi (chỉ tính lệnh thật) — nên linter chưa bắt được lỗi
+  comment `load()` làm hỏng entry script (xem quy tắc 12, mục 6); follow-up:
+  dạy linter quét cả comment. Từ 2026-11-09, `validate`
   còn chạy `node --check` cho mọi file `src/*.js` và `lib/*.js` và kiểm tra
   md5 file lib đã inline trong `src/` khớp bản gốc ở `lib/` (xem mục 5).
 - Workflow `validate.yml` chạy mỗi push/PR vào main (`validate` +
