@@ -18,10 +18,12 @@ License repo: MIT (copyright Dương Nguyễn Quốc Sáng, 2026).
 
 ## Cách hoạt động
 
-- Trang chủ: 5 tab tĩnh (Chương mới, Truyện nam, Nữ tần, Đam mỹ,
-  Bảng xếp hạng) → `book.js` tải danh sách SSR (20–50 truyện/trang).
-- Thể loại: 18 mục tĩnh (tag/genre/status ID lấy từ trang chủ) →
-  `book.js` qua `/tim-kiem?qs=2&...`.
+- Trang chủ: 6 tab tĩnh (Chương mới, Truyện nam, Nữ tần, Đam mỹ, Review,
+  Bảng xếp hạng) → `book.js` tải danh sách SSR (10–50 truyện/trang).
+- Thể loại: 32 mục tĩnh (18 gốc + 7 thể loại bổ sung + 7 chuyên mục
+  Review; tag/genre/status ID lấy từ trang chủ) → `book.js` qua
+  `/tim-kiem?qs=2&...` (7 thể loại bổ sung chỉ chạy sau đăng nhập)
+  hoặc `/review?cat=..` (không cần đăng nhập).
 - Chi tiết: SSR `.cover-info` (tên, tác giả, trạng thái, bìa) +
   `.book-desc-detail` (mô tả) + thể loại.
 - Tìm kiếm: GET `/tim-kiem?q=<kw>&qs=1&start=<n>` → `.book-item`.
@@ -34,19 +36,26 @@ License repo: MIT (copyright Dương Nguyễn Quốc Sáng, 2026).
 
 ## Giới hạn đã biết (kiểm chứng 2026-11-11, chưa đăng nhập)
 
-Site chia làm hai nửa: **không cần đăng nhập** (chi tiết, chương,
-Chương mới / Truyện nam / Nữ tần / Đam mỹ) và **cần đăng nhập**
-(tìm kiếm, thể loại, bảng xếp hạng, mục lục API):
+Site chia làm hai nửa: **không cần đăng nhập** (chi tiết, chương, mục lục,
+Chương mới / Truyện nam / Nữ tần / Đam mỹ / Review) và **cần đăng nhập**
+(tìm kiếm, thể loại, bảng xếp hạng):
 
 - Tìm kiếm `/tim-kiem?q=..&qs=1` khi chưa đăng nhập chỉ trả vỏ trang
   "Đăng nhập để xem nội dung", 0 kết quả → `search.js` báo lỗi tiếng
   Việt rõ ràng thay vì trả rỗng.
 - Thể loại `/tim-kiem?qs=2&tag=..` tương tự → `book.js` báo lỗi tương tự.
 - Bảng xếp hạng `/bang-xep-hang` tương tự (0 mục khi chưa đăng nhập).
-- Mục lục API `/book/index` trả **HTTP 404** khi chưa đăng nhập, dù
-  sign tính đúng (đã kiểm chứng bằng cả code SHA-256 của site lẫn
-  `sha256sum`, nhiều biến thể sign, có/không header XHR/Referer/cookie).
-  Khả năng cao API yêu cầu session đăng nhập.
+- Mục lục API `/book/index` **KHÔNG cần đăng nhập**: `signKey` của API
+  ràng buộc theo IP client (đổi theo mỗi lần tải trang chi tiết), không
+  phải theo session đăng nhập — máy thật IP ổn định nên chạy được
+  (kiểm chứng trên máy: đủ 179 mục không cần cookie). VM curl không
+  test được mục lục vì IP egress xoay theo request. Gặp HTTP 404 thì
+  `toc.js` tự tải lại trang chi tiết lấy bộ sign mới và thử lại 1 lần
+  (đúng bản chất lỗi: IP đổi giữa 2 request).
+- 3 tab Truyện nam / Nữ tần / Đam mỹ bị site giới hạn 50 truyện (không
+  có phân trang) — không sửa được phía extension. Trang Review phân
+  trang 10/trang (`?start=10/20...`); `book.js` tự tính cỡ trang theo
+  URL nên lật trang không bị nhảy mục.
 
 ## Cách dùng khi đã đăng nhập
 
@@ -54,7 +63,8 @@ Chương mới / Truyện nam / Nữ tần / Đam mỹ) và **cần đăng nhậ
 2. Mở cài đặt của nguồn "Wiki Dịch", dán cookie phiên vào ô
    **Cookie wikicv** (chỉ dán giá trị cookie, không dán mật khẩu;
    không commit cookie thật vào repo).
-3. Tìm kiếm / thể loại / mục lục sẽ dùng cookie đó qua header `Cookie`.
+3. Tìm kiếm / thể loại / bảng xếp hạng sẽ dùng cookie đó qua header
+   `Cookie` (mục lục không cần cookie).
 
 Lưu ý: cookie có thể hết hạn — hết hạn thì đăng nhập lại và dán cookie mới.
 
@@ -64,4 +74,4 @@ Lưu ý: cookie có thể hết hạn — hết hạn thì đăng nhập lại v
   (bookId `6a2164653bb6eb290441d20f`, Hoàn thành, 178 chương);
   chương 1 `#bookContentBody` ~9.065 ký tự, mở đầu "Lại tới nữa.";
   `/chuong-moi` 20 mục; `/truyen-nam`, `/nu-tan`, `/dam-my` 50 mục mỗi trang.
-- Test trên máy thật: xem `WIKICV-PROGRESS.md` §7.
+- Test trên máy thật: xem `WIKICV-PROGRESS.md` §6.

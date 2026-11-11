@@ -8,10 +8,17 @@ function execute(key, page) {
     var start = (parseInt(page) - 1) * 20;
     var url = BASE_URL + "/tim-kiem?q=" + encodeURIComponent(key) + "&qs=1&start=" + start;
 
-    rateLimitDelay("wikicv.org");
-    var res = wikiFetch(url);
-    if (!res.ok) return Response.error("Không tải được trang tìm kiếm (HTTP " + res.status + ")");
-
+    // Lay trang qua pacedFetch (file rate-limit.js): nghi jitter truoc
+    // request, retry 429/405/503 toi da 3 lan, ghi cooldown khi bi chan.
+    // Cookie dang nhap (neu co) gui kem qua headers.
+    var pf = pacedFetch(url, { headers: wikiHeaders(url) });
+    if (!pf.ok) {
+        if (pf.error === "cooldown" || pf.status === 405 || pf.status === 429) {
+            return Response.error(rateLimitErrorMessage("Wiki Dịch", "wikicv.org", pf.cooldownRemainingMs));
+        }
+        return Response.error("Không tải được trang tìm kiếm (HTTP " + pf.status + ")");
+    }
+    var res = pf.res;
     var doc = res.html();
     // Site chi tra ket qua tim kiem khi da dang nhap; chua dang nhap thi
     // trang chi la vo "Đăng nhập để xem nội dung" va 0 muc.
@@ -41,7 +48,7 @@ function execute(key, page) {
             name: name,
             link: link,
             cover: cover,
-            description: "",
+            description: wikiItemDescription(el),
             host: BASE_URL
         });
     });

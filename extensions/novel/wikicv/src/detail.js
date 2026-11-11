@@ -5,7 +5,7 @@
 load("config.js");
 load("rate-limit.js");
 function execute(url) {
-    url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
+    url = wikiNormalizeUrl(url);
 
     rateLimitDelay("wikicv.org");
     var res = wikiFetch(url);
@@ -16,6 +16,8 @@ function execute(url) {
     // Tên truyện
     var nameEl = doc.select(".cover-info h2").first();
     var name = (nameEl ? nameEl.text().trim() : "") + "";
+    // Bao loi ro thay vi tra success rong khi site doi selector.
+    if (!name) return Response.error("Không lấy được tên truyện từ trang chi tiết — có thể site đã đổi giao diện.");
 
     // Ảnh bìa
     var coverEl = doc.select(".book-info .cover-wrapper img").first();

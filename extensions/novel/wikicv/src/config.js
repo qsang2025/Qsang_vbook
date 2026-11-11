@@ -8,11 +8,16 @@
 // KHONG xoay User-Agent (AGENTS.md quy tac 10): fetch dung UA mac dinh
 // cua runtime de cookie Cloudflare (cf_clearance) con hieu luc.
 //
-// Cookie: mot so chuc nang cua site (tim kiem, the loai, bang xep hang,
-// muc luc qua API /book/index) yeu cau dang nhap. Nguoi dung dang nhap
-// bang trinh duyet trong app vBook, roi nhap cookie vao config
-// wikicvCookie trong plugin.json (tuy chon, mac dinh rong). KHONG commit
-// cookie that vao repo (AGENTS.md muc 7).
+// Cookie: mot so chuc nang cua site (tim kiem, the loai, bang xep hang)
+// yeu cau dang nhap. Nguoi dung dang nhap bang trinh duyet trong app
+// vBook, roi nhap cookie vao config wikicvCookie trong plugin.json
+// (tuy chon, mac dinh rong). KHONG commit cookie that vao repo
+// (AGENTS.md muc 7).
+// Muc luc qua API /book/index KHONG can dang nhap: signKey cua API
+// rang buoc theo IP client (doi theo moi lan tai trang chi tiet),
+// khong phai theo session dang nhap — may that IP on dinh nen chay
+// duoc; VM curl khong test duoc toc vi IP egress xoay theo request
+// (xem WIKICV-PROGRESS.md §10.1).
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 var BASE_URL = "https://wikicv.org";
 try { if (DOMAIN) BASE_URL = DOMAIN; } catch (e) {}
@@ -20,9 +25,15 @@ try { if (CONFIG_URL) BASE_URL = CONFIG_URL; } catch (e) {}
 
 // ---- Cookie helper ----
 // User nhap cookie vao config wikicvCookie (plugin.json config) de tai trang yeu cau session
+// Mirror du phong (AGENTS.md muc 10): truyenwikidich.net chi 301 ve
+// wikicv.org nen chi la fallback yeu khi domain chinh loi mang/5xx.
+var MIRROR_LIST = ["https://truyenwikidich.net"];
+
 function wikiCookieFromConfig() {
     var c = "";
-    try { if (typeof wikicvCookie !== "undefined" && wikicvCookie) { c = String(wikicvCookie).replace(/^"|"$/g, ""); } } catch (e) {}
+    try { if (typeof wikicvCookie !== "undefined" && wikicvCookie) { c = String(wikicvCookie); } } catch (e) {}
+    // Anh co the dan ca header "Cookie: ..." hoac xuong dong — chi giu gia tri.
+    c = c.replace(/^\s*Cookie:\s*/i, "").replace(/[\r\n]+/g, "").trim().replace(/^"|"$/g, "");
     return c;
 }
 
@@ -38,7 +49,46 @@ function wikiHeaders(referer) {
 }
 
 function wikiFetch(url, referer) {
-    return fetch(url, { headers: wikiHeaders(referer) });
+    var res = null;
+    var err = null;
+    try { res = fetch(url, { headers: wikiHeaders(referer) }); } catch (e) { err = e; }
+    // OK hoac loi 4xx (vd. 404 sai tham so, 403 login) thi tra ngay —
+    // mirror khong cuu duoc, chi thu mirror khi loi mang hoac 5xx.
+    if (res && (res.ok || (res.status && res.status < 500))) return res;
+    for (var i = 0; i < MIRROR_LIST.length; i++) {
+        var mUrl = String(url).replace(/^https?:\/\/[^\/]+/i, MIRROR_LIST[i]);
+        if (mUrl === url) continue;
+        try {
+            var mRes = fetch(mUrl, { headers: wikiHeaders(referer) });
+            if (mRes) return mRes;
+        } catch (e2) {}
+    }
+    if (res) return res;
+    throw err; // giu nguyen hanh vi cu khi loi mang hoan toan
+}
+
+// Mo ta ngan cho 1 muc .book-item trong danh sach: tac gia + trang thai
+// + luot xem/thich/binh luan (selector da kiem chung tren trang that).
+function wikiItemDescription(el) {
+    var parts = [];
+    var authorEl = el.select("p.book-author a").first();
+    if (authorEl) {
+        var a = (authorEl.text().trim()) + "";
+        if (a) parts.push("Tác giả: " + a);
+    }
+    el.select("p.book-publisher a").forEach(function (x) {
+        var h = (x.attr("href") || "") + "";
+        if (h.indexOf("status=") > -1) {
+            var s = (x.text().trim()) + "";
+            if (s) parts.push(s);
+        }
+    });
+    var nums = [];
+    el.select(".book-stats-box .book-stats span[data-ready]").forEach(function (x) {
+        nums.push(((x.text().trim()) + ""));
+    });
+    if (nums.length >= 3) parts.push(nums[0] + " lượt xem • " + nums[1] + " thích • " + nums[2] + " bình luận");
+    return parts.join(" • ");
 }
 
 function wikiNormalizeUrl(url) {

@@ -20,6 +20,25 @@ function execute() {
         { title: "Hệ thống",   input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03dd7ced228f44191b6", script: "book.js" },
         { title: "Cung đấu",   input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03dd7ced228f44191d7", script: "book.js" },
         { title: "Trinh thám", input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03dd7ced228f44191c1&genre=5794f03dd7ced228f44191a7", script: "book.js" },
-        { title: "Hoàn thành", input: BASE_URL + "/tim-kiem?qs=2&status=5794f03dd7ced228f4419191", script: "book.js" }
+        { title: "Hoàn thành", input: BASE_URL + "/tim-kiem?qs=2&status=5794f03dd7ced228f4419191", script: "book.js" },
+        // 7 muc bo sung 2026-11-11 (lay tu trang chu, ID day du da kiem chung):
+        // 5 tag + 2 trang thai. Tat ca qua /tim-kiem?qs=2 nen chi chay
+        // sau khi dang nhap (xem README).
+        { title: "Tùy thân không gian", input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03dd7ced228f44191bb", script: "book.js" },
+        { title: "Sinh con",    input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03dd7ced228f44191c2", script: "book.js" },
+        { title: "Chủ công",    input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03dd7ced228f44191cc", script: "book.js" },
+        { title: "Trạch đấu",   input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03ed7ced228f44191dc", script: "book.js" },
+        { title: "Giới giải trí", input: BASE_URL + "/tim-kiem?qs=2&tag=5794f03ed7ced228f44191de", script: "book.js" },
+        { title: "Còn tiếp",    input: BASE_URL + "/tim-kiem?qs=2&status=5794f03dd7ced228f4419192", script: "book.js" },
+        { title: "Chưa xác minh", input: BASE_URL + "/tim-kiem?qs=2&status=59c6a50112fb553750272b0a", script: "book.js" },
+        // 7 chuyen muc Review (/review?cat=..) — khong can dang nhap,
+        // phan trang 10/trang (book.js tu xu ly co trang theo URL).
+        { title: "Review: Ngôn tình", input: BASE_URL + "/review?cat=5794f03dd7ced228f4419195", script: "book.js" },
+        { title: "Review: Nam sinh",  input: BASE_URL + "/review?cat=5794f03dd7ced228f4419196", script: "book.js" },
+        { title: "Review: Đam mỹ",    input: BASE_URL + "/review?cat=5794f03dd7ced228f4419197", script: "book.js" },
+        { title: "Review: Bách hợp",  input: BASE_URL + "/review?cat=5794f03dd7ced228f4419198", script: "book.js" },
+        { title: "Review: Nữ tôn",    input: BASE_URL + "/review?cat=5794f03dd7ced228f4419199", script: "book.js" },
+        { title: "Review: Không CP",  input: BASE_URL + "/review?cat=5794f03dd7ced228f441919a", script: "book.js" },
+        { title: "Review: Đa nguyên", input: BASE_URL + "/review?cat=6867732623deea6af9481d15", script: "book.js" }
     ]);
 }

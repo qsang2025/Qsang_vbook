@@ -7,20 +7,42 @@ function execute(url, page) {
     if (!page) page = "1";
 
     // Normalize URL — thay domain nếu khác
-    url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
+    url = wikiNormalizeUrl(url);
 
-    // Phân trang dạng ?start=N (20/trang): {{page}} → start
+    // Co trang cua tung loai danh sach: /review phan trang 10/trang,
+    // cac danh sach khac 20/trang. {{page}} -> start=(page-1)*PAGE_SIZE.
+    // URL khong co {{page}} (vd. the loai /tim-kiem?qs=2...) thi khi
+    // page > 1 phai them/thay tham so start=, neu khong se fetch lai
+    // dung URL trang 1 va app lap trang 1 vo han.
+    var PAGE_SIZE = url.indexOf("/review") > -1 ? 10 : 20;
+    var pageNum = parseInt(page, 10);
+    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
     var pageUrl;
     if (url.indexOf("{{page}}") > -1) {
-        var start = (parseInt(page) - 1) * 20;
-        pageUrl = url.replace("{{page}}", String(start));
+        pageUrl = url.replace("{{page}}", String((pageNum - 1) * PAGE_SIZE));
+    } else if (pageNum > 1) {
+        var start = (pageNum - 1) * PAGE_SIZE;
+        if (/[?&]start=\d+/.test(url)) {
+            pageUrl = url.replace(/([?&]start=)\d+/, "$1" + start);
+        } else {
+            pageUrl = url + (url.indexOf("?") > -1 ? "&" : "?") + "start=" + start;
+        }
     } else {
         pageUrl = url;
     }
 
-    rateLimitDelay("wikicv.org");
-    var res = wikiFetch(pageUrl);
-    if (!res.ok) return Response.error("Không tải được trang (HTTP " + res.status + ")");
+    // Lay trang qua pacedFetch (file rate-limit.js): nghi jitter truoc
+    // request, retry 429/405/503 toi da 3 lan, ghi cooldown khi bi chan.
+    // Cookie dang nhap (neu co) gui kem qua headers — pacedFetch khong
+    // tu them cookie cua wikiFetch.
+    var pf = pacedFetch(pageUrl, { headers: wikiHeaders(pageUrl) });
+    if (!pf.ok) {
+        if (pf.error === "cooldown" || pf.status === 405 || pf.status === 429) {
+            return Response.error(rateLimitErrorMessage("Wiki Dịch", "wikicv.org", pf.cooldownRemainingMs));
+        }
+        return Response.error("Không tải được trang (HTTP " + pf.status + ")");
+    }
+    var res = pf.res;
     // Trang tim-kiem / bang-xep-hang khi chua dang nhap chi tra vo login
     // ("Đăng nhập để xem nội dung") va 0 muc — bao ro thay vi tra rong.
 
@@ -61,7 +83,7 @@ function execute(url, page) {
             name: name,
             link: link,
             cover: cover,
-            description: "",
+            description: wikiItemDescription(el),
             host: BASE_URL,
             tag: tag
         });

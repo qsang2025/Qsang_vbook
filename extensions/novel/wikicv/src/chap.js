@@ -3,7 +3,7 @@
 load("config.js");
 load("rate-limit.js");
 function execute(url) {
-    url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
+    url = wikiNormalizeUrl(url);
 
     rateLimitDelay("wikicv.org");
     var res = wikiFetch(url);
