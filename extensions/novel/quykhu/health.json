@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "url": "https://quykhu.com/",
+      "pattern": "QuyKhu|Vozer"
+    },
+    {
+      "name": "Chi tiết truyện mẫu",
+      "url": "https://quykhu.com/nguoi-khong-so-ma-235/",
+      "pattern": "Người Không Sợ Ma"
+    }
+  ]
+}

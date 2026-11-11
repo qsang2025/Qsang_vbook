@@ -187,23 +187,23 @@ Port the novel extension "QuyKhu" (for quykhu.com, formerly vozer.io) into `Qsan
 ---
 
 ## 5. Definition of Done (Final Checklist)
-- [ ] Directory `extensions/novel/quykhu/` exists with all required files.
-- [ ] Author is `"MuseAi"`, locale is `"vi_VN"`, type is `"novel"`.
-- [ ] No `load('...')` inside comments anywhere.
-- [ ] Strict Rhino ES6 syntax throughout `src/*.js`.
-- [ ] `node scripts/cli.js validate` passes with 30 sources, 0 warnings.
-- [ ] `extensions/novel/quykhu/plugin.zip` built and committed.
-- [ ] Root `plugin.json` updated via `build-catalog`.
-- [ ] All commits on branch `feature/quykhu-ag`.
+- [x] Directory `extensions/novel/quykhu/` exists with all required files.
+- [x] Author is `"MuseAi"`, locale is `"vi_VN"`, type is `"novel"`.
+- [x] No `load('...')` inside comments anywhere.
+- [x] Strict Rhino ES6 syntax throughout `src/*.js`.
+- [x] `node scripts/cli.js validate` passes with 30 sources, 0 warnings.
+- [x] `extensions/novel/quykhu/plugin.zip` built and committed.
+- [x] Root `plugin.json` updated via `build-catalog`.
+- [x] All commits on branch `feature/quykhu-ag`.
 
 ---
 
 ## 6. Progress
 - [x] Step 0 — Baseline verified (29 sources clean). REQUEST & CONTEXT written.
-- [ ] Step 1 — Initialize directory, manifest, health, test fixtures.
-- [ ] Step 2 — Implement Rhino ES6 scripts in `src/`.
-- [ ] Step 3 — Build zip, build-catalog, run validate.
-- [ ] Step 4 — Commit & push `feature/quykhu-ag`.
+- [x] Step 1 — Initialize directory, manifest, health, test fixtures.
+- [x] Step 2 — Implement Rhino ES6 scripts in `src/`.
+- [x] Step 3 — Build zip, build-catalog, run validate (30 sources PASS, 0 warnings).
+- [x] Step 4 — Commit & push `feature/quykhu-ag`.
 
 ---
 

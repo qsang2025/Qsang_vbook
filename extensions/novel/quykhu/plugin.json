@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "name": "QuyKhu",
+    "author": "MuseAi",
+    "version": 1,
+    "source": "https://quykhu.com",
+    "regexp": "^https?:\\/\\/(vozer\\.io|quykhu\\.com)\\/.*",
+    "description": "QuyKhu (Vozer) — tổng hợp truyện Voz: truyện ma, tâm linh, hồi ký, tình cảm Voz huyền thoại. (Ref: mizhm v6).",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel",
+    "encrypt": false
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain chính",
+      "mode": "select",
+      "default": "https://quykhu.com",
+      "values": [
+        "https://quykhu.com",
+        "https://vozer.io"
+      ]
+    }
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "page": "page.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js"
+  }
+}

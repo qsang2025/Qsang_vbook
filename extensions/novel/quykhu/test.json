@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "script": "home.js",
+      "input": "",
+      "expect": {
+        "minItems": 5,
+        "contains": [
+          "Nổi bật",
+          "Hoàn thành",
+          "Mới nhất"
+        ]
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "người không sợ ma",
+      "expect": {
+        "minItems": 1,
+        "contains": [
+          "Người Không Sợ Ma"
+        ]
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://quykhu.com/nguoi-khong-so-ma-235/",
+      "expect": {
+        "contains": [
+          "Người Không Sợ Ma"
+        ]
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://quykhu.com/nguoi-khong-so-ma-235/",
+      "expect": {
+        "minItems": 1
+      }
+    },
+    {
+      "script": "chap.js",
+      "input": "https://quykhu.com/nguoi-khong-so-ma-235/chuong-1/",
+      "expect": {
+        "minItems": 1
+      }
+    }
+  ],
+  "note": "Golden fixture cho QuyKhu (quykhu.com). Kiểm tra home tabs, tìm kiếm, chi tiết truyện, mục lục và đọc chương."
+}
