@@ -14,6 +14,7 @@ load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
 load('helper.js');
+load('safe-first.js');
 
 function execute(url) {
     var chapUrl = normalizeUrl(url);
@@ -31,7 +32,7 @@ function execute(url) {
         title = cleanText(t.split(" - ")[0]);
     }
 
-    var content = doc.select("#chapter-c").first();
+    var content = safeFirst(doc.select("#chapter-c"));
     if (content === null) return Response.error("Không đọc được nội dung chương: " + chapUrl);
     content.select("script, style, iframe, ins, .ads, .quang-cao").remove();
     var html = content.html() || "";

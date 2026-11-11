@@ -28,7 +28,7 @@ load('helper.js');
 // Ten chuong tu h1.name: cat tien to 《書名》.
 function chapterTitle(doc) {
     var title = "";
-    var h1 = doc.select("div.chapter-detail h1.name").first();
+    var h1 = safeFirst(doc.select("div.chapter-detail h1.name"));
     if (h1 === null) h1 = safeFirst(doc.select("h1.name"));
     if (h1 === null) h1 = safeFirst(doc.select("h1"));
     if (h1 !== null) title = cleanText(h1.text());
@@ -49,7 +49,7 @@ function squashSpace(s) {
 }
 
 function contentHtml(doc, title) {
-    var content = doc.select("div.chapter-detail div.content").first();
+    var content = safeFirst(doc.select("div.chapter-detail div.content"));
     if (content === null) content = safeFirst(doc.select("div.content"));
     if (content === null) return "";
     content.select("script, style, ins").remove();

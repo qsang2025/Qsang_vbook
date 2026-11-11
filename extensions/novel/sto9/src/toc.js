@@ -27,6 +27,7 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('safe-first.js');
 load('helper.js');
 
 // Muc khong phai chuong = ghi chu cua tac gia (xin nghi, xin phieu,

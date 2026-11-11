@@ -20,6 +20,7 @@ load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('cleanHtml.js');
+load('safe-first.js');
 
 function execute(url) {
     url = normalizeUrl(url);
@@ -29,7 +30,7 @@ function execute(url) {
     var title = cleanText(doc.select("h1.page-d-name").text());
     if (!title) title = cleanText(doc.select("h1").text());
 
-    var article = doc.select("article.page-content").first();
+    var article = safeFirst(doc.select("article.page-content"));
     if (article === null) {
         return Response.error("Không đọc được nội dung chương (chương có thể không tồn tại hoặc đã bị gỡ): " + url);
     }

@@ -34,7 +34,7 @@ function execute(url) {
         title = cleanText(parts[parts.length - 1] || t);
     }
 
-    var content = doc.select(".chapter-c").first();
+    var content = safeFirst(doc.select(".chapter-c"));
     if (content === null) return Response.error("Không đọc được nội dung chương: " + chapUrl);
     content.select("script, style, iframe, ins, .ads, .quang-cao").remove();
     var html = content.html() || "";

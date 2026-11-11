@@ -24,12 +24,12 @@ function execute(url) {
 
     // Tieu de chuong that (data2): "Chuong 1: ..." trong h2.current-chapter.
     var chapTitle = "";
-    var chapTitleEl = doc.select("h2.current-chapter").first();
+    var chapTitleEl = safeFirst(doc.select("h2.current-chapter"));
     if (!chapTitleEl) chapTitleEl = safeFirst(doc.select(".chapter-title h2"));
     if (chapTitleEl) chapTitle = chapTitleEl.text().trim();
 
     // 1. Selector uu tien: .vung-doc .truyen
-    var contentEl = doc.select(".vung-doc .truyen").first();
+    var contentEl = safeFirst(doc.select(".vung-doc .truyen"));
     if (!contentEl) contentEl = safeFirst(doc.select(".truyen"));
     if (contentEl) {
         contentEl.select("script, ins, iframe, .ads, .quangcao").remove();

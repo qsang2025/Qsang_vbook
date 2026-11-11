@@ -24,7 +24,7 @@ function execute(url) {
     var doc = fetchDoc(url);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
-    var info = doc.select(".novel_info_main").first();
+    var info = safeFirst(doc.select(".novel_info_main"));
     if (info === null) return Response.error("Không đọc được trang truyện (site có thể đã đổi giao diện): " + url);
 
     var name = cleanText(info.select(".novel_info_title h1").text());

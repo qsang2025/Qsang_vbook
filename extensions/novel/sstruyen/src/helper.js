@@ -73,7 +73,7 @@ function parseStoryCard(el) {
     }
     if (!name) return null;
 
-    var img = el.select("a.archive-story-card__cover img").first();
+    var img = safeFirst(el.select("a.archive-story-card__cover img"));
     if (img === null) img = safeFirst(el.select("img"));
     var cover = "";
     if (img !== null) {

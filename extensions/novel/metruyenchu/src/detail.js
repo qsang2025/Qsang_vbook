@@ -18,13 +18,13 @@ function execute(url) {
     var doc = r.doc;
 
     var name = "";
-    var titleEl = doc.select("h1[itemprop='name']").first();
+    var titleEl = safeFirst(doc.select("h1[itemprop='name']"));
     if (!titleEl) titleEl = safeFirst(doc.select("h1"));
     if (titleEl) name = titleEl.text().trim();
     if (!name) return Response.error("Không đọc được tên truyện: " + url);
 
     var cover = "";
-    var coverEl = doc.select(".book-info-pic img").first();
+    var coverEl = safeFirst(doc.select(".book-info-pic img"));
     if (!coverEl) coverEl = safeFirst(doc.select("img[src*='/media/']"));
     // KHONG fallback ve <img> dau tien nua: anh dau tien cua trang la
     // logo (/images/logo.png), khong phai bia truyen.

@@ -33,7 +33,7 @@ function execute(url) {
     var doc = fetchDocWithFallback(url, MIRROR_LIST);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
-    var titleEl = doc.select("div.info-wrap div.info h1.title").first();
+    var titleEl = safeFirst(doc.select("div.info-wrap div.info h1.title"));
     if (titleEl === null) titleEl = safeFirst(doc.select("h1.title"));
     if (titleEl === null) return Response.error("Không đọc được tên truyện: " + url);
     var name = cleanText(titleEl.text());
@@ -74,7 +74,7 @@ function execute(url) {
         else if (label === "觀看數") viewCount = value;
         else if (label === "更新時間") updateTime = value;
         else if (label === "分類") {
-            var catLink = tr.select("a#novel-category").first();
+            var catLink = safeFirst(tr.select("a#novel-category"));
             if (catLink === null) catLink = safeFirst(tr.select("a"));
             if (catLink !== null) {
                 genreText = cleanText(catLink.text());

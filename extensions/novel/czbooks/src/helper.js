@@ -128,7 +128,7 @@ function parseNovelItem(el) {
     }
     if (!name) return null;
 
-    var img = el.select("div.novel-item-thumbnail img").first();
+    var img = safeFirst(el.select("div.novel-item-thumbnail img"));
     if (img === null) img = safeFirst(el.select("img"));
 
     var state = cleanText(el.select("div.novel-item-state").text());

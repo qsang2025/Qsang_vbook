@@ -26,7 +26,7 @@
     "regexp": "^https://czbooks\\.net/n/[^/]+/?$",
     "source": "https://czbooks.net",
     "type": "novel",
-    "version": 5
+    "version": 6
   },
   "script": {
     "book": "book.js",

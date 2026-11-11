@@ -29,6 +29,7 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(url) {

@@ -99,7 +99,7 @@ function parseBookRow(el) {
     }
     if (!name) return null;
 
-    var img = el.select(".l-img img").first();
+    var img = safeFirst(el.select(".l-img img"));
     if (img === null) img = safeFirst(el.select("img"));
     var cover = "";
     if (img !== null) {
