@@ -8,44 +8,46 @@ Extension đọc truyện chữ tiếng Việt trên xtruyen.vn.
 - Thể loại: 41 thể loại (Tiên Hiệp, Kiếm Hiệp, Ngôn Tình, Đam Mỹ, Đô Thị, Huyền Huyễn...).
 - Tìm kiếm theo từ khóa, xem chi tiết, mục lục, đọc chương.
 
-## Cơ chế đọc chương (Headless WebView)
+## Cơ chế đọc chương (giải mã trực tiếp, WebView làm dự phòng)
 
 Site đã bỏ cơ chế cũ (xem mục "Cơ chế cũ data_x" bên dưới): trang chương
 hiện chỉ chứa một spinner trong `#chapter-reading-content`. Nội dung nằm
 trong `window.readingChapterConfig.encodedData` (chuỗi base64url ~11 KB
-cho một chương) và được file JS của site (`reading-page.js`, đã obfuscate)
-giải mã bằng pako rồi chèn vào DOM sau khi tải trang. Không có request
-AJAX riêng nào cho nội dung chương (đã kiểm chứng bằng `browser.urls()`:
-chỉ có đúng 1 URL không phải asset tĩnh — chính trang chương).
+cho một chương) và được giải mã trực tiếp trong `chap.js`:
 
-Vì vậy `chap.js` đọc chương qua **Headless WebView** (`Engine.newBrowser`,
-theo hợp đồng `extension-api.md`):
+1. Đổi từng ký tự qua bảng chữ cái tùy chỉnh của site (lấy từ file
+   `reading-page.js` thật, ver 1.0.4 — file này hiện KHÔNG còn obfuscate,
+   hàm `decodeChapterContent` viết rõ) sang base64 chuẩn.
+2. Base64 decode → byte zlib (đầu `78 9c`) → bỏ 2 byte header + 4 byte
+   Adler cuối → inflate DEFLATE thô bằng `src/inflate.js` → UTF-8.
+3. Text chỉ chứa `<br/>` ngăn đoạn: tách thành `<p>`, bỏ dòng trống và
+   dòng quảng cáo.
 
-1. Fetch tĩnh trước (nhanh): lấy tiêu đề + thử `data_x` cũ / DOM tĩnh.
-2. Nếu chưa có nội dung: mở trang bằng WebView, `browser.html(2000)`
-   kiểm tra mỗi 2 giây (tối đa ~12 giây) cho tới khi
-   `#chapter-reading-content` có nội dung thật, rồi lọc bằng `cleanHtml`.
-3. Site render mỗi đoạn bằng `<div>` nên phải đổi `</div>` thành `<br>`
-   trước khi `cleanHtml` (không thì các đoạn dính liền nhau).
+Đã kiểm chứng offline (Node): chương 50 giải ra đúng 19.360 ký tự, mở
+đầu "Tống Mễ nói :", kết "HẾT", khớp bản WebView cũ. Nếu giải mã trực
+tiếp thất bại, `chap.js` vẫn mở trang bằng Headless WebView
+(`Engine.newBrowser`) làm dự phòng: `browser.html(2000)` kiểm tra mỗi
+2 giây (tối đa ~12 giây) cho tới khi `#chapter-reading-content` có nội
+dung thật, rồi lọc bằng `cleanHtml`. Site render mỗi đoạn bằng `<div>`
+nên phải đổi `</div>` thành `<br>` trước khi `cleanHtml` (không thì các
+đoạn dính liền nhau).
 
-Nhược điểm: mỗi chương mất thêm ~10 giây (mở WebView + chờ JS). Đây là
-cách duy nhất đã xác minh được trên máy thật; giải mã trực tiếp
-`encodedData` chưa làm được (xem dưới).
+Thứ tự trong `chap.js`: fetch tĩnh (lấy tiêu đề + thử `data_x` cũ / DOM
+tĩnh) → giải mã trực tiếp `encodedData` → WebView dự phòng.
 
-### Vì sao chưa giải mã trực tiếp được encodedData
+### Vì sao trước đây chưa giải mã trực tiếp được encodedData
 
-Đã thử offline (Node, chuỗi `encodedData` thật của chương 50):
-
-- Base64url chuẩn → 8.201 byte, đầu `89 68 d7 84 ba cc ec b8` — không phải
-  zlib/raw-deflate/gzip, không phải UTF-8 thuần.
-- Base64 với bảng chữ cái tùy chỉnh cũ (`URL64`) → cũng không inflate được.
-- XOR 1 byte (0–255), XOR từ khóa (`xtruyen`, `chapter`, mã truyện/chương),
-  đảo ngược byte, bỏ 1–2 byte đầu — đều không inflate được.
-- Kết luận: dữ liệu đã bị mã hóa/xáo trộn thêm một lớp trước (hoặc sau) khi
-  nén; khóa/thuật toán nằm trong `reading-page.js` đã obfuscate (82 KB,
-  string-array + control-flow flattening) nên chưa trích ra được trong
-  thời gian làm extension này. Nếu sau này giải được, `chap.js` có thể
-  thêm đường fetch trực tiếp nhanh hơn và giữ WebView làm dự phòng.
+Trước khi lấy được `reading-page.js` thật qua máy thật (2026-11-11), đã
+thử offline (Node, chuỗi `encodedData` thật của chương 50) và đều thất
+bại: base64url chuẩn → 8.201 byte, đầu `89 68 d7 84 ba cc ec b8` —
+không phải zlib/raw-deflate/gzip; bảng chữ cái tùy chỉnh cũ (`URL64`),
+XOR 1 byte, XOR khóa lặp (không có chu kỳ ≤ 64 với known-plaintext),
+deflate-rồi-XOR (không có chu kỳ ≤ 128), RC4 với 16 khóa khả dĩ,
+lz-string, Caesar/NOT, đảo byte/cặp/bit/nibble, deflate của plaintext
+UTF-16 — đều không ra. Hóa ra lớp mã hóa chính là **bảng chữ cái tùy
+chỉnh khác** (`pNRzya673Wk...`, lấy từ `reading-page.js` ver 1.0.4),
+còn phần nén vẫn là zlib chuẩn. Chi tiết đầy đủ:
+`work/ext-review/XT-RUYEN-DECODE-PROGRESS.md`.
 
 ## Cơ chế cũ data_x (không còn trên site, giữ làm dự phòng)
 
