@@ -2,7 +2,7 @@
   "metadata": {
     "name": "Sáng Tác Việt APP",
     "author": "MuseAi",
-    "version": 6,
+    "version": 7,
     "source": "https://sangtacviet.app",
     "regexp": "^https?://(www\\.)?(sangtacviet\\.(?:app|vip|com|pro)|dns1\\.stv-appdomain-\\d+\\.org)/truyen/[^/]+/\\d+/\\d+/?$",
     "description": "Sáng Tác Việt APP — nguồn gộp duy nhất (gộp SangtacvietApp v5 + Sáng Tác Việt v10, P3 2026-11-10): JSON-first + HTML fallback, smart key caching, direct-read fallback; đọc truyện dịch máy / convert từ Qidian, Fanqie, 69shu, uukanshu...",
