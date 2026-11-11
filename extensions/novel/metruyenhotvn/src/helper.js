@@ -105,8 +105,8 @@ function parseBookRow(row) {
     }
 
     var description = "";
-    var chapEl = row.select("td.chap.pc a").first();
-    if (chapEl === null) chapEl = row.select("td.chap a").first();
+    var chapEl = safeFirst(row.select("td.chap.pc a"));
+    if (chapEl === null) chapEl = safeFirst(row.select("td.chap a"));
     if (chapEl !== null) description = cleanText(chapEl.text());
 
     var tag = "";
