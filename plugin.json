@@ -105,6 +105,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "QuyKhu",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/quykhu/plugin.zip",
+      "version": 1,
+      "source": "https://quykhu.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/quykhu/icon.png",
+      "description": "QuyKhu (quykhu.com) — đọc truyện chữ tiếng Việt, nổi bật Truyện Voz: truyện ma, tâm linh, tự truyện. Port từ Vozer v6 của mizhm (ref: mizhm).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Sáng Tác Việt APP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacvietapp/plugin.zip",
