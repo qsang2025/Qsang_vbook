@@ -97,8 +97,8 @@ function parseBookRow(row) {
         if (/chương/i.test(t)) { tag = t; break; }
     }
     if (!tag) {
-        if (row.select("span.label-full").first() !== null) tag = "Hoàn thành";
-        else if (row.select("span.label-hot").first() !== null) tag = "Hot";
+        if (safeFirst(row.select("span.label-full")) !== null) tag = "Hoàn thành";
+        else if (safeFirst(row.select("span.label-hot")) !== null) tag = "Hot";
     }
 
     return {
