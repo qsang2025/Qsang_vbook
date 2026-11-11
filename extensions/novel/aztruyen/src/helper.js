@@ -19,21 +19,27 @@
 // de h2 a, mo ta p.crop-text-2.desc); trang chi tiet `/<slug>-<id-so>/`
 // co the loai that o p.story_categories a[itemprop=genre], trang thai o
 // p.story_completed ("Hoàn thành" / "Đang cập nhật"), tac gia that o dong
-// dau mo ta ("Tác giả: ...", neu co), muc luc day du (nhung TOI DA 200
-// chuong moi nhat — site khong co cach lay chuong cu hon, nut prev o
-// chuong dau danh sach bi vo hieu hoa) trong div#chapters ul.chapters
-// li.listc a (URL chuong dang /chuong-N-<tieu-de>-<id>/ hoac /part-N-<id>/);
+// dau mo ta ("Tác giả: ...", neu co), trang thai o dong "Tình Trạng:"
+// trong mo ta (du phong p.story_completed), muc luc trong div#chapters
+// ul.chapters thu 2 ("Danh sách chương", giu nguyen thu tu DOM, khong
+// sap theo so chuong — truyen nhieu quyen danh so lai theo quyen;
+// truyen RAT DAI co the chi hien 200 chuong moi nhat, VD 800 chuong
+// chi hien 601–800, truyen 249 chuong hien du; site khong co cach lay
+// chuong cu hon, nut prev o chuong dau danh sach bi vo hieu hoa)
+// li.listc a (URL chuong dang /chuong-N-<tieu-de>-<id>/,
+// /part-N-<id>/, ca dang co tien to quyen /q-N-chuong-N-...-/);
 // chuong trong `<div class="chapter-content">` (cac doan <p>), tieu de o
 // h2.chapter-title.
-// TIM KIEM HONG: GET /tim-kiem/<tu-khoa> tra trang loi "Trang lỗi hoặc
-// không có kết quả tìm kiếm" voi MOI tu khoa thu (ke ca tu khoa site tu
-// ghi trong "Tìm kiếm gần đây"), ca khi co cookie phien + Referer; POST /
-// voi search_q tra ve trang chu khong loc; khong co endpoint AJAX/goi y
-// nao trong JS cua site (chi co redirect ve /tim-kiem/<tu-khoa>); cung
-// hong nhu vay tren truyen247.pro (cung mau). search.js vi vay bao loi
-// ro bang tieng Viet thay vi tra ket qua sai.
-
-var AZ_SEARCH_BROKEN_MSG = "Chức năng tìm kiếm trên aztruyen.top hiện đang lỗi: site trả về trang lỗi cho mọi từ khóa (đã kiểm chứng). Hãy duyệt truyện bằng mục Thể loại hoặc Trang chủ trong extension này.";
+// TIM KIEM KHONG CO: tim kiem cua chinh site dang hong hoan toan
+// (kiem chung live 2026-11-11) — GET /tim-kiem/<tu-khoa> tra trang loi
+// "Trang lỗi hoặc không có kết quả tìm kiếm" voi MOI tu khoa thu (ke ca
+// tu khoa site tu ghi trong "Tìm kiếm gần đây"), ca khi co cookie phien
+// + Referer; POST / voi search_q tra ve trang chu khong loc; khong co
+// endpoint AJAX/goi y nao trong JS cua site (chi co redirect ve
+// /tim-kiem/<tu-khoa>); cung hong nhu vay tren truyen247.pro (cung mau).
+// Vi vay extension KHONG co search.js / khong khai bao khoa search
+// trong plugin.json (theo create mode: drop script key site that su
+// khong ho tro). Duyet truyen bang Trang chu / The loai.
 
 // Fetch 1 trang HTML co pacing chong rate-limit (AGENTS.md muc 6.11).
 // Duong chinh: pacedFetch() (file rate-limit.js) — kiem tra cooldown, nghi

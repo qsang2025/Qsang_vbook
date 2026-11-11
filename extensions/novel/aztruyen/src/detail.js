@@ -3,16 +3,19 @@
 // Trang chi tiet `/<slug>-<id-so>/` (HTML tinh, kiem chung live 2026-11-11):
 // - Ten: `h1.title` (itemprop=name).
 // - Bia: `meta[property=og:image]` (VD .../images/<slug>-<id>.webp).
-// - Tac gia THAT: dong dau mo ta trong div.description ("Tác giả: ...");
+// - Tac gia THAT: dong dau mo ta trong div.description ("Tác giả: ...",
+//   chu hoa/thuong khong on dinh — "Tác Giả:" hay "Tác giả:" deu co);
 //   neu mo ta khong co dong nay thi dung nguoi dang (a[itemprop=author]).
-// - The loai cua truyen: `p.story_categories a[itemprop=genre]` (chi 1
-//   the loai/truyen tren site nay).
-// - Trang thai: `p.story_completed` ("Hoàn thành" / "Đang cập nhật").
-// - Mo ta: div.description[itemprop=description] (bo dong "Tác giả: ..."
-//   dau tien neu co, vi tac gia da co truong rieng).
-// - So chuong: so muc trong div#chapters ul.chapters (danh sach DAY DU
-//   cua site, NHUNG toi da 200 chuong moi nhat — truyen dai hon thi cac
-//   chuong cu khong co tren site; ghi ro trong chuoi detail khi du 200).
+// - Trang thai: dong "Tình Trạng:" trong mo ta la dang tin nhat
+//   (p.story_completed cua site co khi lech — VD "Ly hôn..." mo ta ghi
+//   "Hoàn Thành" nhung p.story_completed ghi "Đang cập nhật"); chi dung
+//   p.story_completed lam du phong.
+// - So chuong: so link CHUONG that (URL chua chuong-/part-) trong
+//   div#chapters ul.chapters, dedupe theo link (2 ul trung nhau 5 muc
+//   moi nhat); 2 muc "Thông báo"/"Giới thiệu truyện mới" khong tinh.
+//   Ghi chu "chi hien ... chuong moi nhat" CHI KHI tong so chuong site
+//   khai (JSON-LD numberOfPages / "Tổng Chương:" trong mo ta) lon hon
+//   so link liet ke — VD truyen 800 chuong chi hien 601–800.
 //
 // Load: config.js, config-helpers.js, fetch-helpers.js, rate-limit.js,
 // helper.js (theo thu tu nay — xem helper.js).
@@ -61,7 +64,7 @@ function execute(url) {
     var author = "";
     if (descEl !== null) {
         var descHtml = descEl.html() || "";
-        var am = descHtml.match(/Tác giả:\s*([^<]+)/);
+        var am = descHtml.match(/Tác giả:\s*([^<]+)/i);
         if (am) author = cleanText(am[1]);
         if (author && description.indexOf("Tác giả:") === 0) {
             description = cleanText(description.substring(("Tác giả: " + author).length));
@@ -81,13 +84,38 @@ function execute(url) {
     });
 
     var status = "";
-    var statusEl = doc.select("p.story_completed").first();
-    if (statusEl !== null) status = cleanText(statusEl.text());
+    var stm = description.match(/Tình Trạng:\s*([^»]+)/i);
+    if (stm) status = cleanText(stm[1]);
+    if (!status) {
+        var statusEl = doc.select("p.story_completed").first();
+        if (statusEl !== null) status = cleanText(statusEl.text());
+    }
 
-    // So chuong + chuong dau/cuoi trong danh sach #chapters (toi da 200).
+    // Tong so chuong site khai (JSON-LD numberOfPages, du phong dong
+    // "Tổng Chương:" trong mo ta) — dung de biet danh sach chuong co bi
+    // cat bot hay khong.
+    var totalChapters = 0;
+    try {
+        var ldEl = doc.select("script[type=\"application/ld+json\"]").first();
+        if (ldEl !== null) {
+            var ldm = ldEl.html().match(/"numberOfPages"\s*:\s*"(\d+)"/);
+            if (ldm) totalChapters = parseInt(ldm[1], 10);
+        }
+    } catch (e) {
+    }
+    if (!totalChapters || isNaN(totalChapters)) {
+        var tcm = description.match(/Tổng Chương:\s*(\d+)/i);
+        if (tcm) totalChapters = parseInt(tcm[1], 10);
+        if (isNaN(totalChapters)) totalChapters = 0;
+    }
+
+    // So chuong that + chuong dau/cuoi trong danh sach #chapters.
     // Trang co 2 danh sach (5 chuong moi nhat + danh sach day du) nen
-    // phai dedupe theo link truoc khi dem (khong thi 200 thanh 205).
+    // phai dedupe theo link truoc khi dem; chi dem link chuong that
+    // (URL chua chuong-/part-), bo 2 muc "Thông báo"/"Giới thiệu
+    // truyện mới" (khong phai chuong).
     var chapCount = 0;
+    var chapLinks = 0;
     var chapMin = 0;
     var chapMax = 0;
     var chapSeen = {};
@@ -97,10 +125,12 @@ function execute(url) {
         var link = absUrl(href);
         if (chapSeen[link]) return;
         chapSeen[link] = true;
+        chapLinks++;
+        if (href.indexOf("chuong-") === -1 && href.indexOf("part-") === -1) return;
         var label = cleanText(el.text());
         if (!label) return;
         chapCount++;
-        var nm = label.match(/(\d+)/);
+        var nm = label.match(/Chương\s+(\d+)/i);
         if (!nm) return;
         var n = parseInt(nm[1], 10);
         if (isNaN(n)) return;
@@ -123,8 +153,8 @@ function execute(url) {
     }
     detailParts.push("Trạng thái: " + (ongoing ? "Đang cập nhật" : "Hoàn thành"));
     if (chapCount > 0) {
-        if (chapCount >= 200) {
-            detailParts.push("Số chương: " + chapCount + " (chỉ hiện 200 chương mới nhất: Chương " + chapMin + " – " + chapMax + ")");
+        if (totalChapters > 0 && totalChapters > chapLinks && chapMin > 0) {
+            detailParts.push("Số chương: " + chapCount + " (chỉ hiện " + chapCount + " chương mới nhất: Chương " + chapMin + " – " + chapMax + ")");
         } else {
             detailParts.push("Số chương: " + chapCount);
         }
