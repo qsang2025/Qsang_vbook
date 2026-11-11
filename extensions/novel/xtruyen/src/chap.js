@@ -12,6 +12,7 @@
 // Du phong: fetch tinh (neu site tra lai data_x hoac DOM tinh co noi dung).
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
@@ -65,8 +66,8 @@ function decodeDataXToHtml(dataX) {
 // TRUOC khi cleanHtml (no chi boc the div, khong them dau ngat doan).
 function extractFromDoc(doc) {
     if (!doc) return "";
-    var container = doc.select("#chapter-reading-content").first();
-    if (!container) container = doc.select(".chapter-content, .reading-content").first();
+    var container = safeFirst(doc.select("#chapter-reading-content"));
+    if (!container) container = safeFirst(doc.select(".chapter-content, .reading-content"));
     if (!container) return "";
     var text = container.text() || "";
     if (text.length < 200) return "";
@@ -111,8 +112,8 @@ function execute(url) {
     // 1) Fetch tinh: lay tieu de + thu data_x cu / DOM tinh.
     var doc = fetchDoc(url);
     if (doc) {
-        var t = doc.select(".chapter-title").first();
-        if (!t) t = doc.select("h1").first();
+        var t = safeFirst(doc.select(".chapter-title"));
+        if (!t) t = safeFirst(doc.select("h1"));
         if (t) title = cleanText(t.text()) || title;
         var html = doc.html();
         var mData = html.match(/data_x\s*=\s*["']([^"']+)["']/);

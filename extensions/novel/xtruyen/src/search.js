@@ -6,6 +6,7 @@
 // a.btn-link trong .chapter-item.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
@@ -70,8 +71,8 @@ function execute(query, page) {
     var items = [];
     var seen = {};
     doc.select(".popular-item-wrap").forEach(function (e) {
-        var title = e.select(".widget-title a").first();
-        if (!title) title = e.select(".popular-img a").first();
+        var title = safeFirst(e.select(".widget-title a"));
+        if (!title) title = safeFirst(e.select(".popular-img a"));
         if (!title) return;
         var link = absUrl(title.attr("href"));
         if (!link || seen[link]) return;
