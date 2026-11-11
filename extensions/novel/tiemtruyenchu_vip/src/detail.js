@@ -1,5 +1,6 @@
 // detail.js — Thong tin chi tiet truyen Tiem Truyen Chu
 load('config.js');
+load('safe-first.js');
 
 function execute(url) {
     var storyId = resolveStoryId(url);
@@ -162,14 +163,14 @@ function execute(url) {
     if (!htmlName || htmlName.indexOf("Đăng nhập") !== -1) {
         return Response.error("Không tìm thấy thông tin truyện (ID: " + (storyId || url) + ").");
     }
-    var authorEl = doc.select("a[href*='/tac-gia/'], a[href*='author']").first();
+    var authorEl = safeFirst(doc.select("a[href*='/tac-gia/'], a[href*='author']"));
     var htmlAuthor = authorEl ? authorEl.text().trim() : "Không rõ";
     var imgEl = doc.select("img.story-poster").first();
     var htmlCover = imgEl ? (imgEl.attr("data-src") || imgEl.attr("src") || "") : "";
     if (htmlCover && htmlCover.indexOf("http") !== 0) {
         htmlCover = normalizeUrl(htmlCover);
     }
-    var descEl = doc.select("#tab-info, .content-text, .story-desc").first();
+    var descEl = safeFirst(doc.select("#tab-info, .content-text, .story-desc"));
     var htmlDesc = descEl ? descEl.html() : "Chưa có giới thiệu.";
 
     // Trang thai o fallback HTML: chi doc trong khoi story-header, khong co
