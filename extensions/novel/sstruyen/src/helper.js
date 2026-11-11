@@ -18,38 +18,99 @@
 // Fetch 1 trang HTML co pacing chong rate-limit (AGENTS.md muc 6.11).
 // Duong chinh: pacedFetch() (rate-limit.js) — kiem tra cooldown, nghi
 // jitter 0,5-1,5s, retry 429/405/503, tu ghi cooldown 60 phut khi bi chan.
+// fetchSsDoc them 1 vong retry RIENG cho 502/504 (qua tai tam thoi cua
+// server — pacedFetch khong retry 2 ma nay): toi da 3 lan goi (1 lan dau
+// + 2 lan thu lai), cho 2,5s roi 5s giua cac lan; neu site gui Retry-After
+// thi ton trong header do (toi da 30s). 502/504 KHONG ghi cooldown 60 phut
+// nhu 429/405 — day la qua tai tam thoi, khong phai bi chan theo IP, nen
+// lan goi sau van duoc thu lai binh thuong. Het luot thi tra loi tieng Viet
+// ro rang (da thu lai 3 lan) thay vi fail ngay nhu truoc.
 // Tra ve { doc: Document } khi thanh cong, hoac { error: "tieng Viet" }.
 // Caller dung:
 //     var r = fetchSsDoc(url);
 //     if (r.error) return Response.error(r.error);
 //     var doc = r.doc;
-function fetchSsDoc(url) {
-    var res = null;
+
+// So lan goi toi da cho 1 URL khi gap 502/504 (1 lan dau + 2 lan thu lai).
+var SS_MAX_ATTEMPTS = 3;
+// Thoi gian cho giua cac lan thu lai 502/504 (lan 1: 2,5s, lan 2: 5s).
+var SS_RETRY_DELAYS_MS = [2500, 5000];
+
+// Doc header Retry-After (so giay hoac HTTP date) ra mili-giay; -1 neu
+// khong co header hoac khong doc duoc / da qua han. Tran 30 giay.
+function ssRetryAfterMs(headers) {
+    var raw = null;
     try {
-        res = pacedFetch(url, {});
+        if (headers) raw = headers["Retry-After"] || headers["retry-after"] || null;
     } catch (e) {
-        return { error: "Không tải được trang (lỗi mạng): " + url };
+        raw = null;
     }
-    if (!res) return { error: "Không tải được trang: " + url };
-    if (res.error === "cooldown") {
-        return { error: rateLimitErrorMessage("SSTruyen", pacedHostOf(url), res.cooldownRemainingMs) };
+    if (raw === null || raw === undefined || raw === "") return -1;
+    var h = String(raw);
+    var wait = -1;
+    if (/^\s*\d+\s*$/.test(h)) {
+        wait = parseInt(h, 10) * 1000;
+    } else {
+        var parsed = Date.parse(h);
+        if (!isNaN(parsed)) wait = parsed - Date.now();
     }
-    if (!res.ok) {
+    if (wait < 0) return -1;
+    if (wait > 30000) wait = 30000;
+    return wait;
+}
+
+// Thoi gian cho truoc lan thu lai thu `attempt` (attempt dem tu 0):
+// uu tien Retry-After neu site gui, khong thi 2,5s roi 5s.
+function ssRetryWaitMs(attempt, headers) {
+    var raMs = ssRetryAfterMs(headers);
+    if (raMs >= 0) return raMs;
+    var idx = attempt;
+    if (idx < 0) idx = 0;
+    if (idx >= SS_RETRY_DELAYS_MS.length) idx = SS_RETRY_DELAYS_MS.length - 1;
+    return SS_RETRY_DELAYS_MS[idx];
+}
+
+function fetchSsDoc(url) {
+    var attempt = 0;
+    for (attempt = 0; attempt < SS_MAX_ATTEMPTS; attempt++) {
+        var res = null;
+        try {
+            res = pacedFetch(url, {});
+        } catch (e) {
+            return { error: "Không tải được trang (lỗi mạng): " + url };
+        }
+        if (!res) return { error: "Không tải được trang: " + url };
+        if (res.error === "cooldown") {
+            return { error: rateLimitErrorMessage("SSTruyen", pacedHostOf(url), res.cooldownRemainingMs) };
+        }
+        if (res.ok) {
+            var doc = null;
+            try {
+                doc = docFromResponse(res.res, url);
+            } catch (e2) {
+                return { error: "Không đọc được nội dung trang: " + url };
+            }
+            if (!doc) return { error: "Không đọc được nội dung trang: " + url };
+            return { doc: doc };
+        }
         var st = res.status || 0;
+        // 502/504: qua tai tam thoi — cho roi thu lai (con luot).
+        if ((st === 502 || st === 504) && attempt + 1 < SS_MAX_ATTEMPTS) {
+            var wait = ssRetryWaitMs(attempt, res.headers);
+            console.log("fetchSsDoc HTTP " + st + " lan " + (attempt + 1) + "/" + SS_MAX_ATTEMPTS + ", cho " + wait + "ms roi thu lai: " + url);
+            rlSleepMs(wait);
+            continue;
+        }
         if (st === 429 || st === 405) {
             return { error: rateLimitErrorMessage("SSTruyen", pacedHostOf(url), res.cooldownRemainingMs) };
+        }
+        if (st === 502 || st === 504) {
+            return { error: "Website SS Truyện đang quá tải (HTTP " + st + ") — đã thử lại " + SS_MAX_ATTEMPTS + " lần nhưng server vẫn chưa phản hồi. Vui lòng thử lại sau ít phút, hoặc đổi mạng Wi-Fi/4G rồi thử lại." };
         }
         if (st) return { error: "Không tải được trang (HTTP " + st + "): " + url };
         return { error: "Không tải được trang (lỗi mạng): " + url };
     }
-    var doc = null;
-    try {
-        doc = docFromResponse(res.res, url);
-    } catch (e2) {
-        return { error: "Không đọc được nội dung trang: " + url };
-    }
-    if (!doc) return { error: "Không đọc được nội dung trang: " + url };
-    return { doc: doc };
+    return { error: "Không tải được trang: " + url };
 }
 
 // Parser MOT card truyen `article.archive-story-card` thanh doi tuong
