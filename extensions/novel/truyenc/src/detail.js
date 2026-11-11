@@ -15,6 +15,7 @@
 //  - Heuristic cu indexOf("Full") tren toan trang da bo: chu "Full" xuat
 //    hien o nhieu cho khong lien quan (tab "Da Hoan Thanh", badge "Full").
 load('config.js');
+load('safe-first.js');
 load('fetch-helpers.js');
 
 function execute(url) {
@@ -43,7 +44,7 @@ function execute(url) {
     if (cover.indexOf("//") === 0) cover = "https:" + cover;
 
     var author = "";
-    var authorEl = doc.select("a[href*='/tac-gia/']").first();
+    var authorEl = safeFirst(doc.select("a[href*='/tac-gia/']"));
     if (authorEl) {
         author = authorEl.text().trim();
     } else {

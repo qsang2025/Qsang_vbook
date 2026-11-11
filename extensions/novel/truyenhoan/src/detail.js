@@ -8,6 +8,7 @@
 // fetch qua fetchPageDoc() (fetchDoc + kiem challenge, tra loi tieng Viet
 // co huong dan khi gap Cloudflare/login).
 load('config.js');
+load('safe-first.js');
 load('fetch-helpers.js');
 load('challenge-handler.js');
 load('helper.js');
@@ -103,12 +104,12 @@ function execute(url) {
         ongoing = false;
     }
 
-    var descEl = doc.select("div.desc-text.desc-text-full[itemprop=description]").first();
+    var descEl = safeFirst(doc.select("div.desc-text.desc-text-full[itemprop=description]"));
     if (!descEl) {
-        descEl = doc.select("div.desc-text[itemprop=description]").first();
+        descEl = safeFirst(doc.select("div.desc-text[itemprop=description]"));
     }
     if (!descEl) {
-        descEl = doc.select("div.desc-text").first();
+        descEl = safeFirst(doc.select("div.desc-text"));
     }
     var descriptionHtml = descEl ? descEl.html() : "";
 

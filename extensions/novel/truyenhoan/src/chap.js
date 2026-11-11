@@ -7,6 +7,7 @@
 // fetch qua fetchPageDoc() (fetchDoc + kiem challenge, tra loi tieng Viet
 // co huong dan khi gap Cloudflare/login).
 load('config.js');
+load('safe-first.js');
 load('fetch-helpers.js');
 load('challenge-handler.js');
 load('helper.js');
@@ -43,7 +44,7 @@ function execute(url) {
     }
 
     var chapterTitle = "";
-    var titleEl = doc.select("a.chapter-title").first();
+    var titleEl = safeFirst(doc.select("a.chapter-title"));
     if (titleEl) {
         chapterTitle = titleEl.text().trim();
     } else {

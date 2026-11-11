@@ -7,6 +7,7 @@
 // thu hep noi dung CHI trong <article> (ban cu gom moi <p> tren trang
 // nen co the lan nav/footer), data2 = tieu de chuong that tu <title>.
 load('config.js');
+load('safe-first.js');
 load('fetch-helpers.js');
 
 function execute(url) {
@@ -41,9 +42,9 @@ function execute(url) {
     // <article> thi thu cac khoi noi dung chuong chuyen dung; khong bao
     // gio gom moi <p> tren trang (se lan nav/footer/binh luan).
     var content = "";
-    var contentEl = doc.select("article").first();
+    var contentEl = safeFirst(doc.select("article"));
     if (!contentEl) {
-        contentEl = doc.select("#chapter-content, .chapter-content, .reading-content").first();
+        contentEl = safeFirst(doc.select("#chapter-content, .chapter-content, .reading-content"));
     }
     if (contentEl) {
         contentEl.select("script, iframe, .ads, .quangcao, nav, header, footer").remove();

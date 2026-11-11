@@ -7,6 +7,7 @@
 
 load('crypto.js');
 load('config.js');
+load('safe-first.js');
 load('rate-limit.js');
 load('challenge-handler.js');
 
@@ -310,7 +311,7 @@ function execute(url) {
                 return Response.error(formatLoginError("Sáng Tác Việt", url));
             }
             var doc = directRes.html();
-            var el = doc.select("#content-container, .content, .reading-content").first();
+            var el = safeFirst(doc.select("#content-container, .content, .reading-content"));
             if (el) {
                 el.select("script, iframe, .ads").remove();
                 return Response.success(cleanChapterContent(el.html(), host));

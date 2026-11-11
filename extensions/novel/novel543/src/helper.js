@@ -104,8 +104,8 @@ function parseBookItem(el) {
         var cand = h3Links.get(i);
         if (cleanText(cand.text())) { linkEl = cand; break; }
     }
-    if (linkEl === null) linkEl = el.select(".media-content h3 a").first();
-    if (linkEl === null) linkEl = el.select(".media-left a").first();
+    if (linkEl === null) linkEl = safeFirst(el.select(".media-content h3 a"));
+    if (linkEl === null) linkEl = safeFirst(el.select(".media-left a"));
     if (linkEl === null) return null;
     var href = linkEl.attr("href");
     if (!href) return null;
