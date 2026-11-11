@@ -92,7 +92,12 @@ function execute(url) {
         if (bm) bookId = bm[1] + "";
     });
     var statNums = [];
-    doc.select(".book-stats-box .book-stats span[data-ready]").forEach(function (x) {
+    // Số bình luận của TRUYỆN CHÍNH nằm trong .cover-info .book-stats
+    // (thứ tự: lượt xem, thích, bình luận). Các khối .book-stats-box thuộc
+    // truyện tương tự bên dưới — selector cũ lấy nhầm số bình luận của
+    // truyện tương tự đầu tiên. Ít hơn 3 số thì bỏ số khỏi title, không
+    // bao giờ hiện số của truyện khác.
+    doc.select(".cover-info .book-stats span[data-ready]").forEach(function (x) {
         statNums.push(((x.text().trim()) + ""));
     });
     if (bookId) {
