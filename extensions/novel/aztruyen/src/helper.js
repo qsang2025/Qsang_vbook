@@ -90,8 +90,8 @@ function parseBookRow(row) {
     if (!href || !name) return null;
 
     var cover = "";
-    var img = row.select("a.thumbnail img").first();
-    if (img === null) img = row.select("img").first();
+    var img = safeFirst(row.select("a.thumbnail img"));
+    if (img === null) img = safeFirst(row.select("img"));
     if (img !== null) {
         cover = img.attr("data-src") || img.attr("src") || "";
         if (cover.indexOf("//") === 0) cover = "https:" + cover;

@@ -19,6 +19,7 @@ load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(query, page) {
