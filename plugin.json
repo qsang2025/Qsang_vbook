@@ -174,7 +174,7 @@
       "name": "Wiki Dịch",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wikicv/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://wikicv.org",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wikicv/icon.png",
       "description": "Wiki Dịch (wikicv.org) — đọc truyện tiếng Hoa qua bản dịch máy Hán-Việt: chương mới, truyện nam/nữ tần/đam mỹ, tab Review, 25 thể loại + 7 chuyên mục Review. Chi tiết, chương và mục lục đọc được không cần đăng nhập (mã mục lục ràng buộc theo IP máy, không phải đăng nhập); tìm kiếm, thể loại, bảng xếp hạng cần đăng nhập wikicv.org (xem README). Port từ wikicv v1 của alexsonxxx (ref: alexsonxxx).",

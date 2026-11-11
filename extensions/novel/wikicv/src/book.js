@@ -52,9 +52,14 @@ function execute(url, page) {
     var seen = {};
 
     doc.select(".book-item").forEach(function (el) {
-        // Link truyện: a.tooltipped chứa h5.book-title (trỏ detail)
-        // Trên /chuong-moi, a.cover-wrapper trỏ chapter URL nên KHÔNG dùng
+        // Link truyen: 2 bien the markup tuy trang.
+        // - /chuong-moi, /truyen-nam...: a.tooltipped (h5.book-title nam trong).
+        // - /review: a.book-title (h5 chi co class truncate tooltipped).
+        // Thu ca 2 roi moi dung a.cover-wrapper (anh bia) lam du phong.
+        // Tren /chuong-moi, a.cover-wrapper tro chapter URL nen KHONG dung
+        // lam lua chon chinh — chi du phong khi 2 dang tren deu khong co.
         var linkEl = el.select("a.tooltipped").first();
+        if (!linkEl) linkEl = el.select("a.book-title").first();
         if (!linkEl) linkEl = el.select("a.cover-wrapper").first();
         if (!linkEl) return;
 
@@ -69,8 +74,14 @@ function execute(url, page) {
         if (cover.startsWith("//")) cover = "https:" + cover;
         if (cover && !cover.startsWith("http")) cover = BASE_URL + cover;
 
-        // Tên truyện: h5.book-title (có thể trong a.tooltipped)
+        // Ten truyen: h5.book-title tren cac list thuong; tren /review
+        // class book-title nam o the a, h5 chi co truncate tooltipped
+        // nen lay text cua chinh a.book-title; cuoi cung thu h5.truncate.
+        // (Loi v2: chi thu h5.book-title nen /review tra ten rong va
+        // toan bo muc bi bo qua — code 0 voi data [].)
         var nameEl = el.select("h5.book-title").first();
+        if (!nameEl) nameEl = el.select("a.book-title").first();
+        if (!nameEl) nameEl = el.select("h5.truncate").first();
         var name = (nameEl ? nameEl.text().trim() : "") + "";
 
         // Thể loại: p.book-gender (vd: Đam mỹ)
