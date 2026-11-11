@@ -20,6 +20,7 @@ load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(url) {
@@ -30,7 +31,7 @@ function execute(url) {
     if (r.error) return Response.error(r.error);
     var doc = r.doc;
 
-    var root = doc.select("#truyen").first();
+    var root = safeFirst(doc.select("#truyen"));
     if (root === null) root = doc;
 
     var name = "";
