@@ -44,9 +44,9 @@
 // von la ten that, nen khong can data2.
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
-// cleanHtml.js, crypto.js, qimao-api.js, qimao-crypto.js, qimao-des.js
-// vao src/. Tuong thich Rhino ES6: chi dung var/function, noi chuoi
-// bang +.
+// cleanHtml.js, crypto.js, qimao-api.js, qimao-crypto.js, rate-limit.js,
+// qimao-des.js vao src/. Tuong thich Rhino ES6: chi dung var/function,
+// noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
@@ -54,6 +54,7 @@ load('cleanHtml.js');
 load('crypto.js');
 load('qimao-api.js');
 load('qimao-crypto.js');
+load('rate-limit.js');
 load('qimao-des.js');
 
 // Text thuong: moi doan 1 dong (\n don) -> <p>...</p>.
@@ -87,12 +88,23 @@ if (plain && plain.length >= 200) content = plainToHtml(plain);
 }
 
 // DU PHONG 1+2 — trang web (chapterData DES preview, roi DOM).
+// Lay trang qua pacedFetch (rate-limit.js): nghi jitter 2-3s truoc
+// request, retry 429/405/503 toi da 3 lan, ghi cooldown khi bi chan.
+// Gap 405/429 (hoac dang cooldown) thi bao loi chan ro rang, KHONG gui
+// them request; loi khac thi roi xuong luong cu (trang rong -> bao loi
+// chung o cuoi). Khong dung browser fallback khi bi chan theo IP.
 var pageText = "";
 var wordCount = 0;
 var hasAppPrompt = false;
 var hasVipPrompt = false;
 if (!content) {
-var res = fetchPage(url);
+var pf = pacedFetch(url, { minDelayMs: 2000, maxDelayMs: 3000 });
+var res = null;
+if (pf.ok) {
+res = pf.res;
+} else if (pf.error === "cooldown" || pf.status === 405 || pf.status === 429) {
+return Response.error(rateLimitErrorMessage("七猫免费小说", "www.qimao.com", pf.cooldownRemainingMs));
+}
 if (res) {
 var doc = docFromResponse(res, url);
 if (doc) {

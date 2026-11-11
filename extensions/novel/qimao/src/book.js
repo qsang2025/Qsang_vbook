@@ -22,12 +22,13 @@
 // dau bang "/" thi fetch thang path do.
 //
 // Load: build se copy config.js, config-helpers.js, fetch-helpers.js,
-// helper.js vao src/.
+// helper.js, rate-limit.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
+load('rate-limit.js');
 
 function execute(query, page) {
     query = query || "";
@@ -48,8 +49,19 @@ function execute(query, page) {
         pageUrl = BASE_URL + path;
     }
 
-    var res = fetchPage(pageUrl);
-    if (!res) return Response.error("Không tải được trang danh sách: " + pageUrl);
+    // Lay trang danh sach qua pacedFetch (rate-limit.js): nghi jitter 2-3s
+    // truoc request, retry 429/405/503 toi da 3 lan, ghi cooldown khi bi
+    // chan. Gap 405/429 (hoac dang cooldown) thi bao loi chan ro rang;
+    // loi khac thi giu thong bao cu. Khong dung browser fallback khi bi
+    // chan theo IP (trang WAF Aliyun 200 thi van xu ly o duoi).
+    var pf = pacedFetch(pageUrl, { minDelayMs: 2000, maxDelayMs: 3000 });
+    if (!pf.ok) {
+        if (pf.error === "cooldown" || pf.status === 405 || pf.status === 429) {
+            return Response.error(rateLimitErrorMessage("七猫免费小说", "www.qimao.com", pf.cooldownRemainingMs));
+        }
+        return Response.error("Không tải được trang danh sách: " + pageUrl);
+    }
+    var res = pf.res;
     var doc = docFromResponse(res, pageUrl);
     if (!doc) return Response.error("Không tải được trang danh sách: " + pageUrl);
 
