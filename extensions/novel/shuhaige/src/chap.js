@@ -32,6 +32,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -39,8 +40,8 @@ load('helper.js');
 function chapterTitle(doc) {
     var title = "";
     if (doc !== null) {
-        var h1 = doc.select("div.bookname h1").first();
-        if (h1 === null) h1 = doc.select("h1").first();
+        var h1 = safeFirst(doc.select("div.bookname h1"));
+        if (h1 === null) h1 = safeFirst(doc.select("h1"));
         if (h1 !== null) title = cleanText(h1.text());
     }
     // Strip hau to "  N/M" (vd "第3094章 见识  1/5" -> "第3094章 见识").
@@ -108,8 +109,8 @@ function execute(url) {
         var part = contentHtml(doc);
         if (part) fullHtml += part;
         // Dieu huong trang con: chi theo "下一页", dung o "下一章".
-        var nextEl = doc.select("a#pager_next").first();
-        if (nextEl === null) nextEl = doc.select("a.next").first();
+        var nextEl = safeFirst(doc.select("a#pager_next"));
+        if (nextEl === null) nextEl = safeFirst(doc.select("a.next"));
         if (nextEl === null) break;
         var nextText = cleanText(nextEl.text());
         var nextHref = nextEl.attr("href") || "";

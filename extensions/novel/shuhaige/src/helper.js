@@ -106,15 +106,15 @@ function coverFromImg(img) {
 // (ten + link /{id}.html, img cover) + dl > dt > span (tac gia) + dt > a
 // (ten) + dd (mo ta).
 function parseFeaturedItem(el) {
-    var linkEl = el.select("div.image a").first();
-    if (linkEl === null) linkEl = el.select("dl dt a").first();
+    var linkEl = safeFirst(el.select("div.image a"));
+    if (linkEl === null) linkEl = safeFirst(el.select("dl dt a"));
     if (linkEl === null) return null;
     var href = linkEl.attr("href");
     if (!href) return null;
     var name = cleanText(linkEl.attr("title")) || cleanText(linkEl.text());
     if (!name) return null;
-    var img = el.select("div.image img").first();
-    if (img === null) img = el.select("img").first();
+    var img = safeFirst(el.select("div.image img"));
+    if (img === null) img = safeFirst(el.select("img"));
     var author = cleanText(el.select("dl dt span").text());
     var desc = cleanText(el.select("dl dd").text());
     if (author) desc = author + (desc ? " — " + desc : "");
@@ -141,7 +141,7 @@ function parseRowItem(el) {
     if (!href || !name) return null;
     // Dong header co the <b> trong span.s2, khong co href that -> da loai o tren.
     var genreText = cleanText(el.select("span.s1").text()).replace(/[\[\]]/g, "");
-    var latest = el.select("span.s3 a").first();
+    var latest = safeFirst(el.select("span.s3 a"));
     var author = cleanText(el.select("span.s4").text());
     var words = cleanText(el.select("span.s5").text());
     var status = cleanText(el.select("span.s6").text());
@@ -164,15 +164,15 @@ function parseRowItem(el) {
 // Parse MOT the o trang /quanben/ (khong co novelslist2): div.novelslist
 // > div.content > div.top > div.image > a + dl > dt > a (ten) + dd (mo ta).
 function parseTopItem(el) {
-    var linkEl = el.select("div.image a").first();
-    if (linkEl === null) linkEl = el.select("dl dt a").first();
+    var linkEl = safeFirst(el.select("div.image a"));
+    if (linkEl === null) linkEl = safeFirst(el.select("dl dt a"));
     if (linkEl === null) return null;
     var href = linkEl.attr("href");
     if (!href) return null;
     var name = cleanText(linkEl.attr("title")) || cleanText(linkEl.text());
     if (!name) return null;
-    var img = el.select("div.image img").first();
-    if (img === null) img = el.select("img").first();
+    var img = safeFirst(el.select("div.image img"));
+    if (img === null) img = safeFirst(el.select("img"));
     var desc = cleanText(el.select("dl dd").text());
     return {
         name: htmlDecode(name),

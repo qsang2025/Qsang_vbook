@@ -25,6 +25,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -32,8 +33,8 @@ load('helper.js');
 function chapterTitle(doc) {
     var title = "";
     if (doc !== null) {
-        var h1 = doc.select("div.txtnav h1").first();
-        if (h1 === null) h1 = doc.select("h1").first();
+        var h1 = safeFirst(doc.select("div.txtnav h1"));
+        if (h1 === null) h1 = safeFirst(doc.select("h1"));
         if (h1 !== null) title = cleanText(h1.text());
     }
     title = title.replace(/[\uff08\(]\s*\d+\s*\/\s*\d+\s*[\uff09\)]\s*$/, "");
