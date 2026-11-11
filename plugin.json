@@ -61,6 +61,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Mê Truyện Hot VN",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenhotvn/plugin.zip",
+      "version": 1,
+      "source": "https://metruyenhotvn.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenhotvn/icon.png",
+      "description": "Mê Truyện Hot VN — đọc truyện chữ tiếng Việt miễn phí trên metruyenhotvn.com (tên cũ metruyenhot.vn): Tiên Hiệp, Huyền Huyễn, Ngôn Tình, Đam Mỹ, Đô Thị... Tìm kiếm qua API gợi ý /ajax/suggest-story, mục lục đầy đủ qua API /ajax/list-chapter, nội dung chương toàn văn.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Sáng Tác Việt APP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacvietapp/plugin.zip",
