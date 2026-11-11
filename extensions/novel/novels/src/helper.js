@@ -197,8 +197,8 @@ function parseLatestChapterRow(li) {
 // (Khong loc truyen nguoi lon — tra du nhu site tra, theo yeu cau cua
 // nguoi dung ngay 2026-11-06.)
 function parseSearchItem(el) {
-    var linkEl = el.select('.img_span a[href*="/novels/"]').first();
-    if (linkEl === null) linkEl = el.select('a[href*="/novels/"]').first();
+    var linkEl = safeFirst(el.select('.img_span a[href*="/novels/"]'));
+    if (linkEl === null) linkEl = safeFirst(el.select('a[href*="/novels/"]'));
     if (linkEl === null) return null;
     var href = linkEl.attr("href");
     if (!href) return null;

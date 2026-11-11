@@ -13,6 +13,7 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('safe-first.js');
 load('helper.js');
 
 // Tab trang chu (home.js): input gia, book.js tu fetch trang chu /
