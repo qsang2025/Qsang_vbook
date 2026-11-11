@@ -73,8 +73,11 @@ Probe live: chỉ request ẩn danh thường, ≤ 1 request / 3 giây, tuần t
   - [x] Step 3: Phân tích extension-api.md (WebView, Browser, Cookie, LocalStorage)
   - [x] Step 4: Khảo sát dự án mã nguồn mở công khai (zwb8926, ying-ck, zhongbai2333, Legado...)
   - [x] Step 5: Đánh giá Plan B nguồn thay thế
-- [ ] Cụm 3 (Step 6–7)
+- [x] Cụm 3 (Step 6–7)
+  - [x] Step 6: Báo cáo chính thức toàn diện work/ext-review/FANQIE-SURVEY-AG.md
+  - [x] Step 7: Kiểm chứng validate (PASS), extensions rỗng, push nhánh research/fanqie-survey
 
 ## Decisions
 - 2026-11-11: anh Sáng duyệt ranh giới 4 điểm + thêm Plan B.
 - Gộp Recon vào Cụm 1 (master đã có đủ facts từ probe trực tiếp) để tiết kiệm 1 turn master.
+- Báo cáo chính thức hoàn thành đầy đủ 9 giải pháp (H1–H9), 4 hướng vượt rào chỉ phân tích không triển khai, phân định rạch ròi Plan B giữa kênh hợp lệ chính thống và aggregator sao chép lậu.
