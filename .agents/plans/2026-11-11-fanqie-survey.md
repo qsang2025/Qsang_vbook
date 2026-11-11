@@ -66,6 +66,9 @@ Probe live: chỉ request ẩn danh thường, ≤ 1 request / 3 giây, tuần t
 ## Progress
 - [x] Master: plan viết 2026-11-11 01:15 UTC.
 - [ ] Cụm 1 (Step 0–2)
+  - [x] Step 0: Commit plan (commit aa122c4)
+  - [x] Step 1: REQUEST.md + CONTEXT.md
+  - [ ] Step 2: Live probe bổ sung + log
 - [ ] Cụm 2 (Step 3–5)
 - [ ] Cụm 3 (Step 6–7)
 
