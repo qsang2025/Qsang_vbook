@@ -27,7 +27,7 @@ function execute(key, page) {
     var seen = {};
 
     doc.select(".book-item").forEach(function (el) {
-        var linkEl = el.select("a.cover-wrapper").first();
+        var linkEl = wikiFirst(el.select("a.cover-wrapper"));
         if (!linkEl) return;
 
         var link = (linkEl.attr("href") || "") + "";
@@ -35,12 +35,12 @@ function execute(key, page) {
         seen[link] = true;
         if (!link.startsWith("http")) link = BASE_URL + link;
 
-        var imgEl = el.select("img").first();
+        var imgEl = wikiFirst(el.select("img"));
         var cover = imgEl ? ((imgEl.attr("data-src") || imgEl.attr("src") || "") + "") : "";
         if (cover.startsWith("//")) cover = "https:" + cover;
         if (cover && !cover.startsWith("http")) cover = BASE_URL + cover;
 
-        var nameEl = el.select("h5.book-title").first();
+        var nameEl = wikiFirst(el.select("h5.book-title"));
         var name = (nameEl ? nameEl.text().trim() : "") + "";
         if (!name) return;
 

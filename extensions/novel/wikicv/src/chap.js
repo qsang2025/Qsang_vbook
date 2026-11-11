@@ -16,7 +16,9 @@ function execute(url) {
     doc.select("[class*='ads'], [id*='ads'], .fb-comments, #fb-comments").remove();
 
     // Nội dung chương nằm trong #bookContentBody
-    var contentEl = doc.select("#bookContentBody").first();
+    // (dung wikiFirst: .first() cua runtime khong bao gio tra null nen
+    // guard if (!contentEl) cu khong bao gio chay — xem config.js)
+    var contentEl = wikiFirst(doc.select("#bookContentBody"));
     if (!contentEl) return Response.error("Không tìm thấy nội dung chương");
 
     var content = contentEl.html() + "";

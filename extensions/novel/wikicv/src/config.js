@@ -29,6 +29,22 @@ try { if (CONFIG_URL) BASE_URL = CONFIG_URL; } catch (e) {}
 // wikicv.org nen chi la fallback yeu khi domain chinh loi mang/5xx.
 var MIRROR_LIST = ["https://truyenwikidich.net"];
 
+// ---- first() an toan ----
+// QUIRK RUNTIME vBook (kiem chung tren may that 2026-11-11): Elements.first()
+// KHONG bao gio tra null — select rong van tra mot object rong truthy
+// (attr/text deu rong). Vi vay khong duoc dung kieu `if (!el.select(...).first())`
+// de kiem tra ton tai hay lam fallback — chuoi fallback se khong bao gio chay,
+// va attr("href") cua object rong tra "" (lam book.js bo qua het muc /review
+// o v2/v3). Helper nay tra ve element that neu co, null neu khong co —
+// kiem tra bang size() thay vi tin first().
+function wikiFirst(els) {
+    if (!els) return null;
+    try {
+        if (els.size() > 0) return els.first();
+    } catch (e) {}
+    return null;
+}
+
 function wikiCookieFromConfig() {
     var c = "";
     try { if (typeof wikicvCookie !== "undefined" && wikicvCookie) { c = String(wikicvCookie); } } catch (e) {}
@@ -71,7 +87,7 @@ function wikiFetch(url, referer) {
 // + luot xem/thich/binh luan (selector da kiem chung tren trang that).
 function wikiItemDescription(el) {
     var parts = [];
-    var authorEl = el.select("p.book-author a").first();
+    var authorEl = wikiFirst(el.select("p.book-author a"));
     if (authorEl) {
         var a = (authorEl.text().trim()) + "";
         if (a) parts.push("Tác giả: " + a);

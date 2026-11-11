@@ -58,9 +58,12 @@ function execute(url, page) {
         // Thu ca 2 roi moi dung a.cover-wrapper (anh bia) lam du phong.
         // Tren /chuong-moi, a.cover-wrapper tro chapter URL nen KHONG dung
         // lam lua chon chinh — chi du phong khi 2 dang tren deu khong co.
-        var linkEl = el.select("a.tooltipped").first();
-        if (!linkEl) linkEl = el.select("a.book-title").first();
-        if (!linkEl) linkEl = el.select("a.cover-wrapper").first();
+        // PHAI dung wikiFirst thay vi .first() + if (!linkEl): runtime
+        // tra object rong truthy cho select rong nen fallback khong bao
+        // gio chay (loi goc cua /review tra [] o v2/v3 — xem config.js).
+        var linkEl = wikiFirst(el.select("a.tooltipped"));
+        if (!linkEl) linkEl = wikiFirst(el.select("a.book-title"));
+        if (!linkEl) linkEl = wikiFirst(el.select("a.cover-wrapper"));
         if (!linkEl) return;
 
         var link = (linkEl.attr("href") || "") + "";
@@ -69,7 +72,7 @@ function execute(url, page) {
         if (!link.startsWith("http")) link = BASE_URL + link;
 
         // Ảnh bìa nằm trong cover-wrapper
-        var imgEl = el.select("img").first();
+        var imgEl = wikiFirst(el.select("img"));
         var cover = imgEl ? ((imgEl.attr("data-src") || imgEl.attr("src") || "") + "") : "";
         if (cover.startsWith("//")) cover = "https:" + cover;
         if (cover && !cover.startsWith("http")) cover = BASE_URL + cover;
@@ -77,15 +80,13 @@ function execute(url, page) {
         // Ten truyen: h5.book-title tren cac list thuong; tren /review
         // class book-title nam o the a, h5 chi co truncate tooltipped
         // nen lay text cua chinh a.book-title; cuoi cung thu h5.truncate.
-        // (Loi v2: chi thu h5.book-title nen /review tra ten rong va
-        // toan bo muc bi bo qua — code 0 voi data [].)
-        var nameEl = el.select("h5.book-title").first();
-        if (!nameEl) nameEl = el.select("a.book-title").first();
-        if (!nameEl) nameEl = el.select("h5.truncate").first();
+        var nameEl = wikiFirst(el.select("h5.book-title"));
+        if (!nameEl) nameEl = wikiFirst(el.select("a.book-title"));
+        if (!nameEl) nameEl = wikiFirst(el.select("h5.truncate"));
         var name = (nameEl ? nameEl.text().trim() : "") + "";
 
         // Thể loại: p.book-gender (vd: Đam mỹ)
-        var genderEl = el.select("p.book-gender").first();
+        var genderEl = wikiFirst(el.select("p.book-gender"));
         var tag = (genderEl ? genderEl.text().trim() : "") + "";
 
         if (!name) return;

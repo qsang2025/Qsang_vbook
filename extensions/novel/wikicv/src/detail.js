@@ -14,13 +14,13 @@ function execute(url) {
     var doc = res.html();
 
     // Tên truyện
-    var nameEl = doc.select(".cover-info h2").first();
+    var nameEl = wikiFirst(doc.select(".cover-info h2"));
     var name = (nameEl ? nameEl.text().trim() : "") + "";
     // Bao loi ro thay vi tra success rong khi site doi selector.
     if (!name) return Response.error("Không lấy được tên truyện từ trang chi tiết — có thể site đã đổi giao diện.");
 
     // Ảnh bìa
-    var coverEl = doc.select(".book-info .cover-wrapper img").first();
+    var coverEl = wikiFirst(doc.select(".book-info .cover-wrapper img"));
     var cover = "";
     if (coverEl) {
         cover = (coverEl.attr("data-src") || coverEl.attr("src") || "") + "";
@@ -33,7 +33,7 @@ function execute(url) {
     doc.select(".cover-info p").forEach(function (p) {
         var t = p.text() + "";
         if (t.indexOf("Tác giả") > -1) {
-            var a = p.select("a").first();
+            var a = wikiFirst(p.select("a"));
             if (a) author = (a.text().trim()) + "";
         }
     });
@@ -43,7 +43,7 @@ function execute(url) {
     doc.select(".cover-info p").forEach(function (p) {
         var t = p.text() + "";
         if (t.indexOf("Tình trạng") > -1) {
-            var a = p.select("a").first();
+            var a = wikiFirst(p.select("a"));
             status = (a ? a.text().trim() : t.replace("Tình trạng:", "").trim()) + "";
         }
     });
@@ -53,12 +53,12 @@ function execute(url) {
         && status.indexOf("完结") === -1;
 
     // Mô tả
-    var descEl = doc.select(".book-desc-detail").first();
+    var descEl = wikiFirst(doc.select(".book-desc-detail"));
     var description = (descEl ? descEl.html() : "") + "";
 
     // Thể loại: dòng p đầu của .book-desc chứa các link
     var genres = [];
-    var firstP = doc.select(".book-desc > p").first();
+    var firstP = wikiFirst(doc.select(".book-desc > p"));
     if (firstP) {
         firstP.select("a").forEach(function (el) {
             var gTitle = (el.text().trim()) + "";
