@@ -19,14 +19,15 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
 
 function nextPathToken(doc) {
-    var nextLink = doc.select("a.next").first();
-    if (nextLink === null) nextLink = doc.select("a:contains(下一頁)").first();
-    if (nextLink === null) nextLink = doc.select("a:contains(下一页)").first();
+    var nextLink = safeFirst(doc.select("a.next"));
+    if (nextLink === null) nextLink = safeFirst(doc.select("a:contains(下一頁)"));
+    if (nextLink === null) nextLink = safeFirst(doc.select("a:contains(下一页)"));
     if (nextLink === null) return "";
     var href = nextLink.attr("href");
     if (!href) return "";

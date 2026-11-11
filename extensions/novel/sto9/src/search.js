@@ -20,6 +20,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -52,7 +53,7 @@ function execute(query, page) {
             var ogId = doc.select('meta[property="og:book_id"]').first();
             var bookId = ogId !== null ? cleanText(ogId.attr("content")) : "";
             var link = bookId ? BASE_URL + "/book/" + bookId + ".html" : url;
-            var ogAuthor = doc.select('meta[property="og:novel:author"]').first();
+            var ogAuthor = safeFirst(doc.select('meta[property="og:novel:author"]'));
             var ogImg = doc.select('meta[property="og:image"]').first();
             var ogLatest = doc.select('meta[property="og:novel:latest_chapter_name"]').first();
             var ogStatus = doc.select('meta[property="og:novel:status"]').first();
@@ -86,9 +87,9 @@ function execute(query, page) {
     });
 
     var next = "";
-    var nextLink = doc.select("a.next").first();
-    if (nextLink === null) nextLink = doc.select("a:contains(下一頁)").first();
-    if (nextLink === null) nextLink = doc.select("a:contains(下一页)").first();
+    var nextLink = safeFirst(doc.select("a.next"));
+    if (nextLink === null) nextLink = safeFirst(doc.select("a:contains(下一頁)"));
+    if (nextLink === null) nextLink = safeFirst(doc.select("a:contains(下一页)"));
     if (nextLink !== null) {
         var href = nextLink.attr("href");
         if (href) {

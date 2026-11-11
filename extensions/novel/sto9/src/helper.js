@@ -112,15 +112,15 @@ function parseBookItem(el) {
         var cand = h3Links.get(i);
         if (cleanText(cand.text())) { linkEl = cand; break; }
     }
-    if (linkEl === null) linkEl = el.select(".newnav h3 a").first();
-    if (linkEl === null) linkEl = el.select("a.imgbox").first();
+    if (linkEl === null) linkEl = safeFirst(el.select(".newnav h3 a"));
+    if (linkEl === null) linkEl = safeFirst(el.select("a.imgbox"));
     if (linkEl === null) return null;
     var href = linkEl.attr("href");
     if (!href) return null;
     var name = cleanText(linkEl.text());
     if (!name) return null;
-    var img = el.select("a.imgbox img").first();
-    if (img === null) img = el.select("img").first();
+    var img = safeFirst(el.select("a.imgbox img"));
+    if (img === null) img = safeFirst(el.select("img"));
     var labels = el.select(".labelbox label");
     var genreText = labels.size() > 1 ? cleanText(labels.get(1).text()) : "";
     var statusText = labels.size() > 2 ? cleanText(labels.get(2).text()) : "";
