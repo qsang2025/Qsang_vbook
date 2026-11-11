@@ -78,5 +78,30 @@ function execute(url) {
         ongoing: ongoing
     };
     if (genres.length > 0) result.genres = genres;
+
+    // Bình luận (v5): API /comment không cần đăng nhập (khảo sát §12).
+    // bookId lấy từ inline script trang chi tiết (cùng regex với toc.js,
+    // không phụ thuộc tên biến/kiểu khai báo); số bình luận lấy từ
+    // .book-stats (thứ tự: lượt xem, thích, bình luận — như wikiItemDescription).
+    // Không lấy được bookId thì bỏ mục bình luận, detail vẫn trả bình thường.
+    var bookId = "";
+    doc.select("script").forEach(function (sc) {
+        if (bookId) return;
+        var code = (sc.html() || "") + "";
+        var bm = code.match(/\b(?:var|let|const)?\s*bookId\s*=\s*"([^"]+)"/);
+        if (bm) bookId = bm[1] + "";
+    });
+    var statNums = [];
+    doc.select(".book-stats-box .book-stats span[data-ready]").forEach(function (x) {
+        statNums.push(((x.text().trim()) + ""));
+    });
+    if (bookId) {
+        var cCount = statNums.length >= 3 ? statNums[2] : "";
+        result.comment = {
+            title: "Bình luận" + (cCount ? " (" + cCount + ")" : ""),
+            input: bookId,
+            script: "comment.js"
+        };
+    }
     return Response.success(result);
 }

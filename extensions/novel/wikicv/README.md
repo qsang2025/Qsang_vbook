@@ -11,6 +11,7 @@ pacing chống rate-limit; lỗi tiếng Việt; bỏ User-Agent tự xoay).
 | Phần | Nguồn |
 | ---- | ----- |
 | Toàn bộ logic home/genre/detail/search/page/toc/chap + `config.js` (BASE_URL, cookie helper, SHA-256) | alexsonxxx, wikicv v1 (fork `vbook_alexsonxxx`) |
+| `comment.js` (bình luận, v5) + mục `comment` trong `detail.js` | Viết mới từ khảo sát endpoint `/comment` công khai của site (§12) — không copy code mã hóa của Darkrai9x v29 |
 | `rate-limit.js` (copy verbatim từ `lib/`) | Qsang_vbook `lib/rate-limit.js` |
 | Icon | favicon của wikicv.org, resize 200×200 PNG |
 
@@ -25,7 +26,16 @@ License repo: MIT (copyright Dương Nguyễn Quốc Sáng, 2026).
   `/tim-kiem?qs=2&...` (7 thể loại bổ sung chỉ chạy sau đăng nhập)
   hoặc `/review?cat=..` (không cần đăng nhập).
 - Chi tiết: SSR `.cover-info` (tên, tác giả, trạng thái, bìa) +
-  `.book-desc-detail` (mô tả) + thể loại.
+  `.book-desc-detail` (mô tả) + thể loại + mục bình luận (`comment.js`
+  qua API `/comment?bookId=..&start=..&order=newest`, 10 mục/trang,
+  không cần đăng nhập; `bookId` đọc từ inline script trang chi tiết,
+  số bình luận lấy từ `.book-stats`).
+- Bình luận: chỉ đọc. `comment.js` làm phẳng cây trả lời lồng nhau
+  (`children`, thụt bằng tiền tố "↳ " theo cấp), tên = "tên • Cách đây X",
+  mô tả = nội dung đã strip HTML (+ trích dẫn `<blockquote>` nối sau
+  "— Trích:"), link = chương đính kèm (khi `chapter` là object đầy đủ;
+  khi chỉ là `{$oid}` trần thì không có link). Không có đánh giá sao /
+  like bình luận trên site; ghi bình luận cần đăng nhập nên ngoài phạm vi.
 - Tìm kiếm: GET `/tim-kiem?q=<kw>&qs=1&start=<n>` → `.book-item`.
 - Mục lục: API `/book/index?bookId=..&start=..&size=..&signKey=..&sign=..`
   với `sign = sha256(fuzzySign(signKey + start + size))`;
