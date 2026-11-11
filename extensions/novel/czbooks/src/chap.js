@@ -20,6 +20,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -28,8 +29,8 @@ load('helper.js');
 function chapterTitle(doc) {
     var title = "";
     var h1 = doc.select("div.chapter-detail h1.name").first();
-    if (h1 === null) h1 = doc.select("h1.name").first();
-    if (h1 === null) h1 = doc.select("h1").first();
+    if (h1 === null) h1 = safeFirst(doc.select("h1.name"));
+    if (h1 === null) h1 = safeFirst(doc.select("h1"));
     if (h1 !== null) title = cleanText(h1.text());
     title = title.replace(/^《[^》]*》/, "");
     return cleanText(title);
@@ -49,7 +50,7 @@ function squashSpace(s) {
 
 function contentHtml(doc, title) {
     var content = doc.select("div.chapter-detail div.content").first();
-    if (content === null) content = doc.select("div.content").first();
+    if (content === null) content = safeFirst(doc.select("div.content"));
     if (content === null) return "";
     content.select("script, style, ins").remove();
     var html = content.html();
