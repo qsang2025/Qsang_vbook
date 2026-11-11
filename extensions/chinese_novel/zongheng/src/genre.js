@@ -3,8 +3,11 @@
 // chu ky): GET https://api2.zongheng.com/api/catefine/searchConf
 // (kiem chung 2026-11-11: code 200, 12 the loai 8101-8111 + "全部" 0).
 // Moi the loai tro ve book.js voi input la URL API catefine/search;
-// book.js goi POST JSON {cateFineId, pageNo, pageNum} va phan trang
-// theo hasNext (20 truyen/trang).
+// book.js goi POST JSON {cateFineId, pageNo: 1, pageNum: <so trang>}
+// — CHU Y: server dung pageNum lam SO TRANG (1-based) va bo qua
+// pageNo (kiem chung 2026-11-11: pageNum=1..39 khac nhau, trang 39
+// chi 2 truyen, pageNum=40 rong); phan trang theo hasNext, 20
+// truyen/trang co dinh do server tra.
 // Duong doc chinh (search/detail/toc/chap) van dung web v1 — API app
 // chi bo sung the loai + bang xep hang, vi cac endpoint noi dung cua
 // app deu tra 602 Unauthorized (xem ZONGHENG-APP-API.md). KHONG dung

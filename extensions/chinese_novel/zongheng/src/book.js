@@ -226,13 +226,20 @@ function zhApiBookItem(b) {
     };
 }
 
-// Nhanh the loai: POST /api/catefine/search {cateFineId, pageNo,
-// pageNum} — 20 truyen/trang, tra bookList + hasNext.
+// Nhanh the loai: POST /api/catefine/search — 20 truyen/trang, tra
+// bookList + hasNext. CHU Y: ten tham so NGUOC voi y nghia (kiem
+// chung truc tiep 2026-11-11): server BO QUA pageNo, va dung
+// pageNum lam SO TRANG (1-based): pageNum=1..39 moi trang 20 truyen
+// khac nhau, khong trung lap (0/20); trang 39 chi 2 truyen,
+// hasNext false; pageNum=40 rong. Vi vay gui pageNum = so trang
+// yeu cau, pageNo = 1 (vo nghia — da kiem chung pageNo=3/pageNum=1
+// tra giong het pageNo=1/pageNum=1, pageNo=99/pageNum=2 giong het
+// pageNo=1/pageNum=2). Co dinh 20 truyen/trang do server tra.
 function zhCatefineItems(cateFineId, pageNo) {
     var r = zhApiPost("/api/catefine/search", {
         cateFineId: cateFineId,
-        pageNo: pageNo,
-        pageNum: 20
+        pageNo: 1,
+        pageNum: pageNo
     });
     if (!r.ok) return { error: r };
     var list = r.result.bookList || [];

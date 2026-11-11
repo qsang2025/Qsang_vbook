@@ -25,7 +25,7 @@
     "regexp": "https?://(www\\.zongheng\\.com/detail/\\d+|book\\.zongheng\\.com/book/\\d+\\.html|huayu\\.zongheng\\.com/book/\\d+\\.html)",
     "source": "https://www.zongheng.com",
     "type": "chinese_novel",
-    "version": 2
+    "version": 3
   },
   "script": {
     "book": "book.js",
