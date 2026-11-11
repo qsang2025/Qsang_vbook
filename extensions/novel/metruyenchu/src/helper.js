@@ -31,7 +31,7 @@ function parseStoryItems(doc) {
         }
 
         var desc = "";
-        var authorEl = e.select("a[href*='/tac-gia/']").first();
+        var authorEl = safeFirst(e.select("a[href*='/tac-gia/']"));
         if (authorEl) {
             desc = "Tác giả: " + authorEl.text().trim();
         }
