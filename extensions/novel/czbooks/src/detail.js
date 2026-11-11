@@ -23,6 +23,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -33,7 +34,7 @@ function execute(url) {
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
     var titleEl = doc.select("div.info-wrap div.info h1.title").first();
-    if (titleEl === null) titleEl = doc.select("h1.title").first();
+    if (titleEl === null) titleEl = safeFirst(doc.select("h1.title"));
     if (titleEl === null) return Response.error("Không đọc được tên truyện: " + url);
     var name = cleanText(titleEl.text());
     // Ten gom ca 《》: 《誰讓他修仙的！》 -> 誰讓他修仙的！
@@ -74,7 +75,7 @@ function execute(url) {
         else if (label === "更新時間") updateTime = value;
         else if (label === "分類") {
             var catLink = tr.select("a#novel-category").first();
-            if (catLink === null) catLink = tr.select("a").first();
+            if (catLink === null) catLink = safeFirst(tr.select("a"));
             if (catLink !== null) {
                 genreText = cleanText(catLink.text());
                 var href = catLink.attr("href") || "";

@@ -32,6 +32,7 @@
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
+load('safe-first.js');
 load('helper.js');
 
 // Bang cung 25 muc — fallback khi khong lay duoc menu dong.

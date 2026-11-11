@@ -18,6 +18,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -43,7 +44,7 @@ function execute(url) {
     var doc = fetchDoc(url);
     if (!doc) return Response.error("Không tải được trang truyện: " + url);
 
-    var main = doc.select("main").first();
+    var main = safeFirst(doc.select("main"));
     var scope = main !== null ? main : doc;
     var mainText = cleanText(scope.text());
 

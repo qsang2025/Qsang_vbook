@@ -9,6 +9,7 @@
 // se tra bang cai dat ve nhu noi dung chuong (kiem chung bang curl
 // 2026-11-09; noi dung chuong that ~13.000 ky tu).
 load('config.js');
+load('safe-first.js');
 load('fetch-helpers.js');
 load('challenge-handler.js');
 load('helper.js');
@@ -24,19 +25,19 @@ function execute(url) {
     // Tieu de chuong that (data2): "Chuong 1: ..." trong h2.current-chapter.
     var chapTitle = "";
     var chapTitleEl = doc.select("h2.current-chapter").first();
-    if (!chapTitleEl) chapTitleEl = doc.select(".chapter-title h2").first();
+    if (!chapTitleEl) chapTitleEl = safeFirst(doc.select(".chapter-title h2"));
     if (chapTitleEl) chapTitle = chapTitleEl.text().trim();
 
     // 1. Selector uu tien: .vung-doc .truyen
     var contentEl = doc.select(".vung-doc .truyen").first();
-    if (!contentEl) contentEl = doc.select(".truyen").first();
+    if (!contentEl) contentEl = safeFirst(doc.select(".truyen"));
     if (contentEl) {
         contentEl.select("script, ins, iframe, .ads, .quangcao").remove();
         return Response.success(contentEl.html(), chapTitle);
     }
 
     // 2. Fallback: .vung-doc
-    var vungDoc = doc.select(".vung-doc").first();
+    var vungDoc = safeFirst(doc.select(".vung-doc"));
     if (vungDoc) {
         vungDoc.select(".chapter-title, .chapter_control, a.back, a.next, a.btn-dschuong, script, ins, iframe").remove();
         return Response.success(vungDoc.html(), chapTitle);
@@ -49,7 +50,7 @@ function execute(url) {
     // xuong loi "Không tìm thấy nội dung chương." nhu cu (C3).
     var fallbackSelectors = [".chapter-c", "#chapter-c", ".chapter-content", "#chapter-content", "#content", ".reading-content", ".content"];
     for (var i = 0; i < fallbackSelectors.length; i++) {
-        var el = doc.select(fallbackSelectors[i]).first();
+        var el = safeFirst(doc.select(fallbackSelectors[i]));
         if (el) {
             var sel = fallbackSelectors[i];
             if (sel === "#content" || sel === ".content") {

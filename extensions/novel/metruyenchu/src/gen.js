@@ -8,6 +8,7 @@
 // Trang list trong (0 truyen) la ket qua binh thuong, tra success rong
 // (N3), khong bao error.
 load('config.js');
+load('safe-first.js');
 load('fetch-helpers.js');
 load('challenge-handler.js');
 load('helper.js');
@@ -45,7 +46,7 @@ function execute(url, page) {
                 desc = genreEl.text().trim();
             }
 
-            var chapterEl = e.select(".ichapter a").first();
+            var chapterEl = safeFirst(e.select(".ichapter a"));
             if (chapterEl) {
                 var chapterText = chapterEl.text().trim();
                 if (desc) desc += " | " + chapterText;

@@ -10,6 +10,7 @@
 load('config.js');
 load('fetch-helpers.js');
 load('challenge-handler.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(url) {
