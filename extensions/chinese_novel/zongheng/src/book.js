@@ -177,9 +177,129 @@ function storeItems(doc, pageUrl) {
     return items;
 }
 
+// ---- API cong khai cua app Zongheng (v2 hybrid) ----
+// Chi dung 2 endpoint da kiem chung goi duoc an danh (code 200,
+// 2026-11-11): POST /api/catefine/search va POST /api/rank/list
+// tren api2.zongheng.com. Ca hai deu POST + JSON body (GET tra 404;
+// tham so sai kieu tra 500 loi Go unmarshal — cateFineId/rankType
+// phai la so nguyen). Cac endpoint noi dung cua app (search/books,
+// chapter/list, chapter/so/download...) deu tra 602 Unauthorized
+// nen KHONG dung o day, duong doc chinh van la web v1.
+var ZH_API2 = "https://api2.zongheng.com";
+
+function zhApiPost(path, bodyObj) {
+    var pf = pacedFetch(ZH_API2 + path, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(bodyObj)
+    });
+    if (!pf.ok) return { ok: false, status: pf.status, error: pf.error, cooldownRemainingMs: pf.cooldownRemainingMs };
+    var json = null;
+    try { json = pf.res.json(); } catch (e) { json = null; }
+    if (!json || json.code !== 200 || !json.result) {
+        return { ok: false, status: pf.status, error: "bad-json", cooldownRemainingMs: 0 };
+    }
+    return { ok: true, status: pf.status, result: json.result };
+}
+
+// Map 1 muc truyen tu API app (catefine/search bookList, rank/list
+// rankDatas) ve item chuan cua vBook. Ca hai dang deu co bookId,
+// name, picUrl, authorName, totalWord, categoryName.
+function zhApiBookItem(b) {
+    if (!b || !b.bookId || !b.name) return null;
+    var cover = b.picUrl ? String(b.picUrl) : "";
+    if (cover.indexOf("//") === 0) cover = "https:" + cover;
+    var desc = String(b.authorName || "");
+    if (b.totalWord) desc += (desc ? " • " : "") + b.totalWord;
+    if (b.categoryName) desc += (desc ? " • " : "") + String(b.categoryName);
+    if (b.serialStatus === 1) desc += (desc ? " • " : "") + "已完结";
+    else if (b.serialStatus === 0) desc += (desc ? " • " : "") + "连载中";
+    return {
+        name: String(b.name),
+        link: "https://www.zongheng.com/detail/" + b.bookId,
+        cover: cover,
+        description: desc,
+        host: BASE_URL
+    };
+}
+
+// Nhanh the loai: POST /api/catefine/search {cateFineId, pageNo,
+// pageNum} — 20 truyen/trang, tra bookList + hasNext.
+function zhCatefineItems(cateFineId, pageNo) {
+    var r = zhApiPost("/api/catefine/search", {
+        cateFineId: cateFineId,
+        pageNo: pageNo,
+        pageNum: 20
+    });
+    if (!r.ok) return { error: r };
+    var list = r.result.bookList || [];
+    var items = [];
+    var i = 0;
+    for (i = 0; i < list.length; i++) {
+        var it = zhApiBookItem(list[i]);
+        if (it) items.push(it);
+    }
+    var next = "";
+    if (r.result.hasNext) next = String(pageNo + 1);
+    return { items: items, next: next };
+}
+
+// Nhanh bang xep hang: POST /api/rank/list {rankType} — tra toi da
+// 10 muc (rankType 2 chi 6 muc); API khong phan trang theo pageNo
+// (pageNo khac nhau van tra 10 muc) nen chi lay trang 1, next "".
+// Mapping rankType (app) <-> rt (web) — DOI CHIEU 2026-11-11:
+//   rankType 3 (doanh so) ~ rt=3 24h畅销榜; rankType 8 (打赏) ~ rt=7
+//   捧场榜; rankType 7 la phieu de cu (web rt=6 推荐榜 da co o v1).
+//   rt=8 完结榜 va rt=10 24h更新榜 KHONG co tuong duong trong app:
+//   rankType 10 tra HTTP 500, khong co bang nao loc theo hoan thanh
+//   hay cap nhat 24h — nen v2 khong them 2 bang nay.
+function zhRankListItems(rankType) {
+    var r = zhApiPost("/api/rank/list", { rankType: rankType });
+    if (!r.ok) return { error: r };
+    var list = r.result.rankDatas || [];
+    var items = [];
+    var i = 0;
+    for (i = 0; i < list.length; i++) {
+        var it = zhApiBookItem(list[i]);
+        if (it) items.push(it);
+    }
+    return { items: items, next: "" };
+}
+
+function zhApiError(r) {
+    if (!r) return Response.error("Không tải được danh sách (API app Zongheng tạm lỗi, thử lại sau).");
+    if (r.error === "cooldown" || r.status === 405 || r.status === 429) {
+        return Response.error(rateLimitErrorMessage("Zongheng", "api2.zongheng.com", r.cooldownRemainingMs));
+    }
+    return Response.error("Không tải được danh sách từ API app Zongheng (HTTP " + r.status + "), thử lại sau.");
+}
+
 function execute(input, page) {
     page = page || "1";
     var url = zhNormalizeUrl(input);
+    // Nhanh API app (v2): phai dat TRUOC nhanh /rank? cua web vi
+    // "/api/rank/list" cung chua chuoi "/rank/".
+    if (url.indexOf("/api/catefine/search") > -1) {
+        var cm = String(url).match(/cateFineId=(\d+)/);
+        if (!cm) return Response.error("Thiếu mã thể loại (cateFineId) trong đường dẫn thể loại Zongheng.");
+        var pageNo = parseInt(page, 10);
+        if (isNaN(pageNo) || pageNo < 1) pageNo = 1;
+        var cat = zhCatefineItems(parseInt(cm[1], 10), pageNo);
+        if (cat.error) return zhApiError(cat.error);
+        if (cat.items.length === 0) return Response.error("Thể loại này chưa có truyện (hoặc API app tạm lỗi).");
+        return Response.success(cat.items, cat.next);
+    }
+    if (url.indexOf("/api/rank/list") > -1) {
+        var rm = String(url).match(/rankType=(\d+)/);
+        if (!rm) return Response.error("Thiếu mã bảng xếp hạng (rankType) trong đường dẫn bảng Zongheng.");
+        var rk = zhRankListItems(parseInt(rm[1], 10));
+        if (rk.error) return zhApiError(rk.error);
+        if (rk.items.length === 0) return Response.error("Bảng xếp hạng trống (API app tạm lỗi, thử lại sau).");
+        return Response.success(rk.items, rk.next);
+    }
     var pf = pacedFetch(url, { headers: zhHeaders(url) });
     if (!pf.ok) {
         if (pf.error === "cooldown" || pf.status === 405 || pf.status === 429) {

@@ -1,1 +1,39 @@
-{"config":{"DOMAIN":{"default":"https://www.zongheng.com","mode":"select","title":"Domain","values":["https://www.zongheng.com"]},"MIRRORS":{"default":"","format":"text","mode":"input","title":"Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"}},"metadata":{"author":"MuseAi","description":"Zongheng (纵横中文网) — đọc truyện chữ tiếng Trung: bảng xếp hạng, tìm kiếm qua API JSON, chi tiết, mục lục đầy đủ (đánh dấu chương VIP), đọc chương thường. Chương VIP chỉ báo rõ cần mua trên web, không lấy được nội dung. Port từ zongheng v4 của hajljnopera (ref: hajljnopera).","encrypt":false,"language":"javascript","locale":"zh_CN","name":"Zongheng","regexp":"https?://(www\\.zongheng\\.com/detail/\\d+|book\\.zongheng\\.com/book/\\d+\\.html|huayu\\.zongheng\\.com/book/\\d+\\.html)","source":"https://www.zongheng.com","type":"chinese_novel","version":1},"script":{"book":"book.js","chap":"chap.js","detail":"detail.js","home":"home.js","search":"search.js","toc":"toc.js"}}
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://www.zongheng.com",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://www.zongheng.com"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "MuseAi",
+    "description": "Zongheng (纵横中文网) — đọc truyện chữ tiếng Trung: bảng xếp hạng, tìm kiếm qua API JSON, chi tiết, mục lục đầy đủ (đánh dấu chương VIP), đọc chương thường. v2: duyệt theo 12 thể loại + 3 bảng xếp hạng bổ sung (畅销榜/推荐票榜/打赏榜) qua API app công khai của Zongheng. Chương VIP chỉ báo rõ cần mua trên web, không lấy được nội dung. Port từ zongheng v4 của hajljnopera (ref: hajljnopera).",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "zh_CN",
+    "name": "Zongheng",
+    "regexp": "https?://(www\\.zongheng\\.com/detail/\\d+|book\\.zongheng\\.com/book/\\d+\\.html|huayu\\.zongheng\\.com/book/\\d+\\.html)",
+    "source": "https://www.zongheng.com",
+    "type": "chinese_novel",
+    "version": 2
+  },
+  "script": {
+    "book": "book.js",
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "genre": "genre.js"
+  }
+}

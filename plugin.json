@@ -8,10 +8,10 @@
       "name": "Zongheng",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://www.zongheng.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/icon.png",
-      "description": "Zongheng (纵横中文网) — đọc truyện chữ tiếng Trung: bảng xếp hạng, tìm kiếm qua API JSON, chi tiết, mục lục đầy đủ (đánh dấu chương VIP), đọc chương thường. Chương VIP chỉ báo rõ cần mua trên web, không lấy được nội dung. Port từ zongheng v4 của hajljnopera (ref: hajljnopera).",
+      "description": "Zongheng (纵横中文网) — đọc truyện chữ tiếng Trung: bảng xếp hạng, tìm kiếm qua API JSON, chi tiết, mục lục đầy đủ (đánh dấu chương VIP), đọc chương thường. v2: duyệt theo 12 thể loại + 3 bảng xếp hạng bổ sung (畅销榜/推荐票榜/打赏榜) qua API app công khai của Zongheng. Chương VIP chỉ báo rõ cần mua trên web, không lấy được nội dung. Port từ zongheng v4 của hajljnopera (ref: hajljnopera).",
       "type": "chinese_novel",
       "locale": "zh_CN"
     },

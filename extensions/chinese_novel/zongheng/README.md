@@ -1,4 +1,14 @@
-# Zongheng (纵横中文网) — v1
+# Zongheng (纵横中文网) — v2 (hybrid web + API app)
+
+- **Nguồn:** https://www.zongheng.com/ (nền tảng truyện chữ lớn chính thống của Trung Quốc)
+- **Type:** `chinese_novel`, locale `zh_CN`, tác giả `MuseAi`, encrypt `false`.
+- **Port từ:** zongheng v4 của hajljnopera (ref: hajljnopera) — xem khảo sát đầy đủ ở `~/workspace/vbook/work/ext-review/ZONGHENG-SURVEY-2026-11-11.md`.
+- **v2 hybrid (2026-11-11):** giữ nguyên đường đọc chính web v1; chỉ bổ sung
+  thể loại + 3 bảng xếp hạng từ API **công khai** của app Zongheng
+  (`api2.zongheng.com`, gọi được ẩn danh, code 200 — xem
+  `~/workspace/vbook/work/ext-review/ZONGHENG-APP-API.md`). Các endpoint
+  nội dung của app (search/books, chapter/list, chapter/so/download…)
+  đều trả 602 Unauthorized nên KHÔNG đụng vào, không bẻ chữ ký.
 
 - **Nguồn:** https://www.zongheng.com/ (nền tảng truyện chữ lớn chính thống của Trung Quốc)
 - **Type:** `chinese_novel`, locale `zh_CN`, tác giả `MuseAi`, encrypt `false`.
@@ -38,16 +48,27 @@ Viết lại: rank (parse payload `__NUXT__`), detail trang chính
   không viết `load('...')` trong comment. Thêm `book.js` (script danh
   sách dùng chung cho tab home). Không có `page.js` (mục lục 1 trang).
 
-## Chưa có trong v1 (ghi rõ, không giấu)
+## v2 hybrid — thể loại + bảng xếp hạng qua API app công khai
 
-- **Không có `genre.js`:** tham số lọc thể loại `c` của endpoint store
-  hiện bị site bỏ qua (c1/c3/c6/c9 đều trả cùng 50 truyện); trang thể
-  loại mới `/books?worksTypes=...` là Nuxt SPA, chưa tìm được API dữ
-  liệu của nó trong thời gian khảo sát. Hướng tiếp theo: soi JS bundle
-  của trang /books tìm API rồi thêm genre sau.
-- **4 bảng xếp hạng chưa có:** 24h畅销榜 (rt=3), 捧场榜 (rt=7),
-  完结榜 (rt=8), 24h更新榜 (rt=10) — chỉ nạp bằng API client-side,
-  không có trong payload SSR; cần tìm API rank riêng.
+- **Thể loại (`genre.js` mới):** `GET /api/catefine/searchConf` trả 12 thể
+  loại (全部 0, 玄幻奇幻 8101, 武侠仙侠 8102, 都市 8103, 历史 8104,
+  科幻 8105, 奇闻异事 8106, 游戏 8107, N次元 8108, 现实题材 8109,
+  体育 8110, 军事 8111); mỗi thể loại gọi `POST /api/catefine/search`
+  `{"cateFineId":N,"pageNo":1,"pageNum":20}` — 20 truyện/trang, phân trang
+  theo `hasNext`. Nếu searchConf tạm lỗi, dùng danh sách dự phòng đã kiểm
+  chứng cùng ID (ghi trong `genre.js`).
+- **Bảng xếp hạng (`book.js`, thêm nhánh `/api/rank/list`):**
+  `POST /api/rank/list {"rankType":N}` — mỗi bảng 10 mục (rankType 2 chỉ
+  6 mục; API không phân trang thật). Thêm 3 tab home: 畅销榜 (rankType 3,
+  doanh số — tương đương rt=3 24h畅销榜), 推荐票榜 (rankType 7, phiếu đề
+  cử), 打赏榜 (rankType 8, 打赏 — tương đương rt=7 捧场榜).
+- **Không thêm được (ghi rõ, không giấu):** rt=8 完结榜 và rt=10 24h更新榜
+  không có tương đương trong app API — rankType 10 trả **HTTP 500**
+  (không phải danh sách rỗng), không có bảng nào lọc theo hoàn thành hay
+  cập nhật 24h. rankType 2 cùng metric doanh số với rankType 3 nhưng chỉ
+  trả 6 mục nên không thêm tab riêng.
+
+## Chưa có trong v2 (ghi rõ, không giấu)
 - **Chương VIP không đọc được** (paywall thật của site, cần đăng nhập +
   trả tiền trên web). Extension chỉ báo rõ, không bypass.
 - **Tìm kiếm chỉ quét trang chính** (`isFromHuayu=0`); chưa tìm cả
