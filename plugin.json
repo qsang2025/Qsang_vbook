@@ -50,6 +50,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Mê Truyện Chữ Org",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu-org/plugin.zip",
+      "version": 1,
+      "source": "https://metruyenchu.org",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu-org/icon.png",
+      "description": "Mê Truyện Chữ Org — đọc truyện chữ tiếng Việt miễn phí trên metruyenchu.org (site độc lập với metruyenchu.com.vn: backend Laravel, kho truyện riêng): Tiên Hiệp, Xuyên Không, Điền Văn, Ngôn Tình... Tìm kiếm, chi tiết, mục lục và nội dung chương lấy từ HTML tĩnh.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Sáng Tác Việt APP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacvietapp/plugin.zip",
