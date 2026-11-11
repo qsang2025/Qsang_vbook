@@ -69,7 +69,10 @@ Probe live: chỉ request ẩn danh thường, ≤ 1 request / 3 giây, tuần t
   - [x] Step 0: Commit plan (commit aa122c4)
   - [x] Step 1: REQUEST.md + CONTEXT.md (commit 242a7f5)
   - [x] Step 2: Live probe bổ sung + log (work/ext-review/fanqie-probe-log.md)
-- [ ] Cụm 2 (Step 3–5)
+- [x] Cụm 2 (Step 3–5)
+  - [x] Step 3: Phân tích extension-api.md (WebView, Browser, Cookie, LocalStorage)
+  - [x] Step 4: Khảo sát dự án mã nguồn mở công khai (zwb8926, ying-ck, zhongbai2333, Legado...)
+  - [x] Step 5: Đánh giá Plan B nguồn thay thế
 - [ ] Cụm 3 (Step 6–7)
 
 ## Decisions
