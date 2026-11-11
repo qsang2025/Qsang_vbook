@@ -80,8 +80,8 @@ function coverFromImg(img) {
 // .author_box .complete (完本, neu co) + .author (tac gia),
 // .note_box .intro (mo ta). Tag = trang thai + tac gia.
 function parseGenreItem(el) {
-    var nameEl = el.select(".name a").first();
-    if (nameEl === null) nameEl = el.select("a[title]").first();
+    var nameEl = safeFirst(el.select(".name a"));
+    if (nameEl === null) nameEl = safeFirst(el.select("a[title]"));
     if (nameEl === null) return null;
     var href = nameEl.attr("href");
     if (!href) return null;
@@ -119,8 +119,8 @@ function parseDdItem(el) {
         var cand = h4Links.get(i);
         if (cleanText(cand.text())) { linkEl = cand; break; }
     }
-    if (linkEl === null) linkEl = el.select("h4 a").first();
-    if (linkEl === null) linkEl = el.select("a").first();
+    if (linkEl === null) linkEl = safeFirst(el.select("h4 a"));
+    if (linkEl === null) linkEl = safeFirst(el.select("a"));
     if (linkEl === null) return null;
     var href = linkEl.attr("href");
     if (!href) return null;

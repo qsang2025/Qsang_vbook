@@ -17,6 +17,7 @@
 // helper.js, rate-limit.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -45,7 +46,8 @@ function execute(url) {
     doc.select(".book_info > div").forEach(function (el) {
         var t = cleanText(el.text());
         if (!author && t.indexOf("作者：") === 0) {
-            author = cleanText(el.select("a").first() ? el.select("a").first().text() : t.substring(3));
+            var aEl = safeFirst(el.select("a"));
+            author = cleanText(aEl ? aEl.text() : t.substring(3));
         }
         if (!category && t.indexOf("类型：") === 0) category = t.substring(3);
         if (!words && t.indexOf("字数：") === 0) words = t.substring(3);
