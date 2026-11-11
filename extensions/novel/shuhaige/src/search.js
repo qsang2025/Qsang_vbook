@@ -21,6 +21,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -107,7 +108,7 @@ function execute(query, page) {
     if (ogName !== null) {
         var name = cleanText(ogName.attr("content"));
         if (name) {
-            var ogAuthor = doc.select('meta[property="og:novel:author"]').first();
+            var ogAuthor = safeFirst(doc.select('meta[property="og:novel:author"]'));
             var ogImg = doc.select('meta[property="og:image"]').first();
             var ogLatest = doc.select('meta[property="og:novel:latest_chapter_name"]').first();
             var ogStatus = doc.select('meta[property="og:novel:status"]').first();
@@ -139,8 +140,8 @@ function execute(query, page) {
 
     // Phan trang tim kiem: chi theo link ke that neu co, khong doan pattern.
     var next = "";
-    var nextLink = doc.select("a:contains(下一页)").first();
-    if (nextLink === null) nextLink = doc.select("a:contains(下一頁)").first();
+    var nextLink = safeFirst(doc.select("a:contains(下一页)"));
+    if (nextLink === null) nextLink = safeFirst(doc.select("a:contains(下一頁)"));
     if (nextLink !== null) {
         var href = nextLink.attr("href");
         if (href && href.indexOf("http") !== 0 && href.charAt(0) === "/") {

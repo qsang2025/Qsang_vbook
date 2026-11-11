@@ -22,6 +22,7 @@
 // helper.js vao src/.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('safe-first.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('helper.js');
@@ -39,8 +40,8 @@ function execute(url) {
 
     var name = ogContent(doc, "og:novel:book_name");
     if (!name) {
-        var h1 = doc.select("#bookinfo .booktitle h1").first();
-        if (h1 === null) h1 = doc.select("h1").first();
+        var h1 = safeFirst(doc.select("#bookinfo .booktitle h1"));
+        if (h1 === null) h1 = safeFirst(doc.select("h1"));
         if (h1 !== null) name = cleanText(h1.text());
     }
     if (!name) return Response.error("Không đọc được tên truyện: " + url);
