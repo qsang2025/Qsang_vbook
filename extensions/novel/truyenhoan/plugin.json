@@ -8,7 +8,7 @@
     "regexp": "^https?://(www\\.)?(truyenhoan\\.com|wetruyen\\.com)/([A-Za-z0-9\\-_]+\\.\\d+/?|[A-Za-z0-9\\-_]+/chuong-\\d+\\.html)$",
     "source": "https://truyenhoan.com",
     "type": "novel",
-    "version": 5
+    "version": 6
   },
   "config": {
     "DOMAIN": {
