@@ -5,14 +5,49 @@
 //   2. GET duong dan do tra JSON {"status":200,"data":{"content":
 //      "<p data-limit=...>...</p>..."}} — noi dung la HTML don thuan,
 //      KHONG ma hoa (khac xtruyen), khong can WebView.
-//   3. Trong content co chen dong quang cao/watermark cua site (vd.
-//      "原文&来~自于塔读小~说APP...") — nhan dien bang chu "塔读"
-//      (trong van truyen khong bao gio xuat hien) va loai bo.
+//   3. Trong content co chen dong quang cao/watermark cua site —
+//      cac doan <p> ngan dung rieng, vd. "原文&来~自于塔读小~说APP",
+//      "首发&：塔>-读小说", "原文来自于塔&读小说~&",
+//      "站点：塔^读小说,欢迎下载-^". Dang goc chua "塔读" (trong
+//      van truyen khong bao gio xuat hien); bien the chen 0-3 ky
+//      tu khong phai chu Han giua 塔 va 读 (vd. 塔&读, 塔^读,
+//      塔>-读). Ham isWatermark chi xoa doan ngan (<= 40 ky tu)
+//      khop mau watermark — doan truyen that khong khop.
 // Ten chuong lay tu <title> trang chuong, dang
 // "TenTruyen_第1章 ..._TheLoai_TacGia_小说阅读页 - 塔读小说网".
 load('config.js');
 load('rate-limit.js');
 load('safe-first.js');
+
+// Tra true neu doan van la dong quang cao/watermark cua Tadu.
+// Chi ap dung cho doan ngan (<= 40 ky tu sau trim): cac dong
+// quang cao deu ngan va dung rieng; doan truyen that dai hon
+// nhieu va khong chua cac cum quang cao nay.
+function isWatermark(t) {
+    if (!t) return false;
+    // Dang goc chua "塔读" — xoa bat ke do dai (nhu v1). Chu y:
+    // dong quang cao cuoi chuong dai toi 59 ky tu ("塔读小~。>说
+    // —*.—免费*无广>告无*>弹窗，还>-.*能跟书~友们一起互>@动。")
+    // cung chua "塔读" nguyen ven, nen phai kiem tra truoc khi
+    // gioi han do dai o duoi.
+    if (t.indexOf("塔读") !== -1) return true;
+    if (t.length > 40) return false;
+    // Ten site bi chen ky tu (ky tu khong phai chu Han) giua 塔
+    // va 读, kem "小说" hoac cum quang cao — vd. 塔&读小说,
+    // 塔^读小说, 塔>-读小说. Yeu cau kem cum quang cao de khong
+    // xoa nham cau truyen that nhu "塔里传来读书声".
+    if (/塔[^\u4e00-\u9fff]{0,3}读/.test(t)) {
+        if (t.indexOf("小说") !== -1) return true;
+        if (t.indexOf("首发") !== -1) return true;
+        if (t.indexOf("原文来自于") !== -1) return true;
+        if (t.indexOf("站点") !== -1) return true;
+    }
+    // Cum quang cao dung rieng trong doan ngan.
+    if (t.indexOf("首发") !== -1) return true;
+    if (t.indexOf("原文来自于") !== -1) return true;
+    if (t.indexOf("站点：") !== -1) return true;
+    return false;
+}
 
 function execute(url) {
     url = toWww(url);
@@ -45,7 +80,7 @@ function execute(url) {
         var p = paras.get(i);
         var t = cleanText(p.text());
         if (!t) continue;
-        if (t.indexOf("塔读") !== -1) continue;
+        if (isWatermark(t)) continue;
         kept.push("<p>" + p.html().replace(/ data-limit="[^"]*"/g, "") + "</p>");
     }
     if (kept.length === 0) return Response.error("Không đọc được nội dung chương.");
