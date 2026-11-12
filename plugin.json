@@ -5,6 +5,17 @@
   },
   "data": [
     {
+      "name": "QuanBen",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/quanben/plugin.zip",
+      "version": 1,
+      "source": "https://quanben5.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/quanben/icon.png",
+      "description": "QuanBen — đọc truyện chữ tiếng Trung miễn phí (toàn bản, 3.800+ chương/truyện dài). Mặc định chạy trên quanben5.com: từ máy thật, quanben.io trả 403 + trang mặc định CentOS (đã kiểm chứng 2026-11-12) trong khi quanben5.com chạy bình thường; quanben.io vẫn để trong cài đặt DOMAIN cho máy nào mở được. Mục lục tĩnh đầy đủ ở xiaoshuo.html (không cần JSONP), tìm kiếm qua JSONP công khai của site, 16 thể loại. Port từ bản hajljnopera v3 (mã nguồn mở, không mã hóa) + viết lại theo hợp đồng vBook hiện tại; bản duongden v5 bị mã hóa (encrypt: true) nên không dùng được code của nó.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Zongheng",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/plugin.zip",
