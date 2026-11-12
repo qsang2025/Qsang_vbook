@@ -182,6 +182,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyenDich.AI",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyendich/plugin.zip",
+      "version": 1,
+      "source": "https://truyendich.space",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyendich/icon.png",
+      "description": "Đọc truyện dịch AI & Convert trên TruyenDich.AI. Port từ bản v5 của hieu05 (fork yae-miko-313); domain mặc định truyendich.space (.store redirect sang .space, .ai sang .fit).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyện Full",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/plugin.zip",
