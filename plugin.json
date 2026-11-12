@@ -117,6 +117,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Mê Đọc Truyện",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/medoctruyen/plugin.zip",
+      "version": 1,
+      "source": "https://medoctruyen.vn",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/medoctruyen/icon.png",
+      "description": "Mê Đọc Truyện — đọc truyện chữ tiếng Việt trên medoctruyen.vn (tiên hiệp, huyền huyễn, đô thị...). Tìm kiếm qua /browse?q=, 10 truyện/trang, mục lục 24 chương/trang. Chương chỉ đọc được bản xem trước khi chưa đăng nhập (site khóa nội dung đầy đủ sau cổng đăng nhập); có thể dán cookie phiên của bạn vào cấu hình COOKIE để đọc đủ chương (chưa kiểm chứng). Port mới từ khảo sát site (2 base fork Ivan1hai v5 và kychi v1 đều mã hóa, không dùng được làm code).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Mê Truyện Chữ",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu/plugin.zip",
