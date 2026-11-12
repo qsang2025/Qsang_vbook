@@ -204,6 +204,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Web Truyện Dịch",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/webtruyendich/plugin.zip",
+      "version": 1,
+      "source": "https://webtruyendich.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/webtruyendich/icon.png",
+      "description": "Web Truyện Dịch — đọc truyện dịch tiên hiệp, huyền huyễn (bản dịch Vietphrase). Tìm kiếm + danh sách qua API /api/search-novels của site; thể loại đọc từ trang HTML của site vì API bỏ qua tham số genre (đã kiểm chứng 2026-11-12). Mục lục đầy đủ qua API /api/novels/{id}/chapters (1.814 chương/1 lần gọi, mẫu Cẩu Tại Võ Đạo Thế Giới Thành Thánh). Trang chương có Cloudflare challenge — nếu máy bị chặn, mở truyện trong trình duyệt của app một lần để qua xác minh rồi đọc lại. Port từ bản kychi v2 (mã nguồn mở) + viết lại selector, pacing và xử lý lỗi theo hợp đồng vBook hiện tại.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Wetruyen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wetruyen/plugin.zip",
