@@ -5,6 +5,17 @@
   },
   "data": [
     {
+      "name": "17k",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/17k/plugin.zip",
+      "version": 1,
+      "source": "https://www.17k.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/17k/icon.png",
+      "description": "17k (17K小说网) — đọc truyện chữ tiếng Trung: 14 thể loại, bảng xếp hạng, chi tiết, mục lục đầy đủ trong 1 trang, đọc chương miễn phí (HTML thuần). CHỈ đọc chương miễn phí — chương VIP trả lỗi rõ ràng, không mở khóa. KHÔNG có tìm kiếm: API tìm kiếm cũ của site đã chết (61000 '请升级版本') và form web search.17k.com bị tường lửa Alibaba chặn cả trên VM lẫn máy thật. Port từ 17k v3 của hajljnopera (ref: vbook-ext_hajljnopera).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "alicesw",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/alicesw/plugin.zip",
