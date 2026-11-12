@@ -16,6 +16,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Tadu",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tadu/plugin.zip",
+      "version": 1,
+      "source": "https://www.tadu.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tadu/icon.png",
+      "description": "Tadu (塔读小说网) — đọc truyện chữ tiếng Trung: duyệt theo 14 thể loại, tìm kiếm, chi tiết, mục lục đầy đủ, đọc chương qua API nội dung của site (JSON, không mã hoá). Port từ Tadu v2 của Nhocconsr (ref: lethituyen).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Zongheng",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/plugin.zip",
