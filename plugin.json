@@ -16,6 +16,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "52书库",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/52shuku/plugin.zip",
+      "version": 1,
+      "source": "https://www.52shuku.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/52shuku/icon.png",
+      "description": "52书库 — đọc truyện chữ tiếng Trung trên 52shuku.net (chủ yếu truyện hoàn thành). Chương đọc đủ, không cần đăng nhập. Lưu ý: site phân trang toàn bộ văn bản truyện (mục lục là danh sách trang '第N页', không phải tên chương); tìm kiếm hoạt động nhưng không phân trang (chỉ 20 kết quả đầu). Port từ 52shuku v12 của Moleys (fork trên đĩa, đọc được, không mã hóa — bản BaoBao666888 thì mã hóa, không dùng được làm code), viết lại hoàn toàn theo hợp đồng hiện tại — base dùng let/const/arrow function, return null, không pacing, không có search.js.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "alicesw",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/alicesw/plugin.zip",
