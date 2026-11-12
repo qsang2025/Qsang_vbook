@@ -5,6 +5,18 @@
   },
   "data": [
     {
+      "name": "alicesw",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/alicesw/plugin.zip",
+      "version": 1,
+      "source": "https://www.alicesw.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/alicesw/icon.png",
+      "description": "alicesw (爱丽丝书屋) — đọc truyện chữ tiếng Trung: 33 thể loại, bảng xếp hạng ngày/tuần/tháng/tổng, tìm kiếm, chi tiết, mục lục đầy đủ trong 1 trang, đọc chương HTML thuần, bình luận. Port từ alicesw v5 của hieu05 (ref: yae-miko-313). Lưu ý: site chỉ trả nội dung cho UA mobile.",
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "nsfw": true
+    },
+    {
       "name": "QuanBen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/quanben/plugin.zip",
