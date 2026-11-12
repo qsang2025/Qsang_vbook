@@ -35,8 +35,9 @@ function execute(url) {
     if (!json || !json.html) return Response.error("Máy chủ không trả danh sách chương");
     var data = [];
     chapterLinks(json.html).forEach(function (e) {
+        // Vá từ bản AG: thiếu title thì lấy text làm tên chương.
         data.push({
-            name: e.attr("title").replace(/\s*-\s*Cập nhật:.*$/, ""),
+            name: (e.attr("title") || e.text()).replace(/\s*-\s*Cập nhật:.*$/, ""),
             url: e.attr("href"),
             host: BASE_URL
         });

@@ -28,15 +28,22 @@ function execute(url) {
     // Khach chi doc duoc cac chuong dau; server giai thich ly do trong `reason`.
     if (!res.ok) return Response.error((payload && payload.reason) || "Không tải được nội dung chương (HTTP " + res.status + ")");
     if (!payload || !payload.d || !payload.k) return Response.error("Nội dung chương chưa sẵn sàng");
-    return Response.success(xorDecode(payload.d, payload.k).replace(/<img[^>]*>/gi, ""));
+    // Vá từ bản AG: giải mã lỗi thì báo rõ thay vì throw.
+    var decrypted = xorDecode(payload.d, payload.k);
+    if (!decrypted) return Response.error("Không thể giải mã nội dung chương");
+    return Response.success(decrypted.replace(/<img[^>]*>/gi, ""));
 }
 
 function xorDecode(data, key) {
-    var words = CryptoJS.enc.Base64.parse(data);
-    for (var i = 0; i < words.sigBytes; i++) {
-        var shift = 24 - (i % 4) * 8;
-        var k = key.charCodeAt(i % key.length) & 0xff;
-        words.words[i >>> 2] ^= k << shift;
+    try {
+        var words = CryptoJS.enc.Base64.parse(data);
+        for (var i = 0; i < words.sigBytes; i++) {
+            var shift = 24 - (i % 4) * 8;
+            var k = key.charCodeAt(i % key.length) & 0xff;
+            words.words[i >>> 2] ^= k << shift;
+        }
+        return CryptoJS.enc.Utf8.stringify(words);
+    } catch (e) {
+        return "";
     }
-    return CryptoJS.enc.Utf8.stringify(words);
 }

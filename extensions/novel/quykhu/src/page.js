@@ -24,8 +24,10 @@ function execute(url) {
     var size = links.size();
     if (!/\d+(\.html)?$/.test(first)) return Response.success(data);
     var tpl = first.replace(/\d+(\.html)?$/, "{n}$1");
+    // Vá từ bản AG: thiếu total thì ước lượng bằng số trang × cỡ trang.
+    var total = json.total || (json.lastPage * size);
     for (var i = 2; i <= json.lastPage; i++) {
-        data.push(endpoint + "?page=" + i + "&size=" + size + "&total=" + json.total + "&tpl=" + encodeURIComponent(tpl));
+        data.push(endpoint + "?page=" + i + "&size=" + size + "&total=" + total + "&tpl=" + encodeURIComponent(tpl));
     }
     return Response.success(data);
 }
