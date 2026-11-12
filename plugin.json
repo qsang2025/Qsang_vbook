@@ -149,6 +149,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Truyen247",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyen247/plugin.zip",
+      "version": 1,
+      "source": "https://truyen247.pro",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyen247/icon.png",
+      "description": "Truyen247 — đọc truyện chữ tiếng Việt miễn phí trên truyen247.pro (fanfiction, ngôn tình, đam mỹ, truyện teen...). Copy từ mẫu AzTruyen v2 (cùng giao diện; site từng tên là AZTruyen.TOP, kho truyện RIÊNG). LƯU Ý: chức năng tìm kiếm của chính site hiện đang lỗi (trả trang lỗi với mọi từ khóa, đã kiểm chứng 2026-11-12) nên extension không có tìm kiếm; hãy duyệt bằng Trang chủ / Thể loại. Truyện rất dài có thể chỉ liệt kê 200 chương mới nhất trong mục lục (giới hạn đã kiểm chứng trên aztruyen.top, cùng mẫu).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenC",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc/plugin.zip",
