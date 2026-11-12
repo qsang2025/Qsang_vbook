@@ -194,6 +194,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Truyen4u",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyen4u/plugin.zip",
+      "version": 1,
+      "source": "https://truyen4u.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyen4u/icon.png",
+      "description": "Truyen4u — đọc truyện chữ tiếng Việt miễn phí trên truyen4u.com (fanfiction, ngôn tình, đam mỹ, truyện teen...). Port từ AzTruyen v2 (cùng mẫu giao diện). Tìm kiếm qua /tim-kiem/<từ khóa> (kết quả khớp mờ theo từ khóa, 20 truyện/trang). Chương có thể đặt slug tự do (không chỉ chuong-/part-). Truyện rất dài có thể chỉ liệt kê 200 chương trong mục lục.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenC",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc/plugin.zip",
