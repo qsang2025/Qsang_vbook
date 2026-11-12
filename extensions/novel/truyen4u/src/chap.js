@@ -8,6 +8,9 @@
 // id="chapter" (khong phai div noi dung; dung nham selector se lay
 // nham tieu de thay cho noi dung), du phong tu <title> (phan sau dau
 // " - " cuoi cung). Tra ve HTML noi dung + tieu de chuong (data2).
+// Chuong that co the rat ngan (oneshot 1 doan "Helu") nen chi bao loi
+// khi hoan toan khong co doan van ban nao, khong dung nguong 20 ky tu
+// nhu AzTruyen.
 //
 // Load: config.js, config-helpers.js, fetch-helpers.js, rate-limit.js,
 // helper.js (theo thu tu nay — xem helper.js).
@@ -42,6 +45,13 @@ function execute(url) {
     content.select("script, style, iframe, ins, .ads, .quang-cao").remove();
     var html = content.html() || "";
     var text = cleanText(content.text());
-    if (!html || text.length < 20) return Response.error("Nội dung chương trống: " + chapUrl);
+    // Chuong that co the rat ngan (VD oneshot 1 chuong chi co 1 doan
+    // "Helu", 4 ky tu) nen KHONG dung nguong 20 ky tu nhu AzTruyen;
+    // chi bao loi khi hoan toan khong co doan van ban nao.
+    var hasPara = false;
+    content.select("p").forEach(function (el) {
+        if (cleanText(el.text())) hasPara = true;
+    });
+    if (!html || !text || !hasPara) return Response.error("Nội dung chương trống: " + chapUrl);
     return Response.success(html, title);
 }
