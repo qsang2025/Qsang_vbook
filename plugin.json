@@ -73,6 +73,17 @@
       "nsfw": true
     },
     {
+      "name": "AkayTruyen",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/akaytruyen/plugin.zip",
+      "version": 1,
+      "source": "https://akaytruyen.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/akaytruyen/icon.png",
+      "description": "AkayTruyen — đọc truyện chữ tiếng Việt trên akaytruyen.com (truyện sáng tác của AkayHau và các tác giả khác). Chương đọc đủ, không cần đăng nhập. Lưu ý: tìm kiếm của site chỉ trả kết quả khi gõ có dấu (vd \"con đường\", không phải \"con duong\"). Port từ AkayTruyen v3 của Ivan1hai (fork trên đĩa), viết lại hoàn toàn theo hợp đồng hiện tại — base dùng let/arrow function và fetch không pacing, chỉ tham khảo endpoint + selector.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "App Truyện Chữ",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/apptruyenchu/plugin.zip",
