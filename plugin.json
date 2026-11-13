@@ -271,6 +271,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Tiên Vực",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tienvuc/plugin.zip",
+      "version": 1,
+      "source": "https://tienvuc.blog",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tienvuc/icon.png",
+      "description": "Đọc truyện dịch online miễn phí trên tienvuc.blog (Tiên Vực) — đọc đủ chương miễn phí, không cần đăng nhập. Port từ kychi tienvuc v16 (fork trên đĩa, src đọc được), viết lại theo quy tắc nhà. LƯU Ý: chương VIP (đánh dấu [VIP], cần mua bằng xu) trả lỗi tiếng Việt rõ ràng, không mở khóa; mirror tienvuc.me cùng nội dung. Mục lục đủ trong 1 gọi API (Đế Bá 4.941 chương).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyen247",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyen247/plugin.zip",
