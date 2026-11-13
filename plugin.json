@@ -61,6 +61,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Trxs",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/trxs/plugin.zip",
+      "version": 1,
+      "source": "https://trxs.cc",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/trxs/icon.png",
+      "description": "Truyen dong nhan (同人小说) tieng Trung tren trxs.cc — doc du, khong can dang nhap. Port tu alexsonxxx trxscc v1 (ghi cong trong README); viet lai theo quy tac nha Qsang_vbook (GBK, pacing, mirror www.trxs.cc). Tim kiem qua WebView, site gioi han 1 lan tim / 60 giay.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Zongheng",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/plugin.zip",
