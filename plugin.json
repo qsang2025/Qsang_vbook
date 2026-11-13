@@ -249,6 +249,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Tang Thu Vien",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tangthuvien/plugin.zip",
+      "version": 1,
+      "source": "https://tangthuvien.org",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tangthuvien/icon.png",
+      "description": "Đọc truyện chữ tiên hiệp miễn phí trên Tàng Thư Viện (tangthuvien.org). Nội dung chương đầy đủ, không cần đăng nhập. Cổng đọc: tangthuvien.org — tangthuvien.vn không dùng được (DNS sinkhole). Port mới từ khảo sát site (base alexsonxxx tangthuvien v1 đã mã hoá src, không dùng được code).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TiemtruyenchuVIP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tiemtruyenchu_vip/plugin.zip",
