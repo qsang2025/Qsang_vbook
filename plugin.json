@@ -315,6 +315,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyenChu",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://truyenchu.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenchu/icon.png",
+      "description": "Đọc truyện chữ online miễn phí trên truyenchu.net (TruyenChu) — đọc đủ chương, không cần đăng nhập. Port từ MeoU truyenchu v9 (fork trên đĩa, src đọc được) — base đúng phần lớn (site vẫn là Madara WP-Manga): danh sách .page-item-detail, chi tiết .summary_image/.author-content/.genres-content/.post-status/.manga-excerpt, chương .reading-content .text-left đều còn sống. SỬA 1 lỗi ở base: toc.js POST ajax/chapters/ không body thì site trả 400 — phải gửi body manga=<id> (id từ #manga-chapters-holder[data-id]); TOC trả đủ 1 lần, không phân trang (2141 chương Quang Âm Chi Ngoại, 1992 chương Mục Thần Ký), không có page.js. Chương VIP (nếu có) báo lỗi tiếng Việt, không mở khóa. LƯU Ý: chỉ dùng truyenchu.net — truyenchu.vn là DNS sinkhole, không đưa vào mirror.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenDich.AI",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyendich/plugin.zip",
