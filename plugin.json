@@ -337,6 +337,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyenNow",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyennow/plugin.zip",
+      "version": 1,
+      "source": "https://longthieu.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyennow/icon.png",
+      "description": "Đọc truyện chữ sáng tác gốc miễn phí trên longthieu.com (TruyenNow / Long Thiếu) — đọc đủ chương, không cần đăng nhập. Port từ mizhm truyennow v1 (fork trên đĩa, src đọc được) — base đã chết hoàn toàn (site đổi domain truyen.now → longthieu.com và đổi giao diện sang Tailwind, mọi selector cũ đều trả 0) nên viết lại toàn bộ theo hợp đồng hiện tại. Cơ chế: danh sách thẻ a.group (24 mục/trang), thể loại từ /the-loai (lọc bỏ mục 18+), tìm kiếm GET /tim-kiem?q=, mục lục đủ 1 lần qua API /api/chapters/<slug>, chương giải mã từ biến _ed (base64 + URL-encode, không khóa) trong trang /doc/<n>. Trang /doc/ chặn UA bot (curl không UA trả 403, UA trình duyệt trả 200) nên toàn bộ request trên host này dùng UA desktop Chrome cố định (ngoại lệ có bằng chứng, như Tadu). Không có chương VIP/login trên site (0 marker vip/lock).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenTV",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tvtruyen/plugin.zip",
