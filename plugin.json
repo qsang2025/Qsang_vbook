@@ -139,6 +139,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "DocLN",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/docln/plugin.zip",
+      "version": 1,
+      "source": "https://docln.sbs",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/docln/icon.png",
+      "description": "Doc truyen Light Novel tieng Viet tren docln.sbs (Cong Light Novel, he Hako) — doc du, khong can dang nhap. Build moi tu khao sat site (base Darkrai9x hako v13 va Ivan1hai DocLN v1 deu ma hoa, chi dung metadata tham khao); chuong giai ma xor_shuffle tu JS cong khai cua site. The loai doc live tu bo loc /danh-sach (60 the loai).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "La Cà Truyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
