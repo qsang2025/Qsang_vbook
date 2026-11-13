@@ -304,6 +304,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyenTV",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tvtruyen/plugin.zip",
+      "version": 1,
+      "source": "https://www.tvtruyen.space",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tvtruyen/icon.png",
+      "description": "Đọc truyện chữ online miễn phí trên tvtruyen.space (TruyenTV) — đọc đủ chương, không cần đăng nhập. Port từ kychi truyentv v7 (fork trên đĩa, src đọc được). LƯU Ý: site hay đổi domain — tvtruyen.cc 301 về https://www.tvtruyen.space, tvtruyen.vip cũng 301 về .space (kiểm chứng 2026-11-13); tvtruyen.com 403, tvtruyen.net/.org/.xyz/.me chết — mặc định dùng www.tvtruyen.space, đổi trong cài đặt nếu site đổi domain tiếp. Mục lục phân trang 50 chương/trang (?page=N). Chương đọc đủ trong #chapter-content, strip dòng quảng bá của site (.signature). Bình luận qua API /api/comments (QQ Comment Service, model comics).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyện Full",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenfull/plugin.zip",
