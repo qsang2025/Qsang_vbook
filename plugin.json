@@ -414,6 +414,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "ZTruyen",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/ztruyen/plugin.zip",
+      "version": 1,
+      "source": "https://ztruyen.vn",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/ztruyen/icon.png",
+      "description": "Đọc truyện chữ online miễn phí trên ztruyen.vn (ZTruyen) — đọc đủ chương, không cần đăng nhập. Port từ lethituyen ztruyen v5 (fork trên đĩa, src đọc được) — NHƯNG base đã lỗi thời hoàn toàn: site đổi sang WordPress, URL cũ /truyen/<slug>-<id> và selector cũ đều chết (404), extension viết mới từ khảo sát site 2026-11-13. Mục lục qua AJAX theme_get_chaps (52 chương/trang); chương đọc đủ trong #chap-content-box; chương VIP (nếu có) báo lỗi tiếng Việt, không mở khóa. LƯU Ý: phân trang archive HTML chỉ chạy khi chuyên mục có >10 truyện (vd. /hien-dai/page/2/ 200, 10 truyện khác; /tien-hiep/ chỉ có 1 truyện nên /page/2/ 404 là đúng).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "七猫免费小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/qimao/plugin.zip",
