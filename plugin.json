@@ -481,6 +481,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Truyện Hoàng Dung",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoangdung/plugin.zip",
+      "version": 1,
+      "source": "https://truyenhoangdung.xyz",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoangdung/icon.png",
+      "description": "Đọc truyện chữ tiếng Việt miễn phí trên truyenhoangdung.xyz (Truyện Hoàng Dung) — đọc đủ chương, không cần đăng nhập. Port từ TamChau truyenhoangdung v3 (fork trên đĩa, src đọc được) nhưng viết lại theo hợp đồng hiện tại + quy tắc nhà: thêm genre.js (base thiếu) và gen.js dùng chung cho mọi danh sách, mục lục đủ 1 lần trên trang chi tiết (Cổ Chân Nhân 3.813 chương), phân trang theo offset (25/trang, 50/trang cho tìm kiếm), tìm kiếm chạy cả có dấu và không dấu. Không đưa tab \"Truyện trả phí\" vào trang chủ; chương trả phí/bị khóa chỉ báo lỗi tiếng Việt, không mở khóa. Nội dung chương thật + đủ (Âm Dương Quỷ Đạo ch.1: 100 đoạn / 14.612 ký tự; Cổ Chân Nhân ch.1: 16.941 ký tự, mở đầu \"Phương Nguyên, ngoan ngoãn giao ra Xuân Thu Thiền...\").",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyện Mơ",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenmo/plugin.zip",
