@@ -570,6 +570,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Xa Lộ Sách",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xalosach/plugin.zip",
+      "version": 1,
+      "source": "https://xalosach.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xalosach/icon.png",
+      "description": "Đọc truyện chữ tiếng Việt miễn phí trên xalosach.com (Xa Lộ Sách) — đọc đủ chương, không cần đăng nhập. Port từ Ivan1hai xalosach_ok v3 (registry-only, zip tải từ GitHub raw, src đọc được) nhưng viết lại theo hợp đồng hiện tại + quy tắc nhà: sửa phân trang danh sách/the-loai (tham số ?page=N bị site bỏ qua, trang sau dùng /P{N}/), gộp home-content + genre-content thành gen.js, genre.js đọc live 83 thể loại từ trang chủ, mục lục 100 chương/trang qua ?P=N. Chương lấy qua API riêng của site (POST 5xu.g5manhua.com), fallback preview trên web; chương khóa báo lỗi tiếng Việt rõ ràng, không mở khóa. Nội dung chương thật + đủ (mẫu ch.1: mở đầu \"Đau, đau quá!\").",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "XTruyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xtruyen/plugin.zip",
