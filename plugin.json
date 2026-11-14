@@ -386,6 +386,18 @@
       "locale": "vi_VN"
     },
     {
+      "name": "ReaderNovel",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/readernovel/plugin.zip",
+      "version": 1,
+      "source": "https://www.readernovel.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/readernovel/icon.png",
+      "description": "ReaderNovel — light novel tiếng Anh đọc miễn phí trên readernovel.net, không cần đăng nhập, không khóa VIP. Viết lại gần như toàn bộ từ khảo sát site (base Evamirion v1 tối giản, chap.js gốc sai cú pháp). Thể loại Adult/Ecchi/Erotic/Lolicon/Mature/Smut đã lọc khỏi danh sách thể loại. Nguồn gắn cờ 18+.",
+      "type": "novel",
+      "locale": "en_US",
+      "nsfw": true
+    },
+    {
       "name": "Sách Hay Online",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sachhayonline/plugin.zip",
