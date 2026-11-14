@@ -33,7 +33,9 @@ function execute(url) {
     for (var i = 0; i < paras.size(); i++) {
         var h = paras.get(i).html();
         h = h.replace(/^\s+|\s+$/g, "");
-        if (h) out.push("<p>" + h + "</p>");
+        // Doan chi co khoang trang / &nbsp; (vd. doan cuoi chuong) thi bo qua.
+        var textOnly = h.replace(/&nbsp;/g, "").replace(/<[^>]+>/g, "").replace(/^\s+|\s+$/g, "");
+        if (textOnly) out.push("<p>" + h + "</p>");
     }
     if (out.length === 0) return Response.error("Không tải được nội dung chương (có thể sách yêu cầu đăng nhập).");
 
