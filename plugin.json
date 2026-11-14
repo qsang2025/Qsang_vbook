@@ -150,6 +150,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "微風小說網",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/wfxs/plugin.zip",
+      "version": 1,
+      "source": "https://www.wfxs.tw",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/wfxs/icon.png",
+      "description": "微風小說網 (wfxs.tw) — đọc truyện chữ tiếng Trung: 10 thể loại, bảng xếp hạng, tìm kiếm, chi tiết, mục lục đầy đủ một trang, đọc chương đủ, không cần đăng nhập. Viết lại hoàn toàn theo hợp đồng hiện tại từ base longvuu v4 (ref: longvuu) — base dùng arrow function/template literal/return null, không pacing, selector sai, source.js tải 5 trang/lần.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "NiACG",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/niacg/plugin.zip",
