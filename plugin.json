@@ -503,6 +503,18 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyệnHD",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhdc/plugin.zip",
+      "version": 1,
+      "source": "https://truyenhdc.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhdc/icon.png",
+      "description": "Đọc truyện chữ tiếng Việt miễn phí trên truyenhdc.com (TruyệnHD) — đọc đủ chương, không cần đăng nhập. Port từ Darkrai9x truyenhd v15 (fork trên đĩa, src đọc được) nhưng viết lại theo hợp đồng hiện tại + quy tắc nhà: thêm search.js (base thiếu) và gen.js dùng chung cho danh sách SSR + thể loại qua API JSON của site (trang thể loại không có SSR); mục lục phân trang 50 chương/trang qua POST admin-ajax; chương VIP đánh dấu pay/lock, không mở khóa. Nội dung chương thật + đủ (mẫu ch.1: 2.917 ký tự, mở đầu \"Lạo xạo. Nhật Dạ thận trọng rẽ đám cỏ dại...\"). Site có nội dung 18+ nên gắn cờ nsfw.",
+      "type": "novel",
+      "locale": "vi_VN",
+      "nsfw": true
+    },
+    {
       "name": "ValvrareTeam",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/valvrareteam/plugin.zip",
