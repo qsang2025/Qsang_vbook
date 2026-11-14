@@ -328,6 +328,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Sách Hay Online",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sachhayonline/plugin.zip",
+      "version": 1,
+      "source": "https://www.sachhayonline.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sachhayonline/icon.png",
+      "description": "Sách Hay Online — đọc sách tiếng Việt online miễn phí trên sachhayonline.com (Thư Viện Sách Online). Chương đọc đủ, không cần đăng nhập. Site không có chức năng tìm kiếm (mọi endpoint tìm kiếm đều 404, không có form tìm kiếm) nên extension không có tìm kiếm; bản tải ePub/mobi/PDF không đưa vào app. Port từ sachhayonline v2 của lethituyen (fork trên đĩa, đọc được, không mã hoá), viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Sáng Tác Việt APP",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sangtacvietapp/plugin.zip",
