@@ -282,6 +282,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TrichTinhLau",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/trichtinhlau/plugin.zip",
+      "version": 1,
+      "source": "https://trichtinhlau.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/trichtinhlau/icon.png",
+      "description": "Trích Tinh Lâu - Đọc truyện chữ online miễn phí (ref: MeoU trichtinhlau v8)",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyen247",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyen247/plugin.zip",
