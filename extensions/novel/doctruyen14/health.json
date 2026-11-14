@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "url": "https://doctruyen14.biz/",
+      "pattern": "Truyện Ma"
+    },
+    {
+      "name": "Thể loại Truyện Ma",
+      "url": "https://doctruyen14.biz/truyen-ma/",
+      "pattern": "story-card"
+    },
+    {
+      "name": "Truyện mẫu",
+      "url": "https://doctruyen14.biz/tieng-go-cua-luc-3-gio-dem/",
+      "pattern": "entry-content"
+    }
+  ]
+}
