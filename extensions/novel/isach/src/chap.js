@@ -31,8 +31,12 @@ function execute(url) {
     var out = [];
     for (var i = 0; i < paras.size(); i++) {
         var h = paras.get(i).html();
-        h = h.replace(/<div id=["']dropcap["'][^>]*><span[^>]*>([^<]*)<\/span><\/div>/, "$1");
+        // Span an trong dropcap: giu lai chu cai, bo the span.
         h = h.replace(/<span class=["']hidden["']>([^<]*)<\/span>/g, "$1");
+        // Div dropcap con lai chi chua chu cai (+ khoang trang do jsoup
+        // pretty-print chen vao): thay ca div bang chu cai, an luon
+        // khoang trang 2 dau de duoc "Thang ba." chu khong phai "T hang ba.".
+        h = h.replace(/<div id=["']dropcap["'][^>]*>\s*([^<]*?)\s*<\/div>\s*/g, "$1");
         h = h.replace(/^\s+|\s+$/g, "");
         if (h) out.push("<p>" + h + "</p>");
     }
