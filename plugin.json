@@ -217,6 +217,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "iSach",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/isach/plugin.zip",
+      "version": 1,
+      "source": "https://isach.info",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/isach/icon.png",
+      "description": "iSach — đọc sách tiếng Việt online miễn phí trên isach.info (Thư Viện Online). Chương đọc đủ, không cần đăng nhập. Bản tải ePub/mobi/PDF trên web cần đăng nhập và tốn gạo nên app không mở được. Port từ iSach v3 của Darkrai9x (fork trên đĩa, đọc được, không mã hoá), viết lại hoàn toàn theo hợp đồng hiện tại; base cũ tìm mục lục bằng chuỗi có ngoặc kép trong khi site dùng nháy đơn nên luôn rơi về fallback.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "La Cà Truyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
