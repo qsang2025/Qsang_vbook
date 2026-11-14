@@ -1,0 +1,1 @@
+{"cases":[{"name":"Trang chủ","pattern":"Truyện Hay","url":"https://truyenhay.com/"},{"name":"WP API bài viết","pattern":"lay-nguoi-vo-mat","url":"https://truyenhay.com/wp-json/wp/v2/posts?per_page=1&_fields=link"},{"name":"Trang truyện mẫu","pattern":"Tủi phận 42","url":"https://truyenhay.com/tui-phan-42.html"}]}

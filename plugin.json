@@ -470,6 +470,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Truyện Hay",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhay/plugin.zip",
+      "version": 1,
+      "source": "https://truyenhay.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhay/icon.png",
+      "description": "Truyện Hay — đọc truyện ngắn tiếng Việt trên truyenhay.com (truyện ngắn một kỳ và truyện nhiều kỳ như Tủi phận). Chương đọc đủ, không cần đăng nhập. Site đổi chữ Latin thành ký tự IPA/Cyrillic giống hình trong nội dung nên extension trả lại chữ Latin thật. Port từ TruyenHayVN v4 của Darkrai9x (fork trên đĩa, đọc được, không mã hóa), viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyện Hoàn",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenhoan/plugin.zip",
