@@ -27,6 +27,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "85 Novel",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/85novel/plugin.zip",
+      "version": 1,
+      "source": "https://www.85novel.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/85novel/icon.png",
+      "description": "Truyện chữ tiếng Trung trên 85novel.com (85小說網) — đọc đủ, không cần đăng nhập. Site cảnh báo tải nhanh sẽ bị ban IP nên extension giữ 1 luồng, chờ 30 giây giữa các request — mở mục lục truyện dài sẽ hơi chậm. Tìm kiếm đôi khi bị Cloudflare chặn (thử lại sau). Port từ 85 Novel v7 của duongden (fork trên đĩa, đọc được, không mã hoá), viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "alicesw",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/alicesw/plugin.zip",
