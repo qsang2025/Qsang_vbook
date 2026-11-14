@@ -64,7 +64,9 @@ function selFirst(el, css) {
 }
 
 function storySlug(url) {
-    var m = /\/truyen\/([^\/\?#]+)/.exec(String(url || ""));
+    // Chap nhan ca URL day du lan href tuong doi khong co "/" dau
+    // (vd. "truyen/rut-kiem/chuong-305" o trang chuong moi cap nhat).
+    var m = /(?:^|\/)truyen\/([^\/\?#]+)/.exec(String(url || ""));
     return m ? m[1] : "";
 }
 
