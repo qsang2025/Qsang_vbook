@@ -227,6 +227,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Mê Đọc Truyện Chữ",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/medoctruyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://medoctruyenchu.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/medoctruyenchu/icon.png",
+      "description": "Đọc truyện chữ tiếng Việt miễn phí trên medoctruyenchu.net (Mê Đọc Truyện Chữ) — đọc đủ chương, không cần đăng nhập. Port từ Darkrai9x medoctruyenchu v3 (fork trên đĩa, src đọc được trong plugin.zip) nhưng base cũ đã chết hẳn (site đổi sang Laravel) nên viết mới hoàn toàn theo quy tắc nhà: mục lục phân trang 50 chương/trang (?page=N, có page.js), chương trong .chapter-content, tìm kiếm qua POST /ajax/search-story (cần CSRF token; POST này treo từ VM, chỉ kiểm chứng được trên máy thật). Nội dung chương thật + đủ (ch.1 Ta Có Một Toà Đạo Quan 122 đoạn / 14.057 ký tự; ch.177 cuối 422 đoạn / 61.058 ký tự). Site riêng, khác medoctruyen.vn (#23).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Mê Truyện Chữ",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/metruyenchu/plugin.zip",
