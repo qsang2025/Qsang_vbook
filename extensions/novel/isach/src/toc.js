@@ -20,8 +20,7 @@ function execute(url) {
     if (tocUrl.indexOf("?") < 0) tocUrl += "?";
     tocUrl += "&chapter=0000";
 
-    rateLimitDelay("isach.info");
-    var response = fetch(tocUrl);
+    var response = fetchPage(tocUrl);
     if (!response.ok) return Response.error("Không tải được mục lục (HTTP " + response.status + ")");
     var doc = response.html();
 

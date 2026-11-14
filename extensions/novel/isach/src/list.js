@@ -28,8 +28,7 @@ function execute(url, page) {
     if (u.indexOf("?") < 0) u += "?";
     u += "&page=" + cur;
 
-    rateLimitDelay("isach.info");
-    var response = fetch(u);
+    var response = fetchPage(u);
     if (!response.ok) return Response.error("Không tải được danh sách (HTTP " + response.status + ")");
     var doc = response.html();
 

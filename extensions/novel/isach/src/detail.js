@@ -20,8 +20,7 @@ load('safe-first.js');
 function execute(url) {
     url = url || "";
 
-    rateLimitDelay("isach.info");
-    var response = fetch(url);
+    var response = fetchPage(url);
     if (!response.ok) return Response.error("Không tải được trang truyện (HTTP " + response.status + ")");
     var doc = response.html();
     var body = safeFirst(doc.select("#motsach_content_body"));

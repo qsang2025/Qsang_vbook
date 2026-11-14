@@ -63,6 +63,43 @@ function parseMirrorList(value) {
     return list;
 }
 
+// Site phan biet User-Agent (kiem chung live 2026-11-14): UA mac dinh
+// cua runtime (mobile) bi tra ve template mobile ("# mobile" trong
+// title, CSS motsach.mobi.css) — khong co #motsach_content_body, khong
+// co div.ms_text o trang chi tiet, va endpoint tim kiem tra 404. Chi UA
+// desktop moi nhan duoc template day du (kiem chung tu VM + probe tren
+// may that). Vi vay fetchPage LUON gui UA desktop Chrome co dinh cho moi
+// request cua extension nay (ngoai le co bang chung theo quy tac nha
+// 6.10 — tien le Tadu). Site khong co Cloudflare nen khong vuong
+// chuyen cookie cf_clearance gan voi UA.
+var DESKTOP_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
+
+// fetchPage(): fetch HTML co pacing + UA desktop co dinh. Ham nay tu goi
+// rateLimitDelay nen script dung fetchPage KHONG goi rateLimitDelay
+// rieng nua. options duoc chuyen thang cho fetch (vd. queries).
+function fetchPage(url, options) {
+    if (!options) options = {};
+    try {
+        if (typeof rateLimitDelay === "function") {
+            rateLimitDelay("isach.info");
+        }
+    } catch (e) {
+    }
+    var headers = {
+        "User-Agent": DESKTOP_UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "vi-VN,vi;q=0.9",
+        "Referer": BASE_URL + "/"
+    };
+    if (options.headers) {
+        for (var key in options.headers) {
+            headers[key] = options.headers[key];
+        }
+    }
+    options.headers = headers;
+    return fetch(url, options);
+}
+
 // Ghep href tuong doi ("/story.php?..." hoac "story.php?...") thanh URL
 // tuyet doi theo BASE_URL hien tai.
 function absUrl(href) {

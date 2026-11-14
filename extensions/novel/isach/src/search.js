@@ -21,8 +21,7 @@ function execute(key, page) {
         if (isNaN(cur) || cur < 1) cur = 1;
     }
 
-    rateLimitDelay("isach.info");
-    var response = fetch(BASE_URL + "/search/story_result.php", { queries: { search: key, page: String(cur) } });
+    var response = fetchPage(BASE_URL + "/search/story_result.php", { queries: { search: key, page: String(cur) } });
     if (!response.ok) return Response.error("Không tìm được truyện (HTTP " + response.status + ")");
     var doc = response.html();
 

@@ -14,8 +14,7 @@ load('safe-first.js');
 function execute(url, page) {
     url = url || "";
 
-    rateLimitDelay("isach.info");
-    var response = fetch(url);
+    var response = fetchPage(url);
     if (!response.ok) return Response.error("Không tải được bảng xếp hạng (HTTP " + response.status + ")");
     var doc = response.html();
 
