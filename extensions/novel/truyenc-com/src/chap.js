@@ -20,6 +20,11 @@ function execute(url) {
     node.select("input, span.pages, span.current, span.extend").remove();
 
     var content = node.html();
+    // The ad slot leaves its HTML comments behind (they are siblings of the
+    // removed div, not inside it); strip them, plus leading empty <p> tags.
+    content = content.replace(/<!--[\s\S]*?-->/g, "");
+    content = content.replace(/^(<p[^>]*>\s*<\/p>\s*)+/, "");
+    content = content.replace(/^\s+/, "");
     if (!cleanText(content)) return Response.error("Chương trống");
 
     return Response.success(content, "");
