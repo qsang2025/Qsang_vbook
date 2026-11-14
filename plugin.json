@@ -717,6 +717,18 @@
       "locale": "vi_VN"
     },
     {
+      "name": "WuxiaBox",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wuxiabox/plugin.zip",
+      "version": 1,
+      "source": "https://www.wuxiabox.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wuxiabox/icon.png",
+      "description": "WuxiaBox — truyện wuxia & light novel tiếng Anh đọc miễn phí trên wuxiabox.com, không cần đăng nhập, không khóa VIP. Port từ base Moleys v1 (readwn.com), viết lại theo hợp đồng hiện hành; domain đã đổi readwn.com → wuxiabox.com. Thể loại lolicon/hentai đã lọc khỏi danh sách thể loại. Nguồn gắn cờ 18+.",
+      "type": "novel",
+      "locale": "en_US",
+      "nsfw": true
+    },
+    {
       "name": "Xa Lộ Sách",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xalosach/plugin.zip",
