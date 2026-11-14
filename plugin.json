@@ -94,6 +94,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "书本书",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shubenshu/plugin.zip",
+      "version": 1,
+      "source": "https://www.shubenshu.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shubenshu/icon.png",
+      "description": "书本书 — đọc truyện chữ tiếng Trung trên shubenshu.com. Chương đọc đủ, không cần đăng nhập. Port từ shubenshu v3 của yae-miko-313 (fork trên đĩa, đọc được, không mã hóa), viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "NiACG",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/niacg/plugin.zip",
