@@ -205,6 +205,18 @@
       "locale": "vi_VN"
     },
     {
+      "name": "MongTruyen",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/mongtruyen/plugin.zip",
+      "version": 1,
+      "source": "https://mongtruyen.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/mongtruyen/icon.png",
+      "description": "Mộng Truyện - Đọc truyện ngôn tình miễn phí (ref: hieu45666 MongTruyen v2). Site có nội dung 18+ và chương VIP — chương VIP không mở khóa.",
+      "type": "novel",
+      "locale": "vi_VN",
+      "nsfw": true
+    },
+    {
       "name": "QuyKhu",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/quykhu/plugin.zip",
