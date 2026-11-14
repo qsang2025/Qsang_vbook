@@ -146,12 +146,23 @@ function extractXsrfToken(html) {
 }
 
 // Parse danh sach truyen tu trang /list/... (20 muc/trang).
-// Khoi muc la div.flex.mt-2 (anh bia + div.flex.flex-col.gap-2 noi dung).
-// Anh bia KHONG nam trong gap-2 (base cu lay img trong gap-2 nen luon
-// ra NO_COVER) — lay tu khoi ngoai.
+// LUU Y BO CUC DOI THEO UA (kiem chung 2026-11-14): tu VM (desktop) khoi
+// muc la div.flex.mt-2 chua anh bia + div.flex.flex-col.gap-2 noi dung;
+// tu may that (runtime) khoi muc la div.flex.flex-col.gap-2 boc ca hang
+// (anh bia + div.flex.flex-col.gap-1 noi dung). Vi vay lay ca hai
+// selector, gop theo link, uu tien muc co anh bia.
 function parseBookList(doc) {
+    var byLink = {};
+    var order = [];
+    collectBookBlocks(doc.select("div.flex.flex-col.gap-2"), byLink, order);
+    collectBookBlocks(doc.select("div.flex.mt-2"), byLink, order);
     var data = [];
-    var items = doc.select("div.flex.mt-2");
+    var i = 0;
+    for (i = 0; i < order.length; i++) data.push(byLink[order[i]]);
+    return data;
+}
+
+function collectBookBlocks(items, byLink, order) {
     var i = 0;
     for (i = 0; i < items.size(); i++) {
         var e = items.get(i);
@@ -171,10 +182,35 @@ function parseBookList(doc) {
         var h3El = safeFirst(titleA.select("h3"));
         var title = h3El ? cleanText(h3El.text()) : "";
         if (!title) continue;
+        var link = absUrl(href);
+        var author = "";
         var authorEl = safeFirst(e.select(".ms-2"));
-        var author = authorEl ? cleanText(authorEl.text()).replace(/著$/, "").trim() : "";
-        var metaEl = safeFirst(e.select(".text-base-700"));
-        var meta = metaEl ? cleanText(metaEl.text()) : "";
+        if (authorEl) {
+            author = cleanText(authorEl.text()).replace(/著$/, "").trim();
+        } else {
+            var authorDiv = safeFirst(e.select("div.flex.text-center.text-base-700"));
+            if (authorDiv) {
+                var aSpan = safeFirst(authorDiv.select("span"));
+                if (aSpan) {
+                    author = cleanText(aSpan.text()).replace(/\u270D/g, "").replace(/^[\u2014\u2013\-\u00B7\s]+/, "").trim();
+                }
+            }
+        }
+        var meta = "";
+        var status = "";
+        var metaEls = e.select(".text-base-700");
+        var mi = 0;
+        for (mi = 0; mi < metaEls.size(); mi++) {
+            var mEl = metaEls.get(mi);
+            var mText = cleanText(mEl.text());
+            if (!mText) continue;
+            if (mText.indexOf("✍") >= 0) {
+                var sSpans = mEl.select("span");
+                if (sSpans.size() > 1) status = cleanText(sSpans.get(1).text());
+                continue;
+            }
+            if (!meta) meta = mText.replace(/[\s\u2027\u00B7]+$/, "");
+        }
         var latestEl = safeFirst(e.select("a.text-primary-400"));
         var latest = latestEl ? cleanText(latestEl.text()) : "";
         var updatedEl = safeFirst(e.select(".text-base-600"));
@@ -184,19 +220,25 @@ function parseBookList(doc) {
         var desc = descEl ? cleanText(descEl.text()) : "";
         var detailParts = [];
         if (meta) detailParts.push(meta);
+        if (status && meta.indexOf(status) < 0) detailParts.push("狀態: " + status);
         if (latest) detailParts.push("最新章節: " + latest);
         if (updated) detailParts.push(updated);
-        data.push({
+        var item = {
             name: title,
-            link: absUrl(href),
+            link: link,
             cover: cover,
             description: desc,
             author: author,
             detail: detailParts.join("<br>"),
             host: BASE_URL
-        });
+        };
+        if (!byLink[link]) {
+            byLink[link] = item;
+            order.push(link);
+        } else if (!byLink[link].cover && cover) {
+            byLink[link].cover = cover;
+        }
     }
-    return data;
 }
 
 // Ket qua tim kiem dung cung bo cuc danh sach — tai su dung parseBookList.

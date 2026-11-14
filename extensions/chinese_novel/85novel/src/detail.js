@@ -89,7 +89,7 @@ function execute(url) {
     var latestUpdatedEl = safeFirst(doc.select(".flex.gap-3 .opacity-60"));
     var latestUpdated = latestUpdatedEl ? cleanText(latestUpdatedEl.text()) : "";
     var tags = [];
-    var tagEls = doc.select(".flex.flex-wrap.gap-3 span.bg-base-300");
+    var tagEls = doc.select("span.bg-base-300");
     var i = 0;
     for (i = 0; i < tagEls.size(); i++) {
         var t = cleanText(tagEls.get(i).text());
@@ -124,7 +124,8 @@ function execute(url) {
 }
 
 function getCover(doc, url) {
-    var imgEl = safeFirst(doc.select(".hero-content img"));
+    var imgEl = safeFirst(doc.select("img[src^=/cover/]"));
+    if (!imgEl) imgEl = safeFirst(doc.select(".hero-content img"));
     var cover = imgEl ? imgEl.attr("src") : "";
     if (!cover) {
         var ogEl = safeFirst(doc.select("meta[property=og:image]"));
