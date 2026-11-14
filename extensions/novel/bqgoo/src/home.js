@@ -1,4 +1,4 @@
-// home.js — cac tab trang chu cua Bqgoo (bqgoo.cc).
+// home.js — cac tab trang chu cua Bqgoo (bqgooo.cc).
 // Tab TINH, khong fetch (AGENTS.md quy tac 9): moi tab tro ve book.js
 // voi input la ten danh sach trong /api/index (hotlist / toplist /
 // uplist / addlist). book.js se goi /api/index mot lan roi lay ra

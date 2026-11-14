@@ -1,4 +1,4 @@
-// search.js — tim kiem theo tu khoa cua Bqgoo (bqgoo.cc).
+// search.js — tim kiem theo tu khoa cua Bqgoo (bqgooo.cc).
 // GET /api/search?q=<tu-khoa-url-encoded>. Tra ve
 // {data:[{id,title,author,intro}]} — vd. tim "剑来" thi 剑来 (id 1000)
 // dung dau tien. Khong co ket qua thi data rong -> tra danh sach rong,

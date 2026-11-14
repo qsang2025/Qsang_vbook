@@ -1,5 +1,5 @@
-// toc.js — muc luc cua Bqgoo (bqgoo.cc).
-// URL nhan vao la link chi tiet https://www.bqgoo.cc/shu/<id>/.
+// toc.js — muc luc cua Bqgoo (bqgooo.cc).
+// URL nhan vao la link chi tiet https://www.bqgooo.cc/shu/<id>/.
 //   GET /api/booklist?id=<id>
 // Tra ve {list:[ten chuong...]} — vd. 1985 co 7.854 muc. chapterid =
 // vi tri trong list + 1 (chuong dau tien la 1). Link chuong dang

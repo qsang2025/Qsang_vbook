@@ -209,10 +209,10 @@
       "name": "Bqgoo",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/bqgoo/plugin.zip",
-      "version": 1,
-      "source": "https://www.bqgoo.cc",
+      "version": 2,
+      "source": "https://www.bqgooo.cc",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/bqgoo/icon.png",
-      "description": "Bqgoo (bqgoo.cc) — truyện chữ giản thể miễn phí qua API JSON riêng (apibi.cc): huyền huyễn, võ hiệp, đô thị, lịch sử, võng du, khoa huyễn, nữ sinh, hoàn bản. Chương đọc miễn phí toàn văn, không khóa VIP; mục lục 7.854 chương với 夫人她马甲又轰动全城了.",
+      "description": "Bqgoo (bqgooo.cc) — truyện chữ giản thể miễn phí qua API JSON riêng (apibi.cc): huyền huyễn, võ hiệp, đô thị, lịch sử, võng du, khoa huyễn, nữ sinh, hoàn bản. Chương đọc miễn phí toàn văn, không khóa VIP; mục lục 7.854 chương với 夫人她马甲又轰动全城了. Site đã đổi domain bqgoo.cc → bqgooo.cc (domain cũ chuyển hướng 301).",
       "type": "novel",
       "locale": "zh_CN"
     },

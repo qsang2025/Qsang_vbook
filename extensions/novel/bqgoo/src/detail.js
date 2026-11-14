@@ -1,5 +1,5 @@
-// detail.js — chi tiet truyen cua Bqgoo (bqgoo.cc).
-// URL nhan vao la link chi tiet chuan https://www.bqgoo.cc/shu/<id>/
+// detail.js — chi tiet truyen cua Bqgoo (bqgooo.cc).
+// URL nhan vao la link chi tiet chuan https://www.bqgooo.cc/shu/<id>/
 // (link do search.js / book.js tra ve). Lay id roi goi API:
 //   GET /api/book?id=<id>
 // Tra ve {id,title,sortname,author,full,intro,lastchapterid,

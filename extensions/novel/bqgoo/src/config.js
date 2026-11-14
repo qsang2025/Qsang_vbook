@@ -1,10 +1,10 @@
-// config.js — cau hinh goc cua extension Bqgoo (bqgoo.cc).
+// config.js — cau hinh goc cua extension Bqgoo (bqgooo.cc).
 //
 // API JSON that o host rieng, khong phai trang web doc truyen:
 //   BASE_URL mac dinh https://apibi.cc
 //   Mirror: https://apiqu.cc, https://apige.cc (da kiem chung 200).
 // Trang web doc truyen (link truyen / chuong) dung BOOK_ORIGIN
-// https://www.bqgoo.cc; bia dung COVER_HOST https://www.bqg349.xyz.
+// https://www.bqgooo.cc; bia dung COVER_HOST https://www.bqg349.xyz.
 // Nguoi dung doi API host trong cai dat (config DOMAIN trong
 // plugin.json) thi gia tri do se override qua bien DOMAIN duoc app
 // inject. CONFIG_URL (neu co trong plugin.json) override sau cung.
@@ -22,7 +22,7 @@
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 
 var BASE_URL = "https://apibi.cc";
-var BOOK_ORIGIN = "https://www.bqgoo.cc";
+var BOOK_ORIGIN = "https://www.bqgooo.cc";
 var COVER_HOST = "https://www.bqg349.xyz";
 
 try {

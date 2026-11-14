@@ -1,4 +1,4 @@
-// chap.js — noi dung chuong cua Bqgoo (bqgoo.cc).
+// chap.js — noi dung chuong cua Bqgoo (bqgooo.cc).
 // URL chuong: /shu/<id>/<chapterid>.html (vd /shu/1985/1.html).
 // Chi chuong moi can token; cac endpoint khac goi tran van 200.
 //

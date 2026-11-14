@@ -1,14 +1,14 @@
-# Bqgoo (bqgoo.cc)
+# Bqgoo (bqgooo.cc)
 
 Extension vBook cho trang truyện chữ giản thể **Bqgoo** (笔趣阁) — huyền
 huyễn, võ hiệp, đô thị, lịch sử, võng du, khoa huyễn, nữ sinh, hoàn bản.
 Dữ liệu qua API JSON riêng của site (host `apibi.cc`, mirror `apiqu.cc`,
 `apige.cc`), không scrape HTML. Chương đọc miễn phí toàn văn, không khóa VIP.
 
-- Site: https://www.bqgoo.cc
+- Site: https://www.bqgooo.cc (domain cũ www.bqgoo.cc chuyển hướng 301 sang đây, health-check 2026-11-14)
 - API: https://apibi.cc
 - Type: `novel`, locale: `zh_CN`
-- Version: 1, author: MuseAi
+- Version: 2, author: MuseAi
 
 ## Cấu trúc
 

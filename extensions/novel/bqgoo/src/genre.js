@@ -1,4 +1,4 @@
-// genre.js — danh sach the loai cua Bqgoo (bqgoo.cc).
+// genre.js — danh sach the loai cua Bqgoo (bqgooo.cc).
 // DU 8 the loai cua /api/sort (khao sat 2026-11-11, moi key tra 150
 // truyen): xuanhuan 玄幻, wuxia 武侠, dushi 都市, lishi 历史,
 // wangyou 网游, kehuan 科幻, nvsheng 女生, finish 完本.

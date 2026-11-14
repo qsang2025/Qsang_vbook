@@ -1,4 +1,4 @@
-// helper.js — helper rieng cua Bqgoo (bqgoo.cc).
+// helper.js — helper rieng cua Bqgoo (bqgooo.cc).
 // Chi chua ham thuong, khong load them file nao khac. Cac script dung
 // thi load file nay sau file config.js, config-helpers.js,
 // fetch-helpers.js, rate-limit.js (va file cleanHtml.js neu can).

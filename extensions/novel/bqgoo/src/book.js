@@ -1,4 +1,4 @@
-// book.js — renderer danh sach dung chung cua Bqgoo (bqgoo.cc).
+// book.js — renderer danh sach dung chung cua Bqgoo (bqgooo.cc).
 // home.js / genre.js / detail.js tro ve day. Input:
 //   "hotlist" | "toplist" | "uplist" | "addlist"
 //       -> GET /api/index?sort=index, lay danh sach co ten tuong ung
