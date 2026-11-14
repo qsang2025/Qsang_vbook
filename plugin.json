@@ -228,6 +228,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "FanMTL",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/fanmtl/plugin.zip",
+      "version": 1,
+      "source": "https://www.fanmtl.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/fanmtl/icon.png",
+      "description": "FanMTL — truyện fan-fiction & web novel tiếng Anh đọc miễn phí trên fanmtl.com, không cần đăng nhập, không khóa VIP. Viết mới hoàn toàn từ khảo sát site (base Ivan1hai v1 mã hoá, không dùng được). Thể loại smut/ecchi/lolicon đã lọc khỏi danh sách thể loại.",
+      "type": "novel",
+      "locale": "en_US"
+    },
+    {
       "name": "iSach",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/isach/plugin.zip",
