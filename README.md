@@ -1,13 +1,11 @@
 # Qsang_vbook
 
-Tuyển tập extension vBook của Qsang: đọc truyện chữ, truyện tranh, video,
-audio, dịch, TTS và AI — viết theo một khung sườn thống nhất, có kiểm tra tự
-động, mỗi nguồn đều có fixture kiểm thử.
+Tuyển tập extension cho app vBook: đọc truyện chữ (Việt + Trung), truyện tranh,
+xem video, nghe audio, dịch và TTS — viết theo một khung sườn thống nhất, có
+kiểm tra tự động, mỗi nguồn đều có fixture kiểm thử.
 
-> **Repo hiện có 2 extension** (xem [Catalog](#catalog)):
-> **App Truyện Chữ** (novel, v3) và **HHKUNGFU** (video, v1).
-> Khung sườn đã xong; nguồn mới được tạo từ template
-> (xem [Quy trình tạo extension mới](#quy-trình-tạo-extension-mới)).
+Hiện có **66 nguồn** trong catalog. Chỉ đọc nội dung miễn phí: chương khóa hoặc
+VIP hiện thông báo rõ ràng, không mở khóa, không vượt paywall.
 
 ## Cài đặt
 
@@ -25,6 +23,14 @@ trên dùng được ngay.
 Muốn dùng thêm nguồn từ repo khác, xem `repository.json` (danh sách registry
 ngoài) — dán URL registry của repo đó vào app theo cách tương tự.
 
+## Lưu ý khi dùng
+
+- Một số nguồn có nội dung 18+ được gắn cờ `nsfw` trong catalog.
+- Một vài nguồn chỉ đọc đủ chương khi đã đăng nhập tài khoản miễn phí của
+  chính site đó (ghi rõ trong mô tả của nguồn); extension không tự đăng nhập
+  thay người dùng và không lưu mật khẩu hay token thật.
+- Trạng thái sống/chết từng nguồn xem `STATUS.md` (CI cập nhật hàng ngày).
+
 ## Cấu trúc thư mục
 
 ```
@@ -34,30 +40,19 @@ Qsang_vbook/
   STATUS.md                     # trạng thái sống/chết từng nguồn (CI sinh tự động)
   plugin.json                   # registry gốc — SINH TỰ ĐỘNG, không sửa tay
   repository.json               # danh sách registry ngoài (registry-of-registries)
-  .agents/skills/vbook-extensions/  # skill + 5 mode + reference/extension-api.md
-                                # + templates/ 7 loại + scripts/vbook.js
+  extension-api.md              # hợp đồng API duy nhất của vBook
+  .agents/skills/vbook-extensions/  # skill + mode + reference + templates
   lib/                          # thư viện dùng chung (CHỈ LÀ NGUỒN MẪU —
                                 # build copy file cần thiết vào src/ từng extension)
-    cleanHtml.js                # 1 bản chuẩn làm sạch HTML
-    config-helpers.js           # normalizeUrl / absUrl / cleanText / storyItem / nextPageToken
-    fetch-helpers.js            # fetch thường → fallback Engine.newBrowser, mirror failover
-    gbk.js                      # xử lý web Trung (GBK)
   templates/                    # template tạo nguồn mới theo từng loại
-    novel/ comic/ chinese_novel/ video/ audio/ translate/ tts/ ai/
   extensions/                   # nguồn thật — xem Catalog bên dưới
-    novel/apptruyenchu/         # App Truyện Chữ (novel, v4)
-    video/hhkungfu/             # HHKUNGFU (video, v1)
                                 # mỗi nguồn: icon.png + plugin.json + src/ + test.json
                                 # + plugin.zip (do build sinh ra, commit kèm để app
                                 #   cài được từ URL repo — xem AGENTS.md mục 8)
-  tools/cli/                    # build / catalog / validate
   scripts/                      # cli.js (CLI một cửa) + health-check.js
-                                # (probe) + vbook.js (test/testall/install)
-                                # + build_registry.py + clean.py
-  package.json                  # npm scripts cho CLI một cửa
+  tools/                        # build / catalog / validate
   docs/                         # EXTENSION_DEVELOPMENT_GUIDE.md,
                                 # verify-checklist.md, CONTRIBUTING.md
-                                # (hợp đồng API ở extension-api.md tại root, không ở docs/)
   .github/ISSUE_TEMPLATE/       # form xin nguồn mới
 ```
 
@@ -86,8 +81,8 @@ Hợp đồng API duy nhất: `extension-api.md`.
 ## Quy định về plugin.zip — commit kèm để app cài được từ URL repo
 
 `plugin.zip` là artifact do build sinh ra từ `src/`, **được commit kèm**
-với từng nguồn (quyết định của Anh ngày 2026-11-06). Lý do: registry trỏ
-tới `raw.githubusercontent.com/.../extensions/<loại>/<tên>/plugin.zip` nên
+với từng nguồn. Lý do: registry trỏ tới
+`raw.githubusercontent.com/.../extensions/<loại>/<tên>/plugin.zip` nên
 app vBook chỉ cài được khi zip có mặt trên GitHub.
 
 - `.gitignore` chặn `*.zip` nhưng chừa `extensions/**/plugin.zip`.
@@ -100,21 +95,83 @@ Chi tiết: `AGENTS.md` mục 8.
 
 ## Catalog
 
-Bảng này sinh tự động từ registry (`plugin.json`) — hiện có 2 nguồn.
+Bảng này sinh từ registry (`plugin.json`) — hiện có 66 nguồn.
 
-| Tên | Loại | Ngôn ngữ | Phiên bản | Nguồn | Trạng thái |
-|---|---|---|---|---|---|
-| App Truyện Chữ | novel | vi_VN | 3 | https://apptruyenchu.pro | xem STATUS.md |
-| La Cà Truyện | novel | vi_VN | 1 | https://lacatruyen.site | xem STATUS.md |
-| Tiệm Truyện Chữ | novel | vi_VN | 1 | https://tiemtruyenchu.cloud | xem STATUS.md |
-| HHKUNGFU | video | vi_VN | 1 | https://hhkungfu.ee | xem STATUS.md |
+| Tên | Loại | Ngôn ngữ | Phiên bản | Nguồn |
+|---|---|---|---|---|
+| 17k | chinese_novel | zh_CN | 1 | https://www.17k.com |
+| 52书库 | chinese_novel | zh_CN | 1 | https://www.52shuku.net |
+| alicesw | chinese_novel | zh_CN | 1 | https://www.alicesw.com |
+| IHuaBen | chinese_novel | zh_CN | 1 | https://www.ihuaben.com |
+| NovelCooksTW | chinese_novel | zh_TW | 1 | https://novel.cooks.tw |
+| QuanBen | chinese_novel | zh_CN | 1 | https://quanben5.com |
+| Tadu | chinese_novel | zh_CN | 2 | https://www.tadu.com |
+| Trxs | chinese_novel | zh_CN | 1 | https://trxs.cc |
+| Zongheng | chinese_novel | zh_CN | 3 | https://www.zongheng.com |
+| 书本书 | chinese_novel | zh_CN | 1 | https://www.shubenshu.com |
+| NiACG | comic | zh_CN | 5 | https://www.niacg.com |
+| AkayTruyen | novel | vi_VN | 1 | https://akaytruyen.com |
+| App Truyện Chữ | novel | vi_VN | 10 | https://apptruyenchu.pro |
+| AzTruyen | novel | vi_VN | 2 | https://aztruyen.top |
+| Bqgoo | novel | zh_CN | 1 | https://www.bqgoo.cc |
+| Bàn Long | novel | vi_VN | 1 | https://blhvip.vn |
+| DocLN | novel | vi_VN | 1 | https://docln.sbs |
+| La Cà Truyện | novel | vi_VN | 8 | https://lacatruyen.site |
+| LilyHub | novel | vi_VN | 1 | https://www.lilyhub.top |
+| MongTruyen | novel | vi_VN | 1 | https://mongtruyen.com |
+| Mê Truyện Chữ | novel | vi_VN | 8 | https://metruyenchu.com.vn |
+| Mê Truyện Chữ Org | novel | vi_VN | 3 | https://metruyenchu.org |
+| Mê Truyện Hot VN | novel | vi_VN | 3 | https://metruyenhotvn.com |
+| Mê Đọc Truyện | novel | vi_VN | 1 | https://medoctruyen.vn |
+| Mê Đọc Truyện Chữ | novel | vi_VN | 1 | https://medoctruyenchu.net |
+| QuyKhu | novel | vi_VN | 1 | https://quykhu.com |
+| SS Truyện | novel | vi_VN | 4 | https://sstruyen.net |
+| Storya | novel | vi_VN | 1 | https://storya.click |
+| Sáng Tác Việt APP | novel | vi_VN | 7 | https://sangtacviet.app |
+| TacGiaViet | novel | vi_VN | 1 | https://tacgiaviet.com |
+| Tang Thu Vien | novel | vi_VN | 1 | https://tangthuvien.org |
+| TiemtruyenchuVIP | novel | vi_VN | 8 | https://tiemtruyenchu.cloud |
+| Tiên Vực | novel | vi_VN | 1 | https://tienvuc.blog |
+| TrichTinhLau | novel | vi_VN | 1 | https://trichtinhlau.com |
+| Truyen247 | novel | vi_VN | 1 | https://truyen247.pro |
+| Truyen4u | novel | vi_VN | 1 | https://truyen4u.com |
+| TruyenC | novel | vi_VN | 7 | https://truyenc.net |
+| TruyenChu | novel | vi_VN | 1 | https://truyenchu.net |
+| TruyenDich.AI | novel | vi_VN | 1 | https://truyendich.space |
+| TruyenNow | novel | vi_VN | 1 | https://longthieu.com |
+| TruyenTV | novel | vi_VN | 1 | https://www.tvtruyen.space |
+| Truyện Full | novel | vi_VN | 5 | https://truyenfull.link |
+| Truyện Hay | novel | vi_VN | 1 | https://truyenhay.com |
+| Truyện Hoàn | novel | vi_VN | 6 | https://truyenhoan.com |
+| Truyện Hoàng Dung | novel | vi_VN | 1 | https://truyenhoangdung.xyz |
+| Truyện Mơ | novel | vi_VN | 1 | https://truyenmo.one |
+| TruyệnHD | novel | vi_VN | 1 | https://truyenhdc.com |
+| ValvrareTeam | novel | vi_VN | 1 | https://valvrareteam.net |
+| VivuTruyen | novel | vi_VN | 1 | https://vivutruyen.net |
+| Web Truyện Dịch | novel | vi_VN | 1 | https://webtruyendich.com |
+| Wetruyen | novel | vi_VN | 2 | https://wetruyen.com |
+| Wiki Dịch | novel | vi_VN | 5 | https://wikicv.org |
+| Xa Lộ Sách | novel | vi_VN | 1 | https://xalosach.com |
+| XTruyện | novel | vi_VN | 3 | https://xtruyen.vn |
+| ZTruyen | novel | vi_VN | 1 | https://ztruyen.vn |
+| 七猫免费小说 | novel | zh_CN | 6 | https://www.qimao.com |
+| 书海阁 | novel | zh_CN | 6 | https://www.shuhaige.tw |
+| 和图书 | novel | zh_CN | 2 | https://www.hetushu.com |
+| 小說狂人 | novel | zh_TW | 6 | https://czbooks.net |
+| 思兔閱讀 | novel | zh_TW | 7 | https://sto9.com |
+| 爱下电子书 | novel | zh_CN | 4 | https://ixdzs8.com |
+| 稷下書院 | novel | zh_TW | 2 | https://www.novel543.com |
+| 笔趣阁 | novel | zh_CN | 5 | https://www.biquge.tw |
+| 繁體小說 | novel | zh_TW | 7 | https://www.novels.com.tw |
+| Hoạt Hình 3D Trung Quốc | video | vi_VN | 3 | https://phimapi.com/v1/api/the-loai |
+| Hoạt Hình AI Trung Quốc | video | vi_VN | 5 | https://www.dailymotion.com |
 
 Trạng thái sống/chết từng nguồn xem `STATUS.md` (CI cập nhật hàng ngày).
 
 ## Attribution — nguồn gốc từng phần mượn
 
 Repo này đứng trên công sức của cộng đồng vBook. Code mượn **giữ attribution**,
-không ghi tác giả Qsang cho phần copy. 32/33 repo tham khảo không có file
+không ghi tác giả MuseAi cho phần copy. 32/33 repo tham khảo không có file
 LICENSE; chỉ `vbook_duongden` có — đọc `LICENSE` của duongden trước khi dùng
 bất kỳ phần nào từ đó.
 
@@ -145,8 +202,7 @@ Muốn tự thêm nguồn: đọc `docs/CONTRIBUTING.md` và
 
 ## Giấy phép
 
-Repo này dùng **MIT License** (file `LICENSE` ở root, copyright Dương Nguyễn
-Quốc Sáng, 2026): ai cũng được dùng, copy, sửa, kể cả dùng vào việc kiếm tiền,
-với điều kiện giữ lại dòng copyright + bản LICENSE. Code tự viết thuộc về
-Qsang; phần mượn giữ nguyên attribution ở bảng trên và tuân thủ LICENSE gốc
-(nếu có).
+Repo này dùng **MIT License** (file `LICENSE` ở root, copyright MuseAi, 2026):
+ai cũng được dùng, copy, sửa, kể cả dùng vào việc kiếm tiền, với điều kiện giữ
+lại dòng copyright + bản LICENSE. Code tự viết thuộc về MuseAi; phần mượn giữ
+nguyên attribution ở bảng trên và tuân thủ LICENSE gốc (nếu có).
