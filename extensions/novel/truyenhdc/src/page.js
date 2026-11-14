@@ -1,11 +1,14 @@
 // page.js — Phan trang muc luc TruyenHD (truyenhdc.com).
 //
 // Muc luc tren trang chi tiet chi hien 50 chuong/trang, phan trang
-// bang .pagination li[data-id] (mau: 7 trang). Moi trang lay qua
+// bang .pagination li[data-id] (mau: 7 trang). Moi trang sau lay qua
 // POST admin-ajax user_truyen_pagination (id + slug o #views).
-// Tra ve mang payload JSON (dang chuoi) — toc.js se JSON.parse tung
-// muc roi POST lay chuong (mau theo base Darkrai9x v15). Trang 1
-// cung qua payload (tra ve 50 chuong dau giong trang chi tiet).
+// Tra ve mang token — toc.js se doc tung token (mau theo base
+// Darkrai9x v15). Token DAU TIEN la URL trang chi tiet (khong phai
+// payload trang 1): phan hoi AJAX khong co badge VIP (kiem chung
+// tren may that 2026-11-14: vipCount=0) nen chi doc truc tiep trang
+// chi tiet moi danh dau duoc chuong VIP (mau: ch.31-50); cac trang
+// sau dung payload AJAX nhu thuong.
 // Truyen khong co #dsc: dung action all_chap lay toan bo muc luc.
 load("config.js");
 load("rate-limit.js");
@@ -33,7 +36,10 @@ function execute(url) {
         var n = parseInt(el.attr("data-id") || "0", 10);
         if (!isNaN(n) && n > maxPage) maxPage = n;
     });
-    for (var i = 1; i <= maxPage; i++) {
+    // Token dau = URL trang chi tiet (giữ dấu VIP trang 1 — xem
+    // ghi chu o dau file); cac trang sau = payload AJAX.
+    list.push(full);
+    for (var i = 2; i <= maxPage; i++) {
         list.push(JSON.stringify({
             action: "user_truyen_pagination",
             page: i,

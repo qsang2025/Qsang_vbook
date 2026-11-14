@@ -54,13 +54,50 @@ function parseSsrRow(el) {
 function parseSsrDoc(doc) {
     var items = [];
     var seen = {};
-    doc.select(".theloai-thumlist .col-md-6").forEach(function (el) {
-        var item = parseSsrRow(el);
-        if (item && !seen[item.link]) {
-            seen[item.link] = true;
-            items.push(item);
+    var rows = doc.select(".theloai-thumlist .col-md-6");
+    if (rows.size() > 0) {
+        rows.forEach(function (el) {
+            var item = parseSsrRow(el);
+            if (item && !seen[item.link]) {
+                seen[item.link] = true;
+                items.push(item);
+            }
+        });
+        return items;
+    }
+    // Phan hoi AJAX (load_more_page_keyword) tra cac muc nam TRAN:
+    // <a class="thumbnail"><img></a> + <h2><a> + <div class="content">
+    // lien tiep trong body, khong co <tr>/li.col-md-6/.theloai-thumlist
+    // (kiem chung tren may that 2026-11-14: 14.502 ky tu, muc dau
+    // "Mong Trung Nhan"). Dung h2 a lam moc, ghep bia + mo ta theo
+    // thu tu xuat hien.
+    var anchors = doc.select("h2 a");
+    var covers = doc.select("a.thumbnail img");
+    var descs = doc.select(".content p");
+    for (var i = 0; i < anchors.size(); i++) {
+        var a = anchors.get(i);
+        var name = cleanText(a.text());
+        var href = a.attr("href") || "";
+        if (!name || !href) continue;
+        var link = normalizeUrl(href);
+        if (seen[link]) continue;
+        seen[link] = true;
+        var cover = "";
+        if (i < covers.size()) {
+            var im = covers.get(i);
+            cover = normalizeUrl(im.attr("data-src") || im.attr("src") || "");
         }
-    });
+        var desc = "";
+        if (i < descs.size()) desc = cleanText(descs.get(i).text());
+        items.push({
+            name: name,
+            cover: cover,
+            link: link,
+            description: desc,
+            tag: "",
+            host: BASE_URL
+        });
+    }
     return items;
 }
 
@@ -95,13 +132,9 @@ function executeSsr(path, page) {
         body: "action=load_more_page_keyword&current_page_tax=" + pageNum + "&the_loai=" + theLoai + "&option_keyword_tax=new-chap"
     });
     if (r2.error) return Response.error(r2.error);
-    var doc2 = null;
-    try {
-        doc2 = Html.parse("<table>" + r2.doc.html() + "</table>");
-    } catch (e) {
-        return Response.error("Không đọc được danh sách truyện (trang " + pageNum + ").");
-    }
-    var items2 = parseSsrDoc(doc2);
+    // Phan hoi la HTML fragment — doc da parse san, khong boc them
+    // <table> (parser HTML5 se day noi dung khong-phai-bang ra ngoai).
+    var items2 = parseSsrDoc(r2.doc);
     if (items2.length === 0) return Response.error("Hết truyện ở trang " + pageNum + ".");
     // Trang AJAX khong co maxpage; 18 muc/trang — it hon thi la trang cuoi.
     var next2 = items2.length >= 18 ? String(pageNum + 1) : "";

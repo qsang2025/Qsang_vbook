@@ -13,12 +13,20 @@ load("rate-limit.js");
 function parseTocDoc(doc, baseUrl) {
     var chapters = [];
     var seen = {};
-    doc.select("#dsc .listchap li, .listchap li").forEach(function (el) {
+    var rows = doc.select("#dsc .listchap li, .listchap li");
+    if (rows.size() === 0) {
+        // Phan hoi AJAX co the chi la cac <li> tran (khong co wrapper
+        // .listchap) — loc theo href chuong de tranh li le (phan trang,
+        // menu) lan vao.
+        rows = doc.select("li");
+    }
+    rows.forEach(function (el) {
         var aEl = selFirst(el, "a");
         if (!aEl) return;
         var name = cleanText(aEl.text());
         var href = aEl.attr("href") || "";
         if (!name || !href) return;
+        if (href.indexOf("/chap/") < 0) return;
         var link = normalizeUrl(href);
         if (seen[link]) return;
         seen[link] = true;
