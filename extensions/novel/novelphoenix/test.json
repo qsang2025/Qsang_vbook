@@ -1,0 +1,98 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "Latest Release",
+          "Newly Added"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Action",
+          "Fantasy"
+        ],
+        "minItems": 40
+      },
+      "input": "",
+      "script": "genre.js"
+    },
+    {
+      "expect": {
+        "minItems": 22
+      },
+      "input": "/latest-release-novel",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 22
+      },
+      "input": "/latest-release-novel",
+      "page": "2",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 22
+      },
+      "input": "/genre/Action",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Nine Star Hegemon Body Arts"
+        ],
+        "minItems": 1
+      },
+      "input": "Nine Star Hegemon",
+      "script": "search.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Nine Star Hegemon Body Arts",
+          "Ordinary Magician"
+        ],
+        "minItems": 1
+      },
+      "input": "https://novelphoenix.net/nine-star-hegemon-body-arts.html",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "minItems": 100
+      },
+      "input": "https://novelphoenix.net/nine-star-hegemon-body-arts.html",
+      "script": "page.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chapter 1"
+        ],
+        "minItems": 40
+      },
+      "input": "https://novelphoenix.net/nine-star-hegemon-body-arts.html",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Who am I? I am",
+          "Long Chen"
+        ],
+        "minItems": 1
+      },
+      "input": "https://novelphoenix.net/nine-star-hegemon-body-arts/chapter-1.html",
+      "script": "chap.js"
+    }
+  ],
+  "note": "Golden fixture cho NovelPhoenix (novelphoenix.net), khảo sát 2026-11-15. Truyện mẫu: Nine Star Hegemon Body Arts — Ordinary Magician, 7.313 chương / 183 trang mục lục (40 chương/trang), ch.1 mở đầu 'Who am I? I am… Long Chen!' (70 đoạn), ch.7313 'The Twelfth Heavenstage' (36 đoạn). Site SSR, không Cloudflare, không login, không khóa VIP. Thể loại Mature/Ecchi/Adult/Smut/Hentai đã lọc khỏi genre.js; manifest nsfw: true."
+}

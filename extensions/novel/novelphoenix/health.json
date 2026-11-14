@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "pattern": "NovelPhoenix",
+      "url": "https://novelphoenix.net/"
+    },
+    {
+      "name": "Danh sách mới nhất",
+      "pattern": "ul-list1",
+      "url": "https://novelphoenix.net/latest-release-novel"
+    },
+    {
+      "name": "Chi tiết truyện",
+      "pattern": "Nine Star Hegemon Body Arts",
+      "url": "https://novelphoenix.net/nine-star-hegemon-body-arts.html"
+    },
+    {
+      "name": "Mục lục",
+      "pattern": "Chapter 1",
+      "url": "https://novelphoenix.net/nine-star-hegemon-body-arts.html"
+    },
+    {
+      "name": "Nội dung chương",
+      "pattern": "Long Chen",
+      "url": "https://novelphoenix.net/nine-star-hegemon-body-arts/chapter-1.html"
+    }
+  ]
+}

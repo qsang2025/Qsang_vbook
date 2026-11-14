@@ -363,6 +363,18 @@
       "nsfw": true
     },
     {
+      "name": "NovelPhoenix",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novelphoenix/plugin.zip",
+      "version": 1,
+      "source": "https://novelphoenix.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novelphoenix/icon.png",
+      "description": "NovelPhoenix — web novel & light novel tiếng Anh đọc miễn phí trên novelphoenix.net, không cần đăng nhập, không khóa VIP. Viết mới hoàn toàn từ khảo sát site (registry-only, không có base). Thể loại Mature/Ecchi/Adult/Smut/Hentai đã lọc khỏi danh sách thể loại. Nguồn gắn cờ 18+.",
+      "type": "novel",
+      "locale": "en_US",
+      "nsfw": true
+    },
+    {
       "name": "QuyKhu",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/quykhu/plugin.zip",
