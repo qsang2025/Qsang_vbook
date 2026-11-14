@@ -471,6 +471,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyenC.com",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc-com/plugin.zip",
+      "version": 1,
+      "source": "https://truyenc.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenc-com/icon.png",
+      "description": "TruyenC.com — đọc truyện ma và truyện cười tiếng Việt online miễn phí trên truyenc.com. Chương đọc đủ, không cần đăng nhập. Mục truyện audio không đưa vào app (player nhúng, không có danh sách chương); mục truyện 18+ cũng không đưa vào. Khác với nguồn \"TruyenC\" (truyenc.net) đã có trên main. Port từ TruyenC v1 của ustaezav (fork trên đĩa, đọc được, không mã hoá), viết lại hoàn toàn theo hợp đồng hiện tại; base cũ là nguồn 18+ (home/genre chỉ lấy mục 18+, không pacing) nên đã đổi phạm vi sang ma + cười, home trả tab tĩnh, thêm pacing và sửa lỗi .first(). Site không có tìm kiếm thật (/tim-kiem trả trang rỗng) nên tìm kiếm khớp từ khóa với slug trong sitemap.xml.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenChu",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenchu/plugin.zip",
