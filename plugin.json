@@ -249,6 +249,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TacGiaViet",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tacgiaviet/plugin.zip",
+      "version": 1,
+      "source": "https://tacgiaviet.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tacgiaviet/icon.png",
+      "description": "Tác Giả Việt - Đọc truyện tác giả Việt sáng tác, miễn phí (ref: TamChau tacgiaviet v5)",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Tang Thu Vien",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tangthuvien/plugin.zip",
