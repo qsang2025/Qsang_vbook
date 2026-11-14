@@ -1,0 +1,162 @@
+{
+ "cases": [
+  {
+   "expect": {
+    "contains": [
+     "最新更新",
+     "热门浏览",
+     "新书上架",
+     "周榜",
+     "新作榜"
+    ],
+    "minItems": 5
+   },
+   "input": "",
+   "script": "home.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "奇幻玄幻",
+     "BG言情",
+     "现代都市",
+     "H",
+     "肉文"
+    ],
+    "minItems": 60
+   },
+   "input": "",
+   "script": "genre.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "携妻修仙2：月照长曜",
+     "大屌邪神与下流巨乳精灵王"
+    ],
+    "minItems": 24
+   },
+   "input": "/all/0-0-0-0-0-0-2-1/",
+   "script": "list.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "乱世书",
+     "魔刀丽影"
+    ],
+    "minItems": 24
+   },
+   "input": "/all/0-0-0-0-0-0-1-1/",
+   "script": "list.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "末世肉文行",
+     "招惹"
+    ],
+    "minItems": 20
+   },
+   "input": "rank:1",
+   "script": "list.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "高考陪读那三年"
+    ],
+    "minItems": 1
+   },
+   "input": "高考",
+   "script": "search.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "剑来同人恶堕"
+    ],
+    "minItems": 1
+   },
+   "input": "剑来",
+   "script": "search.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "高考陪读那三年",
+     "橙青",
+     "高H"
+    ],
+    "minItems": 1
+   },
+   "input": "https://www.banshanren.com/novel/gaokaopeidunasannian",
+   "script": "detail.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "招惹",
+     "一枝独秀",
+     "连载中"
+    ],
+    "minItems": 1
+   },
+   "input": "https://www.banshanren.com/novel/zhaore",
+   "script": "detail.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "第1章 往后就我们俩了",
+     "第65章 家（完结）"
+    ],
+    "minItems": 65
+   },
+   "input": "https://www.banshanren.com/novel/gaokaopeidunasannian",
+   "script": "toc.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "第1章 揉搓",
+     "第404章 十指紧扣"
+    ],
+    "minItems": 404
+   },
+   "input": "https://www.banshanren.com/novel/zhaore",
+   "script": "toc.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "八月底的县城，热得像个扣死了盖子的大蒸笼"
+    ],
+    "minItems": 1
+   },
+   "input": "https://www.banshanren.com/novel/gaokaopeidunasannian/17756622550001",
+   "script": "chap.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "半山别墅，夜幕降临，透过落地窗可以看见点点星光"
+    ],
+    "minItems": 1
+   },
+   "input": "https://www.banshanren.com/novel/zhaore/1315998862980153747",
+   "script": "chap.js"
+  },
+  {
+   "expect": {
+    "contains": [
+     "顾先生，我们已经把时间压缩到最短了"
+    ],
+    "minItems": 1
+   },
+   "input": "https://www.banshanren.com/novel/zhaore/1315998864653681447",
+   "script": "chap.js"
+  }
+ ],
+ "note": "Golden fixture cho Banshanren (banshanren.com), khao sat 2026-11-14. Site CN 18+ (tag H / 高H / 肉文 / 乱伦 / NTR...), manifest gan co nsfw: true; 4 tag Incest/Netorare (乱伦 / 骨科 / NTR / NTL) khong hien trong genre (tien le valvrareteam, dao nguoc duoc). SSR, khong Cloudflare, khong can dang nhap. Anh bia ma hoa AES nen cover rong. Danh sach /all/ 24 truyen/trang, phan trang chay (trang 1/2/3 khong trung nhau — trang 2 test bang CLI 2 tham so execute(query, \"2\"), khong phai bang URL co san so 2 vi allUrl se dat lai ve 1 khi page rong); o 热搜记录 (10 truyen hot) lap lai moi trang nen parseList bo qua. API /api/search (24/trang) + /api/rank (100 muc). Muc luc du ngay tren trang chi tiet (招惹 404 chuong, 1 lan goi). Truyen mau 1: 高考陪读那三年 — 橙青, 完结, 65 chuong, ch.1 mo dau '八月底的县城，热得像个扣死了盖子的大蒸笼。'. Truyen mau 2: 招惹 — 一枝独秀, 连载中, 404 chuong, ch.1 '半山别墅，夜幕降临，透过落地窗可以看见点点星光。', ch.404 '顾先生，我们已经把时间压缩到最短了。'. Chuong co span.z (so binh luan) da loc. Port tu Banshanren v3 cua ustaezav (fork tren dia, doc duoc, khong ma hoa), viet lai hoan toan theo hop dong hien tai; bo he thong thumb ngau nhien cua base."
+}

@@ -39,6 +39,18 @@
       "nsfw": true
     },
     {
+      "name": "Banshanren",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/banshanren/plugin.zip",
+      "version": 1,
+      "source": "https://www.banshanren.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/banshanren/icon.png",
+      "description": "Banshanren — đọc truyện chữ tiếng Trung 18+ trên banshanren.com (搬山人小说网). Chương đọc đủ, không cần đăng nhập. Site có nhiều truyện người lớn nên nguồn gắn cờ nsfw. Ảnh bìa của site bị mã hoá nên truyện không có ảnh bìa. Port từ Banshanren v3 của ustaezav (fork trên đĩa, đọc được, không mã hoá), viết lại hoàn toàn theo hợp đồng hiện tại; đã bỏ hệ thống thumb ngẫu nhiên của base (gọi worker bên thứ ba + ảnh NSFW).",
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "nsfw": true
+    },
+    {
       "name": "IHuaBen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ihuaben/plugin.zip",
