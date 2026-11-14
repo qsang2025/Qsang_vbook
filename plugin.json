@@ -50,6 +50,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "NovelCooksTW",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/novelcookstw/plugin.zip",
+      "version": 1,
+      "source": "https://novel.cooks.tw",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/novelcookstw/icon.png",
+      "description": "novel.cooks.tw — đọc truyện chữ tiếng Trung phồn thể (Đài Loan): 35 thể loại (đọc live từ API), bảng xếp hạng, tìm kiếm (gõ tiếng Việt không dấu, tên Hán-Việt hoặc tên tiếng Trung đều được), chi tiết, mục lục đầy đủ trong 1 lần gọi, đọc chương miễn phí, không cần đăng nhập. Port từ NovelCooksTW v38 của MeoU (ref: vbook_MeoU_hienpro00123) — viết lại theo hợp đồng vBook hiện tại (pacing, bỏ User-Agent riêng, thể loại đọc live từ API). Từ điển Việt–Trung trong search dùng dữ liệu CC BY-SA 3.0 (Trannosaur/published_dicts, nguồn zh.wiktionary.org).",
+      "type": "chinese_novel",
+      "locale": "zh_TW"
+    },
+    {
       "name": "QuanBen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/quanben/plugin.zip",
