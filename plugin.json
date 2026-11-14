@@ -328,6 +328,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Si Truyện CV",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sitruyencv/plugin.zip",
+      "version": 1,
+      "source": "https://sitruyencv.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sitruyencv/icon.png",
+      "description": "Si Truyện CV — đọc truyện chữ tiếng Việt (Convert + Dịch) trên sitruyencv.com. Chương thường đọc đủ, không cần đăng nhập; chương VIP (từ chương vip_from_chapter) cần đăng nhập/mua trên site. Lưu ý: tìm kiếm chỉ có dấu (gõ không dấu không ra kết quả). Port từ Si Truyện CV v3 của Klein (fork trên đĩa, đọc được, không mã hoá), viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "SS Truyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sstruyen/plugin.zip",

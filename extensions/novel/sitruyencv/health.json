@@ -1,0 +1,1 @@
+{"cases":[{"name":"api root","pattern":"\"status\":\"ok\"","url":"https://api.sitruyencv.com/"},{"name":"trang chi tiet truyen mau","pattern":"ĐOÀN TÀU TỬ VONG","url":"https://api.sitruyencv.com/api/stories/32598"}]}
