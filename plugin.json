@@ -515,6 +515,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "TruyenCv",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tutien/plugin.zip",
+      "version": 1,
+      "source": "https://tutien.pro",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/tutien/icon.png",
+      "description": "Truyện chữ tiếng Việt trên tutien.pro (TruyenCv — Tu Tiên Game) — đọc miễn phí đầy đủ, không cần đăng nhập; danh sách, chi tiết, mục lục và chương qua API JSON riêng của site. Một số chương có thể bị khóa early-access có thời hạn (mở bằng vé trên web) — extension báo rõ chương khóa, không mở khóa, không hiện bản xem trước làm nội dung. Viết mới hoàn toàn từ khảo sát site (base Ivan1hai v1 đã mã hoá, không dùng được).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "TruyenDich.AI",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyendich/plugin.zip",
