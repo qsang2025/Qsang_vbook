@@ -51,6 +51,17 @@
       "nsfw": true
     },
     {
+      "name": "Bixiange",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/bixiange/plugin.zip",
+      "version": 1,
+      "source": "https://m.bixiange.top",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/bixiange/icon.png",
+      "description": "Truyen chu tieng Trung tren m.bixiange.top (笔仙阁) — doc du, khong can dang nhap. Port tu MeoU bixiange v16, viet lai theo quy tac nha Qsang_vbook (GBK, pacing, safeFirst). Tim kiem qua WebView vi tu khoa phai encode GBK; ket qua phan trang theo searchid.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "IHuaBen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ihuaben/plugin.zip",
