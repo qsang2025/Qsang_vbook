@@ -234,9 +234,10 @@
       "version": 1,
       "source": "https://www.fanmtl.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/fanmtl/icon.png",
-      "description": "FanMTL — truyện fan-fiction & web novel tiếng Anh đọc miễn phí trên fanmtl.com, không cần đăng nhập, không khóa VIP. Viết mới hoàn toàn từ khảo sát site (base Ivan1hai v1 mã hoá, không dùng được). Thể loại smut/ecchi/lolicon đã lọc khỏi danh sách thể loại.",
+      "description": "FanMTL — truyện fan-fiction & web novel tiếng Anh đọc miễn phí trên fanmtl.com, không cần đăng nhập, không khóa VIP. Viết mới hoàn toàn từ khảo sát site (base Ivan1hai v1 mã hoá, không dùng được). Thể loại smut/ecchi/lolicon đã lọc khỏi danh sách thể loại. Nguồn gắn cờ 18+.",
       "type": "novel",
-      "locale": "en_US"
+      "locale": "en_US",
+      "nsfw": true
     },
     {
       "name": "iSach",
