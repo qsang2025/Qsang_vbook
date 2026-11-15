@@ -22,6 +22,10 @@ function execute(url) {
     url = String(url || "");
     if (url.charAt(0) === "/") url = siteOrigin() + url;
     url = normalizeUrl(url);
+    // App goi toc.js bang URL tu detail.js (bookinfo) — muc luc that nam o
+    // /html/<cat>/<id>/index.html, khong nam tren trang bookinfo.
+    var m = url.match(/\/bookinfo\/(\d+)\/(\d+)\.html$/);
+    if (m) url = siteOrigin() + "/html/" + m[1] + "/" + m[2] + "/index.html";
     var r = fetchPtDoc(url);
     if (r.error) return Response.error(r.error);
     var doc = r.doc;
