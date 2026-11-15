@@ -30,7 +30,10 @@ var GENRE_INPUTS = {
 };
 
 function execute(url) {
-    var detailUrl = normalizeUrl(url);
+    // Dung absUrl() thay cho normalizeUrl(): normalizeUrl() khong xu ly
+    // URL chi co path (vd "/go/97746/") — no tra nguyen chuoi, fetch nhan
+    // URL tuong doi thi tra fake 504 (loi giong chap.js, sua cung luc).
+    var detailUrl = absUrl(url);
     if (!detailUrl) return Response.error("Link truyện không hợp lệ.");
     // App cat dau "/" cuoi khoi URL arg khi chay that — khoi phuc lai.
     if (detailUrl.slice(-1) !== "/") detailUrl = detailUrl + "/";

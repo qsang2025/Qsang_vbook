@@ -18,7 +18,10 @@ load('safe-first.js');
 load('helper.js');
 
 function execute(url) {
-    var detailUrl = normalizeUrl(url);
+    // Dung absUrl() thay cho normalizeUrl(): normalizeUrl() khong xu ly
+    // URL chi co path (vd "/go/97746/") — no tra nguyen chuoi, fetch nhan
+    // URL tuong doi thi tra fake 504 (loi giong chap.js, sua cung luc).
+    var detailUrl = absUrl(url);
     if (!detailUrl) return Response.error("Link truyện không hợp lệ.");
     if (detailUrl.slice(-1) !== "/") detailUrl = detailUrl + "/";
     var r = fetchBqDoc(detailUrl);

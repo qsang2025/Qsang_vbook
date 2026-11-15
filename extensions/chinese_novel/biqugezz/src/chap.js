@@ -39,7 +39,13 @@ function chapterTitle(doc) {
 }
 
 function execute(url) {
-    var chapUrl = normalizeUrl(url);
+    // normalizeUrl() KHONG xu ly URL chi co path (vd "/go/1/1.html" —
+    // regex doi co host): no tra nguyen chuoi, fetch nhan URL tuong doi
+    // thi tra fake 504 (kiem chung tren may that 2026-11-15: chap
+    // "/go/1/1.html" code 1 HTTP 504, cung chuong URL tuyet doi code 0).
+    // absUrl() ghep ve siteOrigin cho moi dang URL (tuyet doi / "/..."
+    // / tuong doi) nen dung no o day.
+    var chapUrl = absUrl(url);
     if (!chapUrl) return Response.error("Link chương không hợp lệ.");
     var dirUrl = chapUrl.substring(0, chapUrl.lastIndexOf("/") + 1);
 
