@@ -220,7 +220,7 @@
       "name": "全本同人小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/qbtr/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://www.qbtr.cc",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/qbtr/icon.png",
       "description": "全本同人小说 — qbtr.cc: truyện đồng nhân tiếng Trung đọc miễn phí, không cần đăng nhập. Chương đọc đủ qua fetch tĩnh (GBK, .read_chapterDetail) — rescan #12 ghi teaser là sai; mục lục đủ 1.205 chương trên trang chi tiết; tìm kiếm POST EmpireCMS qua WebView; 16 tag qua /e/tags/?tagid= (link đẹp /tags-<id>-0.html chết trên site); không có ảnh bìa trên site. Port base Evamirion v1, viết lại hoàn toàn theo hợp đồng hiện tại.",
