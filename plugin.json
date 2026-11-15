@@ -228,6 +228,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "飘天文学",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/piaotia/plugin.zip",
+      "version": 1,
+      "source": "https://www.piaotia.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/piaotia/icon.png",
+      "description": "飘天文学 — piaotia.com: truyện chữ tiếng Trung, đọc miễn phí, không cần đăng nhập: 9 thể loại, tìm kiếm (WebView, form GBK của site), mục lục đầy đủ 1 trang, chương đọc đủ. Port từ piaotian5 v4 của hajljnopera (ref: hajljnopera) — viết mới gần hết selector theo giao diện live (chap.js cũ chọn #content không còn khớp).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "墨坛文学网",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/22mt/plugin.zip",
