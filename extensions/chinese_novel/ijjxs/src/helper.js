@@ -238,6 +238,30 @@ function parseItemList(doc) {
 
 // Tim link "下一页" tren trang danh sach; tra ve URL tuyet doi
 // (hoac "" neu het trang).
+// Parse rieng cho trang ket qua tim kiem (mobile): 1 sach = 2 link cung
+// URL /txt/<id>.html (link bia text rong + link ten sach); cac link
+// the loai /txt/<slug>/ va /txt/hot/ phai LOAI (chi giu /txt/\d+\.html).
+// (Probe 2026-11-16: ket qua "全世界众筹复活本反派" co 14 link /txt/,
+// chi 2 link la sach that — /txt/60720.html x2; parseItemList chung
+// khong nhan duoc layout nay nen search tra 0 ket qua.)
+function parseSearchList(doc) {
+    var items = [];
+    var seen = {};
+    var links = doc.select("a[href*='/txt/']");
+    for (var i = 0; i < links.size(); i++) {
+        var a = links.get(i);
+        var href = a.attr("href") || "";
+        if (!/\/txt\/\d+\.html/.test(href)) continue;
+        var link = absUrl(href);
+        if (!link || seen[link]) continue;
+        var nm = cleanBookName(a.text());
+        if (!nm) continue;
+        seen[link] = true;
+        items.push({ name: nm, cover: "", link: link, description: "", tag: "", host: siteOrigin() });
+    }
+    return items;
+}
+
 function nextPageHref(doc) {
     var a = safeFirst(doc.select("a:contains(下一页)"));
     if (a === null) return "";

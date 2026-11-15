@@ -12,8 +12,11 @@
 // da dung dinh dang (khong can accept-charset GBK nhu cac site GBK).
 // Ket qua /e/search/result/index.php?page=<0-based>&searchid=<id>
 // (kieu EmpireCMS); trang sau fetch truc tiep bang URL day du do
-// nextPageHref() tra ve. Ket qua parse bang parseItemList() trong
-// helper.js (.catalog .listbg truoc, roi cac dang du phong).
+// nextPageHref() tra ve. Ket qua parse bang parseSearchList() trong
+// helper.js (rieng cho layout mobile: chi giu link /txt/<id>.html,
+// bo link the loai /txt/<slug>/). Da kiem chung tren dien thoai that
+// 2026-11-16 (probe): tim "全世界众筹复活本反派" tra dung 1 sach
+// /txt/60720.html; tieu de trang ket qua "<kw> 搜索结果_久久小说网手机版".
 // LUU Y: tieu de trang ket qua CHUA kiem chung duoc tu VM (can WebView)
 // nen vong poll khong phu thuoc rieng vao tieu de: break khi tieu de
 // chua "搜索"/"信息提示" HOAC khi parseItemList() da thay muc — tranh
@@ -40,7 +43,7 @@ function execute(query, page) {
     if (page !== "") {
         var r = fetchIjDoc(page);
         if (r.error) return Response.error(r.error);
-        var items = parseItemList(r.doc);
+        var items = parseSearchList(r.doc);
         if (items.length === 0) {
             return Response.error("Không tìm thấy \"" + query + "\"");
         }
@@ -69,7 +72,7 @@ function execute(query, page) {
             resultDoc = b.html(6000);
             var ti = String(resultDoc.select("title").text() || "");
             if (ti.indexOf("搜索") !== -1 || ti.indexOf("信息提示") !== -1) break;
-            if (parseItemList(resultDoc).length > 0) break;
+            if (parseSearchList(resultDoc).length > 0) break;
         }
         if (resultDoc) {
             var title2 = String(resultDoc.select("title").text() || "");
@@ -85,7 +88,7 @@ function execute(query, page) {
         b.close();
     }
     if (!resultDoc) return Response.error("Không đọc được trang kết quả tìm kiếm.");
-    var out = parseItemList(resultDoc);
+    var out = parseSearchList(resultDoc);
     if (out.length === 0) {
         return Response.error("Không tìm thấy \"" + query + "\"");
     }
