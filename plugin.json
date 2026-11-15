@@ -250,6 +250,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "破万卷小说",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/powanjuan/plugin.zip",
+      "version": 1,
+      "source": "http://www.powanjuan.cc",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/powanjuan/icon.png",
+      "description": "破万卷小说 — powanjuan.cc: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập: mục lục đầy đủ trên trang chi tiết (2.460 chương ở sách mẫu), chương đọc đủ thật, tìm kiếm qua WebView (POST GBK). Port từ base Moleys v1 (plaintext), viết mới search/gen/zen; rescan #11 đã kiểm chứng ch.1 đầy đủ.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "精品小說網",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/jpxs123/plugin.zip",
