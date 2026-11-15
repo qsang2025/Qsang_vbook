@@ -15,9 +15,18 @@ load('safe-first.js');
 
 function execute(url) {
     url = normalizeUrl(url);
-    var res = fetchPage(url);
-    if (!res.ok) return Response.error("Không tải được chương (HTTP " + res.status + ")");
-    var doc = res.html();
+    // Chap co the nhan URL tuong doi (vd. tu test.json): doi thanh tuyet
+    // doi truoc khi fetch de runtime khong phai doan host.
+    if (url.charAt(0) === "/") url = BASE_URL + url;
+    // FIX 2026-11-15: dung fetchDoc thay cho fetchPage + .html(). fetchPage
+    // co the tra ve doi tuong browser-fallback {doc, ok: true} (khong co
+    // ham .html()) hoac null — ca hai deu crash o day tren may that
+    // (chap dau tien gap HTTP 504: fetchPage log "HTTP 504 lan 1" roi tra
+    // ve doi tuong browser, .html() nem TypeError "Cannot find function
+    // html"). Chi kiem tra res.ok thoi la CHUA DU — doi tuong browser co
+    // ok = true. fetchDoc tra ve Document hoac null, xu ly ca hai dang.
+    var doc = fetchDoc(url);
+    if (!doc) return Response.error("Không tải được chương, thử lại sau");
     doc.select("script").remove();
     doc.select("div.bottem").remove();
     doc.select(".bottem2").remove();

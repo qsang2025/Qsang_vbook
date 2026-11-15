@@ -21,9 +21,11 @@ function execute(url, page) {
     }
     if (!path) return Response.error("Thiếu đường dẫn thể loại");
     var target = BASE_URL + path + pageNo + ".html";
-    var res = fetchPage(target);
-    if (!res.ok) return Response.error("Không tải được danh sách (HTTP " + res.status + ")");
-    var doc = res.html();
+    // FIX 2026-11-15: dung fetchDoc (xem chap.js) — fetchPage + .html()
+    // crash khi fetchPage tra ve doi tuong browser-fallback {doc, ok: true}
+    // hoac null (gap tren may that: HTTP 504 -> TypeError o .html()).
+    var doc = fetchDoc(target);
+    if (!doc) return Response.error("Không tải được danh sách, thử lại sau");
     var data = [];
     var rows = doc.select("#alistbox > div");
     var i = 0;

@@ -9,9 +9,11 @@ load('rate-limit.js');
 load('safe-first.js');
 
 function execute(url) {
-    var res = fetchPage(BASE_URL + (url || ""));
-    if (!res.ok) return Response.error("Không tải được trang chủ (HTTP " + res.status + ")");
-    var doc = res.html();
+    // FIX 2026-11-15: dung fetchDoc (xem chap.js) — fetchPage + .html()
+    // crash khi fetchPage tra ve doi tuong browser-fallback {doc, ok: true}
+    // hoac null (gap tren may that: HTTP 504 -> TypeError o .html()).
+    var doc = fetchDoc(BASE_URL + (url || ""));
+    if (!doc) return Response.error("Không tải được trang chủ, thử lại sau");
     var data = [];
     var rows = doc.select(".GARAN .top");
     var i = 0;

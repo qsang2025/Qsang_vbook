@@ -16,9 +16,11 @@ load('safe-first.js');
 function execute(url) {
     url = normalizeUrl(url);
     url = url.replace("/info-", "/shu/").replace(".html", "/");
-    var res = fetchPage(url);
-    if (!res.ok) return Response.error("Không tải được mục lục (HTTP " + res.status + ")");
-    var doc = res.html();
+    // FIX 2026-11-15: dung fetchDoc (xem chap.js) — fetchPage + .html()
+    // crash khi fetchPage tra ve doi tuong browser-fallback {doc, ok: true}
+    // hoac null (gap tren may that: HTTP 504 -> TypeError o .html()).
+    var doc = fetchDoc(url);
+    if (!doc) return Response.error("Không tải được mục lục, thử lại sau");
     var links = doc.select("#list dl dd a");
     // Dem so lan xuat hien cua moi URL de chi giu lan cuoi cung.
     var counts = {};

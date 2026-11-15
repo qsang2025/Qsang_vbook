@@ -28,9 +28,11 @@ var GENRE_INPUTS = {
 
 function execute(url) {
     url = normalizeUrl(url);
-    var res = fetchPage(url);
-    if (!res.ok) return Response.error("Không tải được trang truyện (HTTP " + res.status + ")");
-    var doc = res.html();
+    // FIX 2026-11-15: dung fetchDoc (xem chap.js) — fetchPage + .html()
+    // crash khi fetchPage tra ve doi tuong browser-fallback {doc, ok: true}
+    // hoac null (gap tren may that: HTTP 504 -> TypeError o .html()).
+    var doc = fetchDoc(url);
+    if (!doc) return Response.error("Không tải được trang truyện, thử lại sau");
 
     var h1El = safeFirst(doc.select("h1.f21h"));
     var author = "";
