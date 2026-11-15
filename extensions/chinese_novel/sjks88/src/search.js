@@ -2,20 +2,18 @@
 //
 // Form tim kiem tren trang chu (kiem chung live 2026-11-16):
 // POST /e/search/indexsearch.php (field keyboard, show=title,
-// classid=0, button submit). POST truc tiep tu VM treo (000 — tarpit
-// IP datacenter), nen gui qua WebView: tao form trong trang chu roi
-// submit (giong bixiange/jpxs123/ffxs8). Ket qua
-// /e/search/result/index.php?page=<0-based>&searchid=<id> (kieu
-// EmpireCMS). Searchid luu vao localStorage de dung cho trang sau.
-// Trang 1 la page token "" (page=1), cac trang sau luu URL day du.
-//
-// Luu y: /e/search/indexsearch.php chi ton tai tren trang chu (form
-// tren trang chi tiet dung /e/search/index.php); luon lay form tu
-// trang chu. Ket qua tim kiem co the dung bo cuc ul.list li (giong
-// trang danh sach) hoac bo cuc khac — parseItemList() trong helper.js
-// thu ca hai (ul.list li roi moi a.title). Neu WebView tra 0 ket qua
+// classid=0). POST truc tiep tu VM treo (000 — tarpit IP datacenter),
+// nen gui qua WebView cua app bang Engine.newBrowser() (tien le
+// bixiange/jpxs123/ffxs8 — API that: b.launch(url, ms), b.callJs(js, ms),
+// b.html(ms), b.close(); KHONG co .get() tra Document). WebView encode
+// form body theo charset cua document (GBK) nen tu khoa duoc gui dung
+// dinh dang; dat them accept-charset="gbk" cho chac (tien le jpxs123).
+// Ket qua /e/search/result/index.php?page=<0-based>&searchid=<id>
+// (kieu EmpireCMS); trang sau fetch truc tiep bang URL day du do
+// nextPageHref() tra ve. Ket qua parse bang parseItemList() trong
+// helper.js (ul.list li roi moi a.title). Neu WebView tra 0 ket qua
 // tren dien thoai that voi 2 tu khoa khac nhau thi cat search.js theo
-// tien le jpxs123/tongrenshe (khong bao gio giu mot o tim kiem chet).
+// tien le jpxs123/tongrenshe.
 //
 // Tai len: file config.js, file config-helpers.js, file fetch-helpers.js,
 // file rate-limit.js, file safe-first.js, file gbk.js, file cleanHtml.js,
@@ -46,53 +44,39 @@ function execute(query, page) {
         return Response.success(items, next);
     }
 
-    // Trang 1: WebView GET trang chu (la form search "formSearch" o day)
-    // roi tao form moi tro toi /e/search/indexsearch.php, do tu khoa
-    // (ma hoa GBK, giong cach nguoi dung go vao o tim kiem), submit.
-    // Khong co Engine (moi truong chay thu tu VM) thi bao loi ro rang.
+    // Trang 1: WebView mo trang chu roi submit form tim kiem bang JS
+    // (tien le ffxs8/bixiange). Khong co Engine (moi truong chay thu
+    // tu VM) thi bao loi ro rang.
     if (typeof Engine === "undefined" || !Engine || !Engine.newBrowser) {
         return Response.error("Tìm kiếm cần WebView của app (Engine không khả dụng)");
     }
-    var raw = Engine.newBrowser().get(BASE_URL + "/");
-    var homeDoc = raw.html("gbk");
-    if (homeDoc === null || isChallengeDoc(homeDoc)) {
-        return Response.error("Không tải được trang chủ (bị chặn hoặc lỗi mạng), thử lại sau");
-    }
-    var form = homeDoc.select("form[name='formSearch']");
-    if (form.isEmpty()) {
-        return Response.error("Không tìm thấy ô tìm kiếm (site có thể đã đổi giao diện)");
-    }
-    var f = form.first();
-
-    // Xoa bo cac nut submit cu roi them cac field an cua form goc.
-    f.select("input[type=submit]").remove();
-    f.select("input[type=hidden]").forEach(function (h) {
-        var name = h.attr("name");
-        var value = h.attr("value");
-        if (name) f.append("<input type='hidden' name='" + name + "' value='" + value + "'/>");
-    });
-    var kw = f.select("input[name='keyboard']");
-    if (kw.isEmpty()) {
-        return Response.error("Không tìm thấy ô nhập từ khóa (site có thể đã đổi giao diện)");
-    }
-    kw.first().val(query);
-
-    // Kich hoat submit tren phien ban goc (bixiange: nut submit co name
-    // "submit" che method submit() nen goi qua prototype).
-    var submitBtn = f.select("input[type=submit]");
-    if (!submitBtn.isEmpty()) {
-        submitBtn.first().click();
-    } else {
-        try { f.submit(); } catch (e) {
-            HTMLFormElement.prototype.submit.call(f);
+    var b = Engine.newBrowser();
+    var resultDoc = null;
+    try {
+        b.launch(BASE_URL + "/", 15000);
+        b.callJs("(function(){var f=document.querySelector('form.formSearch,form[name=formSearch]');if(!f){return 'NOFORM';}var i=f.querySelector('input[name=keyboard]');if(!i){return 'NOINPUT';}try{f.setAttribute('accept-charset','gbk');}catch(e){}i.value=" + JSON.stringify(query) + ";var btn=f.querySelector('input[type=submit],button[type=submit]');if(btn){btn.click();}else{HTMLFormElement.prototype.submit.call(f);}return 'SUBMITTED';})()", 8000);
+        // Trang ket qua ve sau ~0.5-2s; trang "信息提示" tu chuyen ve
+        // trang chu sau 3s, nen poll thay vi sleep co dinh dai.
+        for (var t = 0; t < 10; t++) {
+            sleep(600);
+            resultDoc = b.html(6000);
+            var ti = String(resultDoc.select("title").text() || "");
+            if (ti.indexOf("高级搜索") !== -1 || ti.indexOf("信息提示") !== -1) break;
         }
+        if (resultDoc) {
+            var title2 = String(resultDoc.select("title").text() || "");
+            var body2 = String(resultDoc.select("body").text() || "");
+            if (title2.indexOf("高级搜索") === -1) {
+                var mb = body2.match(/([^ ]{4,40}搜索[^ ]{0,20})/);
+                return Response.error("Tìm kiếm thất bại" + (mb ? ": " + cleanText(mb[1]) : "."));
+            }
+        }
+    } catch (e4) {
+        return Response.error("Lỗi trình duyệt tìm kiếm: " + e4);
+    } finally {
+        b.close();
     }
-
-    // Nhan lai doc sau khi WebView chuyen huong. Ket qua quyet dinh
-    // bang noi dung that (ul.list li) thay vi searchid trong
-    // localStorage: neu submit that bai, doc van la trang chu (portal,
-    // khong co ul.list) nen parseItemList tra rong -> bao loi.
-    var resultDoc = f.ownerDocument();
+    if (!resultDoc) return Response.error("Không đọc được trang kết quả tìm kiếm.");
     var out = parseItemList(resultDoc);
     if (out.length === 0) {
         return Response.error("Không tìm thấy \"" + query + "\"");
