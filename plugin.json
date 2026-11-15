@@ -161,6 +161,18 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Cứu Truyện",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/cuutruyen/plugin.zip",
+      "version": 1,
+      "source": "https://cuutruyen.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/cuutruyen/icon.png",
+      "description": "Cứu Truyện (cuutruyen.net) — đọc truyện tranh: mới cập nhật, nổi bật, thể loại, tìm kiếm. Ảnh chương giải mã DRM của site (xem image_decode.js). Thể loại 18+ (nsfw/khỏa thân/bạo lực/ecchi) đã ẩn khỏi danh sách thể loại. Port từ Cứu Truyện v5 của Darkrai9x (ref: Darkrai9x).",
+      "type": "comic",
+      "locale": "vi_VN",
+      "nsfw": true
+    },
+    {
       "name": "NiACG",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/niacg/plugin.zip",
