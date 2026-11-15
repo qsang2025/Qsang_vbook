@@ -184,6 +184,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "书迷楼",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shumilouxs/plugin.zip",
+      "version": 1,
+      "source": "http://www.shukuai99.org",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shumilouxs/icon.png",
+      "description": "书迷楼 — shukuai99.org: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập: mục lục đầy đủ qua /indexlist/ (748 chương ở sách mẫu), chương đọc đủ thật (ch.1 欢迎进入梦魇直播间 ~4.600 ký tự, ghép 2 trang), tìm kiếm GET /searche6.html. Port từ base Moleys v3 (plaintext), viết mới search/gen; rescan #10 đã kiểm chứng ch.1 đầy đủ thật. Lưu ý: site dùng http (https trả 000 từ VM), domain cũ shumilouxs.com redirect về shukuai99.org.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "同人社",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tongrenshe/plugin.zip",
