@@ -61,14 +61,20 @@ function execute(query, page) {
             sleep(600);
             resultDoc = b.html(6000);
             var ti = String(resultDoc.select("title").text() || "");
-            if (ti.indexOf("高级搜索") !== -1 || ti.indexOf("信息提示") !== -1) break;
+            // Tieu de trang ket qua cua sjks88 la "<tu khoa> 搜索结果 - 手机小说"
+            // (probe 2026-11-16: title nay ve ngay lap tuc, ul.list=1) —
+            // KHONG phai "高级搜索" nhu ffxs8, nen break theo "搜索".
+            if (ti.indexOf("搜索") !== -1 || ti.indexOf("信息提示") !== -1) break;
         }
         if (resultDoc) {
             var title2 = String(resultDoc.select("title").text() || "");
             var body2 = String(resultDoc.select("body").text() || "");
-            if (title2.indexOf("高级搜索") === -1) {
+            if (title2.indexOf("信息提示") !== -1) {
                 var mb = body2.match(/([^ ]{4,40}搜索[^ ]{0,20})/);
                 return Response.error("Tìm kiếm thất bại" + (mb ? ": " + cleanText(mb[1]) : "."));
+            }
+            if (title2.indexOf("搜索") === -1) {
+                return Response.error("Tìm kiếm thất bại.");
             }
         }
     } catch (e4) {

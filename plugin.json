@@ -231,7 +231,7 @@
       "name": "手机小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sjks88/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "http://www.sjks88.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sjks88/icon.png",
       "description": "手机小说 — sjks88.com: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập: mục lục đầy đủ trên trang chi tiết (240 chương ở sách mẫu), chương đọc đủ thật, tìm kiếm qua WebView (POST GBK). Port từ base Moleys v1 (plaintext), viết mới search/gen; rescan #11 đã kiểm chứng ch.1 全球修仙：只有我商城降价十亿倍 đầy đủ thật.",
