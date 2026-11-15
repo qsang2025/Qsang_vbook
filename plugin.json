@@ -206,6 +206,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "刺猬猫",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ciweimao/plugin.zip",
+      "version": 1,
+      "source": "https://mip.ciweimao.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ciweimao/icon.png",
+      "description": "刺猬猫 — mip.ciweimao.com: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập (chương mới nhất khóa sau đăng nhập sẽ báo lỗi rõ, không bypass): mục lục đầy đủ trên 1 trang (749 chương ở sách mẫu), chương đọc đủ thật, lọc watermark 6 ký tự cuối mỗi đoạn, danh sách qua API JSONP của site. Không có tìm kiếm trên site nên search.js được cắt. Port từ base Moleys v4 (plaintext), viết mới config/gen/detail/toc/chap; rescan #11 đã kiểm chứng ch.1 + ch.19 đầy đủ.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "同人社",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tongrenshe/plugin.zip",
