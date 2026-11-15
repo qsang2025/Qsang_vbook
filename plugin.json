@@ -786,6 +786,17 @@
       "nsfw": true
     },
     {
+      "name": "WuxiaWorld",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wuxiaworld/plugin.zip",
+      "version": 1,
+      "source": "https://lite.wuxiaworld.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wuxiaworld/icon.png",
+      "description": "WuxiaWorld — web novel & light novel tiếng Anh đọc miễn phí trên bản lite (lite.wuxiaworld.com), không cần đăng nhập. Chương miễn phí đọc đủ; một số chương mới chỉ có bản xem trước (~900 ký tự) hoặc yêu cầu đăng nhập trên web chính — extension trả bản xem trước kèm ghi chú / báo lỗi rõ ràng, không vượt khóa. Không có duyệt theo thể loại trên bản lite (site không hỗ trợ).",
+      "type": "novel",
+      "locale": "en_US"
+    },
+    {
       "name": "Xa Lộ Sách",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/xalosach/plugin.zip",
