@@ -1,1 +1,101 @@
-{"cases":[{"script":"home.js","input":"","expect":{"contains":["Mới Cập Nhật","Mới Lên Kệ","Sách Mới Nổi Bật"],"minItems":3}},{"script":"genre.js","input":"","expect":{"contains":["玄幻魔法","武侠修真","都市言情"],"minItems":10}},{"script":"up.js","input":"/","expect":{"minItems":30}},{"script":"up1.js","input":"/","expect":{"minItems":30}},{"script":"up2.js","input":"/","expect":{"minItems":10}},{"script":"gen.js","input":"/leibie1_","expect":{"minItems":30}},{"script":"gen.js","input":"/leibie1_","page":"2","expect":{"minItems":30}},{"script":"gen.js","input":"/leibie3_","expect":{"minItems":30}},{"script":"search.js","input":"嫡嫁千金","expect":{"contains":["嫡嫁千金"],"minItems":1}},{"script":"detail.js","input":"https://www.ilwxs.com/info-41361.html","expect":{"contains":["嫡嫁千金","千山茶客"]}},{"script":"toc.js","input":"https://www.ilwxs.com/info-41361.html","expect":{"contains":["第一章 芳菲"],"minItems":200}},{"script":"chap.js","input":"/shu/41361/128018870.html","expect":{"contains":["五月，暮春刚过"]}}],"note":"Fixture cho 乐文小说 (lwxs.com), build 2026-11-15. Truyen mau 嫡嫁千金 (id 41361, tac gia 千山茶客): detail 200, TOC 247 chuong (259 muc dd truoc khi loc trung), ch.1 76 doan <p> mo dau '五月，暮春刚过，天气便急不可待的炙热起来。', tat ca kiem chung tu VM. LUU Y: /search.html tra HTTP 500 tu VM (ca GET lan POST, co/khong cookie) — case search chi chay tren may that; neu tren may cung 500 thi bo search.js theo tien le readernovel/aztruyen. Site mien phi, khong login/VIP; chuong khong chia trang."}
+{
+  "cases": [
+    {
+      "script": "home.js",
+      "input": "",
+      "expect": {
+        "contains": [
+          "Mới Cập Nhật",
+          "Mới Lên Kệ",
+          "Sách Mới Nổi Bật"
+        ],
+        "minItems": 3
+      }
+    },
+    {
+      "script": "genre.js",
+      "input": "",
+      "expect": {
+        "contains": [
+          "玄幻魔法",
+          "武侠修真",
+          "都市言情"
+        ],
+        "minItems": 10
+      }
+    },
+    {
+      "script": "up.js",
+      "input": "/",
+      "expect": {
+        "minItems": 30
+      }
+    },
+    {
+      "script": "up1.js",
+      "input": "/",
+      "expect": {
+        "minItems": 30
+      }
+    },
+    {
+      "script": "up2.js",
+      "input": "/",
+      "expect": {
+        "minItems": 10
+      }
+    },
+    {
+      "script": "gen.js",
+      "input": "/leibie1_",
+      "expect": {
+        "minItems": 30
+      }
+    },
+    {
+      "script": "gen.js",
+      "input": "/leibie1_",
+      "page": "2",
+      "expect": {
+        "minItems": 30
+      }
+    },
+    {
+      "script": "gen.js",
+      "input": "/leibie3_",
+      "expect": {
+        "minItems": 30
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://www.ilwxs.com/info-41361.html",
+      "expect": {
+        "contains": [
+          "嫡嫁千金",
+          "千山茶客"
+        ]
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://www.ilwxs.com/info-41361.html",
+      "expect": {
+        "contains": [
+          "第一章 芳菲"
+        ],
+        "minItems": 200
+      }
+    },
+    {
+      "script": "chap.js",
+      "input": "/shu/41361/128018870.html",
+      "expect": {
+        "contains": [
+          "五月，暮春刚过"
+        ]
+      }
+    }
+  ],
+  "note": "Fixture cho 乐文小说 (lwxs.com), build 2026-11-15. Truyen mau 嫡嫁千金 (id 41361, tac gia 千山茶客): detail 200, TOC 247 chuong (259 muc dd truoc khi loc trung), ch.1 76 doan <p> mo dau '五月，暮春刚过，天气便急不可待的炙热起来。', tat ca kiem chung tu VM. search.js DA BO 2026-11-15: POST /search.html tra HTTP 500 ca tu VM lan tren may that (tien le readernovel/aztruyen). Site mien phi, khong login/VIP; chuong khong chia trang."
+}
