@@ -62,6 +62,18 @@
       "nsfw": true
     },
     {
+      "name": "Biqugezz",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/biqugezz/plugin.zip",
+      "version": 1,
+      "source": "https://www.biqugezz.com/",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/biqugezz/icon.png",
+      "description": "笔趣阁 — Biqugezz (biqugezz.com): truyện chữ tiếng Trung, đọc miễn phí, không cần đăng nhập: mới cập nhật, mới lên kệ, thể loại, tìm kiếm, mục lục đầy đủ, chương chia trang tự nối. Port từ Biqugezz v1 của SoulGod (ref: SoulGod, Nahona).",
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "nsfw": true
+    },
+    {
       "name": "Bixiange",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/bixiange/plugin.zip",
