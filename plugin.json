@@ -206,6 +206,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "抖音小说",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/douyinxs/plugin.zip",
+      "version": 1,
+      "source": "https://m.douyinxs.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/douyinxs/icon.png",
+      "description": "抖音小说 — douyinxs.com: truyện chữ tiếng Trung, đọc miễn phí, không cần đăng nhập: 11 thể loại, tìm kiếm, mục lục phân trang, chương đọc đủ (nối trang _2.html). Port từ douyinxs v1 của SoulGod (ref: SoulGod).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "顶点小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/dingdian666/plugin.zip",

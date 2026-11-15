@@ -1,0 +1,1 @@
+{"cases":[{"name":"Trang chủ","pattern":"抖音小说","url":"https://m.douyinxs.com/"},{"name":"Trang thể loại","pattern":"hot_sale","url":"https://m.douyinxs.com/fenlei/1/1/"},{"name":"Trang truyện mẫu","pattern":"万族之劫","url":"https://m.douyinxs.com/bqg/223080/"}],"note":"Site 200 tu VM (khong Cloudflare). Tim kiem GET /search/?searchkey= tra ket qua that tu VM."}
