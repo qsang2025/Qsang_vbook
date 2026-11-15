@@ -217,6 +217,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "墨坛文学网",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/22mt/plugin.zip",
+      "version": 1,
+      "source": "https://www.22mt.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/22mt/icon.png",
+      "description": "墨坛文学网 — 22mt.net: truyện chữ tiếng Trung, đọc miễn phí, không cần đăng nhập: 8 thể loại, tìm kiếm, mục lục phân trang, chương chia trang tự gộp đủ. Port từ 22mt v1 của SoulGod (ref: SoulGodEve9x9).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "NiACG",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/comic/niacg/plugin.zip",
