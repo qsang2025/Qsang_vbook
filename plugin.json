@@ -261,6 +261,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "饭饭小说",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ffxs8/plugin.zip",
+      "version": 1,
+      "source": "https://www.ffxs8.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ffxs8/icon.png",
+      "description": "饭饭小说 — ffxs8.com: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập: mục lục đầy đủ trên trang chi tiết (1.791 chương ở sách mẫu), chương đọc đủ thật, tìm kiếm qua WebView (POST GBK). Port từ base Moleys v2 (plaintext), viết mới genre/search/gen; rescan #10 đã kiểm chứng ch.1 吞噬星空之主宰 đầy đủ thật.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "墨坛文学网",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/22mt/plugin.zip",
