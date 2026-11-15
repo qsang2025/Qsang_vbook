@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "pattern": "formSearch",
+      "url": "http://www.sjks88.com/"
+    },
+    {
+      "name": "Trang thể loại",
+      "pattern": "index_2",
+      "url": "http://www.sjks88.com/xuanhuan/"
+    },
+    {
+      "name": "Trang truyện mẫu",
+      "pattern": "autor2",
+      "url": "http://www.sjks88.com/xuanhuan/53251.html"
+    },
+    {
+      "name": "Chương 1 mẫu",
+      "pattern": "artic_pages",
+      "url": "http://www.sjks88.com/xuanhuan/53251/1.html"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+[
+  {
+    "script": "home.js",
+    "input": "",
+    "expect": {
+      "contains": [
+        "最新",
+        "排行"
+      ],
+      "minItems": 4
+    }
+  },
+  {
+    "script": "genre.js",
+    "input": "",
+    "expect": {
+      "contains": [
+        "玄幻",
+        "都市"
+      ],
+      "minItems": 22
+    }
+  },
+  {
+    "script": "gen.js",
+    "input": "/xuanhuan/",
+    "expect": {
+      "contains": [
+        "全球修仙"
+      ],
+      "minItems": 20
+    }
+  },
+  {
+    "script": "gen.js",
+    "input": "/xuanhuan/",
+    "page": "https://www.sjks88.com/xuanhuan/index_2.html",
+    "expect": {
+      "contains": [
+        "全球修仙"
+      ],
+      "minItems": 20
+    }
+  },
+  {
+    "script": "gen.js",
+    "input": "/latest/",
+    "expect": {
+      "contains": [
+        "全球修仙"
+      ],
+      "minItems": 20
+    }
+  },
+  {
+    "script": "gen.js",
+    "input": "/ranking/",
+    "expect": {
+      "contains": [
+        "全球修仙"
+      ],
+      "minItems": 20
+    }
+  },
+  {
+    "script": "detail.js",
+    "input": "https://www.sjks88.com/xuanhuan/53251.html",
+    "expect": {
+      "contains": [
+        "全球修仙",
+        "就想搞点钱"
+      ],
+      "minItems": 1
+    }
+  },
+  {
+    "script": "detail.js",
+    "input": "https://www.sjks88.com/xuanhuan/53248.html",
+    "expect": {
+      "contains": [
+        "我都成神了",
+        "清风扶醉月"
+      ],
+      "minItems": 1
+    }
+  },
+  {
+    "script": "toc.js",
+    "input": "https://www.sjks88.com/xuanhuan/53251.html",
+    "expect": {
+      "contains": [
+        "第1节",
+        "第240节"
+      ],
+      "minItems": 240
+    }
+  },
+  {
+    "script": "toc.js",
+    "input": "https://www.sjks88.com/xuanhuan/53248.html",
+    "expect": {
+      "contains": [
+        "第1节"
+      ],
+      "minItems": 100
+    }
+  },
+  {
+    "script": "chap.js",
+    "input": "/xuanhuan/53251/1.html",
+    "expect": {
+      "contains": [
+        "哈哈哈，我穿越了",
+        "林阳"
+      ],
+      "minItems": 1
+    }
+  },
+  {
+    "script": "chap.js",
+    "input": "https://www.sjks88.com/xuanhuan/53251/1.html",
+    "expect": {
+      "contains": [
+        "哈哈哈，我穿越了"
+      ],
+      "minItems": 1
+    }
+  },
+  {
+    "script": "chap.js",
+    "input": "/xuanhuan/53251/2.html",
+    "expect": {
+      "contains": [
+        "你们那边开始测试灵根了吗",
+        "废物一品蓝银草灵根"
+      ],
+      "minItems": 1
+    }
+  },
+  {
+    "script": "search.js",
+    "input": "全球修仙",
+    "expect": {
+      "contains": [
+        "全球修仙"
+      ],
+      "minItems": 1
+    }
+  }
+]
