@@ -1,1 +1,114 @@
-{"cases":[{"expect":{"contains":["最近更新","新书榜"],"minItems":5},"input":"","script":"home.js"},{"expect":{"contains":["玄幻魔法","武侠修真"],"minItems":10},"input":"","script":"genre.js"},{"expect":{"minItems":20},"input":"/lastupdate/","script":"gen.js"},{"expect":{"minItems":20},"input":"/lastupdate/","page":"/lastupdate/2/","script":"gen.js"},{"expect":{"minItems":20},"input":"/leibie1_1.html","script":"gen.js"},{"expect":{"minItems":20},"input":"/leibie2_1.html","script":"gen.js"},{"expect":{"contains":["大奉打更人"],"minItems":1},"input":"大奉打更人","script":"search.js"},{"expect":{"contains":["末世"],"minItems":1},"input":"末世","script":"search.js"},{"expect":{"contains":["大奉打更人","卖报小郎君"]},"input":"https://www.tushumi.cc/shu/105663/","script":"detail.js"},{"expect":{"contains":["末世被算计","万山载月"]},"input":"https://www.tushumi.cc/shu/454369/","script":"detail.js"},{"expect":{"contains":["第一章"],"minItems":900},"input":"https://www.tushumi.cc/shu/105663/","script":"toc.js"},{"expect":{"contains":["第一章"],"minItems":180},"input":"https://www.tushumi.cc/shu/454369/","script":"toc.js"},{"expect":{"contains":["大奉京兆府，监牢"]},"input":"/shu/105663/168360795.html","script":"chap.js"},{"expect":{"contains":["许新年皱了皱眉"]},"input":"https://www.tushumi.cc/shu/105663/168360796.html","script":"chap.js"}],"note":"Fixture cho 图书迷 (tushumi.cc), build 2026-11-15. Truyen mau 1: 大奉打更人 (id 105663, 卖报小郎君, 武侠修真, da hoan thanh — co chuong '完本感言', TOC 980 dd tho / 968 chuong duy nhat; ch.1 '第一章 牢狱之灾' 100 doan <p>, mo dau '大奉京兆府，监牢。许七安幽幽醒来…'; ch.2 89 doan <p>). Truyen mau 2: 末世被算计？我让污染物敲你门！ (id 454369, 万山载月, dang ra, TOC 284 dd tho / 190 chuong duy nhat). Site UTF-8, mien phi, khong login/VIP/preview; search POST /search.html TREO tu VM (co the tarpit IP datacenter) — test tren may that se quyet dinh giu hay bo search.js. Tat ca kiem chung tu VM."}
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "最近更新",
+          "新书榜"
+        ],
+        "minItems": 5
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "玄幻魔法",
+          "武侠修真"
+        ],
+        "minItems": 10
+      },
+      "input": "",
+      "script": "genre.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/lastupdate/",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/lastupdate/",
+      "page": "/lastupdate/2/",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/leibie1_1.html",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/leibie2_1.html",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "大奉打更人",
+          "卖报小郎君"
+        ]
+      },
+      "input": "https://www.tushumi.cc/shu/105663/",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "末世被算计",
+          "万山载月"
+        ]
+      },
+      "input": "https://www.tushumi.cc/shu/454369/",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "第一章"
+        ],
+        "minItems": 900
+      },
+      "input": "https://www.tushumi.cc/shu/105663/",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "第一章"
+        ],
+        "minItems": 180
+      },
+      "input": "https://www.tushumi.cc/shu/454369/",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "大奉京兆府，监牢"
+        ]
+      },
+      "input": "/shu/105663/168360795.html",
+      "script": "chap.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "许新年皱了皱眉"
+        ]
+      },
+      "input": "https://www.tushumi.cc/shu/105663/168360796.html",
+      "script": "chap.js"
+    }
+  ],
+  "note": "search.js removed 2026-11-15: POST/GET /search.html returns HTTP 500 on the real phone (both variants probed); readernovel/aztruyen/lwxs precedent."
+}
