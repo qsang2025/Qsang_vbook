@@ -1,0 +1,1 @@
+{"cases":[{"name":"Trang chủ","pattern":"乐文小说","url":"https://www.ilwxs.com/"},{"name":"Trang thể loại","pattern":"alistbox","url":"https://www.ilwxs.com/leibie1_1.html"},{"name":"Trang truyện mẫu","pattern":"嫡嫁千金","url":"https://www.ilwxs.com/info-41361.html"}],"note":"Site 200 tu VM (khong Cloudflare). Search POST /search.html tra 500 tu VM — khong dua vao health check."}

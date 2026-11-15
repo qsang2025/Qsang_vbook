@@ -139,6 +139,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "乐文小说",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/lwxs/plugin.zip",
+      "version": 1,
+      "source": "https://www.ilwxs.com/",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/lwxs/icon.png",
+      "description": "乐文小说 — Lwxs (lwxs.com): truyện chữ tiếng Trung, đọc miễn phí: mới cập nhật, mới lên kệ, bảng xếp hạng, thể loại, tìm kiếm. Port từ Lwxs v2 của SoulGod (ref: SoulGod).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "书本书",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shubenshu/plugin.zip",
