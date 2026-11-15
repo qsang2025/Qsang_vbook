@@ -283,6 +283,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "無限小說",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/8book/plugin.zip",
+      "version": 1,
+      "source": "https://www.8book.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/8book/icon.png",
+      "description": "無限小說 — 8book.com: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập. Chương đọc qua WebView (HTML tĩnh của trang chương rỗng, nội dung nạp qua JS + iframe); link mục lục trỏ về host spam sport.thepaperbooks.com nhưng episode id là thật nên extension viết lại host về 8book.com. Mục lục đủ 1 trang (120 chương ở sách mẫu), chương 1 đọc đủ thật (2.116 ký tự), tìm kiếm GET /search/?key=. Viết mới hoàn toàn (base duongden v7 mã hoá không dùng được).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "破万卷小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/powanjuan/plugin.zip",
