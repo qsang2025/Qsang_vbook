@@ -1,0 +1,117 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "玄幻魔法",
+          "都市言情"
+        ],
+        "minItems": 6
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "玄幻魔法",
+          "全本小说"
+        ],
+        "minItems": 9
+      },
+      "input": "",
+      "script": "genre.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/sort/1_1/",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/sort/1_1/",
+      "page": "/sort/1_2/",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/sort/3_1/",
+      "script": "gen.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "天师下山"
+        ],
+        "minItems": 5
+      },
+      "input": "天师",
+      "script": "search.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "天师神医",
+          "抽刀断水"
+        ]
+      },
+      "input": "https://www.dingdian666.com/xiaoshuo/47418/",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "大周第一武夫",
+          "醉不致死"
+        ]
+      },
+      "input": "https://www.dingdian666.com/xiaoshuo/347929/",
+      "script": "detail.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "第1章"
+        ],
+        "minItems": 4000
+      },
+      "input": "https://www.dingdian666.com/xiaoshuo/47418/",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "第1章"
+        ],
+        "minItems": 1000
+      },
+      "input": "https://www.dingdian666.com/xiaoshuo/347929/",
+      "script": "toc.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "前往上京市的火车上"
+        ]
+      },
+      "input": "/zhangjie/47418/15616089.html",
+      "script": "chap.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "相比之下，那被挟持的胖子心中更是惊恐万分"
+        ]
+      },
+      "input": "https://www.dingdian666.com/zhangjie/47418/17616089.html",
+      "script": "chap.js"
+    }
+  ],
+  "note": "search.js POST /s.php co luc treo tu VM (tarpit IP datacenter); test tren may that se quyet dinh giu hay bo."
+}
