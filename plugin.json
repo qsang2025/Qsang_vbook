@@ -162,6 +162,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "久久小说",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ijjxs/plugin.zip",
+      "version": 1,
+      "source": "https://www.ijjxsxzw.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/ijjxs/icon.png",
+      "description": "久久小说下载网 — ijjxsxzw.com: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập: đọc online theo trang (/read/<id>/<n>.html), mục lục đầy đủ trên 1 trang (284 trang ở sách mẫu), chương đọc đủ thật, tìm kiếm qua WebView (POST UTF-8). Port từ base Moleys v1 (plaintext), viết mới search/genre/gen; rescan #11 đã kiểm chứng ch.1 đầy đủ.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "乐文小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/lwxs/plugin.zip",
