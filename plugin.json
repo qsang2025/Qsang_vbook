@@ -128,6 +128,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "uu看書",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/uuread/plugin.zip",
+      "version": 1,
+      "source": "https://www.uuread.tw",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/uuread/icon.png",
+      "description": "uu看書 (uuread.tw) — đọc truyện chữ tiếng Trung phồn thể (玄幻, 仙俠, 都市...): thể loại, tìm kiếm, chi tiết, mục lục, đọc chương đủ, không cần đăng nhập. Port từ uu看書 v1 của alexsonxxx (ref: alexsonxxx).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Zongheng",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/plugin.zip",
