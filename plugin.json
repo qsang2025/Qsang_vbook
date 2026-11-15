@@ -785,6 +785,18 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Zumi Novel",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/zuminovel/plugin.zip",
+      "version": 1,
+      "source": "https://zuminovel.com/",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/zuminovel/icon.png",
+      "description": "Zumi Novel (zuminovel.com) — đọc truyện dịch/tiểu thuyết: truyện mới, xem nhiều, thể loại, tìm kiếm, bình luận. Một số truyện thuộc thể loại 18+ (Ecchi/Mature đã ẩn khỏi danh sách thể loại). Port từ Zumi Novel v1 của kychi (ref: kychi).",
+      "type": "novel",
+      "locale": "vi_VN",
+      "nsfw": true
+    },
+    {
       "name": "七猫免费小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/qimao/plugin.zip",
