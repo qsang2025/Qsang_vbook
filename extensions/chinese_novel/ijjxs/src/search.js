@@ -3,7 +3,13 @@
 // Form tim kiem tren trang chu (kiem chung live 2026-11-16):
 // POST /e/search/index.php (field keyboard, show=title,writer,
 // tbname=download, tempid=2, orderby=newstime, myorder=0, nut submit
-// la <button type="submit">), class search. POST truc tiep tu VM treo
+// la <button type="submit">). CHU Y: form KHONG co class "search"
+// (probe 2026-11-16: form.search=NO) — selector phai la
+// form.formSearch,form[name=formSearch],form[action*=search]
+// (action that: https://m.ijjxsxzw.com/e/search/index.php).
+// Selector sai cu lam submit that bai, trang o lai trang chu, vong
+// poll break som tren sach hot cua trang chu va tra 69 sach trang chu
+// lam "ket qua" gia. POST truc tiep tu VM treo
 // (000 — tarpit IP datacenter), nen gui qua WebView cua app bang
 // Engine.newBrowser() (tien le bixiange/jpxs123/ffxs8/sjks88 v2/
 // powanjuan — API that: b.launch(url, ms), b.callJs(js, ms), b.html(ms),
@@ -61,7 +67,7 @@ function execute(query, page) {
     var resultDoc = null;
     try {
         b.launch(BASE_URL + "/", 15000);
-        b.callJs("(function(){var f=document.querySelector('form.search');if(!f){return 'NOFORM';}var i=f.querySelector('input[name=keyboard]');if(!i){return 'NOINPUT';}i.value=" + JSON.stringify(query) + ";var btn=f.querySelector('input[type=submit],button[type=submit]');if(btn){btn.click();}else{HTMLFormElement.prototype.submit.call(f);}return 'SUBMITTED';})()", 8000);
+        b.callJs("(function(){var f=document.querySelector('form.formSearch,form[name=formSearch],form[action*=search]');if(!f){return 'NOFORM';}var i=f.querySelector('input[name=keyboard]');if(!i){return 'NOINPUT';}i.value=" + JSON.stringify(query) + ";var btn=f.querySelector('input[type=submit],button[type=submit]');if(btn){btn.click();}else{HTMLFormElement.prototype.submit.call(f);}return 'SUBMITTED';})()", 8000);
         // Trang ket qua ve sau ~0.5-2s; trang "信息提示" tu chuyen ve
         // trang chu sau 3s, nen poll thay vi sleep co dinh dai.
         // Break khi tieu de chua "搜索"/"信息提示" HOAC khi da thay
@@ -72,7 +78,6 @@ function execute(query, page) {
             resultDoc = b.html(6000);
             var ti = String(resultDoc.select("title").text() || "");
             if (ti.indexOf("搜索") !== -1 || ti.indexOf("信息提示") !== -1) break;
-            if (parseSearchList(resultDoc).length > 0) break;
         }
         if (resultDoc) {
             var title2 = String(resultDoc.select("title").text() || "");
