@@ -91,8 +91,49 @@ function parseBookItem(a, seen) {
     };
 }
 
+// Parser RIENG cho trang ket qua tim kiem — bo cuc KHAC danh sach:
+// <div class="bk_right"><h3><a href="/tongren/<id>.html">TEN</a></h3>
+// <div class="booknews">作者： X <label class="date">NGAY</label></div>
+// <p>简介：...</p></div>. Link <a> NAM TRONG h3 (khong chua h3,
+// .booknews, p nhu .bk > a o trang the loai) nen parseBookItem tra null
+// cho ca 20 ket qua — loi tim kiem tren may that 2026-11-16 (device
+// test 20/22, 2 case search code 1; probe tam xac nhan bk=20, shadow=0).
+function parseSearchList(doc) {
+    var items = [];
+    var seen = {};
+    var cards = doc.select("div.bk_right");
+    if (cards.size() === 0) cards = doc.select("div.bk");
+    for (var i = 0; i < cards.size(); i++) {
+        var card = cards.get(i);
+        var a = safeFirst(card.select("h3 a"));
+        if (a === null) a = safeFirst(card.select("a"));
+        if (a === null) continue;
+        var href = String(a.attr("href") || "");
+        var m = href.match(/^\/(tongren|changgui)\/(\d+)\.html$/);
+        if (!m) continue;
+        var link = BASE_URL + "/" + m[1] + "/" + m[2] + ".html";
+        if (seen[link]) continue;
+        var name = cleanText(a.text());
+        if (!name) continue;
+        seen[link] = 1;
+        var descParts = [];
+        var news = safeFirst(card.select("div.booknews"));
+        if (news !== null) {
+            var t = cleanText(news.text());
+            if (t) descParts.push(t);
+        }
+        var pp = safeFirst(card.select("p"));
+        if (pp !== null) {
+            var d = cleanText(pp.text());
+            if (d) descParts.push(d);
+        }
+        items.push({ name: name, link: link, description: descParts.join(" | ") });
+    }
+    return items;
+}
+
 // Parser toan bo danh sach .bk tren 1 trang (trang the loai, trang
-// chu, trang tag, trang ket qua tim kiem — cung bo cuc).
+// chu, trang tag). Trang ket qua tim kiem dung parseSearchList rieng.
 function parseListItems(doc) {
     var items = [];
     var seen = {};

@@ -106,7 +106,7 @@ function execute(key, page) {
     }
 
     if (!doc) return Response.error("Không đọc được trang kết quả tìm kiếm.");
-    var data = parseListItems(doc);
+    var data = parseSearchList(doc);
     if (data.length === 0) return Response.error("Không tìm thấy \"" + k + "\"");
 
     var next = "";
