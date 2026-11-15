@@ -217,6 +217,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "速读谷",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sudugu520/plugin.zip",
+      "version": 1,
+      "source": "https://www.sudugu520.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sudugu520/icon.png",
+      "description": "速读谷 — sudugu520.com: truyện chữ tiếng Trung đọc miễn phí, không cần đăng nhập: mục lục đầy đủ, chương chia nhiều trang được ghép đủ, tìm kiếm qua /i/sor.aspx. Viết mới từ khảo sát trực tiếp (không có base; rescan #10 đã kiểm chứng ch.1 苟在两界修仙 đầy đủ thật, 4 trang ghép).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "顶点小说",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/dingdian666/plugin.zip",
