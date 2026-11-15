@@ -677,6 +677,18 @@
       "nsfw": true
     },
     {
+      "name": "Novel Next",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novelnext/plugin.zip",
+      "version": 1,
+      "source": "https://novelnext.me",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novelnext/icon.png",
+      "description": "Novel Next — novelnext.me: truyện dịch tiếng Anh đọc miễn phí, không cần đăng nhập: 8.091 truyện, tìm kiếm qua API, mục lục đầy đủ, chương đọc đủ. Viết mới từ khảo sát trực tiếp (2 base Ivan1hai v2 + duongden v6 đều đã mã hoá, không dùng được). Lưu ý: site có thể loại Adult (đã lọc khỏi danh sách thể loại) và thỉnh thoảng giới hạn request 429.",
+      "type": "novel",
+      "locale": "en_US",
+      "nsfw": true
+    },
+    {
       "name": "NovelPhoenix",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/novelphoenix/plugin.zip",
