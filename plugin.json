@@ -577,6 +577,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "MattReading",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/mattreading/plugin.zip",
+      "version": 1,
+      "source": "https://mattreadingtranslations.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/mattreading/icon.png",
+      "description": "MattReading — mattreadingtranslations.com: truyện dịch tiếng Anh đọc miễn phí, không cần đăng nhập: 8 truyện (Tyrant of a Defense Game 885 chương, Slit-Eyed, S-Classes...), tìm kiếm, mục lục đầy đủ, chương đọc đủ. Viết mới từ khảo sát trực tiếp (base Ivan1hai v4 đã mã hoá, không dùng được).",
+      "type": "novel",
+      "locale": "en_US"
+    },
+    {
       "name": "Mê Đọc Truyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/medoctruyen/plugin.zip",
