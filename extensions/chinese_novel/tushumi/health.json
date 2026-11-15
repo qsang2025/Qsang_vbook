@@ -1,0 +1,1 @@
+{"cases":[{"name":"Trang chủ","pattern":"图书迷","url":"https://www.tushumi.cc/"},{"name":"Trang thể loại","pattern":"alistbox","url":"https://www.tushumi.cc/leibie1_1.html"},{"name":"Trang truyện mẫu","pattern":"大奉打更人","url":"https://www.tushumi.cc/shu/105663/"}],"note":"Site 200 tu VM (khong Cloudflare). Search POST /search.html treo tu VM nen khong dua vao health check."}

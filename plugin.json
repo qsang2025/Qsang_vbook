@@ -184,6 +184,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "图书迷",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tushumi/plugin.zip",
+      "version": 1,
+      "source": "https://www.tushumi.cc/",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tushumi/icon.png",
+      "description": "图书迷 — tushumi.cc: truyện chữ tiếng Trung, đọc miễn phí, không cần đăng nhập: mới cập nhật, mới lên kệ, thể loại, tìm kiếm, mục lục đầy đủ, chương đọc đủ. Port từ tushumi.cc v4 của QuocBao (ref: QuocBao, BaoBao666888).",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "微風小說網",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/wfxs/plugin.zip",
