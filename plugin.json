@@ -339,6 +339,18 @@
       "locale": "zh_CN"
     },
     {
+      "name": "腐小说",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/fuxsb/plugin.zip",
+      "version": 1,
+      "source": "https://www.fuxsb.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/fuxsb/icon.png",
+      "description": "腐小说 — fuxsb.com: truyện đam mỹ/BL tiếng Trung đọc miễn phí, không cần đăng nhập. Sách không có chương riêng — mỗi sách phân trang thành nhiều trang, mỗi trang là 1 mục chương (ch.1 2.790 + ch.2 2.787 ký tự, văn xuôi thật, đã kiểm chứng trên máy thật). Tìm kiếm GET EmpireCMS (302 theo searchid) + dự phòng WebView POST; 23 tag; không có ảnh bìa trên site. Trang chi tiết từng bị Cloudflare chặn theo đường dẫn — Anh đã qua challenge 1 lần trong trình duyệt của app nên fetch của extension đọc được (probe 2026-11-16). Port base Moleys v7, viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "nsfw": true
+    },
+    {
       "name": "速读谷",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sudugu520/plugin.zip",
