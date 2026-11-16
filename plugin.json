@@ -107,6 +107,18 @@
       "locale": "zh_TW"
     },
     {
+      "name": "PO18",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/po18me/plugin.zip",
+      "version": 1,
+      "source": "https://wap.po18me.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/po18me/icon.png",
+      "description": "po18me.com — PO18 脸红心跳： truyện chữ tiếng Trung 18+ đọc miễn phí, không cần đăng nhập (nguồn người lớn — nsfw: true, chỉ dành cho người lớn). Chương đọc đủ qua fetch tĩnh (div#nr1, ch.1 寄生 ~2.000 ký tự thật); mục lục đủ 223 chương qua /novel/list/<id>/1.html; thể loại /wapsort/<n>_1.html; tìm kiếm POST /s.php. Port từ base ustaezav PO18 v1 (plaintext), đã bỏ thumb.js (ảnh ngẫu nhiên từ worker ngoài + key cứng, không phải cover thật của site) — site không có cover thật nên để trống.",
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "nsfw": true
+    },
+    {
       "name": "QuanBen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/quanben/plugin.zip",
