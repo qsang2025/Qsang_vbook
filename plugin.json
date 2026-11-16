@@ -953,6 +953,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Việt Nam Thư Quán",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/vn-thuquan/plugin.zip",
+      "version": 1,
+      "source": "https://vnthuquan.org",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/vn-thuquan/icon.png",
+      "description": "Việt Nam Thư Quán — vnthuquan.org: thư viện truyện chữ tiếng Việt miễn phí, văn học cổ điển (Tây Sơn Bi Hùng Truyện, Thủy Hử...). Chương đọc đủ qua fetch tĩnh (ch.2 Tây Sơn 168 đoạn, 19.928 ký tự); mục lục qua API chính thức của site; tìm kiếm GET /Truyen/TimKiem/. Viết mới hoàn toàn (base Ivan1hai v4 mã hoá không dùng được).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "VivuTruyen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/vivutruyen/plugin.zip",
