@@ -1,0 +1,1 @@
+[{"expect":{"contains":["PROBE-DONE"],"minItems":0},"input":"","script":"probe.js"}]
