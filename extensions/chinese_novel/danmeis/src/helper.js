@@ -93,13 +93,83 @@ function parseBookItem(li, seen) {
 }
 
 // Parser toan bo danh sach ul.j_bookList tren 1 trang (trang the loai,
-// trang xep hang, trang ket qua tim kiem — cung bo cuc).
+// trang xep hang — cung bo cuc). Trang ket qua tim kiem KHONG dung bo
+// cuc nay (xem parseSearchList duoi day).
 function parseListItems(doc) {
     var items = [];
     var seen = {};
     var rows = doc.select("ul.j_bookList li.g_col_6");
     for (var i = 0; i < rows.size(); i++) {
         var one = parseBookItem(rows.get(i), seen);
+        if (one !== null) items.push(one);
+    }
+    return items;
+}
+
+// Parser MOT dong ket qua tim kiem (ul.ser-ret li — kiem chung live
+// 2026-11-16: probe tren may that + GET search.php tu VM).
+// Ten lay tu h3 (fallback: alt cua img — KHONG dung title cua a.g_thumb
+// vi site ghi sai thanh "The Great Thief" cho moi sach); link lay tu
+// a.g_thumb (fallback: a trong h3); bia img[_src]; mo ta = em (the loai
+// + tac gia) + p.fs16 dau tien (mo ta sach).
+function parseSearchItem(li, seen) {
+    var id = "";
+    var a = safeFirst(li.select("a.g_thumb"));
+    if (a !== null) id = bookId(String(a.attr("href") || ""));
+    if (!id) {
+        var h3a = safeFirst(li.select("h3 a"));
+        if (h3a !== null) id = bookId(String(h3a.attr("href") || ""));
+    }
+    if (!id) return null;
+    var link = BASE_URL + "/book/" + id + ".html";
+    if (seen[link]) return null;
+
+    var name = "";
+    var h3 = safeFirst(li.select("h3"));
+    if (h3 !== null) name = cleanText(h3.text());
+    if (!name) {
+        var im0 = safeFirst(li.select("img"));
+        if (im0 !== null) name = cleanText(im0.attr("alt") || "");
+    }
+    if (!name) return null;
+    seen[link] = 1;
+
+    var cover = "";
+    var im = safeFirst(li.select("img"));
+    if (im !== null) {
+        cover = String(im.attr("_src") || im.attr("src") || "");
+        if (cover.indexOf("nocover") !== -1) cover = "";
+        if (cover && cover.indexOf("http") !== 0) cover = normalizeDmUrl(cover);
+    }
+
+    var descParts = [];
+    var em = safeFirst(li.select("em"));
+    if (em !== null) {
+        var t = cleanText(em.text());
+        if (t) descParts.push(t);
+    }
+    var dp = safeFirst(li.select("p.fs16"));
+    if (dp !== null) {
+        var d = cleanText(dp.text());
+        if (d) descParts.push(d);
+    }
+
+    return {
+        name: name,
+        cover: cover,
+        link: link,
+        description: descParts.join(" | ")
+    };
+}
+
+// Parser toan bo trang ket qua tim kiem ul.ser-ret (20 sach/trang,
+// #pagestats "N/M"). Bo cuc nay KHAC trang the loai (tien le qbtr #100).
+function parseSearchList(doc) {
+    var items = [];
+    var seen = {};
+    var rows = doc.select("ul.ser-ret li");
+    for (var i = 0; i < rows.size(); i++) {
+        var one = parseSearchItem(rows.get(i), seen);
         if (one !== null) items.push(one);
     }
     return items;

@@ -297,7 +297,7 @@
       "name": "海棠文学",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/danmeis/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://www.danmeis.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/danmeis/icon.png",
       "description": "海棠文学 — danmeis.com: truyện đam mỹ 18+ tiếng Trung đọc miễn phí, không cần đăng nhập (nguồn 18+, chỉ dành cho người lớn). Chương đọc đủ qua fetch tĩnh (#TextContent, ch.1 7.871 ký tự); mục lục đủ 872 chương trên trang chi tiết; tìm kiếm POST /search.html qua WebView. Port base Moleys v2 (haitang16), viết lại hoàn toàn theo hợp đồng hiện tại.",
