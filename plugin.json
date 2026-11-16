@@ -997,6 +997,18 @@
       "locale": "vi_VN"
     },
     {
+      "name": "WTR-LAB",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wtrlab/plugin.zip",
+      "version": 1,
+      "source": "https://wtr-lab.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wtrlab/icon.png",
+      "description": "WTR-LAB — kho truyện dịch tiếng Anh (Next.js, API chính thức của site, không cần đăng nhập). Đọc qua POST /api/reader/get + content_url có chữ ký; mục lục 1 lần gọi API; tìm kiếm qua POST /api/search. Chương khóa trả lỗi rõ ràng, không đọc trước nội dung. Nội dung 18+/adult có trên site (nsfw: true). LƯU Ý: POST của site treo từ IP datacenter (VM) nhưng chạy tốt trên máy thật. Rescan #12.",
+      "type": "novel",
+      "locale": "en_US",
+      "nsfw": true
+    },
+    {
       "name": "WuxiaBox",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/wuxiabox/plugin.zip",

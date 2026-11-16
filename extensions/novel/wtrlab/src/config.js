@@ -5,19 +5,19 @@
 // DOMAIN duoc app inject, nam trong try/catch. Site khong co mirror nao
 // biet duoc nen danh sach mac dinh rong.
 //
-// DAC BIET (khao sat VM 2026-11-16, xem WTRLAB-PROGRESS.md):
+// DAC BIET (kiem chung 2026-11-16, xem WTRLAB-PROGRESS.md):
 // - Site Next.js pages-router, truyen dich tieng Anh. Du lieu qua API JSON:
 //   GET /api/chapters/<raw_id> (muc luc day du 1 lan goi), POST
 //   /api/reader/get {translate, language, raw_id, chapter_no, chapter_id}
 //   (noi dung chuong — tra data.data.body hoac content_url co chu ky
 //   /api/v2/reader/content/... can GET them), POST /api/search {text}.
+//   Trang chi tiet / danh sach / xep hang doc tu __NEXT_DATA__.
 // - POST /api/reader/get + POST /api/search TREO tu VM (timeout 30-90s,
-//   ca ai/web, ca co cookie; GET thi nhanh) — kha nang tarpit IP
-//   datacenter (tien le sjks88/trxs). Probe tren may that se quyet dinh
-//   POST co chay khong (xem WTRLAB-PROBE-README.md).
-// - Chi tiet truyen doc tu __NEXT_DATA__ cua trang chi tiet (GET binh
-//   thuong): title, author, description, image (img.wtr-lab.com),
-//   chapter_count, genres (id so), is_adult.
+//   ca ai/web, ca co cookie; GET thi nhanh) — tarpit IP datacenter, tren
+//   may that chay tot (probe 2026-11-16 ~09:05). Vi vay chap.js/search.js
+//   khong kiem chung duoc tu VM.
+// - URL truyen dung raw_id (/en/novel/<raw_id>/<slug>), khong phai
+//   id/serie_id. Phan trang danh sach 0-based (?page=0 la trang dau).
 // - Genre id -> slug (tu JS cua site): 1:action, 2:adult, 3:adventure,
 //   4:comedy, 5:drama, 6:ecchi, 7:erciyuan, 8:fan-fiction, 9:fantasy,
 //   10:game, 11:gender-bender, 12:harem, 13:historical, 14:horror,
@@ -27,8 +27,9 @@
 //   30:slice-of-life, 31:smut, 32:sports, 33:supernatural, 34:tragedy,
 //   35:urban-life, 36:wuxia, 37:xianxia, 38:xuanhuan, 39:yaoi, 40:yuri.
 //   Loc the loai: GET /en/novel-list?genre=<id> (slug khong co tac dung).
-// - Trang chuong tinh KHONG co text (nap client-side) — chap.js doc qua
-//   API, hoac WebView neu API khong chay (xem probe).
+// - Trang chi tiet khong co co is_adult — nhan biet 18+ qua id the loai
+//   (adult/ecchi/mature/smut/yaoi/yuri), xem file helper.js.
+// - Trang chuong tinh KHONG co text (nap client-side) — chap.js doc qua API.
 //
 // LUU Y load(): file nay duoc load() boi cac script khac, nen KHONG duoc
 // load() them file nao khac o day. Script nao can helper thi tu load()
