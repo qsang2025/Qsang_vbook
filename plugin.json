@@ -1098,6 +1098,17 @@
       "nsfw": true
     },
     {
+      "name": "小説を読もう！",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/yomou/plugin.zip",
+      "version": 2,
+      "source": "https://yomou.syosetu.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/yomou/icon.png",
+      "description": "小説を読もう！ — kho truyện Nhật miễn phí lớn nhất (Shōsetsuka ni Narō), đọc tiếng Nhật gốc qua API chính thức của site, không cần đăng nhập. Chương đầy đủ, mục lục 100 chương/trang, truyện ngắn đọc ngay trên trang chi tiết. Cờ R15 / 残酷な描写あり hiện trong chi tiết truyện (chỉ là cảnh báo nội dung, không phải khóa trả phí). Không có ảnh bìa trên site. Port base khoa301020 v6, viết lại hoàn toàn theo hợp đồng hiện tại.",
+      "type": "novel",
+      "locale": "ja_JP"
+    },
+    {
       "name": "思兔閱讀",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/sto9/plugin.zip",
