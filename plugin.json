@@ -555,6 +555,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Kakuyomu",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/kakuyomu/plugin.zip",
+      "version": 1,
+      "source": "https://kakuyomu.jp",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/kakuyomu/icon.png",
+      "description": "カクヨム (kakuyomu.jp) — tiểu thuyết tiếng Nhật: bảng xếp hạng, thể loại, tìm kiếm. Nội dung đọc ẩn danh, không cần đăng nhập. Viết lại từ __NEXT_DATA__ vì site đã đổi giao diện (base khoa301020 v1, ref: khoa301020).",
+      "type": "novel",
+      "locale": "ja_JP"
+    },
+    {
       "name": "La Cà Truyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
