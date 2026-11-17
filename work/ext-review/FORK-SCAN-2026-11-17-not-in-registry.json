@@ -1,0 +1,2402 @@
+[
+ {
+  "host": "101kks.com",
+  "name": "101kks",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "101minc.com",
+  "name": "101Minc",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "123duw.com",
+  "name": "123ds",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "123truyen.vn",
+  "name": "123 Truyện",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "14.225.254.182",
+  "name": "allin1",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "168txt.cc",
+  "name": "168txt",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "18mh.net",
+  "name": "18mh",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "200669.com",
+  "name": "200669[API - 9x|BTC]",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "20xs.org",
+  "name": "20xs",
+  "type": "chinese_novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "256wx.net",
+  "name": "256wx",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "2tencb.pro",
+  "name": "210CB",
+  "type": "comic",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "4ksw.com",
+  "name": "4ksw",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "5sing.kugou.com",
+  "name": "5sing Kugou",
+  "type": "audio",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "69shu.xyz",
+  "name": "69书吧",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "69shuba.com",
+  "name": "69shu - repo Đường đen",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "69shuba.tw",
+  "name": "69书吧.TW",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "69xinshu.com",
+  "name": "69shu",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "82zw.com",
+  "name": "82zw",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "8383zw.com",
+  "name": "8383zw",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "8muses.com",
+  "name": "8muses",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "8xsk.com",
+  "name": "8xsk",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "99tsx.com",
+  "name": "99txs",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "9y02.xyz",
+  "name": "9y02",
+  "type": "comic",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "aahhss.com",
+  "name": "AAHHSS",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "ai.zalo.solutions",
+  "name": "Multi TTS VN",
+  "type": "tts",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "aistudio.google.com",
+  "name": "AI Chat",
+  "type": "ai",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "allnovel.org",
+  "name": "AllNovel",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "alphapolis.co.jp",
+  "name": "Alphapolis",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "android.lonoapp.net",
+  "name": "[APP] MTC",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "animehay.fm",
+  "name": "Anime Hay",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "animevietsub.news",
+  "name": "Anime Vietsub",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "animevietsub.sale",
+  "name": "AnimeVietsub",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "animevsub.app",
+  "name": "AnimeVsub",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "api-gw.wtzw.com",
+  "name": "Qimao Phim ngắn (七猫短剧)",
+  "type": "video",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "api.deepseek.com",
+  "name": "OpenAI-compatible API",
+  "type": "translate",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "api.langge.cf",
+  "name": "Sói Xám (Fanqie)",
+  "type": "chinese_novel",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "asmr.one",
+  "name": "ASMR One",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "asmr18.fans",
+  "name": "ASMR+18",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "asmrchive.moe",
+  "name": "ASMRchive",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "asmrgay.com",
+  "name": "ASMR基佬中心",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "b.faloo.com",
+  "name": "bFaloo",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "bananacoo.com",
+  "name": "TVKH",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "baotangtruyen14.com",
+  "name": "Bảo Tàng Truyện",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "baozimh.com",
+  "name": "baozimh",
+  "type": "comic",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "bilibili.com",
+  "name": "Trạm B",
+  "type": "video",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "bilibili.tv",
+  "name": "Bilibili",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "bilinovel.net",
+  "name": "Bili Light Novel",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "bixiange.top",
+  "name": "bixiange",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "bjtriz.com",
+  "name": "sweetastes",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "blbattu.com",
+  "name": "BL Bất Tử",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "blvietsub.vip",
+  "name": "BLVietsub",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "bnsvip.net",
+  "name": "【VIP】Bạch Ngọc Sách",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "book.qq.com",
+  "name": "Book QQ",
+  "type": "chinese_novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "book18.org",
+  "name": "book18",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "bookshelf.html5.qq.com",
+  "name": "html5.qq.com",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "boylovebattu.com",
+  "name": "Boylove Bất Tử",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "bqg128.xyz",
+  "name": "07br",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "bqg9527.net",
+  "name": "bqg9527",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "cartoon18.com",
+  "name": "cartoon18",
+  "type": "comic",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "chatxam.info",
+  "name": "Chất Xám",
+  "type": "novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "chillaudio.org",
+  "name": "ChillAudio TTS",
+  "type": "tts",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "ciweimao.com",
+  "name": "CiWeiMao 【刺猬猫】",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "ciyuanji.com",
+  "name": "ciyuanji",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "comic.8ternal.com",
+  "name": "8ternal",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "comnguoinovel.com",
+  "name": "Truyện dịch miễn phí",
+  "type": "novel",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "console.fpt.ai",
+  "name": "FPT AI TTS",
+  "type": "tts",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "cosplaytele.com",
+  "name": "cosplaytele",
+  "type": "comic",
+  "found_in": "gh369-639/vbook-ext-public"
+ },
+ {
+  "host": "cucbongunu.com",
+  "name": "CBunu Comic",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "cuutruyen.net",
+  "name": "Cứu Truyện",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "cwm.elysia.rip",
+  "name": "Elysia",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "damixs.info",
+  "name": "damixs",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "danbooru.donmai.us",
+  "name": "Danbooru",
+  "type": "comic",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "daomeoden.net",
+  "name": "daomeoden",
+  "type": "comic",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "ddxs.com",
+  "name": "ddxs",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "deqixs.org",
+  "name": "deqixsorg",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "deqixss.com",
+  "name": "deqixs",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "destinteam.xyz",
+  "name": "Destin Team",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "dichtienghoa.net",
+  "name": "Dịch Tiếng Hoa",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "diyi69.com",
+  "name": "diyi69",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "dmxs.org",
+  "name": "[dmxs]耽美小说",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "docgiaso1.com",
+  "name": "Độc giả số 1",
+  "type": "comic",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "docsach24.co",
+  "name": "docsach24",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "docsachhay.net",
+  "name": "Đọc Sách Hay",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "doctruyenchufull.org",
+  "name": "Đọc Truyện Full",
+  "type": "novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "doujins.com",
+  "name": "DouJins",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "douyin.com",
+  "name": "Douyin",
+  "type": "video",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "dualeotruyenfull.net",
+  "name": "dualeotruyenfull",
+  "type": "novel",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "dualeotruyenjv.com",
+  "name": "Dưa Leo truyện",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "e-hentai.org",
+  "name": "E Hentai",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "ebookbao6.com",
+  "name": "ebookbao",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "envasion.net",
+  "name": "Motchill",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "fanqienovel.com",
+  "name": "Cà Chua Sói Xám",
+  "type": "chinese_novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "feiku6.com",
+  "name": "Feiku",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "free-reels.com",
+  "name": "FreeReels",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "gaumeoteam.com",
+  "name": "Gấu Mèo Team",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "giangthe.com",
+  "name": "Giáng Thế",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "gioitruyen.com",
+  "name": "Giới Truyện",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "github.com",
+  "name": "Legado",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "global.novelpia.com",
+  "name": "Novelpia Global",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "goctruyentranhvui41.com",
+  "name": "Góc Truyện Tranh",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "gongzicp.com",
+  "name": "gongzicp",
+  "type": "chinese_novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "guphimz.com",
+  "name": "GuPhim",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "h528.com",
+  "name": "h528",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "haccbl.xyz",
+  "name": "Hắc Ám Chi Các",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "haitanglin.com",
+  "name": "haitanglin",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "hangtruyenchu.com",
+  "name": "Hang Truyện Chữ",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "hen18.vip",
+  "name": "Men18",
+  "type": "comic",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "hentai-img.com",
+  "name": "Hentai Image",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "hentai2read.com",
+  "name": "Hentai2Read",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "hentaiasmr.moe",
+  "name": "Hentai ASMR",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "hentaic.net",
+  "name": "hentaic",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "hentaicube.xyz",
+  "name": "HentaiCube",
+  "type": "comic",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "hentaiporns.net",
+  "name": "hentaiporns",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "hentairead.com",
+  "name": "hentairead",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "hentairules.net",
+  "name": "hentairules",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "hentaivietsub.com",
+  "name": "HentaiVietsub.com",
+  "type": "video",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "hentaivnreal.com",
+  "name": "HentaiVN",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "hentaiz.bot",
+  "name": "HentaiZBot",
+  "type": "video",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "hentaiz.cool",
+  "name": "hentaizhot",
+  "type": "video",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "hhhtq.team",
+  "name": "HHHTQ",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "hhkungfu.ee",
+  "name": "HHKUNGFU",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "hhpanda.st",
+  "name": "HHPanda",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "hhtqhay.vip",
+  "name": "HHTQHAY.VIP",
+  "type": "video",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "hiperdex.com",
+  "name": "hiperdex",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "hljzc.cc",
+  "name": "hlzjc",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "hongguoduanju.com",
+  "name": "Hồng quả",
+  "type": "video",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "hotruyen1.com",
+  "name": "Hố Truyện",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "hsex.tv",
+  "name": "Tiểu Bạch TV",
+  "type": "video",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "huazidm.com",
+  "name": "HuaziDM (花子动漫)",
+  "type": "video",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "idejian.com",
+  "name": "idejian",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "ihentai.info",
+  "name": "ihentai",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "immersivetranslate.com",
+  "name": "Immersive Translate",
+  "type": "translate",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "iq.com",
+  "name": "iQIYI",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "iqushuwang.net",
+  "name": "iqushuwang",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "ixdzs.tw",
+  "name": "ixdzs",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "japaneseasmr.com",
+  "name": "Japanese ASMR",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "jellycomics.online",
+  "name": "Jelly Comics",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "jjwxc.net",
+  "name": "Jjwxc-repo duongden💰✅",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "julycomics.site",
+  "name": "JulyComic",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "kanshuwu.org",
+  "name": "kanshuwu",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "kanunu8.com",
+  "name": "kanunu8",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "kenhtruyenma.com",
+  "name": "Kenh Truyen Ma",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "khotruyenchu.fun",
+  "name": "Kho Truyện Chữ",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "khotruyenchu.me",
+  "name": "Kho Truyện Chữ",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "khotruyenchu.space",
+  "name": "Kho Truyện Chữ",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "kkphim.com",
+  "name": "kkphim",
+  "type": "video",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "klz9.com",
+  "name": "KissLove (Raw)",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "kyhuyen.com",
+  "name": "Kỳ Huyễn",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "lacatruyen.homes",
+  "name": "La Cà Truyện",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "lacatruyen.live",
+  "name": "La cà truyện",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "liquge.com",
+  "name": "liquge",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "lkdttzz.com",
+  "name": "lkdttzz",
+  "type": "comic",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "lnkuro.top",
+  "name": "LN Kuro",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "lnovel.org",
+  "name": "Lnovel",
+  "type": "chinese_novel",
+  "found_in": "Evamirion/vbook-ext"
+ },
+ {
+  "host": "lohi2.com",
+  "name": "LoHi",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "loppytoon.com",
+  "name": "LoppyToon",
+  "type": "novel",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "loppytoonn.com",
+  "name": "LoppyToon -18+",
+  "type": "comic",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "lrxs.org",
+  "name": "lrxs",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "lunarx.to",
+  "name": "LunarX",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "luottruyen.net",
+  "name": "LuotTruyen",
+  "type": "comic",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "luottruyen7.com",
+  "name": "LuotTruyen",
+  "type": "comic",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "luphim.com",
+  "name": "LuPhim",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "luvevalandn2.co",
+  "name": "Luvevaland",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "lwxs.com",
+  "name": "lwxs",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.1qxs.com",
+  "name": "17 Tiểu thuyết",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "m.2shuquge.net",
+  "name": "2shuquge",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.60ks.cc",
+  "name": "60ks",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "m.81cnw.com",
+  "name": "81cnw",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.94yd.com",
+  "name": "94yd",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.99csw.com",
+  "name": "99csw",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.abcbiquge.com",
+  "name": "笔趣阁-abcbiquge",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "m.ac.qq.com",
+  "name": "AC QQ",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "m.biquxs.com",
+  "name": "biquxs",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.bqg998.cc",
+  "name": "qmbook",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "m.bqgma.com",
+  "name": "bqgma",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.ijjjxsxzw.com",
+  "name": "ijjjxsxzw",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "m.qiwubiquge.com",
+  "name": "75zwcom",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "m.shencou.com",
+  "name": "shencou 📖",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "m.tangthuvien.net",
+  "name": "Tàng Thư Viện [APP]",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "m.weibo.cn",
+  "name": "Weibo",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "m.xiaojiaren.com",
+  "name": "xiaojiaren",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "m.xinyushuwu2.com",
+  "name": "xinyushuwu",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "m.xsw.tw",
+  "name": "xsw - 台灣小說網",
+  "type": "chinese_novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "m.xyushu5.com",
+  "name": "xyushu5",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "machuteam.vn",
+  "name": "Machu Team",
+  "type": "audio",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "manga-raw.club",
+  "name": "manga-raw",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "manga18.club",
+  "name": "manga18.club",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "manga18fx.com",
+  "name": "manga18fx",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "mangadex.org",
+  "name": "MangaDex",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "mangadistrict.com",
+  "name": "mangadistrict",
+  "type": "comic",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "mangadm.me",
+  "name": "MangaDM",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "mangaread.org",
+  "name": "Manga Read",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "mangayeh.com",
+  "name": "mangayeh",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "manhuagui.com",
+  "name": "Manhua Gui",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "manhuavn.top",
+  "name": "ManhuaVN [Free Chap]",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "manhwabuddy.com",
+  "name": "ManhwaBuddy",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "manhwahentai.me",
+  "name": "ManhwaHentai",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "manhwas.men",
+  "name": "manhwas",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "masiro.me",
+  "name": "masiro 📖🔑",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "mato.suicaodex.com",
+  "name": "MatoDex",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "meiguicom.com",
+  "name": "meiguicom",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "mengyuanshuchengcn.com",
+  "name": "mengyuanshucheng",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "metruyenchu.co",
+  "name": "Mê Truyện Chữ .co",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "metruyenchuvn.org",
+  "name": "Mê Truyện Chữ .com",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "metruyencv.biz",
+  "name": "MTC",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "metruyencv.com",
+  "name": "TruyệnCV",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "metruyencv.com.vn",
+  "name": "Mê Truyện CV",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "metruyencv.xyz",
+  "name": "Mê Truyện CV",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "midureader.com",
+  "name": "Midureader",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "mimihentai.com",
+  "name": "Mimihentai",
+  "type": "comic",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "mimimoe.moe",
+  "name": "Mimimoe",
+  "type": "comic",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "minotruyenv6.xyz",
+  "name": "Mino Truyện",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "mintteanovel.com",
+  "name": "Minttea Novel",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "misskon.com",
+  "name": "Misskon",
+  "type": "comic",
+  "found_in": "gh369-639/vbook-ext-public"
+ },
+ {
+  "host": "monkeyd.net.vn",
+  "name": "MonkeyD VN",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "monkeydd.com",
+  "name": "MonkeyD",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "motchille.cx",
+  "name": "MotChill",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "motphimc.mx",
+  "name": "MotPhim",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "mottruyen.app",
+  "name": "Mọt Truyện",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "moyue.app",
+  "name": "Moyue · Mặc Duyệt",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "municipiodaboavista.com",
+  "name": "municipiodaboavista.com",
+  "type": "comic",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "music.163.com",
+  "name": "NetEase Music",
+  "type": "audio",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "music.octavestreaming.com",
+  "name": "Octave",
+  "type": "audio",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "myreadingmanga.info",
+  "name": "My Reading Manga",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "myrics.com",
+  "name": "Myrics",
+  "type": "chinese_novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "navyteams.com",
+  "name": "Navy Team Comic",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "ncode.syosetu.com",
+  "name": "Syosetu",
+  "type": "novel",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "nettruyen.com.vn",
+  "name": "NetTruyen",
+  "type": "novel",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "nettruyen18.com",
+  "name": "NetTruyen18",
+  "type": "comic",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "nettruyenviet10.com",
+  "name": "NetTruyenViet",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "nettruyenz.com",
+  "name": "NetTruyenZ",
+  "type": "comic",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "nhatruyen.site",
+  "name": "nhatruyen",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "nhentai.net",
+  "name": "nHentai",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "nhieutruyen.com",
+  "name": "nhieutruyen (qidian-vp)",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "novel.html5.qq.com",
+  "name": "[QQ] html5",
+  "type": "chinese_novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "novel18.syosetu.com",
+  "name": "Syosetu R18",
+  "type": "novel",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "novelbuddy.com",
+  "name": "Novel Buddy",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "novelfull.com",
+  "name": "NovelFull",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "novelfull.net",
+  "name": "NovelFull.Net",
+  "type": "eng_novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "novelnext.me",
+  "name": "Novel Next",
+  "type": "novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "ntruyen.xyz",
+  "name": "ntruyen",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "omegascans.org",
+  "name": "Omega Scans",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "ophim17.cc",
+  "name": "OPhim",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "otruyen.cc",
+  "name": "OTruyen",
+  "type": "comic",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "phim.nguonc.com",
+  "name": "NguonC",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "phim4k.xyz",
+  "name": "Phim4K",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "phimfun.net",
+  "name": "PhimFun",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "phimmoic.ws",
+  "name": "Phimmoir",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "phimnhua.online",
+  "name": "Phim Nhựa",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "phimtv.my",
+  "name": "Phimtv",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "phimtv2.com",
+  "name": "PhimTV2",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "pi12345.com",
+  "name": "pi12345",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "piaotian.com",
+  "name": "ptwxz",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "piaotian55.net",
+  "name": "piaotian5",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "piaotianapp.com",
+  "name": "piaotian-app",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "pixiv.net",
+  "name": "pixiv",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "pixnet.cc",
+  "name": "Showbox",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "platform.deepseek.com",
+  "name": "DeepSeek Translate",
+  "type": "translate",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "po18.tw",
+  "name": "po18",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "po18gv.vip",
+  "name": "po18gv",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "po18sm.com",
+  "name": "po18sm",
+  "type": "chinese_novel",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "ptwxz.org",
+  "name": "ptwxzOrg",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "qadcuteo.cc",
+  "name": "QAĐC",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "qidian.com",
+  "name": "qidian",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "quanben.io",
+  "name": "quanben - repo Đường đen",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "quanwenyuedu.io",
+  "name": "quanwenyuedu",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "quykiep.com",
+  "name": "LightNovel VN",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "ranwen.la",
+  "name": "ranwen",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "rawdevart.com",
+  "name": "rawdevart",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "read.douban.com",
+  "name": "douban",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "roadsteami.net",
+  "name": "Roads Team",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "rophim.soy",
+  "name": "RoPhim",
+  "type": "video",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "rophim9.online",
+  "name": "RoPhim",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "royalroad.com",
+  "name": "Royalroad",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "sangtacviet.com",
+  "name": "STV App Vi",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "sayhentai.baby",
+  "name": "SayHentaiBaby -18+",
+  "type": "comic",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "sayhentai.cx",
+  "name": "SayHentai -18+",
+  "type": "comic",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "sayhentai.one",
+  "name": "Say Hentai",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "shencou.com",
+  "name": "Shencou",
+  "type": "chinese_novel",
+  "found_in": "Evamirion/vbook-ext"
+ },
+ {
+  "host": "shibashuwu.net",
+  "name": "ShiBaShuWu -18+",
+  "type": "novel",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "shinigamilnteam.com",
+  "name": "Shinigami LN Team",
+  "type": "novel",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "shubl.com",
+  "name": "shubl",
+  "type": "chinese_novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "shushuwuxs.com",
+  "name": "shushuwuxs",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "sinodan.link",
+  "name": "sinodan",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "sj.qubook.cc",
+  "name": "qubook",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "skymanga.co",
+  "name": "skymanga",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "sobqg.com",
+  "name": "搜笔趣阁",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "sohu.com",
+  "name": "sohu",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "songsearch.kugou.com",
+  "name": "Kugou Music",
+  "type": "audio",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "sstruyen.pics",
+  "name": "nTruyen",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "stash.frostedsakura.my.id",
+  "name": "Frostedsakura Stash",
+  "type": "audio",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "sttruyen.com",
+  "name": "ST Truyện",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "sudugu.org",
+  "name": "LOFTER",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "syosetu.com",
+  "name": "Syosetu",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "syosetu.org",
+  "name": "Hameln (Syosetu.org)",
+  "type": "chinese_novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "tamlinh247.com.vn",
+  "name": "[Main]Tamlinh247",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "tamlinh247.vn",
+  "name": "Tâm Linh 247",
+  "type": "novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "teamsany.com",
+  "name": "Sany Team",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "thegioitruyen.vn",
+  "name": "Thế Giới Truyện",
+  "type": "comic",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "tienvuc.me",
+  "name": "Tiên Vực",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "tiktok.com",
+  "name": "TikTok",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "timotxt.com",
+  "name": "Timotxt",
+  "type": "chinese_novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "tinhlinh.com",
+  "name": "Tinh Linh",
+  "type": "novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "toptruyenww.pro",
+  "name": "Top Truyện",
+  "type": "comic",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "tranh18.com",
+  "name": "Tranh 18",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "translate.google.com",
+  "name": "Google Translate",
+  "type": "translate",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "trumtruyen.live",
+  "name": "Trùm Truyện",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyen.codetheoyeucau.online",
+  "name": "Truyen CodeTheoYeuCau",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyen.lohi2.com",
+  "name": "lohi2",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyen.moe",
+  "name": "MoeTruyen",
+  "type": "comic",
+  "found_in": "Gold2k2k2k/HTri-Vbook-Ext"
+ },
+ {
+  "host": "truyen.now",
+  "name": "Truyen Now",
+  "type": "novel",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "truyen.tangthuvien.vn",
+  "name": "Tàng Thư Viện",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyen35.vn",
+  "name": "Truyện 35",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "truyenchuhay.org",
+  "name": "Truyện Chữ Hay",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyenchuth.com",
+  "name": "truyenchuth",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyenconvert.net",
+  "name": "Truyện Convert",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "truyencv.io",
+  "name": "[APP] Truyện CV",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "truyendex.cc",
+  "name": "TruyenDex",
+  "type": "comic",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "truyendexuat.com",
+  "name": "Truyện Zhihu Tổng Hợp",
+  "type": "novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "truyendich.store",
+  "name": "TruyenDich.AI",
+  "type": "novel",
+  "found_in": "yae-miko-313/ext-vbook"
+ },
+ {
+  "host": "truyendich.vn",
+  "name": "truyendich.vn",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyendichai.com",
+  "name": "Truyện Dịch AI",
+  "type": "novel",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "truyendichai.top",
+  "name": "Truyện Dịch AI",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "truyendocviet.vn",
+  "name": "truyendocviet",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyenfree.org",
+  "name": "truyenfree",
+  "type": "novel",
+  "found_in": "mizhm/vbook-extensions"
+ },
+ {
+  "host": "truyenfull.live",
+  "name": "Truyện Full",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "truyenfull.today",
+  "name": "Truyện Full",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyengg.com",
+  "name": "Truyện GG",
+  "type": "comic",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "truyenggvn.com",
+  "name": "TruyenGG",
+  "type": "comic",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyenh.top",
+  "name": "Truyen H",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyenhdt.com",
+  "name": "TruyệnHD",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "truyenmo.xyz",
+  "name": "Truyện Mơ",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "truyenmoi.app",
+  "name": "Truyện Mới",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyenmoikk.com",
+  "name": "Truyện Mới KK",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyenmoiqq.com",
+  "name": "Truyện Mới",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "truyennet.org",
+  "name": "TruyenNet",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "truyennet.vn",
+  "name": "Truyện Net",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "truyenqq.com.vn",
+  "name": "TruyenQQ",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "truyenqqko.com",
+  "name": "Truyện QQ",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "truyentranh3q.com",
+  "name": "truyentranh3q",
+  "type": "comic",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "truyentranhbl.com",
+  "name": "Đọc Truyện Tranh BL",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "truyentranhdammyy.site",
+  "name": "Truyentranhdammyy",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "truyenvn.my",
+  "name": "TruyenVN",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "truyenwikidich.com",
+  "name": "[APP] Wikidich",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "truyenxxx.net",
+  "name": "truyenheo",
+  "type": "novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "tsumino.com",
+  "name": "TsuMiNo",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "tuishujun.com",
+  "name": "[Review] tuishujun 💬",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "tvtruyen.cc",
+  "name": "TruyenTv",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "tw.hjwzw.com",
+  "name": "黃金屋中文",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "twitch.tv",
+  "name": "Twitch",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "twkan.com",
+  "name": "twkan",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "txt520.com",
+  "name": "txt520",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "tybook.taoyuewenhua.net",
+  "name": "TaoNovel",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "tytnovel.info",
+  "name": "[APP] TYT",
+  "type": "novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "uaa.com",
+  "name": "Uaa",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "ungtycomics.net",
+  "name": "Ưng Tỷ Comics",
+  "type": "comic",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "uukanshu.cc",
+  "name": "uukanshu",
+  "type": "chinese_novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "uushuk.com",
+  "name": "uushuk",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "v5.langge.uk",
+  "name": "Langgee",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "vbookapp.gitbook.io",
+  "name": "Hướng dẫn sử dụng VBook",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "viblo.asia",
+  "name": "Viblo",
+  "type": "novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "viettelai.vn",
+  "name": "Viettel AI TTS",
+  "type": "tts",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "vinahentai.bond",
+  "name": "VinaHentai",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "vip.audiotruyenfull.org",
+  "name": "Audio Truyện Full",
+  "type": "novel",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "vivutruyen.com",
+  "name": "vivutruyencom",
+  "type": "novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "vozer.vn",
+  "name": "Vozer",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "vvbiquge.cc",
+  "name": "vvbiquge",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "w.mgtv.com",
+  "name": "MGTV",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "wanwansekai.com",
+  "name": "WanwanSekai -18+",
+  "type": "novel",
+  "found_in": "hienpro00123/vbook_MeoU"
+ },
+ {
+  "host": "wap.18biquge.com",
+  "name": "18biquge",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "wap.rourouwu.com",
+  "name": "rourouwu",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "watchhentai.net",
+  "name": "WatchHentai.net",
+  "type": "video",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "wattpad.com",
+  "name": "Wattpad",
+  "type": "novel",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "wattpad.com.vn",
+  "name": "Wattpad",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "webtoonscan.com",
+  "name": "WebtoonScan",
+  "type": "comic",
+  "found_in": "WillSun28/vbook-extensions"
+ },
+ {
+  "host": "webtruyenchu.com",
+  "name": "Web Truyện Chữ",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "weebcentral.com",
+  "name": "Weeb Central",
+  "type": "comic",
+  "found_in": "Darkrai9x/vbook-extensions"
+ },
+ {
+  "host": "wenku8.net",
+  "name": "wenku8 📖🔑",
+  "type": "chinese_novel",
+  "found_in": "Moleys/vbook-ext"
+ },
+ {
+  "host": "wetv.vip",
+  "name": "WeTV",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "wikicv.net",
+  "name": "Wiki Dịch",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "wodeshucheng5.com",
+  "name": "wodeshucheng5",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "wuxiaworld.com",
+  "name": "Wuxia World",
+  "type": "",
+  "found_in": "lethituyen/vbooks-extension"
+ },
+ {
+  "host": "x33xs6.com",
+  "name": "x33xs4",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "xbanxia.cc",
+  "name": "Xbanxia - repo Đường đen",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "xbiquge.so",
+  "name": "xbiquge",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "xgmf.zuanqianyi.com",
+  "name": "Dưa Hấu",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "xianqihaotianmi.org",
+  "name": "Xianqihaotiami APP",
+  "type": "chinese_novel",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "xiaoshubao.net",
+  "name": "Xiaoshubao",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "xiongmaoxy.com",
+  "name": "xiongmaoxy",
+  "type": "chinese_novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "xtruyen.net",
+  "name": "XTruyen",
+  "type": "novel",
+  "found_in": "Ivan1hai/ext"
+ },
+ {
+  "host": "y.qq.com",
+  "name": "QQ Music",
+  "type": "audio",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "yeuanime.net",
+  "name": "Yêu Anime",
+  "type": "video",
+  "found_in": "kychitoge/vbook-ext"
+ },
+ {
+  "host": "youku.tv",
+  "name": "YOUKU",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "youtube.com",
+  "name": "YouTube",
+  "type": "video",
+  "found_in": "BaoBao666888/ext-vbook-w"
+ },
+ {
+  "host": "ypshuo.com",
+  "name": "YPShuo - Bình luận sách",
+  "type": "chinese_novel",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "yurineko.net",
+  "name": "Yuri Neko",
+  "type": "",
+  "found_in": "hajljnopera/vbook-ext"
+ },
+ {
+  "host": "zhenhunxiaoshuo.com",
+  "name": "zhenhunxiaoshuo",
+  "type": "chinese_novel",
+  "found_in": "dat-bi/ext-vbook"
+ },
+ {
+  "host": "zingaudio.org",
+  "name": "Zing Audio",
+  "type": "audio",
+  "found_in": "duongden/vbook"
+ },
+ {
+  "host": "zingtruyen.site",
+  "name": "Zing Truyện",
+  "type": "novel",
+  "found_in": "SoulGodEve9x9/Vbook-ext"
+ },
+ {
+  "host": "zingtruyen.store",
+  "name": "Zing Truyện",
+  "type": "novel",
+  "found_in": "lethituyen/vbooks-extension"
+ }
+]
