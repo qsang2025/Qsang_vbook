@@ -1,6 +1,6 @@
 # STATUS — Trạng thái các nguồn (sinh tự động)
 
-> Cập nhật lần cuối: 2026-11-16 01:01 UTC (CI health-check hàng ngày + chạy tay).
+> Cập nhật lần cuối: 2026-11-17 00:49 UTC (CI health-check hàng ngày + chạy tay).
 > File này **không sửa tay**. GitHub Actions sinh lại file này;
 > muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.
 
@@ -25,6 +25,7 @@
 | Bixiange | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | IHuaBen | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | NovelCooksTW | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| PO18 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | QuanBen | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | SF轻小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Tadu | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
@@ -42,9 +43,13 @@
 | 微風小說網 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 手机小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 抖音小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 海棠文学 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 無限小說 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 爱寻书 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 爱趣书网 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 破万卷小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 精品小說網 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 腐小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 速读谷 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 顶点小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 飘天文学 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
@@ -60,8 +65,10 @@
 | DocTruyen14 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | FanMTL | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | iSach | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Kakuyomu | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | La Cà Truyện | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | LilyHub | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| MattReading | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Mê Đọc Truyện | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Mê Đọc Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Mê Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
@@ -98,10 +105,12 @@
 | Truyện Mơ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | TruyệnHD | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | ValvrareTeam | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Việt Nam Thư Quán | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | VivuTruyen | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Web Truyện Dịch | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Wetruyen | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Wiki Dịch | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| WTR-LAB | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | WuxiaBox | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | WuxiaWorld | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Xa Lộ Sách | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
@@ -112,6 +121,7 @@
 | 书海阁 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 和图书 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 小說狂人 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| 小説を読もう！ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 思兔閱讀 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 爱下电子书 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 稷下書院 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
