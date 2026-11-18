@@ -566,6 +566,17 @@
       "locale": "ja_JP"
     },
     {
+      "name": "Kỳ Huyễn",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/kyhuyen/plugin.zip",
+      "version": 1,
+      "source": "https://kyhuyen.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/kyhuyen/icon.png",
+      "description": "Kỳ Huyễn — đọc truyện chữ tiếng Việt trên kyhuyen.com (truyện convert, truyện dịch, sáng tác). Tìm kiếm qua /tim-kiem?q=, 24 truyện/trang, mục lục đầy đủ trên trang chi tiết (chia tab 200 chương), chương đọc đủ không login/VIP. Port từ base kychi_kyhuyen của kychitoge/vbook-ext (ref: kychi), viết lại theo chuẩn nhà Qsang_vbook, selector kiểm chứng live 2026-11-18.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "La Cà Truyện",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/lacatruyen/plugin.zip",
