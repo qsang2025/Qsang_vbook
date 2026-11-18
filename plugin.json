@@ -151,6 +151,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Zhenhunxiaoshuo",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zhenhunxiaoshuo/plugin.zip",
+      "version": 1,
+      "source": "https://www.zhenhunxiaoshuo.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zhenhunxiaoshuo/icon.png",
+      "description": "Truyen đam mỹ / ngôn tình tiếng Trung trên zhenhunxiaoshuo.com (镇魂小说网) — đọc đủ, không cần đăng nhập. Gồm 镇魂 (priest), 魔道祖师, 天官赐福 và hơn 400 truyện thuần ái / ngôn tình / bách hợp. Không có tìm kiếm thật trên site (chỉ đoán slug) nên extension bỏ search.js, giữ mục lục + chương.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Zongheng",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/zongheng/plugin.zip",
