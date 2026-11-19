@@ -1010,6 +1010,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Truyện Kim Dung",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenkimdung/plugin.zip",
+      "version": 1,
+      "source": "https://truyenkimdung.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenkimdung/icon.png",
+      "description": "Truyện Kim Dung — thư viện võ hiệp Kim Dung trên truyenkimdung.net (trọn 20 bộ: bản cũ, truyện ngắn, bản tân tu). Tìm kiếm qua /?q=, lọc theo phiên bản qua /?version=, mục lục đầy đủ trên trang chi tiết (/truyen/<slug>/hoi-<n>-...), chương đọc đủ không login/VIP (đăng nhập chỉ để bình luận). Viết theo chuẩn nhà Qsang_vbook, selector kiểm chứng live 2026-11-19; tham khảo pattern bản Truyện Kim Dung v2 của Meo (ref: Meo).",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Truyện Mơ",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyenmo/plugin.zip",
