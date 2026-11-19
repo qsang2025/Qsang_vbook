@@ -141,6 +141,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Sto66",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sto66/plugin.zip",
+      "version": 1,
+      "source": "https://www.sto66.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sto66/icon.png",
+      "description": "思兔阅读 (Sto66) — sto66.com: kho truyện chữ tiếng Trung lớn, đọc đầy đủ không cần đăng nhập. Mục lục phân trang 500 chương/trang, tìm kiếm theo từ khoá/tác giả, danh sách theo bảng xếp hạng, cập nhật gần nhất, truyện hoàn thành và thể loại. Port theo pattern extension Sto66 v2 của Meo (chinese_novel/sto66), giữ attribution trong description này.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Tadu",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/tadu/plugin.zip",
