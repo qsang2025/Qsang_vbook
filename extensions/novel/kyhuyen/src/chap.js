@@ -2,7 +2,8 @@
 //
 // Trang chuong `/truyen/<slug>/chuong-<N>/<id>` (HTML tinh, kiem chung live
 // 2026-11-18): noi dung o .story-content article, cac doan tach nhau bang
-// <br/><br/>; tieu de chuong o the <title> ("Ten truyen - Chuong N: ...").
+// <br/><br/>; tieu de chuong o h1.header-page ("Chuong N: ..."),
+// fallback the <title> ("Ten truyen - Chuong N: ...").
 // Watermark chen trong bai: <span class="d-none">…yhuyen com</span> va the
 // <a href="https://kyhuyen.com">KyHuyen.com</a> (ke ca dau "." con sot
 // lai sau khi cat the), cong them khoi quang cao (script/div quang cao
@@ -54,5 +55,15 @@ function execute(url) {
     if (!cleanText(contentEl.text())) {
         return Response.error("Nội dung chương trống: " + chapUrl);
     }
-    return Response.success(htmlContent);
+
+    // Tieu de chuong tra ve qua data2 (theo extension-api): lay tu
+    // h1.header-page, fallback the <title> sau dau " - ".
+    var titleEl = safeFirst(doc.select("h1.header-page"));
+    var title = titleEl ? cleanText(titleEl.text()) : "";
+    if (!title) {
+        var t = cleanText(doc.select("title").text());
+        var sep = t.indexOf(" - ");
+        if (sep !== -1) title = cleanText(t.substring(sep + 3));
+    }
+    return Response.success(htmlContent, title);
 }
