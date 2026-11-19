@@ -1,6 +1,7 @@
 // TruyenDich.AI — config dung chung cho moi script.
 // Domain mac dinh: truyendich.space (2026-11-12: .store redirect sang .space,
-// .ai redirect sang .fit — ca 3 deu cung mot backend). Nguoi dung doi domain
+// .ai redirect sang .fit — ca 3 deu cung mot backend; 2026-11-19: them mirror
+// .us cung backend). Nguoi dung doi domain
 // trong cai dat nguon; cac mirror duoc liet ke trong plugin.json.
 let BASE_URL = "https://truyendich.space";
 try {

@@ -947,10 +947,10 @@
       "name": "TruyenDich.AI",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyendich/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://truyendich.space",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/truyendich/icon.png",
-      "description": "Đọc truyện dịch AI & Convert trên TruyenDich.AI. Port từ bản v5 của hieu05 (fork yae-miko-313); domain mặc định truyendich.space (.store redirect sang .space, .ai sang .fit).",
+      "description": "Đọc truyện dịch AI & Convert trên TruyenDich.AI. Port từ bản v5 của hieu05 (fork yae-miko-313); domain mặc định truyendich.space (.store redirect sang .space, .ai sang .fit; .us là mirror cùng backend, kiểm chứng 19/11/2026).",
       "type": "novel",
       "locale": "vi_VN"
     },

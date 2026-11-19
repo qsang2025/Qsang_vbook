@@ -8,8 +8,10 @@
 - Mặc định: **https://truyendich.space** (kiểm chứng 2026-11-12: `.store`
   redirect 301 sang `.space`; `.ai` redirect sang `.fit`; cả ba cùng một
   backend, API giống hệt nhau).
-- Dự phòng trong cài đặt nguồn (DOMAIN, dạng select): `.store`, `.fit`.
-- Regexp cover cả `.space`, `.store`, `.ai`, `.fit`.
+- Dự phòng trong cài đặt nguồn (DOMAIN, dạng select): `.store`, `.fit`,
+  `.us` (mirror cùng backend, kiểm chứng 2026-11-19: trang chủ / chi tiết /
+  chương 1 trên `.us` khớp fixture của `.space`).
+- Regexp cover cả `.space`, `.store`, `.ai`, `.fit`, `.us`.
 
 ## Cách hoạt động
 
