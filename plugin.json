@@ -1323,6 +1323,17 @@
       "locale": "zh_TW"
     },
     {
+      "name": "HHTQ Vietsub",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtqvietsub/plugin.zip",
+      "version": 1,
+      "source": "https://hhtq.press",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtqvietsub/icon.png",
+      "description": "HHTQ Vietsub (hhtq.press) — xem phim hoạt hình 3D Trung Quốc Vietsub: danh sách, tìm kiếm, chi tiết, mục lục tập qua AJAX của theme HalimMovies, phát qua player của site (iframe embed). Build mới từ đầu theo cấu trúc live của hhtq.press khảo sát 2026-11-20; bản Darkrai9x hhtqvietsub bị mã hoá toàn bộ nên không dùng lại code, chỉ dùng để chứng minh site làm được extension.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Hoạt Hình 3D Trung Quốc",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/plugin.zip",
