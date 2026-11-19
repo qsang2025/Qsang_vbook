@@ -1,4 +1,4 @@
-// helper.js — Ham dung chung cho TruyenTV (tvtruyen.space).
+// helper.js — Ham dung chung cho TruyenTV (tvtruyen1.com).
 //
 // Site VN, SSR day du (khong can giai ma GBK, khong can WebView).
 // Port tu kychi truyentv v7 (fork tren dia, src doc duoc), viet lai theo
@@ -45,7 +45,7 @@
 // --- Fetch 1 trang: tra {doc, rawHtml} hoac {error} -----------------------
 // Doc rawHtml truoc roi Html.parse (chi doc body 1 lan — tranh double-read
 // lam .html() tra null). Thu URL goc truoc, roi mirror (mirror 301 ve
-// .space nen fetch() theo redirect).
+// tvtruyen1.com nen fetch() theo redirect).
 function fetchTvPage(url, options) {
     options = options || {};
     var candidates = [url];
@@ -105,7 +105,7 @@ function fetchTvPage(url, options) {
             continue;
         }
         if (isChallengeDoc(doc)) {
-            lastError = "Trang đang yêu cầu xác minh Cloudflare — hãy mở www.tvtruyen.space trong trình duyệt của app một lần rồi thử lại.";
+            lastError = "Trang đang yêu cầu xác minh Cloudflare — hãy mở www.tvtruyen1.com trong trình duyệt của app một lần rồi thử lại.";
             continue;
         }
         return { doc: doc, rawHtml: rawHtml };
@@ -117,11 +117,16 @@ function fetchTvPage(url, options) {
 function normalizeUrl(raw) {
     var u = String(raw || "").trim();
     if (!u) return "";
-    if (u.indexOf("//") === 0) return "https:" + u;
+    if (u.indexOf("//") === 0) u = "https:" + u;
     if (u.indexOf("http") !== 0) {
         if (u.charAt(0) !== "/") u = "/" + u;
         return BASE_URL + u;
     }
+    // Domain cu (space/cc/vip) da 301 ve tvtruyen1.com (2026-11-19):
+    // viet lai host cu ve BASE_URL de link trong thu vien tai thang
+    // domain moi, khong phu thuoc redirect.
+    u = u.replace(/^https?:\/\/(?:www\.)?tvtruyen\.(?:space|cc|vip)(?=\/|$)/i, BASE_URL);
+    u = u.replace(/^https?:\/\/tvtruyen1\.com(?=\/|$)/i, BASE_URL);
     return u.replace(/([^:])\/\/+/g, "$1/");
 }
 
