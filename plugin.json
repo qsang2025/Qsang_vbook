@@ -317,6 +317,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "晋江文学城",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/jjwxc/plugin.zip",
+      "version": 1,
+      "source": "https://www.jjwxc.net",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/jjwxc/icon.png",
+      "description": "晋江文学城 (Tấn Giang) — jjwxc.net: truyện chữ tiếng Trung mã hoá GBK. Đọc chương MIỄN PHÍ đầy đủ không cần đăng nhập; chương VIP được đánh dấu [VIP] + khoá trong mục lục và báo lỗi rõ khi mở, KHÔNG bypass VIP/đăng nhập/mua chương (sách mẫu 砸锅卖铁去上学: 338 chương, 15 miễn phí + 323 VIP). Mục lục đầy đủ trên trang truyện, tìm kiếm qua WebView (form GBK), danh sách theo cập nhật/miễn phí/hoàn kết/điểm + thể loại 言情/纯爱/百合/无CP/多元. Không có ảnh bìa trên trang truyện nên cover để trống.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "海棠文学",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/danmeis/plugin.zip",
