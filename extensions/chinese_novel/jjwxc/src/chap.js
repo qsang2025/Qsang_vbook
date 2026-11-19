@@ -31,10 +31,20 @@ load('cleanHtml.js');
 load('helper.js');
 
 // Dong rac UI trong div.noveltext (dau + cuoi chuong).
+// Trang gop nhieu muc UI tren CUNG 1 dong (vd "[添加书签] [推荐给朋友]
+// [投诉]", "作者有话说 显示所有文的作话") nen khong the so khop
+// chinh xac ca dong: dong rac neu chua bat ky cum UI dac trung nao,
+// hoac khop chinh xac 1 token ngan, hoac la dong dieu huong chan
+// trang dang "第1章 第 1 章".
+var JUNK_SUBSTRINGS = [
+    "[添加书签]", "[推荐给朋友]", "[投诉]", "作者有话说",
+    "显示所有文的作话", "插入书签", "为收藏文章分类",
+    "新增收藏类别", "查看收藏列表", "定制收藏类别"
+];
 var JUNK_LINES = [
-    "[添加书签]", "[推荐给朋友]", "[投诉]", "投诉色情有害", "投诉涉未成年有害",
-    "投诉数据造假", "投诉伪更", "其他", "文章收藏", "插入书签", "作者有话说",
-    "显示所有文的作话", "请稍候", "推荐给朋友", "添加书签", "投诉"
+    "投诉色情有害", "投诉涉未成年有害",
+    "投诉数据造假", "投诉伪更", "其他", "文章收藏",
+    "请稍候", "推荐给朋友", "添加书签", "投诉", "新增", "取消"
 ];
 
 function isJunkLine(t) {
@@ -42,6 +52,12 @@ function isJunkLine(t) {
     for (i = 0; i < JUNK_LINES.length; i++) {
         if (t === JUNK_LINES[i]) return true;
     }
+    for (i = 0; i < JUNK_SUBSTRINGS.length; i++) {
+        if (t.indexOf(JUNK_SUBSTRINGS[i]) !== -1) return true;
+    }
+    // Dong dieu huong chan trang: "第1章 第 1 章" (tieu de don
+    // da bi loai o tren bang t === title).
+    if (/^第\s*\d+\s*章(\s+第\s*\d+\s*章)?$/.test(t)) return true;
     return false;
 }
 
