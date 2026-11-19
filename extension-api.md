@@ -591,6 +591,18 @@ function execute(query, page) {
 - App versions before this show such a section empty — require a recent app if a page
   depends on it.
 
+**Endless last section:** the last section of a page loads on its own and keeps
+going: when its script returns a non-empty `data2`, the app calls
+`execute(input, data2)` again when the user scrolls to the end, until `data2`
+comes back empty, repeats, or adds no new item. Only the last section behaves
+this way, and only with a vertical layout (`grid`, `list`, `news_hero`,
+`news_list`, `board_list`, `thread_list`). Items with a duplicate `link` are
+dropped. Other sections show only their first page.
+
+**Explore tab:** a `home` tab or a `genre` entry with `type: "explore"` opens an
+explore page instead of a list — the named script is called as `execute(input)`
+and returns sections in the explore format above.
+
 **Section `type` values:**
 
 | Value | Description |

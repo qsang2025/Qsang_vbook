@@ -62,7 +62,7 @@ affected guidance and templates.
 ## Resources
 
 - `templates/novel`, `chinese_novel`, `comic`, `audio`, `video`, `tts`,
-  `translate`, `ai` (repo root): complete scaffolds for each supported type.
+  `translate`, `ai`, `forum` (repo root): complete scaffolds for each supported type.
 - `scripts/vbook.js`: connection-aware REST CLI.
 - `scripts/servers.example.json`: local server-list example; `servers.json` is
   per-machine and ignored.
