@@ -141,6 +141,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Shushuwuxs",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shushuwuxs/plugin.zip",
+      "version": 1,
+      "source": "https://www.shushuwuxs.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/shushuwuxs/icon.png",
+      "description": "Truyen tieng Trung tren shushuwuxs.com (书书屋小说) — doc du, khong can dang nhap. Kho truyen lon, chuong phan trang (tu noi cac trang). Khong co tim kiem that tren site (form search la Baidu CSE, ket qua chi hien bang JavaScript) nen extension bo search.js, giu trang chu/the loai/muc luc/chuong. Tham khao cau truc the loai va cach noi trang chuong tu extension shushuwuxs cua dat-bi/ext-vbook.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Sto66",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/chinese_novel/sto66/plugin.zip",
