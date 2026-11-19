@@ -77,29 +77,20 @@ function listThreads(query, page) {
 }
 
 // --- Che do 2: tim kiem tu khoa bang POST ---
+// XenForo doi token CSRF moi lan tim; token doi khi het han (400) nen
+// thu lai 1 lan voi token moi truoc khi bao loi.
 function searchKeyword(query, page) {
-    // Buoc 1: lay token CSRF tu form tim kiem.
-    var formDoc = fetch(BASE_URL + "/search/").html();
-    var token = formDoc.select("input[name=\"_xfToken\"]").attr("value");
-    if (!token) return Response.error("Không lấy được token tìm kiếm, thử lại sau");
-
-    // Buoc 2: POST tim kiem; fetch tu theo redirect toi trang ket qua.
-    var res = fetch(BASE_URL + "/search/search", {
-        method: "POST",
-        body: {
-            keywords: query,
-            _xfToken: token,
-            search_type: "post",
-            order: "date"
-        }
-    });
+    var res = doSearchPost(query);
+    if (!res.ok && res.status === 400) {
+        res = doSearchPost(query);
+    }
     if (!res.ok) return Response.error("Tìm kiếm thất bại (HTTP " + res.status + ")");
     var resultsUrl = res.url || "";
     if (resultsUrl.indexOf("/search/") === -1) {
         return Response.error("Tìm kiếm thất bại, thử lại sau");
     }
 
-    // Buoc 3: trang 1 lay tu POST; trang sau GET lai URL ket qua + ?page=N.
+    // Trang 1 lay tu POST; trang sau GET lai URL ket qua + ?page=N.
     var doc = null;
     if (page === "1") {
         doc = res.html();
@@ -135,4 +126,20 @@ function searchKeyword(query, page) {
 
     var hasNext = !doc.select(".pageNav-page--later").isEmpty();
     return Response.success(items, hasNext ? String(parseInt(page) + 1) : "");
+}
+
+// Mot lan tim kiem: GET /search/ lay token _xfToken, POST /search/search.
+function doSearchPost(query) {
+    var formDoc = fetch(BASE_URL + "/search/").html();
+    var token = formDoc.select("input[name=\"_xfToken\"]").attr("value");
+    if (!token) return { ok: false, status: 0, url: "", html: function () { return null; } };
+    return fetch(BASE_URL + "/search/search", {
+        method: "POST",
+        body: {
+            keywords: query,
+            _xfToken: token,
+            search_type: "post",
+            order: "date"
+        }
+    });
 }
