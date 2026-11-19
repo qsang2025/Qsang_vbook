@@ -2,7 +2,9 @@
 //
 // Layout da kiem chung cua zhenhunxiaoshuo.com (WordPress, UTF-8):
 //   Chuong: https://www.zhenhunxiaoshuo.com/<n>.html
-//     h1.focusbox-title            tieu de chuong (vd. "第1章 他……他他他他还没有脚！")
+//     h1.article-title               tieu de chuong (vd. "第1章 他……他他他他还没有脚！")
+//       (site dung class article-title, khong phai focusbox-title;
+//        giu focusbox-title lam fallback phong khi site doi lai template)
 //     article.article-content > p  toan bo noi dung chuong, moi <p> 1 doan
 //   Noi dung doc DU, khong login/VIP (kiem chung ch.1 镇魂: mo dau
 //   "农历七月十五，天还没亮。" , ket "...收获颇丰——他不单见了领导，还见了鬼。"
@@ -65,7 +67,9 @@ function execute(url) {
     }
     if (!doc) return Response.error("Không đọc được nội dung chương: " + url);
 
-    var title = cleanText(doc.select("h1.focusbox-title").text());
+    var titleEl = doc.select("h1.article-title").first();
+    if (titleEl === null) titleEl = doc.select("h1.focusbox-title").first();
+    var title = titleEl ? cleanText(titleEl.text()) : "";
 
     var article = doc.select("article.article-content").first();
     if (article === null) {
