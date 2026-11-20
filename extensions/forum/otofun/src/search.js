@@ -10,6 +10,8 @@
 //    qua). Phai POST: GET /search/ lay token _xfToken, POST /search/search
 //    (keywords + _xfToken), theo redirect toi trang ket qua /search/<id>/,
 //    doc cac .block-row. Phan trang ket qua dung ?page=N tren URL ket qua.
+//    Token gan voi cookie xf_csrf cua session: POST khong kem cookie nay
+//    tra 400 — lay xf_csrf tu phan hoi GET roi gui kem qua header Cookie.
 //
 // Bam vao thread thi mo thang reader (posts.js), khong qua trang detail.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
@@ -129,12 +131,23 @@ function searchKeyword(query, page) {
 }
 
 // Mot lan tim kiem: GET /search/ lay token _xfToken, POST /search/search.
+// XenForo gan _xfToken voi cookie xf_csrf cua session: POST khong kem
+// cookie nay tra 400 (da tai hien bang curl: khong cookie -> 400, kem
+// xf_csrf -> 200, chi kem xf_session van 400). Runtime app khong chac tu
+// mang cookie tu GET sang POST, nen doc xf_csrf tu phan hoi GET roi gui
+// kem thu cong qua header Cookie; moi lan tim lay token + cookie moi.
 function doSearchPost(query) {
-    var formDoc = fetch(BASE_URL + "/search/").html();
+    var formRes = fetch(BASE_URL + "/search/");
+    if (!formRes.ok) return { ok: false, status: formRes.status, url: "", html: function () { return null; } };
+    var formDoc = formRes.html();
     var token = formDoc.select("input[name=\"_xfToken\"]").attr("value");
     if (!token) return { ok: false, status: 0, url: "", html: function () { return null; } };
+    var csrf = getSearchCsrf(formRes);
+    var headers = { "Referer": BASE_URL + "/search/" };
+    if (csrf) headers["Cookie"] = "xf_csrf=" + csrf;
     return fetch(BASE_URL + "/search/search", {
         method: "POST",
+        headers: headers,
         body: {
             keywords: query,
             _xfToken: token,
@@ -142,4 +155,30 @@ function doSearchPost(query) {
             order: "date"
         }
     });
+}
+
+// Doc gia tri cookie xf_csrf vua duoc server set khi GET /search/.
+// Thu tu: (1) header Set-Cookie cua chinh phan hoi GET do (chinh xac
+// nhat — token vua lay gan voi cookie nay); (2) jar cookie cua app
+// (localCookie) neu GET da luu Set-Cookie vao do. Tra "" neu khong doc
+// duoc — khi do POST gui khong kem Cookie nhu cu (khong te hon).
+function getSearchCsrf(formRes) {
+    var m = null;
+    try {
+        var setCookie = formRes.header("set-cookie");
+        if (setCookie) {
+            m = setCookie.match(/xf_csrf=([^;]+)/);
+            if (m) return m[1];
+        }
+    } catch (e) {
+    }
+    try {
+        var jar = localCookie.getCookie();
+        if (jar) {
+            m = jar.match(/xf_csrf=([^;]+)/);
+            if (m) return m[1];
+        }
+    } catch (e) {
+    }
+    return "";
 }
