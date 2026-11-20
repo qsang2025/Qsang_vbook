@@ -509,6 +509,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Tinhte Forum",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/tinhte/plugin.zip",
+      "version": 1,
+      "source": "https://tinhte.vn",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/tinhte/icon.png",
+      "description": "Dien dan Tinhte (tinhte.vn) — doc thread cong nghe mien phi, khong can dang nhap. Chi doc: bam thread mo thang reader, khong dang bai/like/tra loi. KHONG co tim kiem tu khoa: XenForo bat cookie CSRF (xf_csrf) ma runtime vBook khong doc duoc (da thu 3 cach ngay 20/11 deu HTTP 400) — hay duyet bang Trang chu / The loai. Board dung /forums/<slug>.<id>/ (12 board that, lay tu /forums/), thread dung /thread/<slug>.<id>/, phan trang danh sach va bai trong thread dung /page-N. Trang thread la Next.js nen bai viet doc tu JSON __NEXT_DATA__ (job posts), khong phai .message XenForo.",
+      "type": "forum",
+      "locale": "vi_VN"
+    },
+    {
       "name": "VOZ Forum",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/voz/plugin.zip",
