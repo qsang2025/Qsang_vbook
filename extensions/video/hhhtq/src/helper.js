@@ -7,7 +7,8 @@
 // Tat ca ham duoi day ho tro ca 2 giao dien ma khong can xoay User-Agent.
 // File nay duoc nap boi cac script khac, KHONG nap them file nao o day.
 // Script phai nap file config.js, file config-helpers.js,
-// file fetch-helpers.js, file rate-limit.js truoc file helper.js.
+// file fetch-helpers.js, file rate-limit.js, file safe-first.js
+// truoc file helper.js.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 
 function originOf(url) {
@@ -65,8 +66,13 @@ function extractImgCover(root) {
 // va Desktop (.myui-vodlist__box hoac #searchList li).
 function parseCardEl(el) {
     if (!el) return null;
-    var a = el.select("a[href*='/phim/']").first();
-    if (a === null) a = el.select("a[href*='/xem/']").first();
+    // LUU Y: Elements.first() tren runtime vBook KHONG bao gio tra null
+    // (select rong van tra object rong truthy) nen khong duoc dung
+    // `if (a === null)` de fallback — phai dung safeFirst (kiem size()).
+    // Trang /show/ chi co link /xem/ (khong co /phim/) nen ban cu luon
+    // tra 0 item o trang chu/danh muc.
+    var a = safeFirst(el.select("a[href*='/phim/']"));
+    if (a === null) a = safeFirst(el.select("a[href*='/xem/']"));
     if (a === null) return null;
 
     var rawHref = String(a.attr("href") || "");

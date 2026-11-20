@@ -3,12 +3,13 @@
 // Trang xem phim da chua san danh sach server cua tap do trong .server-list
 // va cac khoi #glist-1..4 / #playlist1..4, nen chi can fetch 1 trang.
 // Tai len: file config.js, file config-helpers.js, file fetch-helpers.js,
-// file rate-limit.js, file helper.js.
+// file rate-limit.js, file safe-first.js, file helper.js.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(url) {

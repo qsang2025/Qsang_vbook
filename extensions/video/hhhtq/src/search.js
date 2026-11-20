@@ -1,12 +1,13 @@
 // search.js — tim kiem tu khoa (/vod/search/) va renderer danh sach cho tab
 // home/genre (/show/... hoac /type/...).
 // Tai len: file config.js, file config-helpers.js, file fetch-helpers.js,
-// file rate-limit.js, file helper.js.
+// file rate-limit.js, file safe-first.js, file helper.js.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
 load('fetch-helpers.js');
 load('rate-limit.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(query, page) {
