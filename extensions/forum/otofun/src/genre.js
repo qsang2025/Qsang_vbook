@@ -1,7 +1,7 @@
 // genre.js — danh sach board (chuyen muc) cua Otofun.
 //
 // Lay tu trang /forums/: moi node .node--forum la mot board (62 board).
-// Moi muc tro ve search.js voi input la duong dan board day du.
+// Moi muc tro ve list.js voi input la duong dan board day du.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 
@@ -15,7 +15,7 @@ function execute() {
         return {
             title: link.text(),
             input: link.attr("href"),
-            script: "search.js",
+            script: "list.js",
             description: el.select(".node-description").text()
         };
     });

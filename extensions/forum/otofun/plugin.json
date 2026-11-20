@@ -17,7 +17,7 @@
   },
   "metadata": {
     "author": "MuseAi",
-    "description": "Dien dan Otofun (otofun.net.vn) — doc thread xe hoi mien phi, khong can dang nhap. Chi doc: bam thread mo thang reader, khong dang bai/like/tra loi. Tim kiem chay bang POST (XenForo, lay token _xfToken + cookie xf_csrf truoc). Phan trang bai trong thread dung /page-N.",
+    "description": "Dien dan Otofun (otofun.net.vn) — doc thread xe hoi mien phi, khong can dang nhap. Chi doc: bam thread mo thang reader, khong dang bai/like/tra loi. KHONG co tim kiem tu khoa: XenForo bat cookie CSRF (xf_csrf) ma runtime vBook khong doc duoc (da thu 3 cach ngay 20/11 deu HTTP 400) — hay duyet bang Trang chu / The loai. Phan trang bai trong thread dung /page-N.",
     "encrypt": false,
     "language": "javascript",
     "locale": "vi_VN",
@@ -25,12 +25,12 @@
     "regexp": "(www\\.)?otofun\\.net\\.vn/threads/[^/]+/?$",
     "source": "https://www.otofun.net.vn",
     "type": "forum",
-    "version": 3
+    "version": 4
   },
   "script": {
     "genre": "genre.js",
     "home": "home.js",
-    "posts": "posts.js",
-    "search": "search.js"
+    "list": "list.js",
+    "posts": "posts.js"
   }
 }
