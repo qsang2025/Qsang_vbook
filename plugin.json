@@ -501,10 +501,10 @@
       "name": "Otofun",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/otofun/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://www.otofun.net.vn",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/otofun/icon.png",
-      "description": "Dien dan Otofun (otofun.net.vn) — doc thread xe hoi mien phi, khong can dang nhap. Chi doc: bam thread mo thang reader, khong dang bai/like/tra loi. Tim kiem chay bang POST (XenForo, lay token _xfToken truoc). Phan trang bai trong thread dung /page-N.",
+      "description": "Dien dan Otofun (otofun.net.vn) — doc thread xe hoi mien phi, khong can dang nhap. Chi doc: bam thread mo thang reader, khong dang bai/like/tra loi. Tim kiem chay bang POST (XenForo, lay token _xfToken + cookie xf_csrf truoc). Phan trang bai trong thread dung /page-N.",
       "type": "forum",
       "locale": "vi_VN"
     },
