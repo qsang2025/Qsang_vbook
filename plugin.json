@@ -1356,6 +1356,28 @@
       "locale": "zh_CN"
     },
     {
+      "name": "HHHTQ",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhhtq/plugin.zip",
+      "version": 1,
+      "source": "https://hhhtq.team",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhhtq/icon.png",
+      "description": "HHHTQ (hhhtq.team) — xem phim hoạt hình 3D Trung Quốc Vietsub (Tiên Nghịch, Tru Tiên, Đấu Phá Thương Khung, Sư Huynh Ơi Sư Huynh, Phàm Nhân Tu Tiên...): hỗ trợ cả giao diện mobile và desktop của MacCMS, giải mã link phát native .m3u8/.mp4 trực tiếp từ Dailymotion, Archive.org, DU server và fallback WebView cho các server nhúng khác (ref: kychitoge).",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "HHKUNGFU",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/plugin.zip",
+      "version": 4,
+      "source": "https://hhkungfu.ee",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/icon.png",
+      "description": "HHKUNGFU (hhkungfu.ee) — xem phim hoạt hình 3D Kungfu Trung Quốc Vietsub & Thuyết Minh (Thương Nguyên Đồ, Đấu La Đại Lục 2, Tru Tiên, Đại Chúa Tể...): hỗ trợ đầy đủ 4 server 1080P V1/V2 & 4K V1/V2 qua AJAX player.php và chế độ WebView container tương thích trình phát nhúng của site (ref: Qsang, kychitoge).",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
       "name": "HHTQ Vietsub",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtqvietsub/plugin.zip",
