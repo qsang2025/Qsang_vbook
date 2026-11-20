@@ -1367,6 +1367,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "HHHTQ",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhhtq/plugin.zip",
+      "version": 2,
+      "source": "https://hhhtq.team",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhhtq/icon.png",
+      "description": "HHHTQ (hhhtq.team) — xem phim hoạt hình 3D Trung Quốc Vietsub (Tiên Nghịch, Tru Tiên, Đấu Phá Thương Khung, Sư Huynh Ơi Sư Huynh, Phàm Nhân Tu Tiên...): hỗ trợ cả giao diện mobile và desktop của MacCMS, giải mã link phát native .m3u8/.mp4 trực tiếp từ Dailymotion, Archive.org, DU server và fallback WebView cho các server nhúng khác (ref: kychitoge).",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
       "name": "HHTQ Vietsub",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtqvietsub/plugin.zip",
