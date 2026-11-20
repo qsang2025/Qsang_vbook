@@ -6,7 +6,7 @@
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 function execute() {
     return Response.success([
-        { title: "M\u1edbi nh\u1ea5t", input: "/whats-new/posts/", script: "list.js" },
-        { title: "Chia s\u1ebb ki\u1ebfn th\u1ee9c", input: "/s/chia-se-kien-thuc.104/", script: "list.js" }
+        { title: "Mới nhất", input: "/whats-new/posts/", script: "list.js" },
+        { title: "Chia sẻ kiến thức", input: "/s/chia-se-kien-thuc.104/", script: "list.js" }
     ]);
 }

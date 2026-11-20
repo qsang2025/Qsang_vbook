@@ -22,7 +22,7 @@
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 
-var NO_KEYWORD_SEARCH_MSG = "VOZ Forum kh\u00f4ng h\u1ed7 tr\u1ee3 t\u00ecm ki\u1ebfm t\u1eeb kh\u00f3a: di\u1ec5n \u0111\u00e0n b\u1eaft cookie CSRF m\u00e0 app kh\u00f4ng \u0111\u1ecdc \u0111\u01b0\u1ee3c. H\u00e3y duy\u1ec7t b\u1eb1ng Trang ch\u1ee7 (M\u1edbi nh\u1ea5t / Chia s\u1ebb ki\u1ebfn th\u1ee9c) ho\u1eb7c Th\u1ec3 lo\u1ea1i \u0111\u1ec3 ch\u1ecdn board r\u1ed3i m\u1edf thread.";
+var NO_KEYWORD_SEARCH_MSG = "VOZ Forum không hỗ trợ tìm kiếm từ khóa: diễn đàn bắt cookie CSRF mà app không đọc được. Hãy duyệt bằng Trang chủ (Mới nhất / Chia sẻ kiến thức) hoặc Thể loại để chọn board rồi mở thread.";
 
 function execute(query, page) {
     query = query || "";
@@ -42,7 +42,7 @@ function listThreads(query, page) {
     var base = query.indexOf("http") === 0 ? query : BASE_URL + query;
     var url = base + (base.indexOf("?") === -1 ? "?" : "&") + "page=" + page;
     var response = fetch(url);
-    if (!response.ok) return Response.error("Kh\u00f4ng t\u1ea3i \u0111\u01b0\u1ee3c danh s\u00e1ch (HTTP " + response.status + ")");
+    if (!response.ok) return Response.error("Không tải được danh sách (HTTP " + response.status + ")");
     var doc = response.html();
 
     // Ten board (chi co khi duyet mot board /s/...; trang whats-new

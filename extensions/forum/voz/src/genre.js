@@ -8,7 +8,7 @@ load('config.js');
 
 function execute() {
     var response = fetch(BASE_URL + "/");
-    if (!response.ok) return Response.error("Kh\u00f4ng t\u1ea3i \u0111\u01b0\u1ee3c danh s\u00e1ch board (HTTP " + response.status + ")");
+    if (!response.ok) return Response.error("Không tải được danh sách board (HTTP " + response.status + ")");
     var doc = response.html();
 
     var genres = doc.select(".node--forum").map(function (el) {
