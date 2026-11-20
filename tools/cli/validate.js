@@ -48,7 +48,7 @@ const REPO = "qsang2025/Qsang_vbook";
 const BRANCH = "main";
 const RAW_BASE = "https://raw.githubusercontent.com/" + REPO + "/" + BRANCH;
 const LOCALES = ["vi_VN", "zh_CN", "ja_JP", "en_US", "zh_TW"];
-const TYPES = ["novel", "comic", "chinese_novel", "video", "audio", "translate", "tts", "ai"];
+const TYPES = ["novel", "comic", "chinese_novel", "video", "audio", "translate", "tts", "ai", "forum"];
 // File helper được chấp nhận trong src/ mà không cần có trong script map.
 const HELPER_NAMES = ["config.js", "helper.js"];
 

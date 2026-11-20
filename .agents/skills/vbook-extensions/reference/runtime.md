@@ -102,6 +102,17 @@ Static and dynamic sections mix freely on one page.
   retry. Pull to refresh reruns `explore.js`, then the section scripts.
 - Apps older than this feature show dynamic sections empty.
 
+**Endless last section:** the last section of a page keeps loading while its
+script returns a non-empty `data2` — the app calls `execute(input, data2)` again
+at the end of the list, until `data2` is empty, repeats, or adds no new item.
+Only the last section, and only with a vertical layout (`grid`, `list`,
+`news_hero`, `news_list`, `board_list`, `thread_list`). Duplicate `link` items
+are dropped.
+
+**Explore tab:** a `home` tab or a `genre` entry with `type: "explore"` opens an
+explore page instead of a list; the named script is called as `execute(input)`
+and returns explore sections.
+
 ## Packaging and actions
 
 - Optional files referenced dynamically from detail fields (for example `similar.js`

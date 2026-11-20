@@ -33,7 +33,7 @@ home / genre  →  search  →  detail  →  (page)  →  toc  →  chap
 - Không dùng arrow function hay cú pháp JS hiện đại vượt giới hạn Rhino ES6.
 - Locale chuẩn: `vi_VN` / `zh_CN` / `ja_JP` / `en_US`. Type chuẩn theo
   `extension-api.md`: `novel`, `chinese_novel`, `comic`, `video`, `audio`,
-  `translate`, `tts`, `ai`.
+  `translate`, `tts`, `ai`, `forum`.
 
 ## 2. config.js — bắt buộc với mọi nguồn
 

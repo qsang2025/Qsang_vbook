@@ -46,6 +46,18 @@ Declare `chatStream`. Provider URL, key, and model belong in config. Stream with
 `fetch(..., {stream:true})`, `readLine()`, and `ai.emitToken(...)`, or return one complete
 non-empty response for a non-streaming provider.
 
+## Forum
+
+Read-only forum: a thread list opens straight into the reader, with no detail,
+toc, or chap page. Declare `posts` plus at least one list source (`home`,
+`explore`, `genre`, or `search`); `search.js` doubles as the list script for
+`home` / `genre` tabs, the same way it does for novels. `posts(url, page)`
+returns one page of posts as `data` (or `{ posts, page, total_pages }` to show
+page numbers and allow jumping) and the next token as `data2`. Section types
+`board_list` and `thread_list` render forum lists in explore; TTS reads a
+thread page by page, one post at a time as "author: content". The app never
+posts, likes, or replies through a forum extension.
+
 ## Shared navigation/detail notes
 
 - Detail genre/tag links go in `genres` — the only one of the two the detail screen

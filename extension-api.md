@@ -135,6 +135,7 @@ produce encrypted scripts. A script that fails to decrypt is used as plain text.
 | `tts` | Text-to-speech engine |
 | `translate` | Translation engine |
 | `ai` | AI assistant provider (see [AI Assistant Engine](#complete-example-ai-assistant-engine)) |
+| `forum` | Read-only forum (thread list → reader, no detail page; see [`posts.js`](#postsjs)) |
 
 `ebook` and `news` are not extension types — they are values of `detail`'s
 [`type`](#detailjs) field.
@@ -157,6 +158,7 @@ positionally:
 | `toc` | Chapter list (of one TOC page) | `execute(url)` |
 | `chap` | Chapter content | `execute(url)` |
 | `track` | Video / audio track | `execute(data)` |
+| `posts` | Forum thread posts (one page) | `execute(url, page)` |
 | `page` | Optional TOC pagination: list of TOC page URLs | `execute(url)` |
 | `voice` | TTS voice + language list | `execute()` |
 | `tts` | TTS synthesis | `execute(text, voiceId)` |
@@ -180,24 +182,25 @@ passed unchanged.
 `plugin.json` must exist in `src/`; scripts the app never calls for a type can be
 omitted from both.
 
-| Script | `novel` | `comic` | `audio` | `video` | `tts` | `translate` | `ai` |
-|--------|:------:|:------:|:------:|:------:|:----:|:----------:|:--:|
-| `search` (+ the scripts it references) | ✓ | ✓ | ✓ | ✓ | — | — | — |
-| `detail` | ✓ | ✓ | ✓ | ✓ | — | — | — |
-| `toc` | ✓ | ✓ | ✓ | ✓ | — | — | — |
-| `chap` | ✓ | ✓ | ✓² | ✓² | — | — | — |
-| `page` | ○¹ | ○¹ | ○¹ | ○¹ | — | — | — |
-| `track` | — | — | ✓ | ✓ | — | — | — |
-| `home` | ○ | ○ | ○ | ○ | — | — | — |
-| `explore` | ○ | ○ | ○ | ○ | — | — | — |
-| `genre` | ○ | ○ | ○ | ○ | — | — | — |
-| `voice` | — | — | — | — | ✓ | — | — |
-| `tts` | — | — | — | — | ✓ | — | — |
-| `language` | — | — | — | — | — | ✓ | — |
-| `model` | — | — | — | — | — | ○ | — |
-| `style` | — | — | — | — | — | ○ | — |
-| `translate` | — | — | — | — | — | ✓ | — |
-| `chatStream` | — | — | — | — | — | — | ✓ |
+| Script | `novel` | `comic` | `audio` | `video` | `tts` | `translate` | `ai` | `forum` |
+|--------|:------:|:------:|:------:|:------:|:----:|:----------:|:--:|:-----:|
+| `search` (+ the scripts it references) | ✓ | ✓ | ✓ | ✓ | — | — | — | ✓ |
+| `detail` | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
+| `toc` | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
+| `chap` | ✓ | ✓ | ✓² | ✓² | — | — | — | — |
+| `posts` | — | — | — | — | — | — | — | ✓ |
+| `page` | ○¹ | ○¹ | ○¹ | ○¹ | — | — | — | — |
+| `track` | — | — | ✓ | ✓ | — | — | — | — |
+| `home` | ○ | ○ | ○ | ○ | — | — | — | ○ |
+| `explore` | ○ | ○ | ○ | ○ | — | — | — | ○ |
+| `genre` | ○ | ○ | ○ | ○ | — | — | — | ○ |
+| `voice` | — | — | — | — | ✓ | — | — | — |
+| `tts` | — | — | — | — | ✓ | — | — | — |
+| `language` | — | — | — | — | — | ✓ | — | — |
+| `model` | — | — | — | — | — | ○ | — | — |
+| `style` | — | — | — | — | — | ○ | — | — |
+| `translate` | — | — | — | — | — | ✓ | — | — |
+| `chatStream` | — | — | — | — | — | — | ✓ | — |
 
 ¹ `page` paginates the table of contents, for sites that split the chapter list over
 several pages. It receives the book URL and returns the TOC page URLs; `toc` is then
@@ -223,6 +226,17 @@ playable tracks, then `track` to resolve the chosen one (see
   `style` scripts expose selectors whose chosen IDs are passed to `translate`.
   Also skips the fetch scripts.
 - **`ai`** (engine): only `chatStream`.
+- **`forum`** (read-only forum, no detail page): required `posts` (one page of
+  thread posts) + at least one list source (`home` / `genre` / `search` —
+  `search.js` doubles as the list script for `home` / `genre` tabs, the same
+  way it does for novels). No `detail` / `toc` / `chap`: tapping a thread in
+  a list opens the reader directly with `posts.js` (the app saves the item
+  to history first, taking `name` / `cover` from the list item, so `posts.js`
+  only needs to return the posts). Call order: `home` / `genre` / `search` →
+  `posts`. Optional discovery `home`, `explore`, `genre` — omit them and the
+  app just hides those sections. TTS reads a thread page by page, one post at
+  a time as "author: content", stopping at the end of the page, so `content`
+  must be real paragraph text, not loose HTML fragments.
 
 The per-chapter content script by type:
 
@@ -234,6 +248,7 @@ The per-chapter content script by type:
 | `audio` | `toc` | `chap` → track list, then `track` → playback object | Each TOC entry is one track of the playlist; plays `audios[0].data` when present, else `data`. Formats: `audio`, `album` |
 | `tts` | `voice` → voices/languages | `tts` → base64 audio | Engine, not a content source |
 | `translate` | `language` → from/to list; optional `model` / `style` selectors | `translate` → text/segments | Engine, not a content source |
+| `forum` | `home` / `genre` / `search` → thread list | `posts` → post list (reader opens directly, no detail) | Read-only; no posting, liking, or replying |
 
 What `chap` must return depends on the book's type (from `detail`'s `type`/`format`,
 else the extension `type`):
@@ -576,6 +591,18 @@ function execute(query, page) {
 - App versions before this show such a section empty — require a recent app if a page
   depends on it.
 
+**Endless last section:** the last section of a page loads on its own and keeps
+going: when its script returns a non-empty `data2`, the app calls
+`execute(input, data2)` again when the user scrolls to the end, until `data2`
+comes back empty, repeats, or adds no new item. Only the last section behaves
+this way, and only with a vertical layout (`grid`, `list`, `news_hero`,
+`news_list`, `board_list`, `thread_list`). Items with a duplicate `link` are
+dropped. Other sections show only their first page.
+
+**Explore tab:** a `home` tab or a `genre` entry with `type: "explore"` opens an
+explore page instead of a list — the named script is called as `execute(input)`
+and returns sections in the explore format above.
+
 **Section `type` values:**
 
 | Value | Description |
@@ -586,6 +613,8 @@ function execute(query, page) {
 | `list` | Vertical list layout |
 | `ranking` | Numbered ranking list |
 | `chip` | Tag/chip buttons row |
+| `board_list` | Forum board list (vertical) |
+| `thread_list` | Forum thread list (vertical) |
 
 **Action fields** (used in both section `more` and item `action`):
 
@@ -689,6 +718,22 @@ function execute(query, page) {
 | `tag` | string | no | Tag text (e.g. "Completed", "Hot") |
 | `host` | string | no | Base URL for a relative `link` / `cover` (default: extension `source`) |
 | `type` | string | no | Content type of the item, see below |
+| `author` | string | no | Forum thread author (also `board` items: —) |
+| `time` | string | no | Forum thread time (display text, or epoch seconds/ms) |
+| `avatar` | string | no | Forum thread author avatar URL |
+| `replies` | string | no | Forum thread reply count, as display text (e.g. `"1.2K"`) |
+| `views` | string | no | Forum thread view count, as display text |
+| `board` | string | no | Forum thread board name |
+| `last_post` | object | no | Forum thread last post: `{ user, time }` |
+| `pinned` | boolean | no | Forum thread is pinned (shown first) |
+| `locked` | boolean | no | Forum thread is locked |
+| `hot` | boolean | no | Forum thread is hot (reply count shown in red) |
+| `threads` | string | no | Forum board thread count, as display text |
+| `posts` | string | no | Forum board post count, as display text |
+
+`description` on a forum thread is the post lead; on a board it is the board
+description. A board is a list item whose `link` / `action` usually opens a
+thread list (`{ type: "list", ... }`).
 
 #### Item `type`
 
@@ -703,6 +748,10 @@ Applies to list/search items and explore items alike (case-insensitive).
 In explore, `stream` / `short` only take effect through a `detail` action — the
 default one created from `link`, or an explicit `{ type: "detail" }`. Any other
 action type overrides them.
+
+Items of a `forum` extension always open the reader directly, whatever `type`
+the script declares (the same rule the API table states for forum items):
+there is no detail page for a forum thread.
 
 ### detail.js
 
@@ -929,6 +978,76 @@ function execute(url) {
     return Response.success(images);
 }
 ```
+
+### posts.js
+
+Returns one page of posts of a forum thread (`forum` type only). `url` is the
+thread's `link`; `page` is the token the previous call returned as `data2`
+(empty on the first call). Return one page of posts as `data` and the next
+token as `data2` (empty at the end). To show page numbers and let users jump
+to a page, return `data` as an object `{ posts, page, total_pages }` and keep
+the token a page number (`"1"`, `"2"`, …; an empty `page` on the first call
+means 1). Without `total_pages` the app only loads pages one after another.
+
+**Parameters:**
+
+| Param | Description |
+|-------|-------------|
+| `url` | The thread URL — the `link` a list item pointed to |
+| `page` | Next-page token — whatever the previous call returned as `data2`. Empty on the first page |
+
+```js
+function execute(url, page) {
+    page = page || "1";
+
+    let pageUrl = url + (url.indexOf("?") === -1 ? "?" : "&") + "page=" + page;
+    let doc = fetch(pageUrl).html();
+
+    let posts = doc.select(".post").map(function(el) {
+        return {
+            id: el.attr("data-id"),
+            floor: el.select(".floor").text(),
+            url: el.select(".permalink").attr("href"),
+            is_op: el.hasClass("op"),
+            time: el.select(".post-time").text(),
+            user: {
+                name: el.select(".username").text(),
+                avatar: el.select(".avatar img").attr("src"),
+                link: el.select(".username").attr("href")
+            },
+            content: el.select(".post-content").html(),
+            content_format: "html"
+        };
+    });
+
+    let hasNext = doc.select(".pagination .next").size() > 0;
+    return Response.success(posts, hasNext ? String(parseInt(page) + 1) : "");
+}
+```
+
+**Post fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | no | Post id (or `floor`) — used to de-duplicate across pages |
+| `floor` | string | no | Floor number as display text (e.g. `"#1"`) |
+| `url` | string | no | Post permalink |
+| `is_op` | boolean | no | True when the post is by the thread starter |
+| `time` | string | no | Post time (display text, or epoch seconds/ms) |
+| `user` | object | yes | Author: `name` (required); optional `id`, `avatar`, `link`, `title`, `role`, `badges[]`, `joined`, `posts_count` (number), `reputation`, `online` |
+| `content` | string | yes | Post body. Write it as real paragraph text, not loose HTML fragments — TTS reads one post at a time as "author: content" |
+| `content_format` | string | no | `"html"` (default) or `"markdown"` |
+| `signature` | string | no | Author signature (+ `signature_format`, same values as `content_format`) |
+| `edited` | object | no | `{ time, by, reason }` |
+| `likes` | number | no | Like count |
+| `dislikes` | number | no | Dislike count |
+| `reactions` | array | no | `[{ type, count }]` — `type` is display text (e.g. an emoji) |
+| `reply_to` | object | no | `{ floor, user }` of the post this replies to |
+| `attachments` | array | no | `[{ type, link, name, size }]` — tapping one opens the link |
+
+Pagination follows the site, not a fixed rule: some sites use `?page=N`,
+others (e.g. XenForo) put the page in the path (`/page-N`). Verify against a
+multi-page thread — a thread with a single post cannot prove pagination works.
 
 ### track.js (Video & Audio)
 

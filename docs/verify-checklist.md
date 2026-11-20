@@ -15,7 +15,7 @@ Mục nào không áp dụng thì ghi rõ lý do, không bỏ qua im lặng.
 - [ ] `locale` chuẩn: `vi_VN` / `zh_CN` / `ja_JP` / `en_US` — không
       `vi-VN`, `ja`, `en`, `cn-CN`.
 - [ ] `type` chuẩn theo `extension-api.md` (`novel`, `chinese_novel`,
-      `comic`, `video`, `audio`, `translate`, `tts`, `ai`) — không tự chế
+      `comic`, `video`, `audio`, `translate`, `tts`, `ai`, `forum`) — không tự chế
       type (`eng_novel`, `jp_novel`…).
 - [ ] `regexp` phủ đúng domain nguồn (kèm các mirror đã biết), không sai
       chính tả (vd. thiếu `h` trong `https`).
