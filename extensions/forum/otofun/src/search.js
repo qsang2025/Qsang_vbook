@@ -7,15 +7,21 @@
 //    Thread ghim (sticky) chi hien o trang 1 — tu trang 2 tro di bo qua
 //    de khoi trung lap (XenForo lap lai thread ghim tren moi trang).
 // 2. Tim kiem tu khoa: XenForo KHONG co tim kiem GET (/search?q= tra 0 ket
-//    qua). Phai POST: GET /search/ lay token _xfToken, POST /search/search
-//    (keywords + _xfToken), theo redirect toi trang ket qua /search/<id>/,
-//    doc cac .block-row. Phan trang ket qua dung ?page=N tren URL ket qua.
-//    Token gan voi cookie xf_csrf cua session: POST khong kem cookie nay
-//    tra 400 — lay xf_csrf tu phan hoi GET roi gui kem qua header Cookie.
+//    qua). Phai POST: GET /search/ lay token _xfToken + cookie xf_csrf,
+//    POST /search/search (keywords + _xfToken, kem Cookie xf_csrf), theo
+//    redirect toi trang ket qua /search/<id>/, doc cac .block-row. Phan
+//    trang ket qua dung ?page=N tren URL ket qua. Token gan voi cookie
+//    xf_csrf cua cung session: POST khong kem cookie nay tra 400 — GET
+//    chay qua pacedFetch (file rate-limit.js) de doc Set-Cookie qua
+//    res.headers.get (mau sangtacvietapp/src/chap.js extractReadContextId).
+//    Neu khong doc duoc cookie thi KHONG POST mu ma bao loi ro.
 //
 // Bam vao thread thi mo thang reader (posts.js), khong qua trang detail.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('rate-limit.js');
+
+var NO_COOKIE_MSG = "Không lấy được cookie tìm kiếm (xf_csrf) nên không gửi tìm kiếm được. Hãy thử lại sau — nếu vẫn lỗi, tìm kiếm từ khóa sẽ bị bỏ, chỉ giữ duyệt board và đọc thread.";
 
 function execute(query, page) {
     query = query || "";
@@ -80,11 +86,16 @@ function listThreads(query, page) {
 
 // --- Che do 2: tim kiem tu khoa bang POST ---
 // XenForo doi token CSRF moi lan tim; token doi khi het han (400) nen
-// thu lai 1 lan voi token moi truoc khi bao loi.
+// thu lai 1 lan voi token moi truoc khi bao loi. Neu khong doc duoc
+// cookie xf_csrf thi bao loi ro ngay, khong POST mu.
 function searchKeyword(query, page) {
     var res = doSearchPost(query);
+    if (!res.ok && res.noCookie) return Response.error(NO_COOKIE_MSG);
+    if (!res.ok && res.error === "cooldown") return Response.error(rateLimitErrorMessage("Otofun", "www.otofun.net.vn", res.cooldownMs));
     if (!res.ok && res.status === 400) {
         res = doSearchPost(query);
+        if (!res.ok && res.noCookie) return Response.error(NO_COOKIE_MSG);
+        if (!res.ok && res.error === "cooldown") return Response.error(rateLimitErrorMessage("Otofun", "www.otofun.net.vn", res.cooldownMs));
     }
     if (!res.ok) return Response.error("Tìm kiếm thất bại (HTTP " + res.status + ")");
     var resultsUrl = res.url || "";
@@ -130,24 +141,30 @@ function searchKeyword(query, page) {
     return Response.success(items, hasNext ? String(parseInt(page) + 1) : "");
 }
 
-// Mot lan tim kiem: GET /search/ lay token _xfToken, POST /search/search.
-// XenForo gan _xfToken voi cookie xf_csrf cua session: POST khong kem
-// cookie nay tra 400 (da tai hien bang curl: khong cookie -> 400, kem
-// xf_csrf -> 200, chi kem xf_session van 400). Runtime app khong chac tu
-// mang cookie tu GET sang POST, nen doc xf_csrf tu phan hoi GET roi gui
-// kem thu cong qua header Cookie; moi lan tim lay token + cookie moi.
+// Mot lan tim kiem: GET /search/ lay token _xfToken + cookie xf_csrf,
+// POST /search/search. XenForo gan _xfToken voi cookie xf_csrf cua cung
+// session: POST khong kem cookie nay tra 400 (tai hien bang curl tu VM:
+// khong cookie -> 400; kem xf_csrf cung session -> 303 ve trang ket qua,
+// GET lai trang ket qua tra 200, 20 ket qua). Runtime app khong tu mang
+// cookie tu GET sang POST, nen GET chay qua pacedFetch (file rate-limit.js)
+// de doc Set-Cookie qua res.headers.get — mau sangtacvietapp/src/chap.js
+// extractReadContextId (da chay that tren may Anh). Neu khong doc duoc
+// cookie thi tra co noCookie, KHONG POST mu.
 function doSearchPost(query) {
-    var formRes = fetch(BASE_URL + "/search/");
-    if (!formRes.ok) return { ok: false, status: formRes.status, url: "", html: function () { return null; } };
+    var pf = pacedFetch(BASE_URL + "/search/");
+    if (!pf.ok) return { ok: false, status: pf.status, error: pf.error, cooldownMs: pf.cooldownRemainingMs, noCookie: false, url: "", html: function () { return null; } };
+    var formRes = pf.res;
     var formDoc = formRes.html();
     var token = formDoc.select("input[name=\"_xfToken\"]").attr("value");
-    if (!token) return { ok: false, status: 0, url: "", html: function () { return null; } };
+    if (!token) return { ok: false, status: 0, error: null, cooldownMs: 0, noCookie: false, url: "", html: function () { return null; } };
     var csrf = getSearchCsrf(formRes);
-    var headers = { "Referer": BASE_URL + "/search/" };
-    if (csrf) headers["Cookie"] = "xf_csrf=" + csrf;
+    if (!csrf) return { ok: false, status: 0, error: null, cooldownMs: 0, noCookie: true, url: "", html: function () { return null; } };
     return fetch(BASE_URL + "/search/search", {
         method: "POST",
-        headers: headers,
+        headers: {
+            "Referer": BASE_URL + "/search/",
+            "Cookie": "xf_csrf=" + csrf
+        },
         body: {
             keywords: query,
             _xfToken: token,
@@ -158,27 +175,48 @@ function doSearchPost(query) {
 }
 
 // Doc gia tri cookie xf_csrf vua duoc server set khi GET /search/.
-// Thu tu: (1) header Set-Cookie cua chinh phan hoi GET do (chinh xac
-// nhat — token vua lay gan voi cookie nay); (2) jar cookie cua app
-// (localCookie) neu GET da luu Set-Cookie vao do. Tra "" neu khong doc
-// duoc — khi do POST gui khong kem Cookie nhu cu (khong te hon).
+// Thu tu (mau sangtacvietapp/src/chap.js extractReadContextId, da chay that
+// tren may Anh): (1) res.headers.get("Set-Cookie") — accessor Headers cua
+// runtime; (2) quet key "set-cookie" trong res.headers (neu headers la
+// object thuong); (3) formRes.header("set-cookie") — accessor cu; (4) jar
+// cookie cua app (localCookie) neu GET da luu Set-Cookie vao do. Tra ""
+// neu khong doc duoc — khi do doSearchPost KHONG POST mu ma bao loi ro.
 function getSearchCsrf(formRes) {
-    var m = null;
+    var cookieStr = "";
     try {
-        var setCookie = formRes.header("set-cookie");
-        if (setCookie) {
-            m = setCookie.match(/xf_csrf=([^;]+)/);
-            if (m) return m[1];
+        if (formRes && formRes.headers) {
+            if (typeof formRes.headers.get === "function") {
+                cookieStr = formRes.headers.get("Set-Cookie") || formRes.headers.get("set-cookie") || "";
+            }
+            if (!cookieStr) {
+                for (var k in formRes.headers) {
+                    if (k.toLowerCase() === "set-cookie") {
+                        var val = formRes.headers[k];
+                        if (val) cookieStr += (typeof val === "string" ? val : (val.join ? val.join("; ") : String(val))) + "; ";
+                    }
+                }
+            }
         }
     } catch (e) {
+    }
+    if (!cookieStr) {
+        try {
+            var sc = formRes.header("set-cookie");
+            if (sc) cookieStr = sc;
+        } catch (e2) {
+        }
+    }
+    if (cookieStr) {
+        var m = cookieStr.match(/xf_csrf=([^;,\s]+)/i);
+        if (m) return m[1];
     }
     try {
         var jar = localCookie.getCookie();
         if (jar) {
-            m = jar.match(/xf_csrf=([^;]+)/);
-            if (m) return m[1];
+            var m2 = jar.match(/xf_csrf=([^;,\s]+)/i);
+            if (m2) return m2[1];
         }
-    } catch (e) {
+    } catch (e3) {
     }
     return "";
 }
