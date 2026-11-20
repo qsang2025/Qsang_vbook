@@ -11,9 +11,9 @@
       "url": "https://voz.vn/"
     },
     {
-      "name": "Danh sách thread (board Chia sẻ kiến thức)",
+      "name": "Danh sách thread (board Chuyện trò linh tinh)",
       "pattern": "structItem--thread",
-      "url": "https://voz.vn/s/chia-se-kien-thuc.104/"
+      "url": "https://voz.vn/f/chuyen-tro-linh-tinhtm.17/"
     },
     {
       "name": "Bài viết mới",
@@ -23,7 +23,7 @@
     {
       "name": "Nội dung thread",
       "pattern": "message--post",
-      "url": "https://voz.vn/t/placeholder-thread.1/"
+      "url": "https://voz.vn/t/tuoi-trung-nien-lam-sao-tim-duoc-niem-vui-trong-cong-viec-va-cuoc-song.1295089/"
     }
   ]
 }

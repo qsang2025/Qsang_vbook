@@ -45,10 +45,10 @@ function listThreads(query, page) {
     if (!response.ok) return Response.error("Không tải được danh sách (HTTP " + response.status + ")");
     var doc = response.html();
 
-    // Ten board (chi co khi duyet mot board /s/...; trang whats-new
-    // khong co board rieng nen de trong).
+    // Ten board (chi co khi duyet mot board /f/... hoac section /s/...;
+    // trang whats-new khong co board rieng nen de trong).
     var boardName = "";
-    if (url.indexOf("/s/") !== -1) {
+    if (url.indexOf("/f/") !== -1 || url.indexOf("/s/") !== -1) {
         boardName = doc.select(".p-title-value").text();
     }
 

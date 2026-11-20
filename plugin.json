@@ -509,6 +509,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "VOZ Forum",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/voz/plugin.zip",
+      "version": 1,
+      "source": "https://voz.vn",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/forum/voz/icon.png",
+      "description": "Dien dan VOZ (voz.vn) — doc thread cong nghe, doi song mien phi, khong can dang nhap. Chi doc: bam thread mo thang reader, khong dang bai/like/tra loi. KHONG co tim kiem tu khoa: XenForo bat cookie CSRF (xf_csrf) ma runtime vBook khong doc duoc (da thu 3 cach ngay 20/11 deu HTTP 400) — hay duyet bang Trang chu / The loai. Muc dung /s/<slug>.<id>/, thread dung /t/<slug>.<id>/, phan trang bai trong thread dung /page-N.",
+      "type": "forum",
+      "locale": "vi_VN"
+    },
+    {
       "name": "AkayTruyen",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/akaytruyen/plugin.zip",

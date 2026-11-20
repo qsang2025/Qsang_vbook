@@ -7,6 +7,6 @@
 function execute() {
     return Response.success([
         { title: "Mới nhất", input: "/whats-new/posts/", script: "list.js" },
-        { title: "Chia sẻ kiến thức", input: "/s/chia-se-kien-thuc.104/", script: "list.js" }
+        { title: "Chuyện trò linh tinh", input: "/f/chuyen-tro-linh-tinhtm.17/", script: "list.js" }
     ]);
 }

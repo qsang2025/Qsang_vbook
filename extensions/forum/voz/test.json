@@ -4,7 +4,7 @@
       "expect": {
         "contains": [
           "Mới nhất",
-          "Chia sẻ kiến thức"
+          "Chuyện trò linh tinh"
         ],
         "minItems": 2
       },
@@ -14,10 +14,10 @@
     {
       "expect": {
         "contains": [
-          "Chia sẻ kiến thức",
+          "Chuyện trò linh tinh",
           "Góp ý"
         ],
-        "minItems": 15
+        "minItems": 40
       },
       "input": "",
       "script": "genre.js"
@@ -25,18 +25,18 @@
     {
       "expect": {
         "contains": [
-          "Chia sẻ kiến thức"
+          "Chuyện trò linh tinh"
         ],
         "minItems": 20
       },
-      "input": "/s/chia-se-kien-thuc.104/",
+      "input": "/f/chuyen-tro-linh-tinhtm.17/",
       "script": "list.js"
     },
     {
       "expect": {
         "minItems": 20
       },
-      "input": "/s/chia-se-kien-thuc.104/",
+      "input": "/f/chuyen-tro-linh-tinhtm.17/",
       "page": "2",
       "script": "list.js"
     },
@@ -50,11 +50,12 @@
     {
       "expect": {
         "contains": [
-          "#1"
+          "#1",
+          "minhphuc2023"
         ],
         "minItems": 20
       },
-      "input": "https://voz.vn/t/placeholder-thread.1/",
+      "input": "https://voz.vn/t/tuoi-trung-nien-lam-sao-tim-duoc-niem-vui-trong-cong-viec-va-cuoc-song.1295089/",
       "script": "posts.js"
     },
     {
@@ -64,10 +65,10 @@
         ],
         "minItems": 20
       },
-      "input": "https://voz.vn/t/placeholder-thread.1/",
+      "input": "https://voz.vn/t/tuoi-trung-nien-lam-sao-tim-duoc-niem-vui-trong-cong-viec-va-cuoc-song.1295089/",
       "page": "2",
       "script": "posts.js"
     }
   ],
-  "note": "Golden fixture cho VOZ Forum (voz.vn, XenForo SSR UTF-8), khao sat 2026-11-20. Dien dan cong nghe/doi song VN, doc mien phi khong login. Muc dung /s/<slug>.<id>/, thread dung /t/<slug>.<id>/, phan trang bai trong thread dung /page-N. VM bi chan (403/000) nen kiem chung chinh bang device test qua forwarder. BO tim kiem tu khoa theo pattern aztruyen/17k + Otofun v4 (XenForo bat cookie xf_csrf, runtime khong doc duoc). CHUA CO URL thread that: 2 case posts.js dang dung placeholder https://voz.vn/t/placeholder-thread.1/ — thay bang thread that lay tu ket qua list.js tren device truoc khi chay testall."
+  "note": "Golden fixture cho VOZ Forum (voz.vn, XenForo SSR UTF-8), khao sat 2026-11-20. Dien dan cong nghe/doi song VN, doc mien phi khong login. Board that dung /f/<slug>.<id>/ (47 board, lay tu trang chu /); /s/<slug>.<id>/ cung tra danh sach (20 thread) nhung board 'Chia se kien thuc' khong co trong danh sach board live nen khong dung lam tab. Thread dung /t/<slug>.<id>/, phan trang bai trong thread dung /page-N, phan trang danh sach dung ?page=N. VM bi chan (403/000) nen kiem chung chinh bang device test qua forwarder. BO tim kiem tu khoa theo pattern aztruyen/17k + Otofun v4 (XenForo bat cookie xf_csrf, runtime khong doc duoc). Thread mau: 'Tuoi trung nien lam sao tim duoc niem vui...' (1295089, 56 tra loi, 3 trang x 20 bai; OP minhphuc2023). Da kiem chung bang device test: home 2 tab, genre 47 board, board f17 p1 23 thread (2 ghim), p2 21 thread (0 ghim), whats-new 20 thread, posts p1 20 bai (#1 OP), p2 21 bai (#21). Icon.png tu favicon 128px cua site (resize 200x200)."
 }
