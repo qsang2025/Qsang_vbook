@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "name": "FQ Video",
+    "author": "MuseAi",
+    "version": 1,
+    "source": "https://fanqienovel.com",
+    "description": "FQ Video (Fanqie / Hồng Quả) — phim ngắn (真人短剧), mạn kịch / hoạt hình (漫剧) và hoạt hình AI (AI剧) qua API trực tiếp của cổng video chính thức hongguoduanju.com kết hợp mục lục fanqienovel.com, phát MP4 native không proxy. Xây mới clean-room theo giấy phép MIT (không dùng code mã hóa GPL-3.0 từ duongden/vbook). Lưu ý: web công khai mở miễn phí 5 tập đầu mỗi bộ; tập 6+ bị khóa trên ứng dụng gốc.",
+    "locale": "zh_CN",
+    "regexp": "^(?:https?://)?(?:[^/]+\\.)?(?:hongguoduanju\\.com/(?:detail\\?(?:[^#\\s]*&)?series_id=\\d+[^#\\s]*|player/\\d+(?:/\\d+)?(?:\\?[^#\\s]*)?)|(?:fanqienovel|fqnovel|snssdk|changdunovel)\\.com/page/\\d+\\?(?:[^#\\s]*&)?fq_type=(?:short|animation)(?:&[^#\\s]*)?)/?$",
+    "type": "video",
+    "language": "javascript",
+    "encrypt": false,
+    "nsfw": false
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "track": "track.js"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain nguồn (Fanqie)",
+      "default": "https://fanqienovel.com",
+      "mode": "select",
+      "values": [
+        "https://fanqienovel.com"
+      ]
+    },
+    "VIDEO_DOMAIN": {
+      "title": "Domain cổng video (Hồng Quả / Fanqie)",
+      "default": "https://hongguoduanju.com",
+      "mode": "select",
+      "values": [
+        "https://hongguoduanju.com"
+      ]
+    },
+    "MIRRORS": {
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)",
+      "default": "",
+      "mode": "input",
+      "format": "text"
+    },
+    "thread_num": 1,
+    "delay": 2000
+  }
+}

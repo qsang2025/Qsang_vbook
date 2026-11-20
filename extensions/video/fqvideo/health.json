@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ cổng video Hongguo / Fanqie",
+      "url": "https://hongguoduanju.com/",
+      "pattern": "_ROUTER_DATA"
+    },
+    {
+      "name": "Danh mục Mạn kịch / Hoạt hình",
+      "url": "https://hongguoduanju.com/category/comic-drama",
+      "pattern": "recommendList"
+    },
+    {
+      "name": "API mục lục Fanqie cho series video",
+      "url": "https://fanqienovel.com/api/reader/directory/detail?bookId=7706512650816982040",
+      "pattern": "allItemIds"
+    }
+  ]
+}

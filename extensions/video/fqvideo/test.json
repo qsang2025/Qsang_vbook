@@ -1,0 +1,101 @@
+{
+  "cases": [
+    {
+      "script": "home.js",
+      "input": "",
+      "expect": {
+        "contains": ["Phim ngắn Hot", "Hoạt hình / Mạn kịch Hot", "Hoạt hình AI Hot"],
+        "minItems": 7
+      }
+    },
+    {
+      "script": "genre.js",
+      "input": "",
+      "expect": {
+        "contains": ["Phim ngắn — Huyền huyễn", "Mạn kịch — Huyền huyễn", "Hoạt hình AI — Khoa huyễn"],
+        "minItems": 40
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "/rank/hot-real-drama",
+      "expect": {
+        "contains": ["hongguoduanju.com/detail?series_id="],
+        "minItems": 15
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "/category/comic-drama",
+      "expect": {
+        "contains": ["hongguoduanju.com/detail?series_id="],
+        "minItems": 20
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "东北",
+      "expect": {
+        "contains": ["少夫人来自东北3"],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "求生",
+      "expect": {
+        "contains": ["求生"],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://hongguoduanju.com/detail?series_id=7706512650816982040",
+      "expect": {
+        "contains": ["少夫人来自东北3", "video", "series"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://fanqienovel.com/page/7708355462780947518?fq_type=animation",
+      "expect": {
+        "contains": ["video", "series"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://hongguoduanju.com/detail?series_id=7706512650816982040",
+      "expect": {
+        "contains": ["第1集", "hongguoduanju.com/player/7706512650816982040/"],
+        "minItems": 90
+      }
+    },
+    {
+      "script": "chap.js",
+      "input": "https://hongguoduanju.com/player/7706512650816982040/7706514645208534041",
+      "expect": {
+        "contains": ["HD Trực tiếp (Tự động)", "MP4 Tiêu chuẩn (Dự phòng)"],
+        "minItems": 2
+      }
+    },
+    {
+      "script": "track.js",
+      "input": "{\"seriesId\":\"7706512650816982040\",\"itemId\":\"7706514645208534041\",\"mode\":\"hd\"}",
+      "expect": {
+        "contains": ["native", "video/mp4", "http"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "track.js",
+      "input": "{\"seriesId\":\"7708355462780947518\",\"itemId\":\"7708355470964050969\",\"mode\":\"hd\"}",
+      "expect": {
+        "contains": ["native", "video/mp4", "http"],
+        "minItems": 1
+      }
+    }
+  ],
+  "note": "Golden fixture cho FQ Video (fanqienovel.com / hongguoduanju.com, build clean-room MIT 2026-11-20). Phim ngan mau: 7706512650816982040 (少夫人来自东北3, 96 tap, tap 1: 7706514645208534041). Man kich / hoat hinh mau: 7708355462780947518 (tap 1: 7708355470964050969). Ca hai case track.js phai giai ra luong MP4 native khong ma hoa (er=0) tu API truc tiep. Web cong khai mo mien phi 5 tap dau; tap 6+ bi khoa ung dung goc (HTTP 403)."
+}
