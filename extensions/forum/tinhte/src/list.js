@@ -61,7 +61,9 @@ function listThreads(query, page) {
         var titleLink = el.select("h3.title a.PreviewTooltip");
         if (titleLink.isEmpty()) titleLink = el.select("h3.title a[href*=\"thread/\"]");
         if (titleLink.isEmpty()) titleLink = el.select("h3.title a");
-        var timeEl = el.select(".posterDate abbr.DateTime");
+        // Ngay bat dau: abbr.DateTime (thread moi) hoac span.DateTime
+        // (thread rat cu, vd. 2006/2008, chi co text "9/5/06").
+        var timeEl = el.select(".posterDate .DateTime");
         var timeText = timeEl.text();
         if (!timeText) timeText = timeEl.attr("data-datestring") + " " + timeEl.attr("data-timestring");
         var author = el.attr("data-author");
