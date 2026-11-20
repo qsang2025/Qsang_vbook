@@ -44,13 +44,17 @@ function execute(url) {
         textLen += lead.length;
     }
     blocks.forEach(function (el) {
-        var tagName = String(el.tagName()).toLowerCase();
-        if (tagName === "figure") {
-            var img = el.select("img").first();
-            if (img !== null) {
-                var src = String(img.attr("src") || "");
-                if (src) htmlParts.push("<p><img src=\"" + src + "\" /></p>");
-            }
+        // Khong dung el.tagName(): runtime vBook khong co ham nay (loi
+        // "TypeError: not a function", code 403 — giong vu toc.js 103 phai
+        // bo children()/tagName()). Nhan dien figure bang img con.
+        // QUAN TRONG: .first() cua runtime KHONG bao gio tra null — select
+        // rong van tra ve object (da kiem chung tren may that 20/11) nen
+        // KHONG dung `first() !== null` de kiem tra; dung .size() > 0.
+        var imgs = el.select("img");
+        if (imgs.size() > 0) {
+            var img = imgs.first();
+            var src = String(img.attr("src") || "");
+            if (src) htmlParts.push("<p><img src=\"" + src + "\" /></p>");
             return;
         }
         var text = cleanText(el.text());

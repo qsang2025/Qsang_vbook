@@ -501,7 +501,7 @@
       "name": "VnExpress",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/news/vnexpress/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://vnexpress.net",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/news/vnexpress/icon.png",
       "description": "VnExpress (vnexpress.net) — đọc tin tức loại news: trang chủ theo chuyên mục, danh sách bài, tìm kiếm và đọc bài đầy đủ trong reader (nghe TTS được). Extension news đầu tiên của repo, build theo hợp đồng loại news (home/genre/search/article, không qua trang detail) khảo sát live 2026-11-20. Bài trả phí của VnExpress sẽ báo lỗi rõ ràng, không vượt paywall.",
