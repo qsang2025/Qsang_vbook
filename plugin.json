@@ -1337,10 +1337,10 @@
       "name": "FQ Video",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/fqvideo/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://fanqienovel.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/fqvideo/icon.png",
-      "description": "FQ Video (Fanqie / Hồng Quả) — phim ngắn (真人短剧), mạn kịch / hoạt hình (漫剧) và hoạt hình AI (AI剧) qua API trực tiếp của cổng video chính thức hongguoduanju.com kết hợp mục lục fanqienovel.com, phát MP4 native không proxy. Xây mới clean-room theo giấy phép MIT (không dùng code mã hóa GPL-3.0 từ duongden/vbook). Lưu ý: web công khai mở miễn phí 5 tập đầu mỗi bộ; tập 6+ bị khóa trên ứng dụng gốc.",
+      "description": "FQ Video (Fanqie / Hồng Quả) — phim ngắn (真人短剧), mạn kịch / hoạt hình (漫剧) và hoạt hình AI (AI剧) qua API trực tiếp của cổng video chính thức hongguoduanju.com kết hợp mục lục fanqienovel.com, phát MP4 native không proxy. Xây mới clean-room theo giấy phép MIT (không dùng code mã hóa GPL-3.0 từ duongden/vbook). Lưu ý: web công khai chỉ mở miễn phí các tập đầu mỗi bộ (thường 3–5 tập); các tập sau bị khóa trên ứng dụng gốc.",
       "type": "video",
       "locale": "zh_CN"
     },

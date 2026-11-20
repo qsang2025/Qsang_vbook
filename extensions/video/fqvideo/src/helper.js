@@ -223,8 +223,11 @@ function fqHttpError(r, url, actionLabel, bodyText) {
     if (isVerifyResponse(r.status, r.headers, body)) {
         return "FQ Video đang yêu cầu xác minh bảo mật (captcha). Vui lòng đợi ít phút rồi thử lại, không tải lại liên tục.";
     }
+    if (r.status === 403 && body.indexOf("search_rejected") !== -1) {
+        return "Tìm kiếm trên FQ Video tạm bị từ chối bởi máy chủ (search_rejected). Vui lòng thử lại sau hoặc duyệt theo danh mục / BXH.";
+    }
     if (r.status === 403 && (body.indexOf("public_fallback_unavailable") !== -1 || body.indexOf("protected_playback_unavailable") !== -1)) {
-        return "Tập này bị khóa trên web công khai (chỉ mở miễn phí 5 tập đầu; tập 6+ cần xem trên ứng dụng Fanqie / Hồng Quả).";
+        return "Tập này bị khóa trên web công khai (chỉ mở miễn phí các tập đầu; các tập bị khóa cần xem trên ứng dụng Fanqie / Hồng Quả).";
     }
     if (r.status === 400 && body.indexOf("too_long") !== -1) {
         return "Từ khóa tìm kiếm tối đa 30 ký tự (giới hạn API FQ Video). Vui lòng rút gọn từ khóa.";
