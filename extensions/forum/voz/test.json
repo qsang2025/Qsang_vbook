@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "expect": {
+        "contains": [
+          "Mới nhất",
+          "Chia sẻ kiến thức"
+        ],
+        "minItems": 2
+      },
+      "input": "",
+      "script": "home.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chia sẻ kiến thức",
+          "Góp ý"
+        ],
+        "minItems": 15
+      },
+      "input": "",
+      "script": "genre.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "Chia sẻ kiến thức"
+        ],
+        "minItems": 20
+      },
+      "input": "/s/chia-se-kien-thuc.104/",
+      "script": "list.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/s/chia-se-kien-thuc.104/",
+      "page": "2",
+      "script": "list.js"
+    },
+    {
+      "expect": {
+        "minItems": 20
+      },
+      "input": "/whats-new/posts/",
+      "script": "list.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "#1"
+        ],
+        "minItems": 20
+      },
+      "input": "https://voz.vn/t/placeholder-thread.1/",
+      "script": "posts.js"
+    },
+    {
+      "expect": {
+        "contains": [
+          "#21"
+        ],
+        "minItems": 20
+      },
+      "input": "https://voz.vn/t/placeholder-thread.1/",
+      "page": "2",
+      "script": "posts.js"
+    }
+  ],
+  "note": "Golden fixture cho VOZ Forum (voz.vn, XenForo SSR UTF-8), khao sat 2026-11-20. Dien dan cong nghe/doi song VN, doc mien phi khong login. Muc dung /s/<slug>.<id>/, thread dung /t/<slug>.<id>/, phan trang bai trong thread dung /page-N. VM bi chan (403/000) nen kiem chung chinh bang device test qua forwarder. BO tim kiem tu khoa theo pattern aztruyen/17k + Otofun v4 (XenForo bat cookie xf_csrf, runtime khong doc duoc). CHUA CO URL thread that: 2 case posts.js dang dung placeholder https://voz.vn/t/placeholder-thread.1/ — thay bang thread that lay tu ket qua list.js tren device truoc khi chay testall."
+}

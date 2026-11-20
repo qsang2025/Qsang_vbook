@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ",
+      "pattern": "voz",
+      "url": "https://voz.vn/"
+    },
+    {
+      "name": "Danh sách board",
+      "pattern": "node--forum",
+      "url": "https://voz.vn/"
+    },
+    {
+      "name": "Danh sách thread (board Chia sẻ kiến thức)",
+      "pattern": "structItem--thread",
+      "url": "https://voz.vn/s/chia-se-kien-thuc.104/"
+    },
+    {
+      "name": "Bài viết mới",
+      "pattern": "structItem--thread",
+      "url": "https://voz.vn/whats-new/posts/"
+    },
+    {
+      "name": "Nội dung thread",
+      "pattern": "message--post",
+      "url": "https://voz.vn/t/placeholder-thread.1/"
+    }
+  ]
+}
