@@ -1,0 +1,124 @@
+{
+  "cases": [
+    {
+      "script": "home.js",
+      "input": "",
+      "expect": {
+        "contains": ["Bộ AI Dài Tập", "Marathon Trên 3 Tiếng", "Top Xem Nhiều Nhất", "Mới Ra Trong Tuần", "Kênh Tuyển Chọn"],
+        "minItems": 8
+      }
+    },
+    {
+      "script": "explore.js",
+      "input": "",
+      "expect": {
+        "contains": ["Kênh Hoạt Hình AI Tuyển Chọn", "Marathon Trên 3 Tiếng", "Top Xem Nhiều Nhất"],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "genre.js",
+      "input": "",
+      "expect": {
+        "contains": ["Tu Tiên", "Mạt Thế", "Hệ Thống", "Marathon Trên 3 Tiếng", "Top Xem Nhiều Nhất", "Mới Ra Trong Tuần"],
+        "minItems": 13
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "playlist:hoạt hình AI Trung Quốc trọn bộ",
+      "expect": {
+        "contains": ["playlist?list="],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "video:hoạt hình AI Trung Quốc full thuyết minh",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "min:10800:video:hoạt hình AI Trung Quốc full trọn bộ thuyết minh",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "sort:view_count:video:hoạt hình AI Trung Quốc full thuyết minh",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 3
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "channels:featured",
+      "expect": {
+        "contains": ["CibiiSub", "Zzzphim"],
+        "minItems": 6
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://www.youtube.com/playlist?list=PLb1WvdR78l_kmBPdY-rJ50Dk9dtr_kmN-",
+      "expect": {
+        "contains": ["CibiiSub"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "contains": ["Zzzphim"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://www.youtube.com/playlist?list=PLb1WvdR78l_kmBPdY-rJ50Dk9dtr_kmN-",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 100
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "contains": ["Xem Bản Full"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "chap.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "contains": ["resolve:vU2qMWj-750"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "track.js",
+      "input": "resolve:vU2qMWj-750|t=1800|end=3600|dur=7200",
+      "expect": {
+        "contains": ["native", "1800000", "3600000", "7200000"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "comment.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "minItems": 1
+      }
+    }
+  ],
+  "note": "Golden fixture v4 cho Hoạt Hình AI YouTube (Cloud Invidious Auto-Discovery, AUDIO_FILTER & CLEAN_TITLES, AI Badges, Marathon/Top Views/New This Week tabs + min:/sort: prefixes, Cross-Source YouTube -> Dailymotion HLS fallback)."
+}

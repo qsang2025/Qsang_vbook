@@ -1,0 +1,123 @@
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://www.youtube.com",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://www.youtube.com"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Piped / Invidious dự phòng (cách nhau bằng dấu phẩy)"
+    },
+    "MIN_DURATION": {
+      "default": "1200",
+      "mode": "select",
+      "title": "Thời lượng tối thiểu video lẻ (giây: 600=10p, 1200=20p, 3600=60p)",
+      "values": [
+        "600",
+        "1200",
+        "3600"
+      ]
+    },
+    "CUSTOM_CHANNELS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Kênh YouTube bổ sung (@handle hoặc UC..., cách nhau dấu phẩy)"
+    },
+    "PREFERRED_QUALITY": {
+      "default": "1080p",
+      "mode": "select",
+      "title": "Chất lượng ưu tiên mặc định",
+      "values": [
+        "auto_hls",
+        "4k_2k",
+        "1080p",
+        "720p"
+      ]
+    },
+    "SORT_BY": {
+      "default": "relevance",
+      "mode": "select",
+      "title": "Sắp xếp kết quả tìm kiếm",
+      "values": [
+        "relevance",
+        "upload_date",
+        "view_count",
+        "duration"
+      ]
+    },
+    "ENABLE_DANMAKU": {
+      "default": "on",
+      "mode": "select",
+      "title": "Mưa bình luận (Danmaku) từ bình luận YouTube",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    "AUDIO_FILTER": {
+      "default": "all",
+      "mode": "select",
+      "title": "Lọc ưu tiên bản Thuyết Minh / Trọn Bộ",
+      "values": [
+        "all",
+        "thuyet_minh",
+        "tron_bo"
+      ]
+    },
+    "CLEAN_TITLES": {
+      "default": "on",
+      "mode": "select",
+      "title": "Làm gọn tiêu đề tập phim trong mục lục",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    "AUDIO_ONLY_MODE": {
+      "default": "off",
+      "mode": "select",
+      "title": "Chế độ Tiết kiệm Data / Chỉ nghe Audio Thuyết Minh",
+      "values": [
+        "off",
+        "data_saver_360p",
+        "audio_stream"
+      ]
+    },
+    "BLOCKED_KEYWORDS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Từ khóa chặn (cách nhau dấu phẩy, vd: reaction, game, đam mỹ)"
+    }
+  },
+  "metadata": {
+    "author": "MuseAi",
+    "description": "Hoạt Hình AI Trung Quốc trên YouTube — bộ dài tập (playlist), bản full nhiều tiếng (>= 20 phút), kênh tuyển chọn. Lọc bỏ Shorts & video ngắn.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "Hoạt Hình AI YouTube",
+    "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
+    "source": "https://www.youtube.com",
+    "type": "video",
+    "version": 7
+  },
+  "script": {
+    "chap": "chap.js",
+    "comment": "comment.js",
+    "detail": "detail.js",
+    "explore": "explore.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "track": "track.js"
+  }
+}

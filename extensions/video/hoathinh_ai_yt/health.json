@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "name": "Trang chủ YouTube",
+      "url": "https://www.youtube.com/",
+      "pattern": "youtube"
+    },
+    {
+      "name": "Playlist mẫu Hoạt Hình 3D - AI",
+      "url": "https://www.youtube.com/playlist?list=PLb1WvdR78l_kmBPdY-rJ50Dk9dtr_kmN-",
+      "pattern": "PLb1WvdR78l_kmBPdY-rJ50Dk9dtr_kmN-"
+    },
+    {
+      "name": "Video bản full mẫu",
+      "url": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "pattern": "ytInitialPlayerResponse"
+    }
+  ]
+}
