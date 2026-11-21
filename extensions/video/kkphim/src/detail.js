@@ -15,8 +15,9 @@ function execute(url) {
     if (!slug) return Response.error("Không đọc được slug phim từ URL: " + url);
 
     var json = fetchJson(BASE_URL + "/phim/" + slug);
-    var m = detailItem(json);
-    if (!m) return Response.error("Không tải được thông tin phim: " + url);
+    var d = detailData(json);
+    if (!d || !d.item) return Response.error("Không tải được thông tin phim: " + url);
+    var m = d.item;
 
     var genres = [];
     var cats = m.category || [];

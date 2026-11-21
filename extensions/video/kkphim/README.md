@@ -17,11 +17,10 @@
 
 ## Điểm khác với hoathinh3d (cùng API phimapi.com)
 
-- **Hình dạng response chi tiết đã đổi:** API nay trả `{data:{item:{...}}}`,
-  không còn `{movie, episodes}` ở top level như tài liệu cũ của hoathinh3d
-  (README hoathinh3d dòng 24). KKPhim đọc `data.item`; hoathinh3d có thể
-  đã gãy ở detail/toc/chap với hình dạng mới này — cần kiểm tra riêng,
-  không thuộc phạm vi task này.
+- **API trả 2 hình dạng chi tiết tuy đường dẫn:** `/phim/<slug>` trả
+  `{movie, episodes}` (episodes ở top level — đúng như hoathinh3d vẫn đọc,
+  hoathinh3d KHÔNG gãy); `/v1/api/phim/<slug>` trả `{data:{item}}` với
+  episodes nằm trong item. KKPhim đọc cả 2 dạng qua `detailData()`.
 - **Không lọc country:** hoathinh3d chỉ lấy `country=trung-quoc` (donghua TQ);
   KKPhim lấy toàn bộ kho hoạt hình (mọi quốc gia).
 - **Pacing:** mỗi request gọi `rateLimitDelay()` trước (quy tắc 11 AGENTS.md);

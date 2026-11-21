@@ -17,13 +17,13 @@ function execute(url) {
     if (!slug || !epSlug) return Response.error("Không xác định được tập phim từ URL: " + url);
 
     var json = fetchJson(BASE_URL + "/phim/" + slug);
-    var m = detailItem(json);
-    if (!m || !m.episodes) return Response.error("Không tải được thông tin tập phim: " + url);
+    var d = detailData(json);
+    if (!d || !d.episodes) return Response.error("Không tải được thông tin tập phim: " + url);
 
     var tracks = [];
     var s = 0;
-    for (s = 0; s < m.episodes.length; s++) {
-        var server = m.episodes[s];
+    for (s = 0; s < d.episodes.length; s++) {
+        var server = d.episodes[s];
         var data = server.server_data || [];
         var j = 0;
         for (j = 0; j < data.length; j++) {

@@ -6,11 +6,12 @@
 //               khac hoathinh3d chi loc country=trung-quoc)
 //   the loai:   /v1/api/the-loai -> {data:{items:[{name, slug}]}}
 //               (26 loai, loai phim-18 ra khoi catalog chung)
-//   chi tiet:   /phim/<slug> -> {data:{item:{name, episode_current,
-//               episodes:[{server_name, server_data:[{name, slug,
-//               link_m3u8, link_embed}]}]}}} — LUU Y: chi tiet nam o
-//               data.item (API doi hinh dang so voi tai lieu cu
-//               {movie, episodes} o top level cua hoathinh3d).
+//   chi tiet:   /phim/<slug> -> {movie:{...}, episodes:[{server_name,
+//               server_data:[{name, slug, link_m3u8, link_embed}]}]}
+//               (episodes o TOP LEVEL, movie khong chua episodes).
+//               Cung endpoint duoi /v1/api/phim/<slug> tra hinh dang
+//               khac: {data:{item:{..., episodes:[...]}}} — episodes
+//               NAM TRONG item. Code doc ca 2 dang (xem detailData).
 //   tim kiem:   /v1/api/tim-kiem?keyword=<q>&page=N
 //   anh: thumb_url/poster_url tuyet doi (phimimg.com) o chi tiet,
 //        tuong doi (uploads/...) o danh sach -> ghep voi CDN anh.
@@ -51,10 +52,24 @@ function fetchJson(url) {
     }
 }
 
-// Doi tuong phim tu JSON chi tiet /phim/<slug> (nam o data.item).
-function detailItem(json) {
-    if (!json || !json.data || !json.data.item) return null;
-    return json.data.item;
+// Doi tuong phim + danh sach server/tap tu JSON chi tiet.
+// API tra 2 hinh dang tuy duong dan: /phim/<slug> -> {movie, episodes}
+// (episodes o top level); /v1/api/phim/<slug> -> {data:{item}} voi
+// episodes nam trong item. Ham nay chuan hoa ca 2 ve {item, episodes}
+// (null khi khong doc duoc).
+function detailData(json) {
+    if (!json) return null;
+    var item = null;
+    var episodes = null;
+    if (json.data && json.data.item) {
+        item = json.data.item;
+        episodes = item.episodes || null;
+    } else if (json.movie) {
+        item = json.movie;
+        episodes = json.episodes || null;
+    }
+    if (!item) return null;
+    return { item: item, episodes: episodes };
 }
 
 // Anh thumb/poster cua API: chi tiet tra duong dan tuyet doi, danh sach

@@ -1425,7 +1425,7 @@
       "name": "KKPhim",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/kkphim/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://kkphim.com",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/kkphim/icon.png",
       "description": "Kho phim tổng hợp KKPhim (kkphim.com) qua API công khai phimapi.com: hoạt hình, phim bộ, phim lẻ Vietsub & Thuyết minh, link m3u8 trực tiếp phát mượt trên ExoPlayer. Không cần đăng nhập.",
