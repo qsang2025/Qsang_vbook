@@ -1,0 +1,40 @@
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://hhkungfu.ee",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://hhkungfu.ee"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "MuseAi",
+    "description": "HHKUNGFU (hhkungfu.ee) — xem phim hoạt hình 3D Kungfu Trung Quốc Vietsub & Thuyết Minh (Thương Nguyên Đồ, Đấu La Đại Lục 2, Tru Tiên, Tiên Nghịch...): ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI khi có tập tương ứng, kèm đầy đủ 4 server 1080P V1/V2 & 4K V1/V2 qua AJAX player.php (WebView dynamic-iframe) và Webview Trang Nguồn (ref: Qsang, kychitoge).",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "HHKUNGFU",
+    "nsfw": false,
+    "regexp": "^(?:https?://)?(?:www\\.)?hhkungfu\\.ee/(?:watch-[^/\\?]+/[^/\\?]+|(?!moi-cap-nhat|top-xem-nhieu|hoan-thanh|lich-chieu|lich-su|bookmark|category|tag|watch-|page|wp-|dang-ky|sitemap|player|feed)[^/\\?]+)/?$",
+    "source": "https://hhkungfu.ee",
+    "type": "video",
+    "version": 5
+  },
+  "script": {
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "track": "track.js"
+  }
+}
