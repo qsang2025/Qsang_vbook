@@ -81,7 +81,8 @@ function tocChannel(cid) {
                     var vm = rc[j].richItemRenderer && rc[j].richItemRenderer.content && rc[j].richItemRenderer.content.lockupViewModel;
                     if (vm) {
                         var p = parseLockupViewModel(vm);
-                        if (p && !isShortOrTooShort(p.link, p.durationSec, 1200) && !seen[p.link]) {
+                        var minSec = getMinDurationSec();
+                        if (p && !isShortOrTooShort(p.link, p.durationSec, minSec) && !seen[p.link]) {
                             seen[p.link] = true;
                             episodes.push({
                                 name: p.name,
@@ -98,8 +99,83 @@ function tocChannel(cid) {
         }
     }
     if (episodes.length === 0) {
-        return Response.error("Không tìm thấy video dài (>= 20 phút) trên kênh: " + cid);
+        return Response.error("Không tìm thấy video dài (>= " + Math.floor(getMinDurationSec() / 60) + " phút) trên kênh: " + cid);
     }
+    return Response.success(episodes);
+}
+
+function parseTimestampsFromDescription(desc, durSec) {
+    var list = [];
+    if (!desc) return list;
+    var lines = String(desc).split(/\r?\n/);
+    var i = 0;
+    for (i = 0; i < lines.length; i++) {
+        var line = cleanText(lines[i]);
+        if (!line) continue;
+        var m = line.match(/^(?:[-*•]\s*)?(?:\[|\()?\s*((?:\d{1,2}:)?\d{1,2}:\d{2})\s*(?:\]|\))?\s*[-–:|•]?\s*(.*)$/);
+        if (!m) continue;
+        var sec = parseDurationSec(m[1]);
+        if (durSec > 0 && sec >= durSec) continue;
+        if (list.length > 0 && sec <= list[list.length - 1].startSec) continue;
+        var label = cleanText(m[2] || "");
+        list.push({
+            startSec: sec,
+            label: label
+        });
+    }
+    return list;
+}
+
+function tocVideo(vid) {
+    var shortDesc = "";
+    var durSec = 0;
+    var pRes = requestInnerTube("player", { videoId: vid }, "WEB");
+    if (pRes && pRes.videoDetails) {
+        shortDesc = String(pRes.videoDetails.shortDescription || "");
+        durSec = parseDurationSec(pRes.videoDetails.lengthSeconds);
+    }
+    var durFmt = durSec > 0 ? formatDuration(durSec) : "";
+    var episodes = [{
+        name: "Xem Bản Full (Trọn Bộ)",
+        url: BASE_URL + "/watch?v=" + vid,
+        description: durFmt,
+        lock: false,
+        pay: false
+    }];
+
+    var stamps = parseTimestampsFromDescription(shortDesc, durSec);
+    var i = 0;
+    if (stamps.length >= 2) {
+        for (i = 0; i < stamps.length; i++) {
+            var st = stamps[i];
+            var lbl = st.label ? st.label : ("Phần " + (i + 1));
+            var tsFmt = formatTimestamp(st.startSec);
+            episodes.push({
+                name: lbl + " (" + tsFmt + ")",
+                url: BASE_URL + "/watch?v=" + vid + "&t=" + st.startSec,
+                description: tsFmt,
+                lock: false,
+                pay: false
+            });
+        }
+    } else if (durSec >= 3600) {
+        var step = 1800;
+        var idx = 1;
+        var sec = 0;
+        while (sec < durSec) {
+            var markerFmt = formatTimestamp(sec);
+            episodes.push({
+                name: "Phần " + idx + " (" + markerFmt + ")",
+                url: BASE_URL + "/watch?v=" + vid + "&t=" + sec,
+                description: markerFmt,
+                lock: false,
+                pay: false
+            });
+            sec += step;
+            idx += 1;
+        }
+    }
+
     return Response.success(episodes);
 }
 
@@ -109,15 +185,7 @@ function execute(url) {
     if (listId) return tocPlaylist(listId);
 
     var vid = extractVideoId(url);
-    if (vid) {
-        return Response.success([{
-            name: "Xem Bản Full",
-            url: BASE_URL + "/watch?v=" + vid,
-            description: "",
-            lock: false,
-            pay: false
-        }]);
-    }
+    if (vid) return tocVideo(vid);
 
     var cid = resolveChannelId(url);
     if (cid) return tocChannel(cid);

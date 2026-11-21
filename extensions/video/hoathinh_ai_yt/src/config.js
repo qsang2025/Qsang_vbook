@@ -83,6 +83,59 @@ function getCustomMirrors() {
     return list;
 }
 
+function getMinDurationSec() {
+    try {
+        if (typeof MIN_DURATION !== "undefined" && MIN_DURATION) {
+            var n = parseInt(String(MIN_DURATION).trim(), 10);
+            if (!isNaN(n) && n > 0) return n;
+        }
+    } catch (e) {}
+    return 1200;
+}
+
+function getAllFeaturedChannels() {
+    var list = [];
+    var seen = {};
+    var i = 0;
+    for (i = 0; i < FEATURED_CHANNELS.length; i++) {
+        var fc = FEATURED_CHANNELS[i];
+        list.push(fc);
+        if (fc.id) seen[String(fc.id).toLowerCase()] = true;
+        if (fc.handle) seen[String(fc.handle).replace(/^\/+/, "").toLowerCase()] = true;
+    }
+    try {
+        if (typeof CUSTOM_CHANNELS !== "undefined" && CUSTOM_CHANNELS) {
+            var parts = String(CUSTOM_CHANNELS).split(",");
+            for (i = 0; i < parts.length; i++) {
+                var raw = parts[i].trim();
+                if (!raw) continue;
+                var cid = "";
+                var handle = "";
+                var mUc = raw.match(/(UC[a-zA-Z0-9_-]{10,})/);
+                var mHandle = raw.match(/(@[a-zA-Z0-9_.-]+)/);
+                if (mHandle) {
+                    handle = mHandle[1];
+                } else if (mUc) {
+                    cid = mUc[1];
+                } else {
+                    handle = raw.charAt(0) === "@" ? raw : ("@" + raw);
+                }
+                var key = (cid || handle).toLowerCase();
+                if (!key || seen[key]) continue;
+                seen[key] = true;
+                list.push({
+                    title: cid || handle,
+                    id: cid,
+                    handle: handle ? ("/" + handle) : "",
+                    cover: "",
+                    description: "Kênh YouTube bổ sung"
+                });
+            }
+        }
+    } catch (e) {}
+    return list;
+}
+
 var _cachedVisitorData = "";
 
 function fetchVisitorData() {
@@ -261,6 +314,8 @@ function requestApi(endpoint, opts) {
         invEndpoint = "/api/v1/videos/" + endpoint.substring(9);
     } else if (endpoint.indexOf("/playlists/") === 0) {
         invEndpoint = "/api/v1/playlists/" + endpoint.substring(11);
+    } else if (endpoint.indexOf("/comments/") === 0) {
+        invEndpoint = "/api/v1/comments/" + endpoint.substring(10);
     }
     for (i = 0; i < INVIDIOUS_INSTANCES.length; i++) {
         j = fetchJsonSafe(INVIDIOUS_INSTANCES[i] + invEndpoint, timeoutMs);

@@ -32,7 +32,7 @@ function collectSearchItems(contents, items, seen, filterMode) {
                                 });
                             }
                         } else if (parsed.kind === "video" && filterMode !== "playlist") {
-                            if (!isShortOrTooShort(parsed.link, parsed.durationSec, 1200) && !seen[parsed.link]) {
+                            if (!isShortOrTooShort(parsed.link, parsed.durationSec, getMinDurationSec()) && !seen[parsed.link]) {
                                 seen[parsed.link] = true;
                                 items.push({
                                     name: parsed.name,
@@ -123,7 +123,7 @@ function searchChannel(cid, page) {
                 var rc = richContents[i];
                 if (rc.richItemRenderer && rc.richItemRenderer.content && rc.richItemRenderer.content.lockupViewModel) {
                     var pv = parseLockupViewModel(rc.richItemRenderer.content.lockupViewModel);
-                    if (pv && !isShortOrTooShort(pv.link, pv.durationSec, 1200) && !seen[pv.link]) {
+                    if (pv && !isShortOrTooShort(pv.link, pv.durationSec, getMinDurationSec()) && !seen[pv.link]) {
                         seen[pv.link] = true;
                         items.push({
                             name: pv.name,
@@ -150,14 +150,16 @@ function execute(query, page) {
     page = page ? String(page).trim() : "";
 
     if (query === "channels:featured") {
+        var allChannels = getAllFeaturedChannels();
         var chItems = [];
         var i = 0;
-        for (i = 0; i < FEATURED_CHANNELS.length; i++) {
-            var ch = FEATURED_CHANNELS[i];
+        for (i = 0; i < allChannels.length; i++) {
+            var ch = allChannels[i];
+            var chLink = ch.id ? (BASE_URL + "/channel/" + ch.id) : (BASE_URL + ch.handle);
             chItems.push({
                 name: ch.title,
                 cover: ch.cover,
-                link: BASE_URL + "/channel/" + ch.id,
+                link: chLink,
                 description: ch.description,
                 host: BASE_URL
             });

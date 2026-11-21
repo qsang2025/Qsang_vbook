@@ -69,13 +69,30 @@ function detailPlaylist(listId) {
         format: "series",
         ongoing: true
     };
+    var plSuggests = [];
     if (channelId) {
         result.genres = [{
             title: author || "Xem kênh",
             input: "channel:" + channelId,
             script: "search.js"
         }];
+        plSuggests.push({
+            title: "Cùng kênh: " + (author || channelId),
+            input: "channel:" + channelId,
+            script: "search.js"
+        });
     }
+    plSuggests.push({
+        title: "Bộ AI Dài Tập Liên Quan",
+        input: "playlist:hoạt hình AI Trung Quốc trọn bộ",
+        script: "search.js"
+    });
+    result.suggests = plSuggests;
+    result.comment = {
+        title: "Bình luận YouTube",
+        input: BASE_URL + "/playlist?list=" + listId,
+        script: "comment.js"
+    };
     return Response.success(result);
 }
 
@@ -124,13 +141,30 @@ function detailVideo(vid) {
         format: "stream",
         ongoing: false
     };
+    var vidSuggests = [];
     if (vd.channelId) {
         result.genres = [{
             title: author || "Xem kênh",
             input: "channel:" + vd.channelId,
             script: "search.js"
         }];
+        vidSuggests.push({
+            title: "Cùng kênh: " + (author || vd.channelId),
+            input: "channel:" + vd.channelId,
+            script: "search.js"
+        });
     }
+    vidSuggests.push({
+        title: "Bộ AI Dài Tập Liên Quan",
+        input: "playlist:hoạt hình AI Trung Quốc trọn bộ",
+        script: "search.js"
+    });
+    result.suggests = vidSuggests;
+    result.comment = {
+        title: "Bình luận YouTube",
+        input: BASE_URL + "/watch?v=" + vid,
+        script: "comment.js"
+    };
     return Response.success(result);
 }
 
@@ -156,7 +190,19 @@ function detailChannel(cid) {
             title: "Playlist & Video của kênh",
             input: "channel:" + cid,
             script: "search.js"
-        }]
+        }],
+        suggests: [
+            {
+                title: "Cùng kênh: " + title,
+                input: "channel:" + cid,
+                script: "search.js"
+            },
+            {
+                title: "Bộ AI Dài Tập Liên Quan",
+                input: "playlist:hoạt hình AI Trung Quốc trọn bộ",
+                script: "search.js"
+            }
+        ]
     });
 }
 

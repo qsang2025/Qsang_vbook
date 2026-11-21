@@ -79,7 +79,22 @@
         "contains": ["resolve:vU2qMWj-750"],
         "minItems": 1
       }
+    },
+    {
+      "script": "track.js",
+      "input": "resolve:vU2qMWj-750|t=1800",
+      "expect": {
+        "contains": ["native", "1800000"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "comment.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "minItems": 1
+      }
     }
   ],
-  "note": "Golden fixture cho Hoạt Hình AI YouTube (YouTube InnerTube API + 3-tier Piped/Invidious/InnerTube stream resolver)."
+  "note": "Golden fixture v2 cho Hoạt Hình AI YouTube (InnerTube API + 3-tier Piped/Invidious + Timestamp Split + Subtitles VTT + Multi-Audio + SponsorBlock + Comments)."
 }

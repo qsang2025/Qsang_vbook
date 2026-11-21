@@ -13,6 +13,22 @@
       "format": "text",
       "mode": "input",
       "title": "Piped / Invidious dự phòng (cách nhau bằng dấu phẩy)"
+    },
+    "MIN_DURATION": {
+      "default": "1200",
+      "mode": "select",
+      "title": "Thời lượng tối thiểu video lẻ (giây: 600=10p, 1200=20p, 3600=60p)",
+      "values": [
+        "600",
+        "1200",
+        "3600"
+      ]
+    },
+    "CUSTOM_CHANNELS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Kênh YouTube bổ sung (@handle hoặc UC..., cách nhau dấu phẩy)"
     }
   },
   "metadata": {
@@ -25,10 +41,11 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 1
+    "version": 2
   },
   "script": {
     "chap": "chap.js",
+    "comment": "comment.js",
     "detail": "detail.js",
     "genre": "genre.js",
     "home": "home.js",

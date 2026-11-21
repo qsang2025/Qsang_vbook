@@ -88,10 +88,12 @@ function collectInvidiousStreams(data, hlsList, mp4List) {
     }
 }
 
-function resolveTracks(vid) {
+function resolveTracks(vid, startSec) {
     var hlsList = [];
     var mp4List = [];
     var hdList = [];
+    var subtitles = [];
+    var audios = [];
     var clients = ["ANDROID", "IOS", "ANDROID_VR"];
     var i = 0;
 
@@ -99,6 +101,15 @@ function resolveTracks(vid) {
         var itData = requestInnerTube("player", { videoId: vid }, clients[i]);
         if (itData && itData.streamingData) {
             collectInnerTubeStreams(itData, hlsList, mp4List, hdList);
+            if (subtitles.length === 0) {
+                subtitles = extractInnerTubeSubtitles(itData);
+            }
+            if (audios.length === 0 && itData.streamingData.adaptiveFormats) {
+                audios = extractInnerTubeAudios(itData.streamingData.adaptiveFormats, {
+                    "Referer": BASE_URL + "/",
+                    "Origin": BASE_URL
+                });
+            }
             if (hlsList.length > 0 || mp4List.length > 0 || hdList.length > 0) break;
         }
     }
@@ -106,8 +117,12 @@ function resolveTracks(vid) {
     if (hlsList.length === 0 && mp4List.length === 0 && hdList.length === 0) {
         var apiRes = requestApi("/streams/" + vid, { timeoutMs: 5000 });
         if (apiRes) {
-            if (apiRes.tier === "piped") collectPipedStreams(apiRes.data, hlsList, mp4List);
-            else if (apiRes.tier === "invidious") collectInvidiousStreams(apiRes.data, hlsList, mp4List);
+            if (apiRes.tier === "piped") {
+                collectPipedStreams(apiRes.data, hlsList, mp4List);
+                if (subtitles.length === 0) subtitles = extractPipedSubtitles(apiRes.data);
+            } else if (apiRes.tier === "invidious") {
+                collectInvidiousStreams(apiRes.data, hlsList, mp4List);
+            }
         }
     }
 
@@ -121,7 +136,14 @@ function resolveTracks(vid) {
             seenUrl[hlsList[i]] = true;
             servers.push({
                 title: "Native HLS (.m3u8)",
-                data: "hls|" + hlsList[i]
+                data: JSON.stringify({
+                    mode: "hls",
+                    url: hlsList[i],
+                    vid: vid,
+                    startSec: startSec || 0,
+                    subtitles: subtitles,
+                    audios: audios
+                })
             });
         }
     }
@@ -130,7 +152,14 @@ function resolveTracks(vid) {
             seenUrl[mp4List[i].url] = true;
             servers.push({
                 title: "MP4 " + mp4List[i].label,
-                data: "mp4|" + mp4List[i].url
+                data: JSON.stringify({
+                    mode: "mp4",
+                    url: mp4List[i].url,
+                    vid: vid,
+                    startSec: startSec || 0,
+                    subtitles: subtitles,
+                    audios: audios
+                })
             });
         }
     }
@@ -139,13 +168,21 @@ function resolveTracks(vid) {
             seenUrl[hdList[i].v] = true;
             servers.push({
                 title: "MP4 " + hdList[i].label + " (HD)",
-                data: "av|" + JSON.stringify({ v: hdList[i].v, a: hdList[i].a })
+                data: JSON.stringify({
+                    mode: "av",
+                    v: hdList[i].v,
+                    a: hdList[i].a,
+                    vid: vid,
+                    startSec: startSec || 0,
+                    subtitles: subtitles,
+                    audios: audios
+                })
             });
         }
     }
     servers.push({
         title: "Tự động giải mã (Re-resolve)",
-        data: "resolve:" + vid
+        data: startSec > 0 ? ("resolve:" + vid + "|t=" + startSec) : ("resolve:" + vid)
     });
     return servers;
 }
@@ -154,6 +191,7 @@ function execute(url) {
     url = normYtUrl(url);
     var vid = extractVideoId(url);
     if (!vid) return Response.error("Không đọc được ID video YouTube từ URL: " + url);
+    var startSec = extractStartSec(url);
 
-    return Response.success(resolveTracks(vid));
+    return Response.success(resolveTracks(vid, startSec));
 }

@@ -79,10 +79,25 @@ function formatDuration(sec) {
     return pad2(m) + ":" + pad2(s);
 }
 
+function formatTimestamp(sec) {
+    var n = parseInt(sec, 10);
+    if (isNaN(n) || n <= 0) return "00:00";
+    return formatDuration(n);
+}
+
+function extractStartSec(url) {
+    var s = String(url || "");
+    var m = s.match(/[?&]t=(\d+)/);
+    if (!m) return 0;
+    var n = parseInt(m[1], 10);
+    return (!isNaN(n) && n > 0) ? n : 0;
+}
+
 function isShortOrTooShort(urlOrFlag, durSec, minSec) {
     if (urlOrFlag === true) return true;
     if (typeof urlOrFlag === "string" && urlOrFlag.indexOf("/shorts/") !== -1) return true;
-    if (durSec > 0 && durSec < (minSec || 1200)) return true;
+    var limit = (minSec !== undefined && minSec !== null) ? minSec : getMinDurationSec();
+    if (durSec > 0 && durSec < limit) return true;
     return false;
 }
 
@@ -226,7 +241,7 @@ function parseVideoRenderer(vr) {
     var isShort = false;
     var navUrl = vr.navigationEndpoint && vr.navigationEndpoint.commandMetadata && vr.navigationEndpoint.commandMetadata.webCommandMetadata && vr.navigationEndpoint.commandMetadata.webCommandMetadata.url;
     if (navUrl && String(navUrl).indexOf("/shorts/") !== -1) isShort = true;
-    if (isShortOrTooShort(isShort, durSec, 1200)) return null;
+    if (isShortOrTooShort(isShort, durSec, getMinDurationSec())) return null;
 
     var channelName = getRunsText(vr.ownerText || vr.shortBylineText);
     var cover = pickBestThumb(vr.thumbnail && vr.thumbnail.thumbnails, id);
@@ -290,4 +305,121 @@ function resolveChannelId(url) {
         return String(res.endpoint.browseEndpoint.browseId);
     }
     return "";
+}
+
+function ensureFmtVtt(url) {
+    var u = String(url || "");
+    if (!u) return "";
+    if (u.indexOf("fmt=") !== -1) {
+        return u.replace(/([?&])fmt=[^&]*/i, "$1fmt=vtt");
+    }
+    return u + (u.indexOf("?") === -1 ? "?" : "&") + "fmt=vtt";
+}
+
+function extractInnerTubeSubtitles(data) {
+    var list = [];
+    if (!data || !data.captions || !data.captions.playerCaptionsTracklistRenderer) return list;
+    var tracks = data.captions.playerCaptionsTracklistRenderer.captionTracks || [];
+    var hasVi = false;
+    var translatableBase = "";
+    var i = 0;
+    for (i = 0; i < tracks.length; i++) {
+        var ct = tracks[i];
+        if (!ct || !ct.baseUrl) continue;
+        var vttUrl = ensureFmtVtt(ct.baseUrl);
+        var lang = ct.languageCode ? String(ct.languageCode) : "";
+        var label = getRunsText(ct.name) || lang || "Subtitle";
+        if (lang === "vi" || lang.indexOf("vi-") === 0 || lang.indexOf("vi_") === 0) {
+            hasVi = true;
+        }
+        if (!translatableBase && ct.isTranslatable !== false) {
+            translatableBase = vttUrl;
+        }
+        list.push({
+            data: vttUrl,
+            type: "vtt",
+            label: label,
+            language: lang
+        });
+    }
+    if (!hasVi && translatableBase) {
+        var autoUrl = translatableBase.replace(/([?&])tlang=[^&]*/i, "");
+        autoUrl += (autoUrl.indexOf("?") === -1 ? "?" : "&") + "tlang=vi";
+        list.push({
+            data: autoUrl,
+            type: "vtt",
+            label: "Tiếng Việt (Tự dịch)",
+            language: "vi"
+        });
+    }
+    return list;
+}
+
+function extractPipedSubtitles(data) {
+    var list = [];
+    if (!data || !data.subtitles || !data.subtitles.length) return list;
+    var i = 0;
+    for (i = 0; i < data.subtitles.length; i++) {
+        var s = data.subtitles[i];
+        if (!s || !s.url) continue;
+        list.push({
+            data: String(s.url),
+            type: "vtt",
+            label: String(s.name || s.code || "Subtitle"),
+            language: String(s.code || "")
+        });
+    }
+    return list;
+}
+
+function extractInnerTubeAudios(adaptiveFormats, headers) {
+    var byKey = {};
+    var order = [];
+    var i = 0;
+    if (!adaptiveFormats || !adaptiveFormats.length) return [];
+    for (i = 0; i < adaptiveFormats.length; i++) {
+        var af = adaptiveFormats[i];
+        if (!af || !af.url || !af.mimeType) continue;
+        var mt = String(af.mimeType);
+        if (mt.indexOf("audio/") !== 0) continue;
+        var at = af.audioTrack;
+        if (!at) continue;
+        var key = String(at.id || at.displayName || "");
+        if (!key) continue;
+        var isMp4 = mt.indexOf("audio/mp4") !== -1;
+        var bitrate = parseInt(af.bitrate || 0, 10) || 0;
+        var existing = byKey[key];
+        if (!existing || (isMp4 && !existing._isMp4) || (isMp4 === existing._isMp4 && bitrate > existing._bitrate)) {
+            var lang = "";
+            if (at.id) {
+                var dotIdx = String(at.id).indexOf(".");
+                lang = dotIdx !== -1 ? String(at.id).substring(0, dotIdx) : String(at.id);
+            }
+            var entry = {
+                data: String(af.url),
+                type: "",
+                label: cleanText(at.displayName || lang || "Audio"),
+                language: lang,
+                headers: headers || {},
+                _isDefault: !!at.audioIsDefault,
+                _isMp4: isMp4,
+                _bitrate: bitrate
+            };
+            if (!existing) order.push(key);
+            byKey[key] = entry;
+        }
+    }
+    if (order.length <= 1) return [];
+    var out = [];
+    for (i = 0; i < order.length; i++) {
+        var item = byKey[order[i]];
+        out.push({
+            data: item.data,
+            type: item.type,
+            label: item.label,
+            language: item.language,
+            headers: item.headers
+        });
+    }
+    return out;
 }
