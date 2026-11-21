@@ -9,6 +9,14 @@
       }
     },
     {
+      "script": "explore.js",
+      "input": "",
+      "expect": {
+        "contains": ["Kênh Hoạt Hình AI Tuyển Chọn", "Marathon Trên 3 Tiếng", "Top Xem Nhiều Nhất"],
+        "minItems": 5
+      }
+    },
+    {
       "script": "genre.js",
       "input": "",
       "expect": {

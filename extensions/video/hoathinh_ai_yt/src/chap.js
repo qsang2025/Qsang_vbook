@@ -277,6 +277,40 @@ function resolveTracks(vid, startSec, endSec, durSec) {
     videoServers.sort(function (a, b) { return b.height - a.height; });
     var servers = orderServersByQuality(hlsServers, videoServers, getPreferredQuality());
 
+    if (hdList.length > 0 && hdList[0].a && hdList[0].aInit && hdList[0].aIndex) {
+        var audioTrackItem = {
+            title: "Audio Thuyết Minh (Tiết kiệm Data)",
+            data: JSON.stringify({
+                mode: "audio_only",
+                a: hdList[0].a,
+                aInit: hdList[0].aInit,
+                aIndex: hdList[0].aIndex,
+                vid: vid,
+                startSec: startSec || 0,
+                endSec: endSec || 0,
+                durSec: durSec || 0,
+                subtitles: subtitles
+            })
+        };
+        var audioMode = getAudioOnlyMode();
+        if (audioMode === "audio_stream") {
+            servers.unshift(audioTrackItem);
+        } else {
+            servers.push(audioTrackItem);
+        }
+    }
+
+    if (getAudioOnlyMode() === "data_saver_360p") {
+        var sIdx = 0;
+        for (sIdx = 0; sIdx < servers.length; sIdx++) {
+            if (servers[sIdx].title.indexOf("360p") !== -1) {
+                var picked = servers.splice(sIdx, 1)[0];
+                servers.unshift(picked);
+                break;
+            }
+        }
+    }
+
     servers.push({
         title: "Tự động giải mã (Re-resolve)",
         data: buildResolveToken(vid, startSec, endSec, durSec)
@@ -285,7 +319,11 @@ function resolveTracks(vid, startSec, endSec, durSec) {
 }
 
 function execute(url) {
-    url = normYtUrl(url);
+    var raw = String(url || "").trim();
+    if (/\.m3u8(\?|$)/i.test(raw) && raw.indexOf("http") === 0) {
+        return Response.success([{ title: "PhimAPI Native HLS", data: raw }]);
+    }
+    url = normYtUrl(raw);
     var vid = extractVideoId(url);
     if (!vid) return Response.error("Không đọc được ID video YouTube từ URL: " + url);
     var startSec = extractStartSec(url);

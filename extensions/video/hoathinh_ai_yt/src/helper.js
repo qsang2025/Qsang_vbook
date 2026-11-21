@@ -188,9 +188,22 @@ function formatCleanEpisodeTitle(rawTitle, fallbackIndex) {
     return s;
 }
 
+function isBlockedByUserKeywords(title) {
+    var kws = getBlockedKeywords();
+    if (!kws || kws.length === 0) return false;
+    var s = String(title || "").toLowerCase();
+    if (!s) return false;
+    var i = 0;
+    for (i = 0; i < kws.length; i++) {
+        if (s.indexOf(kws[i]) !== -1) return true;
+    }
+    return false;
+}
+
 function isNoiseVideoTitle(title) {
     var s = String(title || "").toLowerCase();
     if (!s) return false;
+    if (isBlockedByUserKeywords(s)) return true;
     if (s.indexOf("karaoke") !== -1) return true;
     if (s.indexOf("nhạc nền") !== -1 || s.indexOf("nhac nen") !== -1) return true;
     if (s.indexOf("behind the scenes") !== -1) return true;
@@ -767,4 +780,82 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         aIndex: String(bestAudio.indexRange.start) + "-" + String(bestAudio.indexRange.end),
         height: parseInt(bestVideo.height || 0, 10) || 0
     };
+}
+
+function deduplicateSiblingParts(parts) {
+    if (!parts || parts.length <= 1) return parts || [];
+    var byPart = {};
+    var order = [];
+    var i = 0;
+    for (i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        var pNum = p._partNum || 9999;
+        var isMerged = /\b(?:tổng hợp|tong hop|full|trọn bộ|tron bo)\b/i.test(p.name) && /[-+&]/.test(p.name);
+        if (pNum > 0 && pNum < 9999) {
+            var prev = byPart[pNum];
+            if (!prev) {
+                byPart[pNum] = { item: p, merged: isMerged };
+                order.push(pNum);
+            } else if (prev.merged && !isMerged) {
+                byPart[pNum] = { item: p, merged: isMerged };
+            }
+        } else {
+            var uniqKey = "u_" + i;
+            byPart[uniqKey] = { item: p, merged: isMerged };
+            order.push(uniqKey);
+        }
+    }
+    var out = [];
+    for (i = 0; i < order.length; i++) {
+        out.push(byPart[order[i]].item);
+    }
+    return out;
+}
+
+function fetchPhimApiTocFallback(seriesTitle) {
+    var clean = extractBaseSeriesTitle(seriesTitle);
+    if (!clean || clean.length < 3) clean = cleanText(seriesTitle);
+    if (!clean) return [];
+    try {
+        var searchUrl = "https://phimapi.com/v1/api/tim-kiem?keyword=" + encodeURIComponent(clean) + "&limit=5";
+        var sJson = fetchJsonSafe(searchUrl, 5000);
+        var items = sJson && sJson.data && sJson.data.items;
+        if (!items || !items.length) return [];
+
+        var bestSlug = "";
+        var i = 0;
+        for (i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (it && it.slug && String(it.type || "").toLowerCase() !== "single") {
+                bestSlug = String(it.slug);
+                break;
+            }
+        }
+        if (!bestSlug && items[0] && items[0].slug) bestSlug = String(items[0].slug);
+        if (!bestSlug) return [];
+
+        var detail = fetchJsonSafe("https://phimapi.com/phim/" + encodeURIComponent(bestSlug), 6000);
+        if (!detail || !detail.episodes || !detail.episodes.length) return [];
+        var epsOut = [];
+        var seen = {};
+        var grp = detail.episodes[0];
+        var sd = grp && grp.server_data ? grp.server_data : [];
+        for (i = 0; i < sd.length; i++) {
+            var ep = sd[i];
+            if (!ep || !ep.link_m3u8 || seen[ep.link_m3u8]) continue;
+            seen[ep.link_m3u8] = true;
+            var epName = cleanText(ep.name || ("Tập " + (i + 1)));
+            if (/^\d+$/.test(epName)) epName = "Tập " + epName;
+            epsOut.push({
+                name: epName,
+                url: String(ep.link_m3u8),
+                description: "PhimAPI HLS",
+                lock: false,
+                pay: false
+            });
+        }
+        return epsOut;
+    } catch (e) {
+        return [];
+    }
 }

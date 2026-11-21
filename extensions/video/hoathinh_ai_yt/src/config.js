@@ -440,3 +440,28 @@ function requestApi(endpoint, opts) {
 
     return null;
 }
+
+function getAudioOnlyMode() {
+    try {
+        if (typeof AUDIO_ONLY_MODE !== "undefined" && AUDIO_ONLY_MODE) {
+            var v = String(AUDIO_ONLY_MODE).trim();
+            if (v === "data_saver_360p" || v === "audio_stream") return v;
+        }
+    } catch (e) {}
+    return "off";
+}
+
+function getBlockedKeywords() {
+    var out = [];
+    try {
+        if (typeof BLOCKED_KEYWORDS !== "undefined" && BLOCKED_KEYWORDS) {
+            var parts = String(BLOCKED_KEYWORDS).split(",");
+            var i = 0;
+            for (i = 0; i < parts.length; i++) {
+                var kw = parts[i].trim().toLowerCase();
+                if (kw) out.push(kw);
+            }
+        }
+    } catch (e) {}
+    return out;
+}

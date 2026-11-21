@@ -79,6 +79,22 @@
         "on",
         "off"
       ]
+    },
+    "AUDIO_ONLY_MODE": {
+      "default": "off",
+      "mode": "select",
+      "title": "Chế độ Tiết kiệm Data / Chỉ nghe Audio Thuyết Minh",
+      "values": [
+        "off",
+        "data_saver_360p",
+        "audio_stream"
+      ]
+    },
+    "BLOCKED_KEYWORDS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Từ khóa chặn (cách nhau dấu phẩy, vd: reaction, game, đam mỹ)"
     }
   },
   "metadata": {
@@ -91,12 +107,13 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 5
+    "version": 6
   },
   "script": {
     "chap": "chap.js",
     "comment": "comment.js",
     "detail": "detail.js",
+    "explore": "explore.js",
     "genre": "genre.js",
     "home": "home.js",
     "search": "search.js",

@@ -452,6 +452,13 @@ function execute(data) {
                 if (obj.mode === "av" && obj.v) {
                     return resolveAdaptiveFmp4Hls(obj, opts);
                 }
+                if (obj.mode === "audio_only" && obj.a && obj.aInit && obj.aIndex) {
+                    var aM3u8 = buildFmp4MediaM3u8(String(obj.a), String(obj.aInit), String(obj.aIndex), 4);
+                    if (aM3u8) {
+                        return buildNativeTrack(aM3u8, "application/x-mpegURL", opts);
+                    }
+                    return buildNativeTrack(String(obj.a), "audio/mp4", opts);
+                }
             }
         } catch (e) {}
     }

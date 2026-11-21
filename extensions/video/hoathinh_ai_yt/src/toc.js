@@ -15,10 +15,14 @@ function tocPlaylist(listId) {
     var token = "";
     var pageCount = 0;
 
+    var playlistTitle = "";
     while (pageCount < 10) {
         var payload = token ? { continuation: token } : { browseId: "VL" + listId };
         var res = requestInnerTube("browse", payload, "WEB");
         if (!res) break;
+        if (!playlistTitle && res.header && res.header.playlistHeaderRenderer) {
+            playlistTitle = getRunsText(res.header.playlistHeaderRenderer.title);
+        }
 
         var items = null;
         if (token) {
@@ -57,6 +61,10 @@ function tocPlaylist(listId) {
     }
 
     if (episodes.length === 0) {
+        if (playlistTitle) {
+            var phimEps = fetchPhimApiTocFallback(playlistTitle);
+            if (phimEps && phimEps.length > 0) return Response.success(phimEps);
+        }
         return Response.error("Không tìm thấy tập nào trong playlist: " + listId);
     }
     return Response.success(normalizeEpisodeOrder(episodes));
@@ -170,6 +178,7 @@ function findSiblingSeriesParts(channelId, currentVid, baseTitle) {
         if (a._partNum !== b._partNum) return a._partNum - b._partNum;
         return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
     });
+    siblings = deduplicateSiblingParts(siblings);
     var out = [];
     for (i = 0; i < siblings.length; i++) {
         out.push({
