@@ -19,7 +19,7 @@ function markWatchedEpisodeName(name, url) {
     return name;
 }
 
-function tocPlaylist(listId) {
+function tocPlaylist(listId, cacheKey) {
     var episodes = [];
     var seen = {};
     var token = "";
@@ -55,7 +55,7 @@ function tocPlaylist(listId) {
                         seen[parsed.link] = true;
                         var epName = formatCleanEpisodeTitle(parsed.name, episodes.length + 1);
                         episodes.push({
-                            name: markWatchedEpisodeName(epName, parsed.link),
+                            name: epName,
                             url: parsed.link,
                             description: parsed.durationText || "",
                             lock: false,
@@ -74,14 +74,19 @@ function tocPlaylist(listId) {
     if (episodes.length === 0) {
         if (playlistTitle) {
             var phimEps = fetchPhimApiTocFallback(playlistTitle);
-            if (phimEps && phimEps.length > 0) return Response.success(phimEps);
+            if (phimEps && phimEps.length > 0) {
+                if (cacheKey) cacheSetJson(cacheKey, phimEps);
+                return Response.success(applyWatchedMarkersToEpisodes(phimEps));
+            }
         }
         return Response.error("Không tìm thấy tập nào trong playlist: " + listId);
     }
-    return Response.success(normalizeEpisodeOrder(episodes));
+    var normEps = normalizeEpisodeOrder(episodes);
+    if (cacheKey) cacheSetJson(cacheKey, normEps);
+    return Response.success(applyWatchedMarkersToEpisodes(normEps));
 }
 
-function tocChannel(cid) {
+function tocChannel(cid, cacheKey) {
     var episodes = [];
     var seen = {};
     var res = requestInnerTube("browse", {
@@ -104,7 +109,7 @@ function tocChannel(cid) {
                         if (p && !isShortOrTooShort(p.link, p.durationSec, minSec) && !seen[p.link]) {
                             seen[p.link] = true;
                             episodes.push({
-                                name: markWatchedEpisodeName(p.name, p.link),
+                                name: p.name,
                                 url: p.link,
                                 description: p.durationText || "",
                                 lock: false,
@@ -120,7 +125,8 @@ function tocChannel(cid) {
     if (episodes.length === 0) {
         return Response.error("Không tìm thấy video dài (>= " + Math.floor(getMinDurationSec() / 60) + " phút) trên kênh: " + cid);
     }
-    return Response.success(episodes);
+    if (cacheKey) cacheSetJson(cacheKey, episodes);
+    return Response.success(applyWatchedMarkersToEpisodes(episodes));
 }
 
 function parseTimestampsFromDescription(desc, durSec) {
@@ -203,7 +209,7 @@ function findSiblingSeriesParts(channelId, currentVid, baseTitle) {
     return out;
 }
 
-function tocVideo(vid) {
+function tocVideo(vid, cacheKey) {
     var title = "";
     var channelId = "";
     var shortDesc = "";
@@ -218,7 +224,7 @@ function tocVideo(vid) {
     var durFmt = durSec > 0 ? formatDuration(durSec) : "";
     var fullUrl = BASE_URL + "/watch?v=" + vid;
     var episodes = [{
-        name: markWatchedEpisodeName("Xem Bản Full (Trọn Bộ)", fullUrl),
+        name: "Xem Bản Full (Trọn Bộ)",
         url: fullUrl,
         description: durFmt,
         lock: false,
@@ -226,6 +232,12 @@ function tocVideo(vid) {
     }];
 
     var stamps = parseTimestampsFromDescription(shortDesc, durSec);
+    if (stamps.length < 2) {
+        var commentStamps = fetchTimestampsFromComments(vid, durSec);
+        if (commentStamps && commentStamps.length >= 2) {
+            stamps = commentStamps;
+        }
+    }
     var i = 0;
     if (stamps.length >= 2) {
         for (i = 0; i < stamps.length; i++) {
@@ -271,24 +283,30 @@ function tocVideo(vid) {
     if (channelId && baseTitle.length >= 6) {
         var siblingParts = findSiblingSeriesParts(channelId, vid, baseTitle);
         for (i = 0; i < siblingParts.length; i++) {
-            siblingParts[i].name = markWatchedEpisodeName(siblingParts[i].name, siblingParts[i].url);
             episodes.push(siblingParts[i]);
         }
     }
 
-    return Response.success(episodes);
+    if (cacheKey) cacheSetJson(cacheKey, episodes);
+    return Response.success(applyWatchedMarkersToEpisodes(episodes));
 }
 
 function execute(url) {
     url = normYtUrl(url);
+    var cacheKey = "toc_v10_" + url;
+    var cachedEps = cacheGetJson(cacheKey, 30 * 60 * 1000);
+    if (cachedEps && cachedEps.length > 0) {
+        return Response.success(applyWatchedMarkersToEpisodes(cachedEps));
+    }
+
     var listId = extractPlaylistId(url);
-    if (listId) return tocPlaylist(listId);
+    if (listId) return tocPlaylist(listId, cacheKey);
 
     var vid = extractVideoId(url);
-    if (vid) return tocVideo(vid);
+    if (vid) return tocVideo(vid, cacheKey);
 
     var cid = resolveChannelId(url);
-    if (cid) return tocChannel(cid);
+    if (cid) return tocChannel(cid, cacheKey);
 
     return Response.error("URL YouTube không hợp lệ: " + url);
 }

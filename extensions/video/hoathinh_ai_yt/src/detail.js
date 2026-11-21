@@ -4,7 +4,7 @@ load('config.js');
 load('config-helpers.js');
 load('helper.js');
 
-function detailPlaylist(listId) {
+function detailPlaylist(listId, cacheKey) {
     var res = requestInnerTube("browse", { browseId: "VL" + listId }, "WEB");
     if (!res) return Response.error("Không tải được thông tin playlist: " + listId);
 
@@ -101,6 +101,7 @@ function detailPlaylist(listId) {
         input: BASE_URL + "/playlist?list=" + listId,
         script: "comment.js"
     };
+    if (cacheKey) cacheSetJson(cacheKey, result);
     return Response.success(result);
 }
 
@@ -122,7 +123,7 @@ function fetchPlayerDetailsFallback(vid) {
     }
 }
 
-function detailVideo(vid) {
+function detailVideo(vid, cacheKey) {
     var vd = null;
     var pRes = requestInnerTube("player", { videoId: vid }, "WEB");
     if (pRes && pRes.videoDetails) vd = pRes.videoDetails;
@@ -178,10 +179,11 @@ function detailVideo(vid) {
         input: BASE_URL + "/watch?v=" + vid,
         script: "comment.js"
     };
+    if (cacheKey) cacheSetJson(cacheKey, result);
     return Response.success(result);
 }
 
-function detailChannel(cid) {
+function detailChannel(cid, cacheKey) {
     var res = requestInnerTube("browse", { browseId: cid }, "WEB");
     if (!res || !res.metadata || !res.metadata.channelMetadataRenderer) {
         return Response.error("Không tải được thông tin kênh: " + cid);
@@ -189,7 +191,7 @@ function detailChannel(cid) {
     var m = res.metadata.channelMetadataRenderer;
     var cover = pickBestThumb(m.avatar && m.avatar.thumbnails, "");
     var title = cleanText(m.title || cid);
-    return Response.success({
+    var result = {
         name: title,
         author: title,
         cover: cover,
@@ -216,19 +218,31 @@ function detailChannel(cid) {
                 script: "search.js"
             }
         ]
-    });
+    };
+    if (cacheKey) cacheSetJson(cacheKey, result);
+    return Response.success(result);
 }
 
 function execute(url) {
     url = normYtUrl(url);
+    var cacheKey = "detail_v10_" + url;
+    var cached = cacheGetJson(cacheKey, 30 * 60 * 1000);
+    if (cached && cached.name) {
+        var cachedVid = extractVideoId(url);
+        if (cachedVid && !extractPlaylistId(url)) {
+            recordWatchedVideo(cachedVid, cleanText(cached.name), cached.cover || "", "");
+        }
+        return Response.success(cached);
+    }
+
     var listId = extractPlaylistId(url);
-    if (listId) return detailPlaylist(listId);
+    if (listId) return detailPlaylist(listId, cacheKey);
 
     var vid = extractVideoId(url);
-    if (vid) return detailVideo(vid);
+    if (vid) return detailVideo(vid, cacheKey);
 
     var cid = resolveChannelId(url);
-    if (cid) return detailChannel(cid);
+    if (cid) return detailChannel(cid, cacheKey);
 
     return Response.error("URL YouTube không hợp lệ: " + url);
 }

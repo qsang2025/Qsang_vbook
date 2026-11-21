@@ -205,6 +205,63 @@ function getAllFeaturedChannels() {
         if (fc.id) seen[String(fc.id).toLowerCase()] = true;
         if (fc.handle) seen[String(fc.handle).replace(/^\/+/, "").toLowerCase()] = true;
     }
+
+    var remoteUrl = getRemoteChannelsUrl();
+    if (remoteUrl) {
+        var remoteList = null;
+        var fastMode = getFastCacheMode();
+        var cacheKey = "remote_channels_v10";
+        var ttlMs = 24 * 60 * 60 * 1000;
+        if (fastMode === "on") {
+            try {
+                if (typeof cacheStorage !== "undefined" && cacheStorage) {
+                    var cachedRaw = cacheStorage.getItem(cacheKey);
+                    if (cachedRaw) {
+                        var cachedObj = JSON.parse(cachedRaw);
+                        if (cachedObj && cachedObj.ts && (Date.now() - cachedObj.ts <= ttlMs) && cachedObj.val && cachedObj.val.length) {
+                            remoteList = cachedObj.val;
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+        if (!remoteList) {
+            var fetched = fetchJsonSafe(remoteUrl, 3500);
+            if (fetched) {
+                if (fetched.length) remoteList = fetched;
+                else if (fetched.channels && fetched.channels.length) remoteList = fetched.channels;
+                if (remoteList && remoteList.length && fastMode === "on") {
+                    try {
+                        if (typeof cacheStorage !== "undefined" && cacheStorage) {
+                            cacheStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), val: remoteList }));
+                        }
+                    } catch (e) {}
+                }
+            }
+        }
+        if (remoteList && remoteList.length) {
+            for (i = 0; i < remoteList.length; i++) {
+                var rc = remoteList[i];
+                if (!rc) continue;
+                var rId = rc.id ? String(rc.id).trim() : "";
+                var rHandle = rc.handle ? String(rc.handle).trim() : "";
+                var rKeyId = rId.toLowerCase();
+                var rKeyHandle = rHandle.replace(/^\/+/, "").toLowerCase();
+                if (!rKeyId && !rKeyHandle) continue;
+                if ((rKeyId && seen[rKeyId]) || (rKeyHandle && seen[rKeyHandle])) continue;
+                if (rKeyId) seen[rKeyId] = true;
+                if (rKeyHandle) seen[rKeyHandle] = true;
+                list.push({
+                    title: rc.title ? String(rc.title) : (rId || rHandle),
+                    id: rId,
+                    handle: rHandle ? (rHandle.charAt(0) === "/" ? rHandle : ("/" + rHandle)) : "",
+                    cover: rc.cover ? String(rc.cover) : "",
+                    description: rc.description ? String(rc.description) : "Kênh cộng đồng"
+                });
+            }
+        }
+    }
+
     try {
         if (typeof CUSTOM_CHANNELS !== "undefined" && CUSTOM_CHANNELS) {
             var parts = String(CUSTOM_CHANNELS).split(",");
@@ -499,4 +556,36 @@ function getSubLangMode() {
         }
     } catch (e) {}
     return "vi";
+}
+
+function getAutoSkipIntroSec() {
+    try {
+        if (typeof AUTO_SKIP_INTRO !== "undefined" && AUTO_SKIP_INTRO) {
+            var v = String(AUTO_SKIP_INTRO).trim().toLowerCase();
+            if (v === "off" || v === "0") return 0;
+            var n = parseInt(v, 10);
+            if (!isNaN(n) && n > 0) return n;
+        }
+    } catch (e) {}
+    return 0;
+}
+
+function getRemoteChannelsUrl() {
+    try {
+        if (typeof REMOTE_CHANNELS_URL !== "undefined" && REMOTE_CHANNELS_URL) {
+            var u = String(REMOTE_CHANNELS_URL).trim();
+            if (u.indexOf("http") === 0) return u;
+        }
+    } catch (e) {}
+    return "";
+}
+
+function getFastCacheMode() {
+    try {
+        if (typeof FAST_CACHE !== "undefined" && FAST_CACHE) {
+            var m = String(FAST_CACHE).trim();
+            if (m === "on" || m === "off" || m === "clear") return m;
+        }
+    } catch (e) {}
+    return "on";
 }

@@ -171,6 +171,13 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
             skips.push(sbSkips[i]);
         }
     }
+    var autoIntro = getAutoSkipIntroSec();
+    if (skips.length === 0 && autoIntro > 0 && (!totalDurSec || totalDurSec > autoIntro * 4)) {
+        skips.push({
+            fromTime: 0,
+            toTime: Math.round(autoIntro * 1000)
+        });
+    }
 
     var out = {
         type: "native",

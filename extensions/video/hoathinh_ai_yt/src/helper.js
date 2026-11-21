@@ -161,6 +161,27 @@ function isRecapOrReviewTitle(title) {
     return false;
 }
 
+function detectSubGenreBadge(title) {
+    var s = String(title || "").toLowerCase();
+    if (!s) return "";
+    if (s.indexOf("tu tiên") !== -1 || s.indexOf("tu tien") !== -1 || s.indexOf("phàm nhân") !== -1 || s.indexOf("pham nhan") !== -1 || s.indexOf("đấu phá") !== -1 || s.indexOf("dau pha") !== -1 || s.indexOf("tiên nghịch") !== -1 || s.indexOf("tien nghich") !== -1) {
+        return "Tu Tiên";
+    }
+    if (s.indexOf("hệ thống") !== -1 || s.indexOf("he thong") !== -1 || s.indexOf("thức tỉnh") !== -1 || s.indexOf("thuc tinh") !== -1) {
+        return "Hệ Thống";
+    }
+    if (s.indexOf("xuyên không") !== -1 || s.indexOf("xuyen khong") !== -1 || s.indexOf("trọng sinh") !== -1 || s.indexOf("trong sinh") !== -1) {
+        return "Xuyên Không";
+    }
+    if (s.indexOf("mạt thế") !== -1 || s.indexOf("mat the") !== -1 || s.indexOf("tận thế") !== -1 || s.indexOf("tan the") !== -1) {
+        return "Mạt Thế";
+    }
+    if (s.indexOf("cổ trang") !== -1 || s.indexOf("co trang") !== -1 || s.indexOf("kiếm hiệp") !== -1 || s.indexOf("kiem hiep") !== -1 || s.indexOf("võ hiệp") !== -1 || s.indexOf("vo hiep") !== -1) {
+        return "Cổ Trang";
+    }
+    return "";
+}
+
 function detectAiBadges(title, durSec) {
     var s = String(title || "").toLowerCase();
     var hasTm = s.indexOf("thuyết minh") !== -1 || s.indexOf("thuyet minh") !== -1;
@@ -174,6 +195,8 @@ function detectAiBadges(title, durSec) {
 
     var parts = [];
     if (isRecapOrReviewTitle(title)) parts.push("Review/Tóm tắt");
+    var subGenre = detectSubGenreBadge(title);
+    if (subGenre) parts.push(subGenre);
     if (hasTm) parts.push("Thuyết Minh");
     else if (hasLt) parts.push("Lồng Tiếng");
     else if (hasSub) parts.push("Vietsub");
@@ -1284,6 +1307,213 @@ function parseWatchNextRelatedItems(nextRes) {
                 host: BASE_URL
             });
         }
+    }
+    return out;
+}
+
+function getRawRunsTextPreserveNewlines(obj) {
+    if (!obj) return "";
+    if (obj.content) return String(obj.content);
+    if (obj.simpleText) return String(obj.simpleText);
+    if (obj.runs && obj.runs.length) {
+        var out = "";
+        var i = 0;
+        for (i = 0; i < obj.runs.length; i++) {
+            out += obj.runs[i].text || "";
+        }
+        return out;
+    }
+    return "";
+}
+
+function parseTimestampLinesFromComment(rawText, durSec) {
+    if (!rawText) return [];
+    var lines = String(rawText).split(/\r?\n/);
+    var out = [];
+    var seenSec = {};
+    var i = 0;
+    for (i = 0; i < lines.length; i++) {
+        var line = String(lines[i] || "").trim();
+        if (!line) continue;
+        var m = line.match(/^(?:[-•*>\s]*)?((?:\d{1,2}:)?\d{1,2}:\d{2})(?:\s*[-–:|.]?\s*(.*))?$/);
+        if (!m) continue;
+        var sec = parseDurationSec(m[1]);
+        if (sec < 0) continue;
+        if (durSec > 0 && sec >= durSec) continue;
+        if (seenSec[sec]) continue;
+        seenSec[sec] = true;
+        var lbl = cleanText(m[2] || "");
+        out.push({
+            startSec: sec,
+            label: lbl || ("Mốc " + formatTimestamp(sec))
+        });
+    }
+    if (out.length < 2) return [];
+    out.sort(function (a, b) {
+        return a.startSec - b.startSec;
+    });
+    return out;
+}
+
+function fetchTimestampsFromComments(vid, durSec) {
+    if (!vid) return [];
+    try {
+        var nextRes = requestInnerTube("next", { videoId: String(vid) }, "WEB", 2500);
+        if (!nextRes) return [];
+        var contents = nextRes.contents &&
+            nextRes.contents.twoColumnWatchNextResults &&
+            nextRes.contents.twoColumnWatchNextResults.results &&
+            nextRes.contents.twoColumnWatchNextResults.results.results &&
+            nextRes.contents.twoColumnWatchNextResults.results.results.contents;
+        if (!contents || !contents.length) return [];
+
+        var token = "";
+        var i = 0;
+        for (i = 0; i < contents.length; i++) {
+            var isr = contents[i] && contents[i].itemSectionRenderer;
+            if (!isr || !isr.contents) continue;
+            if (isr.sectionIdentifier === "comment-item-section") {
+                token = extractContinuationToken(isr.contents);
+                if (token) break;
+            }
+        }
+        if (!token) {
+            for (i = 0; i < contents.length; i++) {
+                var isr2 = contents[i] && contents[i].itemSectionRenderer;
+                if (isr2 && isr2.contents) {
+                    token = extractContinuationToken(isr2.contents);
+                    if (token) break;
+                }
+            }
+        }
+        if (!token) return [];
+
+        var cRes = requestInnerTube("next", { continuation: token }, "WEB", 2500);
+        if (!cRes) return [];
+
+        var entityMap = {};
+        var mutations = cRes.frameworkUpdates && cRes.frameworkUpdates.entityBatchUpdate && cRes.frameworkUpdates.entityBatchUpdate.mutations;
+        if (mutations && mutations.length) {
+            for (i = 0; i < mutations.length; i++) {
+                var mut = mutations[i];
+                var cep = mut && mut.payload && mut.payload.commentEntityPayload;
+                if (cep && cep.properties && cep.properties.commentId) {
+                    entityMap[String(cep.properties.commentId)] = cep;
+                }
+            }
+        }
+
+        var rawComments = [];
+        var endpoints = cRes.onResponseReceivedEndpoints || [];
+        for (i = 0; i < endpoints.length && rawComments.length < 10; i++) {
+            var ep = endpoints[i];
+            var contItems = null;
+            if (ep.reloadContinuationItemsCommand && ep.reloadContinuationItemsCommand.continuationItems) {
+                contItems = ep.reloadContinuationItemsCommand.continuationItems;
+            } else if (ep.appendContinuationItemsAction && ep.appendContinuationItemsAction.continuationItems) {
+                contItems = ep.appendContinuationItemsAction.continuationItems;
+            }
+            if (!contItems || !contItems.length) continue;
+            var j = 0;
+            for (j = 0; j < contItems.length && rawComments.length < 10; j++) {
+                var ci = contItems[j];
+                var ctr = ci && ci.commentThreadRenderer;
+                if (!ctr) continue;
+                var cvm = ctr.commentViewModel && ctr.commentViewModel.commentViewModel;
+                var cr = ctr.comment && ctr.comment.commentRenderer;
+                var rawTxt = "";
+                if (cvm && cvm.commentKey && entityMap[cvm.commentKey]) {
+                    var ent = entityMap[cvm.commentKey];
+                    if (ent.properties && ent.properties.content && ent.properties.content.content) {
+                        rawTxt = String(ent.properties.content.content);
+                    }
+                } else if (cr && cr.contentText) {
+                    rawTxt = getRawRunsTextPreserveNewlines(cr.contentText);
+                }
+                if (rawTxt) rawComments.push(rawTxt);
+            }
+        }
+
+        var dSec = parseInt(durSec || 0, 10) || 0;
+        for (i = 0; i < rawComments.length; i++) {
+            var stamps = parseTimestampLinesFromComment(rawComments[i], dSec);
+            if (stamps && stamps.length >= 2) return stamps;
+        }
+    } catch (e) {}
+    return [];
+}
+
+var _fastCacheClearedOnce = false;
+
+function handleFastCacheMode() {
+    var mode = (typeof getFastCacheMode === "function") ? getFastCacheMode() : "on";
+    if (mode === "clear") {
+        if (!_fastCacheClearedOnce) {
+            _fastCacheClearedOnce = true;
+            try {
+                if (typeof cacheStorage !== "undefined" && cacheStorage && cacheStorage.clear) {
+                    cacheStorage.clear();
+                }
+            } catch (e) {}
+            try {
+                if (typeof localStorage !== "undefined" && localStorage && localStorage.removeItem) {
+                    localStorage.removeItem("watched_vids_v9");
+                    localStorage.removeItem("watched_items_v9");
+                }
+            } catch (e2) {}
+        }
+        return "clear";
+    }
+    return mode;
+}
+
+function cacheGetJson(key, maxAgeMs) {
+    if (!key) return null;
+    var mode = handleFastCacheMode();
+    if (mode !== "on") return null;
+    try {
+        if (typeof cacheStorage === "undefined" || !cacheStorage) return null;
+        var raw = cacheStorage.getItem(String(key));
+        if (!raw) return null;
+        var obj = JSON.parse(raw);
+        if (!obj || typeof obj.ts !== "number") return null;
+        if (maxAgeMs && maxAgeMs > 0 && (Date.now() - obj.ts > maxAgeMs)) return null;
+        return obj.val !== undefined ? obj.val : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function cacheSetJson(key, val) {
+    if (!key) return;
+    var mode = handleFastCacheMode();
+    if (mode !== "on") return;
+    try {
+        if (typeof cacheStorage === "undefined" || !cacheStorage) return;
+        cacheStorage.setItem(String(key), JSON.stringify({
+            ts: Date.now(),
+            val: val
+        }));
+    } catch (e) {}
+}
+
+function applyWatchedMarkersToEpisodes(episodes) {
+    if (!episodes || !episodes.length) return episodes || [];
+    var out = [];
+    var i = 0;
+    for (i = 0; i < episodes.length; i++) {
+        var ep = episodes[i];
+        if (!ep) continue;
+        var copy = {};
+        var k;
+        for (k in ep) {
+            if (ep.hasOwnProperty(k)) copy[k] = ep[k];
+        }
+        var vid = extractVideoId(copy.url);
+        if (vid && isVideoWatched(vid) && copy.name && String(copy.name).indexOf("[Đã xem] ") !== 0) {
+            copy.name = "[Đã xem] " + copy.name;
+        }
+        out.push(copy);
     }
     return out;
 }

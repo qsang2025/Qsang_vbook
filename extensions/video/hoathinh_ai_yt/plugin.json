@@ -117,6 +117,34 @@
         "zh-Hans",
         "off"
       ]
+    },
+    "AUTO_SKIP_INTRO": {
+      "default": "off",
+      "mode": "select",
+      "title": "Tự động bỏ qua Intro đầu video khi chưa có SponsorBlock (giây)",
+      "values": [
+        "off",
+        "15",
+        "30",
+        "45",
+        "60"
+      ]
+    },
+    "REMOTE_CHANNELS_URL": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "URL JSON Kho Kênh Cộng Đồng (để trống dùng kho kênh mặc định + đám mây)"
+    },
+    "FAST_CACHE": {
+      "default": "on",
+      "mode": "select",
+      "title": "Bộ nhớ đệm mở nhanh Mục lục & Chi tiết (<50ms)",
+      "values": [
+        "on",
+        "off",
+        "clear"
+      ]
     }
   },
   "metadata": {
@@ -129,7 +157,7 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 9
+    "version": 10
   },
   "script": {
     "chap": "chap.js",
