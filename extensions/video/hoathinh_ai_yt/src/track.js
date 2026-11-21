@@ -1,7 +1,7 @@
 // track.js — tra ve payload phat native (.m3u8 / .mp4), subtitles, multi-audio, SponsorBlock & timestamp skip.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-load('config-helpers.js');
+load('rate-limit.js');
 load('helper.js');
 
 function originOf(url) {
@@ -287,7 +287,19 @@ function resolveAdaptiveFmp4Hls(obj, opts) {
     return buildNativeTrack(String(obj.v), obj.mimeType ? String(obj.mimeType) : "video/mp4", opts);
 }
 
-function resolveLazy(vid, startSec, endSec, durSec) {
+function buildWebviewTrack(watchUrl) {
+    var u = watchUrl || (BASE_URL + "/");
+    return Response.success({
+        type: "webview",
+        data: u,
+        host: originOf(u),
+        headers: { "Referer": BASE_URL + "/" },
+        timeSkip: []
+    });
+}
+
+function resolveLazy(vid, startSec, endSec, durSec, reqOpts) {
+    reqOpts = reqOpts || {};
     var hdrs = {
         "Referer": BASE_URL + "/",
         "Origin": BASE_URL
@@ -300,9 +312,33 @@ function resolveLazy(vid, startSec, endSec, durSec) {
             var subs = extractInnerTubeSubtitles(itData);
             var adaptive = itData.streamingData.adaptiveFormats || [];
             var multiAudios = extractInnerTubeAudios(adaptive, hdrs);
-            var totalDur = durSec || parseDurationSec(itData.videoDetails && itData.videoDetails.lengthSeconds);
+            var vd = itData.videoDetails || {};
+            var totalDur = durSec || parseDurationSec(vd.lengthSeconds);
+            if (vd.title) {
+                var vTitle = cleanText(vd.title);
+                var vCover = pickBestThumb(vd.thumbnail && vd.thumbnail.thumbnails, vid);
+                recordWatchedVideo(vid, vTitle, vCover, formatDuration(totalDur));
+            }
 
-            if (itData.streamingData.hlsManifestUrl) {
+            if (reqOpts.mode === "lazy_audio") {
+                var aPair = findAdaptiveMp4Pair(adaptive, 720, "");
+                if (aPair && aPair.aUrl && aPair.aInit && aPair.aIndex) {
+                    var aOnlyM3u8 = buildFmp4MediaM3u8(aPair.aUrl, aPair.aInit, aPair.aIndex, 2);
+                    if (aOnlyM3u8) {
+                        setPreferredPlayerClient(clients[i]);
+                        return buildNativeTrack(aOnlyM3u8, "application/x-mpegURL", {
+                            vid: vid,
+                            startSec: startSec,
+                            endSec: endSec,
+                            durSec: totalDur,
+                            skipExtras: true,
+                            subtitles: subs
+                        });
+                    }
+                }
+            }
+
+            if (reqOpts.mode !== "lazy_mp4" && itData.streamingData.hlsManifestUrl) {
                 setPreferredPlayerClient(clients[i]);
                 return buildNativeTrack(String(itData.streamingData.hlsManifestUrl), "application/x-mpegURL", {
                     vid: vid,
@@ -314,18 +350,22 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                     audios: multiAudios
                 });
             }
+
             var prefQ = getPreferredQuality();
             var targetHeights = [];
-            if (prefQ === "4k_2k") {
-                targetHeights = [2160, 1440, 1080, 720];
-            } else if (prefQ === "720p") {
-                targetHeights = [720];
-            } else if (prefQ !== "auto_hls") {
-                targetHeights = [1080, 720];
+            if (reqOpts.height && reqOpts.mode !== "lazy_mp4") {
+                if (reqOpts.height >= 2160) targetHeights = [2160, 1440, 1080, 720];
+                else if (reqOpts.height >= 1440) targetHeights = [1440, 1080, 720];
+                else if (reqOpts.height >= 1080) targetHeights = [1080, 720];
+                else targetHeights = [720];
+            } else if (reqOpts.mode !== "lazy_mp4") {
+                if (prefQ === "4k_2k") targetHeights = [2160, 1440, 1080, 720];
+                else if (prefQ === "720p") targetHeights = [720];
+                else if (prefQ !== "auto_hls") targetHeights = [1080, 720];
             }
             var hi = 0;
             for (hi = 0; hi < targetHeights.length; hi++) {
-                var hdPair = findAdaptiveMp4Pair(adaptive, targetHeights[hi]);
+                var hdPair = findAdaptiveMp4Pair(adaptive, targetHeights[hi], reqOpts.codecFam || "");
                 if (hdPair) {
                     var hdTrack = buildFmp4TrackFromPair(hdPair, hdrs, {
                         vid: vid,
@@ -366,8 +406,8 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                 });
             }
 
-            var wantH = prefQ === "720p" ? 720 : (prefQ === "4k_2k" ? 2160 : 1080);
-            var fallbackPair = findAdaptiveMp4Pair(adaptive, wantH);
+            var wantH = reqOpts.height || (prefQ === "720p" ? 720 : (prefQ === "4k_2k" ? 2160 : 1080));
+            var fallbackPair = findAdaptiveMp4Pair(adaptive, wantH, reqOpts.codecFam || "");
             if (fallbackPair) {
                 var fbTrack = buildFmp4TrackFromPair(fallbackPair, hdrs, {
                     vid: vid,
@@ -404,7 +444,7 @@ function resolveLazy(vid, startSec, endSec, durSec) {
         }
     }
 
-    var dmFallback = resolveCrossSourceFallback(vid);
+    var dmFallback = resolveCrossSourceFallback(vid, durSec);
     if (dmFallback && dmFallback.url) {
         return buildNativeTrack(dmFallback.url, dmFallback.mimeType || "application/x-mpegURL", {
             vid: vid,
@@ -414,7 +454,7 @@ function resolveLazy(vid, startSec, endSec, durSec) {
         });
     }
 
-    return Response.error("Không giải mã được stream YouTube (có thể IP bị chặn bot): " + vid);
+    return buildWebviewTrack(BASE_URL + "/watch?v=" + vid + (startSec > 0 ? "&t=" + startSec + "s" : ""));
 }
 
 function execute(data) {
@@ -425,30 +465,22 @@ function execute(data) {
         try {
             var obj = JSON.parse(s);
             if (obj && obj.mode) {
-                var opts = {
-                    vid: obj.vid ? String(obj.vid) : "",
-                    startSec: obj.startSec || 0,
-                    endSec: obj.endSec || 0,
-                    durSec: obj.durSec || 0,
-                    subtitles: obj.subtitles || [],
-                    audios: obj.audios || [],
-                    audioUrl: obj.a ? String(obj.a) : ""
-                };
-                if (obj.mode === "hls" && obj.url) {
-                    return buildNativeTrack(String(obj.url), "application/x-mpegURL", opts);
+                if (obj.mode === "webview" && obj.url) {
+                    return buildWebviewTrack(String(obj.url));
                 }
-                if (obj.mode === "mp4" && obj.url) {
-                    return buildNativeTrack(String(obj.url), "video/mp4", opts);
+                if ((obj.mode === "lazy" || obj.mode === "lazy_mp4" || obj.mode === "lazy_audio") && obj.vid) {
+                    return resolveLazy(String(obj.vid), obj.startSec || 0, obj.endSec || 0, obj.durSec || 0, {
+                        mode: obj.mode,
+                        height: parseInt(obj.height || 0, 10) || 0,
+                        codecFam: obj.codecFam ? String(obj.codecFam) : ""
+                    });
                 }
-                if (obj.mode === "av" && obj.v) {
-                    return resolveAdaptiveFmp4Hls(obj, opts);
-                }
-                if (obj.mode === "audio_only" && obj.a && obj.aInit && obj.aIndex) {
-                    var aM3u8 = buildFmp4MediaM3u8(String(obj.a), String(obj.aInit), String(obj.aIndex), 2);
-                    if (aM3u8) {
-                        return buildNativeTrack(aM3u8, "application/x-mpegURL", opts);
-                    }
-                    return buildNativeTrack(String(obj.a), "audio/mp4", opts);
+                if (obj.vid) {
+                    return resolveLazy(String(obj.vid), obj.startSec || 0, obj.endSec || 0, obj.durSec || 0, {
+                        mode: obj.mode === "audio_only" ? "lazy_audio" : (obj.mode === "mp4" ? "lazy_mp4" : "lazy"),
+                        height: parseInt(obj.height || 0, 10) || 0,
+                        codecFam: obj.codecFam ? String(obj.codecFam) : ""
+                    });
                 }
             }
         } catch (e) {}

@@ -2,7 +2,7 @@
 // Tab tinh, khong fetch (AGENTS.md §6 quy tac 9).
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-load('config-helpers.js');
+load('rate-limit.js');
 load('helper.js');
 
 function execute() {

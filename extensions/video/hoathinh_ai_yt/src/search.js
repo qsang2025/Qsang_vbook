@@ -1,7 +1,7 @@
 // search.js — tim kiem playlist, ban full >= 20 phut va kenh tuyen chon tren YouTube.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-load('config-helpers.js');
+load('rate-limit.js');
 load('helper.js');
 
 function collectSearchItems(contents, items, seen, filterMode, minDur) {

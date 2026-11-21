@@ -1,7 +1,7 @@
 // detail.js — chi tiet Playlist, Video Ban Full hoac Kenh YouTube.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-load('config-helpers.js');
+load('rate-limit.js');
 load('helper.js');
 
 function detailPlaylist(listId, cacheKey) {

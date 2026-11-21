@@ -272,7 +272,7 @@ function isShortOrTooShort(urlOrFlag, durSec, minSec) {
     if (urlOrFlag === true) return true;
     if (typeof urlOrFlag === "string" && urlOrFlag.indexOf("/shorts/") !== -1) return true;
     var limit = (minSec !== undefined && minSec !== null) ? minSec : getMinDurationSec();
-    if (durSec > 0 && durSec < limit) return true;
+    if (limit > 0 && (!durSec || durSec <= 0 || durSec < limit)) return true;
     return false;
 }
 
@@ -772,7 +772,49 @@ function extractInnerTubeAudios(adaptiveFormats, headers) {
     return out;
 }
 
-function resolveCrossSourceFallback(vid) {
+function normalizeForMatch(s) {
+    var txt = cleanText(s).toLowerCase();
+    txt = txt.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, "a")
+        .replace(/[èéẹẻẽêềếệểễ]/g, "e")
+        .replace(/[ìíịỉĩ]/g, "i")
+        .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, "o")
+        .replace(/[ùúụủũưừứựửữ]/g, "u")
+        .replace(/[ỳýỵỷỹ]/g, "y")
+        .replace(/đ/g, "d");
+    txt = txt.replace(/[^a-z0-9\s]/g, " ");
+    return cleanText(txt);
+}
+
+function scoreTitleSimilarity(targetTitle, candidateTitle, targetDurSec, candidateDurSec) {
+    var a = normalizeForMatch(targetTitle);
+    var b = normalizeForMatch(candidateTitle);
+    if (!a || !b) return 0;
+    var aWords = a.split(" ");
+    var bSet = {};
+    var bWords = b.split(" ");
+    var i = 0;
+    for (i = 0; i < bWords.length; i++) {
+        if (bWords[i].length >= 2) bSet[bWords[i]] = true;
+    }
+    var validA = 0;
+    var matched = 0;
+    for (i = 0; i < aWords.length; i++) {
+        if (aWords[i].length < 2) continue;
+        validA++;
+        if (bSet[aWords[i]]) matched++;
+    }
+    if (validA === 0) return 0;
+    var score = matched / validA;
+    if (b.indexOf(a) !== -1 || a.indexOf(b) !== -1) score += 0.25;
+    if (targetDurSec > 0 && candidateDurSec > 0) {
+        var ratio = Math.abs(targetDurSec - candidateDurSec) / Math.max(targetDurSec, candidateDurSec);
+        if (ratio <= 0.25) score += 0.15;
+        else if (ratio > 0.6) score -= 0.2;
+    }
+    return score;
+}
+
+function resolveCrossSourceFallback(vid, durSec) {
     if (!vid) return null;
     try {
         var oembedUrl = "https://www.youtube.com/oembed?url=" + encodeURIComponent("https://www.youtube.com/watch?v=" + vid) + "&format=json";
@@ -783,25 +825,34 @@ function resolveCrossSourceFallback(vid) {
         if (!searchQ || searchQ.length < 3) searchQ = cleanText(oembed.title);
         if (!searchQ) return null;
 
-        var dmSearchUrl = "https://api.dailymotion.com/videos?search=" + encodeURIComponent(searchQ) + "&limit=3&fields=id,title,duration";
+        var dmSearchUrl = "https://api.dailymotion.com/videos?search=" + encodeURIComponent(searchQ) + "&limit=5&fields=id,title,duration";
         var dmSearch = fetchJsonSafe(dmSearchUrl, 5000);
         if (!dmSearch || !dmSearch.list || !dmSearch.list.length) return null;
 
+        var bestItem = null;
+        var bestScore = 0;
         var i = 0;
         for (i = 0; i < dmSearch.list.length; i++) {
-            var item = dmSearch.list[i];
-            if (!item || !item.id) continue;
-            var metaUrl = "https://www.dailymotion.com/player/metadata/video/" + encodeURIComponent(String(item.id));
-            var meta = fetchJsonSafe(metaUrl, 5000);
-            var hlsUrl = meta && meta.qualities && meta.qualities.auto && meta.qualities.auto[0] && meta.qualities.auto[0].url;
-            if (hlsUrl) {
-                return {
-                    url: String(hlsUrl),
-                    mimeType: "application/x-mpegURL",
-                    title: item.title ? cleanText(item.title) : cleanText(oembed.title),
-                    duration: parseInt(item.duration || 0, 10) || 0
-                };
+            var cand = dmSearch.list[i];
+            if (!cand || !cand.id) continue;
+            var sc = scoreTitleSimilarity(searchQ, cand.title || "", durSec || 0, parseInt(cand.duration || 0, 10) || 0);
+            if (sc > bestScore) {
+                bestScore = sc;
+                bestItem = cand;
             }
+        }
+        if (!bestItem || bestScore < 0.45) return null;
+
+        var metaUrl = "https://www.dailymotion.com/player/metadata/video/" + encodeURIComponent(String(bestItem.id));
+        var meta = fetchJsonSafe(metaUrl, 5000);
+        var hlsUrl = meta && meta.qualities && meta.qualities.auto && meta.qualities.auto[0] && meta.qualities.auto[0].url;
+        if (hlsUrl) {
+            return {
+                url: String(hlsUrl),
+                mimeType: "application/x-mpegURL",
+                title: bestItem.title ? cleanText(bestItem.title) : cleanText(oembed.title),
+                duration: parseInt(bestItem.duration || 0, 10) || 0
+            };
         }
     } catch (e) {}
     return null;
@@ -954,7 +1005,19 @@ function buildFmp4MediaM3u8(baseUrl, initRangeStr, indexRangeStr, groupCount) {
     var indexEnd = parseInt(idxParts[1], 10);
     if (isNaN(indexEnd) || indexEnd <= 0) return "";
     try {
-        var r = fetch(baseUrl + "&range=" + indexRangeStr, { timeout: 6000 });
+        var r = null;
+        if (typeof pacedFetch === "function") {
+            var pf = pacedFetch(baseUrl + "&range=" + indexRangeStr, {
+                minDelayMs: 40,
+                maxDelayMs: 120,
+                maxRetries: 1,
+                timeout: 6000
+            });
+            if (pf && pf.ok) r = pf.res;
+        } else {
+            if (typeof rateLimitDelay === "function") rateLimitDelay(baseUrl, 40, 120);
+            r = fetch(baseUrl + "&range=" + indexRangeStr, { timeout: 6000 });
+        }
         if (!r || !r.ok) return "";
         var bytes = b64ToBytes(r.base64());
         var segs = parseSidxSegments(bytes, indexEnd, groupCount || 3);
@@ -1117,16 +1180,20 @@ function fetchPhimApiTocFallback(seriesTitle) {
         if (!items || !items.length) return [];
 
         var bestSlug = "";
+        var bestScore = 0;
         var i = 0;
         for (i = 0; i < items.length; i++) {
             var it = items[i];
-            if (it && it.slug && String(it.type || "").toLowerCase() !== "single") {
+            if (!it || !it.slug) continue;
+            var candName = it.name || it.origin_name || it.slug;
+            var sc = scoreTitleSimilarity(clean, candName, 0, 0);
+            if (String(it.type || "").toLowerCase() !== "single") sc += 0.1;
+            if (sc > bestScore) {
+                bestScore = sc;
                 bestSlug = String(it.slug);
-                break;
             }
         }
-        if (!bestSlug && items[0] && items[0].slug) bestSlug = String(items[0].slug);
-        if (!bestSlug) return [];
+        if (!bestSlug || bestScore < 0.45) return [];
 
         var detail = fetchJsonSafe("https://phimapi.com/phim/" + encodeURIComponent(bestSlug), 6000);
         if (!detail || !detail.episodes || !detail.episodes.length) return [];

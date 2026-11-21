@@ -1,7 +1,7 @@
 // toc.js — danh sach tap cua Playlist, Video Ban Full hoac Kenh YouTube.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
-load('config-helpers.js');
+load('rate-limit.js');
 load('helper.js');
 
 function isDeletedOrPrivate(title) {
@@ -51,7 +51,7 @@ function tocPlaylist(listId, cacheKey) {
             if (it && it.lockupViewModel) {
                 var parsed = parseLockupViewModel(it.lockupViewModel);
                 if (parsed && parsed.id && !isDeletedOrPrivate(parsed.name)) {
-                    if (!isShortOrTooShort(parsed.link, parsed.durationSec, 120) && !seen[parsed.link]) {
+                    if (parsed.durationSec > 0 && !isShortOrTooShort(parsed.link, parsed.durationSec, 120) && !seen[parsed.link]) {
                         seen[parsed.link] = true;
                         var epName = formatCleanEpisodeTitle(parsed.name, episodes.length + 1);
                         episodes.push({
@@ -106,7 +106,7 @@ function tocChannel(cid, cacheKey) {
                     if (vm) {
                         var p = parseLockupViewModel(vm);
                         var minSec = getMinDurationSec();
-                        if (p && !isShortOrTooShort(p.link, p.durationSec, minSec) && !seen[p.link]) {
+                        if (p && p.durationSec > 0 && !isShortOrTooShort(p.link, p.durationSec, minSec) && !seen[p.link]) {
                             seen[p.link] = true;
                             episodes.push({
                                 name: p.name,

@@ -9,6 +9,40 @@ try {
     }
 } catch (e) {}
 
+function siteOrigin() {
+    var m = BASE_URL.match(/^(https?:\/\/[^\/]+)/);
+    return m ? m[1] : BASE_URL;
+}
+
+function cleanText(s) {
+    return String(s === undefined || s === null ? "" : s)
+        .replace(/[\s\u3000]+/g, " ")
+        .trim();
+}
+
+var CLIENT_VERSIONS = {
+    ANDROID: "20.10.38",
+    ANDROID_VR: "1.60.19",
+    IOS: "20.10.4",
+    WEB: "2.20241126.01.00"
+};
+
+function getClientVersion(clientType) {
+    var key = clientType || "WEB";
+    try {
+        if (typeof cacheStorage !== "undefined" && cacheStorage) {
+            var raw = cacheStorage.getItem("yt_cver_v11");
+            if (raw) {
+                var obj = JSON.parse(raw);
+                if (obj && obj.ts && (Date.now() - obj.ts <= 24 * 60 * 60 * 1000) && obj.versions && obj.versions[key]) {
+                    return String(obj.versions[key]);
+                }
+            }
+        }
+    } catch (e) {}
+    return CLIENT_VERSIONS[key] || CLIENT_VERSIONS.WEB;
+}
+
 var PIPED_INSTANCES = [
     "https://api.piped.private.coffee",
     "https://pipedapi.ducks.party",
@@ -150,10 +184,22 @@ function fetchCloudInvidiousInstances() {
     if (_cloudInvidiousFetched) return _cloudInvidious;
     _cloudInvidiousFetched = true;
     try {
-        var res = fetch("https://api.invidious.io/instances.json?sort_by=health", {
-            headers: { "Accept": "application/json" },
-            timeout: 3500
-        });
+        var res = null;
+        if (typeof pacedFetch === "function") {
+            var pf = pacedFetch("https://api.invidious.io/instances.json?sort_by=health", {
+                headers: { "Accept": "application/json" },
+                minDelayMs: 60,
+                maxDelayMs: 160,
+                maxRetries: 1,
+                timeout: 3500
+            });
+            if (pf && pf.ok) res = pf.res;
+        } else {
+            res = fetch("https://api.invidious.io/instances.json?sort_by=health", {
+                headers: { "Accept": "application/json" },
+                timeout: 3500
+            });
+        }
         if (!res || !res.ok) return _cloudInvidious;
         var arr = JSON.parse(res.text());
         if (!arr || !arr.length) return _cloudInvidious;
@@ -296,30 +342,96 @@ function getAllFeaturedChannels() {
 }
 
 var _cachedVisitorData = "";
+var _deadMirrors = {};
+
+function markMirrorDead(baseUrl) {
+    if (baseUrl) _deadMirrors[String(baseUrl).replace(/\/+$/, "").toLowerCase()] = true;
+}
+
+function markMirrorAlive(tier, baseUrl) {
+    if (!baseUrl) return;
+    var clean = String(baseUrl).replace(/\/+$/, "");
+    try {
+        if (typeof cacheStorage !== "undefined" && cacheStorage) {
+            var raw = cacheStorage.getItem("healthy_mirrors_v11");
+            var obj = raw ? JSON.parse(raw) : { ts: Date.now(), piped: "", invidious: "" };
+            obj.ts = Date.now();
+            obj[tier] = clean;
+            cacheStorage.setItem("healthy_mirrors_v11", JSON.stringify(obj));
+        }
+    } catch (e) {}
+}
+
+function getHealthyMirrorList(tier, defaults) {
+    var out = [];
+    var seen = {};
+    var i = 0;
+    try {
+        if (typeof cacheStorage !== "undefined" && cacheStorage) {
+            var raw = cacheStorage.getItem("healthy_mirrors_v11");
+            if (raw) {
+                var obj = JSON.parse(raw);
+                if (obj && obj.ts && (Date.now() - obj.ts <= 6 * 60 * 60 * 1000) && obj[tier]) {
+                    var cachedUrl = String(obj[tier]).replace(/\/+$/, "");
+                    var ck = cachedUrl.toLowerCase();
+                    if (cachedUrl && !_deadMirrors[ck]) {
+                        seen[ck] = true;
+                        out.push(cachedUrl);
+                    }
+                }
+            }
+        }
+    } catch (e) {}
+    for (i = 0; i < defaults.length; i++) {
+        var u = String(defaults[i] || "").replace(/\/+$/, "");
+        var uk = u.toLowerCase();
+        if (u && !seen[uk] && !_deadMirrors[uk]) {
+            seen[uk] = true;
+            out.push(u);
+        }
+    }
+    return out;
+}
 
 function fetchVisitorData() {
     if (_cachedVisitorData) return _cachedVisitorData;
     try {
-        var res = fetch(BASE_URL + "/youtubei/v1/visitor_id?prettyPrint=false", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Origin": BASE_URL,
-                "Referer": BASE_URL + "/"
-            },
-            body: JSON.stringify({
-                context: {
-                    client: {
-                        clientName: "WEB",
-                        clientVersion: "2.20241126.01.00",
-                        hl: "vi",
-                        gl: "VN"
-                    }
+        var reqBody = JSON.stringify({
+            context: {
+                client: {
+                    clientName: "WEB",
+                    clientVersion: getClientVersion("WEB"),
+                    hl: "vi",
+                    gl: "VN"
                 }
-            }),
-            timeout: 8000
+            }
         });
+        var reqHeaders = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Origin": BASE_URL,
+            "Referer": BASE_URL + "/"
+        };
+        var res = null;
+        if (typeof pacedFetch === "function") {
+            var pf = pacedFetch(BASE_URL + "/youtubei/v1/visitor_id?prettyPrint=false", {
+                method: "POST",
+                headers: reqHeaders,
+                body: reqBody,
+                minDelayMs: 60,
+                maxDelayMs: 160,
+                maxRetries: 1,
+                timeout: 8000
+            });
+            if (pf && pf.ok) res = pf.res;
+        } else {
+            res = fetch(BASE_URL + "/youtubei/v1/visitor_id?prettyPrint=false", {
+                method: "POST",
+                headers: reqHeaders,
+                body: reqBody,
+                timeout: 8000
+            });
+        }
         if (res && res.ok) {
             var j = JSON.parse(res.text());
             if (j && j.responseContext && j.responseContext.visitorData) {
@@ -332,10 +444,11 @@ function fetchVisitorData() {
 
 function getInnerTubeContext(clientType, visitorData) {
     var cl = null;
+    var ver = getClientVersion(clientType);
     if (clientType === "ANDROID") {
         cl = {
             clientName: "ANDROID",
-            clientVersion: "20.10.38",
+            clientVersion: ver,
             androidSdkVersion: 34,
             osName: "Android",
             osVersion: "14",
@@ -345,7 +458,7 @@ function getInnerTubeContext(clientType, visitorData) {
     } else if (clientType === "ANDROID_VR") {
         cl = {
             clientName: "ANDROID_VR",
-            clientVersion: "1.60.19",
+            clientVersion: ver,
             androidSdkVersion: 32,
             deviceMake: "Oculus",
             deviceModel: "Quest 3",
@@ -355,7 +468,7 @@ function getInnerTubeContext(clientType, visitorData) {
     } else if (clientType === "IOS") {
         cl = {
             clientName: "IOS",
-            clientVersion: "20.10.4",
+            clientVersion: ver,
             deviceMake: "Apple",
             deviceModel: "iPhone16,2",
             osName: "iPhone",
@@ -366,7 +479,7 @@ function getInnerTubeContext(clientType, visitorData) {
     } else {
         cl = {
             clientName: "WEB",
-            clientVersion: "2.20241126.01.00",
+            clientVersion: ver,
             hl: "vi",
             gl: "VN"
         };
@@ -393,10 +506,6 @@ function requestInnerTubeOnce(action, payload, clientType, timeoutMs, visitorDat
             if (payload.hasOwnProperty(k)) body[k] = payload[k];
         }
     }
-    if (action === "player" && clientType && clientType !== "WEB") {
-        body.contentCheckOk = true;
-        body.racyCheckOk = true;
-    }
     body.context = getInnerTubeContext(clientType || "WEB", visitorData || "");
 
     var headers = {
@@ -405,21 +514,28 @@ function requestInnerTubeOnce(action, payload, clientType, timeoutMs, visitorDat
         "Origin": BASE_URL,
         "Referer": BASE_URL + "/"
     };
-    if (clientType === "ANDROID") {
-        headers["User-Agent"] = "com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip";
-    } else if (clientType === "ANDROID_VR") {
-        headers["User-Agent"] = "com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip";
-    } else if (clientType === "IOS") {
-        headers["User-Agent"] = "com.google.ios.youtube/20.10.4 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)";
-    }
 
     try {
-        var res = fetch(url, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(body),
-            timeout: timeoutMs || 12000
-        });
+        var res = null;
+        if (typeof pacedFetch === "function") {
+            var pf = pacedFetch(url, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(body),
+                minDelayMs: 60,
+                maxDelayMs: 180,
+                maxRetries: 2,
+                timeout: timeoutMs || 12000
+            });
+            if (pf && pf.ok) res = pf.res;
+        } else {
+            res = fetch(url, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(body),
+                timeout: timeoutMs || 12000
+            });
+        }
         if (!res || !res.ok) return null;
         var txt = res.text();
         if (isBadApiText(txt)) return null;
@@ -448,10 +564,22 @@ function requestInnerTube(action, payload, clientType, timeoutMs, useVisitorData
 
 function fetchJsonSafe(url, timeoutMs) {
     try {
-        var res = fetch(url, {
-            headers: { "Accept": "application/json" },
-            timeout: timeoutMs || 7000
-        });
+        var res = null;
+        if (typeof pacedFetch === "function") {
+            var pf = pacedFetch(url, {
+                headers: { "Accept": "application/json" },
+                minDelayMs: 50,
+                maxDelayMs: 150,
+                maxRetries: 1,
+                timeout: timeoutMs || 7000
+            });
+            if (pf && pf.ok) res = pf.res;
+        } else {
+            res = fetch(url, {
+                headers: { "Accept": "application/json" },
+                timeout: timeoutMs || 7000
+            });
+        }
         if (!res || !res.ok) return null;
         var txt = res.text();
         if (isBadApiText(txt)) return null;
@@ -477,10 +605,14 @@ function requestApi(endpoint, opts) {
     }
 
     var custom = getCustomMirrors();
-    var pipedList = custom.concat(PIPED_INSTANCES);
+    var pipedList = getHealthyMirrorList("piped", custom.concat(PIPED_INSTANCES));
     for (i = 0; i < pipedList.length; i++) {
         j = fetchJsonSafe(pipedList[i] + endpoint, timeoutMs);
-        if (j) return { tier: "piped", data: j };
+        if (j) {
+            markMirrorAlive("piped", pipedList[i]);
+            return { tier: "piped", data: j };
+        }
+        markMirrorDead(pipedList[i]);
     }
 
     var invEndpoint = endpoint;
@@ -491,15 +623,14 @@ function requestApi(endpoint, opts) {
     } else if (endpoint.indexOf("/comments/") === 0) {
         invEndpoint = "/api/v1/comments/" + endpoint.substring(10);
     }
-    for (i = 0; i < INVIDIOUS_INSTANCES.length; i++) {
-        j = fetchJsonSafe(INVIDIOUS_INSTANCES[i] + invEndpoint, timeoutMs);
-        if (j) return { tier: "invidious", data: j };
-    }
-
-    var cloudInv = fetchCloudInvidiousInstances();
-    for (i = 0; i < cloudInv.length; i++) {
-        j = fetchJsonSafe(cloudInv[i] + invEndpoint, timeoutMs);
-        if (j) return { tier: "invidious", data: j };
+    var invList = getHealthyMirrorList("invidious", INVIDIOUS_INSTANCES.concat(fetchCloudInvidiousInstances()));
+    for (i = 0; i < invList.length; i++) {
+        j = fetchJsonSafe(invList[i] + invEndpoint, timeoutMs);
+        if (j) {
+            markMirrorAlive("invidious", invList[i]);
+            return { tier: "invidious", data: j };
+        }
+        markMirrorDead(invList[i]);
     }
 
     if (opts.innerTubeAction) {
