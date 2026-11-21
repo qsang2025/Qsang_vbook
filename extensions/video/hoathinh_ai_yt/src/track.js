@@ -243,6 +243,72 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
     return Response.success(out);
 }
 
+function buildFmp4TrackFromPair(pair, hdrs, opts) {
+    if (!pair || !pair.vUrl || !pair.vInit || !pair.vIndex || !pair.aUrl || !pair.aInit || !pair.aIndex) return null;
+    var videoM3u8 = buildFmp4MediaM3u8(pair.vUrl, pair.vInit, pair.vIndex, 3);
+    if (!videoM3u8) return null;
+    var audioM3u8 = buildFmp4MediaM3u8(pair.aUrl, pair.aInit, pair.aIndex, 4);
+    if (!audioM3u8) return null;
+    var audioUri = buildFmp4DataUri(audioM3u8);
+    if (!audioUri) return null;
+
+    var nextOpts = {
+        vid: opts.vid || "",
+        startSec: opts.startSec || 0,
+        endSec: opts.endSec || 0,
+        durSec: opts.durSec || 0,
+        subtitles: opts.subtitles || [],
+        audios: [{
+            title: "Audio",
+            label: "Tiếng Việt / Gốc",
+            language: "vi",
+            type: "application/x-mpegURL",
+            data: audioUri,
+            headers: hdrs
+        }]
+    };
+    return buildNativeTrack(videoM3u8, "application/x-mpegURL", nextOpts);
+}
+
+function resolveAdaptiveFmp4Hls(obj, opts) {
+    var hdrs = {
+        "Referer": BASE_URL + "/",
+        "Origin": BASE_URL
+    };
+    if (obj.v && obj.a && obj.vInit && obj.vIndex && obj.aInit && obj.aIndex) {
+        var direct = buildFmp4TrackFromPair({
+            vUrl: String(obj.v),
+            vInit: String(obj.vInit),
+            vIndex: String(obj.vIndex),
+            aUrl: String(obj.a),
+            aInit: String(obj.aInit),
+            aIndex: String(obj.aIndex)
+        }, hdrs, opts);
+        if (direct) return direct;
+    }
+
+    var vid = opts.vid || "";
+    var targetH = parseInt(obj.height || 0, 10) || 1080;
+    if (vid) {
+        var clients = getPlayerClientsOrder();
+        var i = 0;
+        for (i = 0; i < clients.length; i++) {
+            var itData = requestInnerTube("player", { videoId: vid }, clients[i]);
+            if (itData && itData.streamingData && itData.streamingData.adaptiveFormats) {
+                var pair = findAdaptiveMp4Pair(itData.streamingData.adaptiveFormats, targetH);
+                if (pair) {
+                    var res = buildFmp4TrackFromPair(pair, hdrs, opts);
+                    if (res) {
+                        setPreferredPlayerClient(clients[i]);
+                        return res;
+                    }
+                }
+            }
+        }
+    }
+    return buildNativeTrack(String(obj.v), obj.mimeType ? String(obj.mimeType) : "video/mp4", opts);
+}
+
 function resolveLazy(vid, startSec, endSec, durSec) {
     var hdrs = {
         "Referer": BASE_URL + "/",
@@ -269,6 +335,25 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                     audios: multiAudios
                 });
             }
+            var prefQ = getPreferredQuality();
+            var wantH = prefQ === "720p" ? 720 : 1080;
+            if (prefQ !== "auto_hls") {
+                var hdPair = findAdaptiveMp4Pair(adaptive, wantH);
+                if (hdPair) {
+                    var hdTrack = buildFmp4TrackFromPair(hdPair, hdrs, {
+                        vid: vid,
+                        startSec: startSec,
+                        endSec: endSec,
+                        durSec: totalDur,
+                        subtitles: subs
+                    });
+                    if (hdTrack) {
+                        setPreferredPlayerClient(clients[i]);
+                        return hdTrack;
+                    }
+                }
+            }
+
             var formats = itData.streamingData.formats || [];
             var best = null;
             var j = 0;
@@ -292,34 +377,19 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                 });
             }
 
-            var bestV = null;
-            var bestA = "";
-            for (j = 0; j < adaptive.length; j++) {
-                var af = adaptive[j];
-                if (!af || !af.url || !af.mimeType) continue;
-                var mt = String(af.mimeType);
-                if (mt.indexOf("audio/mp4") !== -1) {
-                    if (!bestA || parseInt(af.itag || 0, 10) === 140) bestA = String(af.url);
-                } else if (mt.indexOf("video/mp4") !== -1 || mt.indexOf("video/webm") !== -1) {
-                    var afH = parseInt(af.height || 0, 10);
-                    var bestH = bestV ? parseInt(bestV.height || 0, 10) : 0;
-                    if (!bestV || afH > bestH || (afH === bestH && mt.indexOf("video/mp4") !== -1)) {
-                        bestV = af;
-                    }
-                }
-            }
-            if (bestV && bestV.url) {
-                setPreferredPlayerClient(clients[i]);
-                var vMime = String(bestV.mimeType).indexOf("video/webm") !== -1 ? "video/webm" : "video/mp4";
-                return buildNativeTrack(String(bestV.url), vMime, {
+            var fallbackPair = findAdaptiveMp4Pair(adaptive, wantH);
+            if (fallbackPair) {
+                var fbTrack = buildFmp4TrackFromPair(fallbackPair, hdrs, {
                     vid: vid,
                     startSec: startSec,
                     endSec: endSec,
                     durSec: totalDur,
-                    audioUrl: bestA,
-                    audios: multiAudios,
                     subtitles: subs
                 });
+                if (fbTrack) {
+                    setPreferredPlayerClient(clients[i]);
+                    return fbTrack;
+                }
             }
         }
     }
@@ -380,7 +450,7 @@ function execute(data) {
                     return buildNativeTrack(String(obj.url), "video/mp4", opts);
                 }
                 if (obj.mode === "av" && obj.v) {
-                    return buildNativeTrack(String(obj.v), obj.mimeType ? String(obj.mimeType) : "video/mp4", opts);
+                    return resolveAdaptiveFmp4Hls(obj, opts);
                 }
             }
         } catch (e) {}

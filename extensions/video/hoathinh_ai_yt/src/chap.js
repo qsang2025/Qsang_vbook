@@ -24,43 +24,39 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
     }
 
     var adaptive = sd.adaptiveFormats || [];
-    var bestAudio = "";
-    var fallbackAudio = "";
+    var bestAudioObj = null;
     for (i = 0; i < adaptive.length; i++) {
         var af = adaptive[i];
-        if (!af || !af.url || !af.mimeType) continue;
+        if (!af || !af.url || !af.mimeType || !af.initRange || !af.indexRange) continue;
         var amt = String(af.mimeType);
         if (amt.indexOf("audio/mp4") !== -1) {
-            if (!bestAudio || parseInt(af.itag || 0, 10) === 140) {
-                bestAudio = String(af.url);
+            if (!bestAudioObj || parseInt(af.itag || 0, 10) === 140) {
+                bestAudioObj = af;
                 if (parseInt(af.itag || 0, 10) === 140) break;
             }
-        } else if (amt.indexOf("audio/webm") !== -1 && !fallbackAudio) {
-            fallbackAudio = String(af.url);
         }
     }
-    if (!bestAudio) bestAudio = fallbackAudio;
-    if (bestAudio) {
+    if (bestAudioObj) {
         var byH = {};
         var heights = [];
         for (i = 0; i < adaptive.length; i++) {
             var vf = adaptive[i];
-            if (!vf || !vf.url || !vf.mimeType) continue;
+            if (!vf || !vf.url || !vf.mimeType || !vf.initRange || !vf.indexRange) continue;
             var vmt = String(vf.mimeType);
-            var isMp4 = vmt.indexOf("video/mp4") !== -1;
-            var isWebm = vmt.indexOf("video/webm") !== -1;
-            if (!isMp4 && !isWebm) continue;
+            if (vmt.indexOf("video/mp4") === -1) continue;
             var h = parseInt(vf.height || 0, 10) || 0;
             if (h < 720) continue;
-            var existing = byH[h];
-            if (!existing || (isMp4 && !existing.isMp4)) {
-                if (!existing) heights.push(h);
+            if (!byH[h]) {
+                heights.push(h);
                 byH[h] = {
                     v: String(vf.url),
-                    a: bestAudio,
+                    a: String(bestAudioObj.url),
+                    vInit: String(vf.initRange.start) + "-" + String(vf.initRange.end),
+                    vIndex: String(vf.indexRange.start) + "-" + String(vf.indexRange.end),
+                    aInit: String(bestAudioObj.initRange.start) + "-" + String(bestAudioObj.initRange.end),
+                    aIndex: String(bestAudioObj.indexRange.start) + "-" + String(bestAudioObj.indexRange.end),
                     height: h,
-                    isMp4: isMp4,
-                    mimeType: isMp4 ? "video/mp4" : "video/webm",
+                    mimeType: "video/mp4",
                     label: vf.qualityLabel ? String(vf.qualityLabel) : (h + "p")
                 };
             }
@@ -242,6 +238,11 @@ function resolveTracks(vid, startSec, endSec, durSec) {
                     mode: "av",
                     v: hdList[i].v,
                     a: hdList[i].a,
+                    vInit: hdList[i].vInit,
+                    vIndex: hdList[i].vIndex,
+                    aInit: hdList[i].aInit,
+                    aIndex: hdList[i].aIndex,
+                    height: hdList[i].height || 0,
                     mimeType: hdList[i].mimeType || "video/mp4",
                     vid: vid,
                     startSec: startSec || 0,

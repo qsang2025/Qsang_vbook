@@ -569,3 +569,202 @@ function resolveCrossSourceFallback(vid) {
     } catch (e) {}
     return null;
 }
+
+function b64ToBytes(b64) {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var lookup = [];
+    var i = 0;
+    for (i = 0; i < 256; i++) lookup[i] = -1;
+    for (i = 0; i < 64; i++) lookup[chars.charCodeAt(i)] = i;
+    var s = String(b64 || "");
+    var out = [];
+    var buffer = 0;
+    var bits = 0;
+    for (i = 0; i < s.length; i++) {
+        var c = s.charCodeAt(i);
+        if (c === 61) break;
+        var val = c < 256 ? lookup[c] : -1;
+        if (val === -1) continue;
+        buffer = (buffer << 6) | val;
+        bits += 6;
+        if (bits >= 8) {
+            bits -= 8;
+            out.push((buffer >> bits) & 255);
+        }
+    }
+    return out;
+}
+
+function strToB64(str) {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var raw = unescape(encodeURIComponent(String(str || "")));
+    var out = "";
+    var i = 0;
+    while (i < raw.length) {
+        var b1 = raw.charCodeAt(i++) & 255;
+        var has2 = i < raw.length;
+        var b2 = has2 ? (raw.charCodeAt(i++) & 255) : 0;
+        var has3 = i < raw.length;
+        var b3 = has3 ? (raw.charCodeAt(i++) & 255) : 0;
+        var trip = (b1 << 16) | (b2 << 8) | b3;
+        out += chars.charAt((trip >> 18) & 63);
+        out += chars.charAt((trip >> 12) & 63);
+        out += has2 ? chars.charAt((trip >> 6) & 63) : "=";
+        out += has3 ? chars.charAt(trip & 63) : "=";
+    }
+    return out;
+}
+
+function sidxU32(b, o) {
+    return (((b[o] << 24) >>> 0) + (b[o + 1] << 16) + (b[o + 2] << 8) + b[o + 3]);
+}
+
+function sidxU16(b, o) {
+    return (b[o] << 8) + b[o + 1];
+}
+
+function parseSidxSegments(bytes, indexEnd, groupCount) {
+    if (!bytes || bytes.length < 32) return [];
+    var pos = 0;
+    while (pos + 8 <= bytes.length) {
+        var sz = sidxU32(bytes, pos);
+        var type = String.fromCharCode(bytes[pos + 4], bytes[pos + 5], bytes[pos + 6], bytes[pos + 7]);
+        if (type === "sidx") {
+            var ver = bytes[pos + 8];
+            var timescale = sidxU32(bytes, pos + 16);
+            if (!timescale) return [];
+            var off = pos + 20;
+            var firstOffset = 0;
+            if (ver === 0) {
+                firstOffset = sidxU32(bytes, off + 4);
+                off += 8;
+            } else {
+                firstOffset = sidxU32(bytes, off + 12);
+                off += 16;
+            }
+            var count = sidxU16(bytes, off + 2);
+            off += 4;
+            var curByte = indexEnd + 1 + firstOffset;
+            var rawSegs = [];
+            var i = 0;
+            for (i = 0; i < count && off + 12 <= bytes.length; i++) {
+                var refSize = sidxU32(bytes, off) & 0x7FFFFFFF;
+                var dur = sidxU32(bytes, off + 4);
+                if (refSize > 0 && dur > 0) {
+                    rawSegs.push({
+                        start: curByte,
+                        end: curByte + refSize - 1,
+                        dur: dur / timescale
+                    });
+                }
+                curByte += refSize;
+                off += 12;
+            }
+            if (!groupCount || groupCount <= 1) return rawSegs;
+            var grouped = [];
+            for (i = 0; i < rawSegs.length; i += groupCount) {
+                var endIdx = Math.min(i + groupCount - 1, rawSegs.length - 1);
+                var sumDur = 0;
+                var j = i;
+                for (j = i; j <= endIdx; j++) sumDur += rawSegs[j].dur;
+                grouped.push({
+                    start: rawSegs[i].start,
+                    end: rawSegs[endIdx].end,
+                    dur: sumDur
+                });
+            }
+            return grouped;
+        }
+        if (sz < 8) break;
+        pos += sz;
+    }
+    return [];
+}
+
+function buildFmp4MediaM3u8(baseUrl, initRangeStr, indexRangeStr, groupCount) {
+    if (!baseUrl || !initRangeStr || !indexRangeStr) return "";
+    var idxParts = String(indexRangeStr).split("-");
+    if (idxParts.length !== 2) return "";
+    var indexEnd = parseInt(idxParts[1], 10);
+    if (isNaN(indexEnd) || indexEnd <= 0) return "";
+    try {
+        var r = fetch(baseUrl + "&range=" + indexRangeStr, { timeout: 6000 });
+        if (!r || !r.ok) return "";
+        var bytes = b64ToBytes(r.base64());
+        var segs = parseSidxSegments(bytes, indexEnd, groupCount || 3);
+        if (!segs || segs.length === 0) return "";
+
+        var maxDur = 1;
+        var i = 0;
+        for (i = 0; i < segs.length; i++) {
+            var d = Math.ceil(segs[i].dur);
+            if (d > maxDur) maxDur = d;
+        }
+        var lines = [
+            "#EXTM3U",
+            "#EXT-X-VERSION:7",
+            "#EXT-X-TARGETDURATION:" + maxDur,
+            "#EXT-X-MEDIA-SEQUENCE:0",
+            "#EXT-X-PLAYLIST-TYPE:VOD",
+            "#EXT-X-INDEPENDENT-SEGMENTS",
+            "#EXT-X-MAP:URI=\"" + baseUrl + "&range=" + initRangeStr + "\""
+        ];
+        for (i = 0; i < segs.length; i++) {
+            lines.push("#EXTINF:" + segs[i].dur.toFixed(3) + ",");
+            lines.push(baseUrl + "&range=" + segs[i].start + "-" + segs[i].end);
+        }
+        lines.push("#EXT-X-ENDLIST");
+        return lines.join("\n");
+    } catch (e) {
+        return "";
+    }
+}
+
+function buildFmp4DataUri(m3u8Text) {
+    if (!m3u8Text) return "";
+    return "data:application/x-mpegurl;base64," + strToB64(m3u8Text);
+}
+
+function findAdaptiveMp4Pair(adaptive, targetHeight) {
+    if (!adaptive || !adaptive.length) return null;
+    var bestAudio = null;
+    var bestVideo = null;
+    var i = 0;
+    for (i = 0; i < adaptive.length; i++) {
+        var af = adaptive[i];
+        if (!af || !af.url || !af.mimeType || !af.initRange || !af.indexRange) continue;
+        var mt = String(af.mimeType);
+        if (mt.indexOf("audio/mp4") !== -1) {
+            if (!bestAudio || parseInt(af.itag || 0, 10) === 140) {
+                bestAudio = af;
+                if (parseInt(af.itag || 0, 10) === 140) break;
+            }
+        }
+    }
+    if (!bestAudio) return null;
+    for (i = 0; i < adaptive.length; i++) {
+        var vf = adaptive[i];
+        if (!vf || !vf.url || !vf.mimeType || !vf.initRange || !vf.indexRange) continue;
+        var vmt = String(vf.mimeType);
+        if (vmt.indexOf("video/mp4") === -1) continue;
+        var h = parseInt(vf.height || 0, 10) || 0;
+        if (h < 720) continue;
+        if (targetHeight > 0 && h === targetHeight) {
+            bestVideo = vf;
+            break;
+        }
+        if (!bestVideo || h > (parseInt(bestVideo.height || 0, 10) || 0)) {
+            bestVideo = vf;
+        }
+    }
+    if (!bestVideo) return null;
+    return {
+        vUrl: String(bestVideo.url),
+        vInit: String(bestVideo.initRange.start) + "-" + String(bestVideo.initRange.end),
+        vIndex: String(bestVideo.indexRange.start) + "-" + String(bestVideo.indexRange.end),
+        aUrl: String(bestAudio.url),
+        aInit: String(bestAudio.initRange.start) + "-" + String(bestAudio.initRange.end),
+        aIndex: String(bestAudio.indexRange.start) + "-" + String(bestAudio.indexRange.end),
+        height: parseInt(bestVideo.height || 0, 10) || 0
+    };
+}
