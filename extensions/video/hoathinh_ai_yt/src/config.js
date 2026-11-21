@@ -20,6 +20,10 @@ function cleanText(s) {
         .trim();
 }
 
+// Ghi chu (review v11): InnerTube player API bat buoc khai bao mot client app
+// (ANDROID/IOS/ANDROID_VR) trong JSON context moi tra ve link phat truc tiep;
+// khong co API key, khong login. Header HTTP thi khong xoay UA. Version hien
+// dang hardcode; hook yt_cver_v11 du phong lay version tuoi khi co co che nap.
 var CLIENT_VERSIONS = {
     ANDROID: "20.10.38",
     ANDROID_VR: "1.60.19",
