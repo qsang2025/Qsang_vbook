@@ -1,6 +1,6 @@
 # STATUS — Trạng thái các nguồn (sinh tự động)
 
-> Cập nhật lần cuối: 2026-11-20 00:50 UTC (CI health-check hàng ngày + chạy tay).
+> Cập nhật lần cuối: 2026-11-21 00:54 UTC (CI health-check hàng ngày + chạy tay).
 > File này **không sửa tay**. GitHub Actions sinh lại file này;
 > muốn sửa trạng thái một nguồn thì sửa nguồn đó rồi chạy lại CI.
 
@@ -60,6 +60,10 @@
 | 饭饭小说 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 墨坛文学网 | chinese_novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | NiACG | comic | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Otofun | forum | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| Tinhte Forum | forum | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| VOZ Forum | forum | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| VnExpress | news | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | AkayTruyen | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | App Truyện Chữ | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | AzTruyen | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
@@ -134,6 +138,8 @@
 | 稷下書院 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 笔趣阁 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | 繁體小說 | novel | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| FQ Video | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
+| HHHTQ | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | HHTQ Vietsub | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Hoạt Hình 3D Trung Quốc | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
 | Hoạt Hình AI Trung Quốc | video | CHƯA TEST | chưa chạy testall (cần thiết bị thật / VBOOK_SERVER) |
