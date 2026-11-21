@@ -1,0 +1,85 @@
+{
+  "cases": [
+    {
+      "script": "home.js",
+      "input": "",
+      "expect": {
+        "contains": ["Bộ AI Dài Tập", "Kênh Tuyển Chọn"],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "genre.js",
+      "input": "",
+      "expect": {
+        "contains": ["Tu Tiên", "Mạt Thế", "Hệ Thống"],
+        "minItems": 10
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "playlist:hoạt hình AI Trung Quốc trọn bộ",
+      "expect": {
+        "contains": ["playlist?list="],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "video:hoạt hình AI Trung Quốc full thuyết minh",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 5
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "channels:featured",
+      "expect": {
+        "contains": ["CibiiSub", "Zzzphim"],
+        "minItems": 6
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://www.youtube.com/playlist?list=PLb1WvdR78l_kmBPdY-rJ50Dk9dtr_kmN-",
+      "expect": {
+        "contains": ["CibiiSub"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "detail.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "contains": ["Zzzphim"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://www.youtube.com/playlist?list=PLb1WvdR78l_kmBPdY-rJ50Dk9dtr_kmN-",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 100
+      }
+    },
+    {
+      "script": "toc.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "contains": ["Xem Bản Full"],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "chap.js",
+      "input": "https://www.youtube.com/watch?v=vU2qMWj-750",
+      "expect": {
+        "contains": ["resolve:vU2qMWj-750"],
+        "minItems": 1
+      }
+    }
+  ],
+  "note": "Golden fixture cho Hoạt Hình AI YouTube (YouTube InnerTube API + 3-tier Piped/Invidious/InnerTube stream resolver)."
+}

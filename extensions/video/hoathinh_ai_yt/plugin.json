@@ -1,0 +1,39 @@
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://www.youtube.com",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://www.youtube.com"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Piped / Invidious dự phòng (cách nhau bằng dấu phẩy)"
+    }
+  },
+  "metadata": {
+    "author": "MuseAi",
+    "description": "Hoạt Hình AI Trung Quốc trên YouTube — bộ dài tập (playlist), bản full nhiều tiếng (>= 20 phút), kênh tuyển chọn. Lọc bỏ Shorts & video ngắn.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "Hoạt Hình AI YouTube",
+    "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
+    "source": "https://www.youtube.com",
+    "type": "video",
+    "version": 1
+  },
+  "script": {
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "track": "track.js"
+  }
+}
