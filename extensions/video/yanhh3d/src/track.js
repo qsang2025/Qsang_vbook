@@ -41,6 +41,29 @@ function webviewTrack(watchUrl) {
     });
 }
 
+function resolvePhimApiFallback(watchUrl) {
+    var info = watchSlugAndEp(watchUrl);
+    if (!info || !info.slug) return "";
+    var json = fetchJson("https://phimapi.com/phim/" + info.slug, { referer: "https://phimapi.com/" });
+    if (!json || !json.episodes || !(json.episodes instanceof Array)) return "";
+    var epNum = info.ep || 1;
+    var s = 0;
+    for (s = 0; s < json.episodes.length; s++) {
+        var srv = json.episodes[s];
+        var data = (srv && srv.server_data) ? srv.server_data : [];
+        var j = 0;
+        for (j = 0; j < data.length; j++) {
+            var item = data[j];
+            if (!item || !item.link_m3u8) continue;
+            var n = episodeNumber(item.slug) || episodeNumber(item.name);
+            if (n === epNum || (epNum <= 1 && String(item.slug || "").toLowerCase() === "full")) {
+                return String(item.link_m3u8);
+            }
+        }
+    }
+    return "";
+}
+
 function execute(input) {
     input = String(input === undefined || input === null ? "" : input).trim();
     if (!input) return Response.error("Không có dữ liệu server để phát.");
@@ -82,6 +105,10 @@ function execute(input) {
         if (plain && plain.stream) {
             return nativeTrack(plain.stream, plain.referer || watch);
         }
+        var apiStream = resolvePhimApiFallback(watch);
+        if (apiStream) {
+            return nativeTrack(apiStream, "https://phimapi.com/");
+        }
         return webviewTrack(watch);
     }
 
@@ -90,7 +117,16 @@ function execute(input) {
         if (fb && fb.stream) {
             return nativeTrack(fb.stream, fb.referer || watch);
         }
+        var apiStream2 = resolvePhimApiFallback(watch);
+        if (apiStream2) {
+            return nativeTrack(apiStream2, "https://phimapi.com/");
+        }
         return webviewTrack(watch);
+    }
+
+    var apiFallback = resolvePhimApiFallback(watch);
+    if (apiFallback) {
+        return nativeTrack(apiFallback, "https://phimapi.com/");
     }
 
     if (src) {

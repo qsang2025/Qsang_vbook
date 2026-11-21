@@ -1,0 +1,40 @@
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://hhtq.sh",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://hhtq.sh"
+      ]
+    },
+    "MIRRORS": {
+      "default": "",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "MuseAi",
+    "description": "HHTQ 4K (hhtq.sh) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh: ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI/hhtq.press khi có tập tương ứng, kèm các server 1080P/4K qua AJAX player.php và Webview Trang Nguồn.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "HHTQ 4K",
+    "nsfw": false,
+    "regexp": "^(?:https?://)?(?:www\\.)?hhtq\\.sh/(?:(?:[^/\\?]+/)?[^/\\?]+/tap-[^/\\?]+\\.html|(?!(?:moi-cap-nhat|top-xem-nhieu|hoan-thanh|lich-chieu|lich-chieu-phim|lich-su|bookmark|do-thi|hien-dai|tu-tien|dang-ky|sitemap)/?$)(?!category/|tag/|page/|wp-|player/|feed/)(?:[^/\\?]+/)?[^/\\?]+)/?$",
+    "source": "https://hhtq.sh",
+    "type": "video",
+    "version": 1
+  },
+  "script": {
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "track": "track.js"
+  }
+}

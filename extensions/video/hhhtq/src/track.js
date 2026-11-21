@@ -125,6 +125,40 @@ function directStreamFromText(text) {
     return "";
 }
 
+function phimApiEpisodeNumber(s) {
+    var m = String(s || "").match(/tap-(\d+)/i);
+    if (!m) m = String(s || "").match(/Tập\s*(\d+)/i);
+    if (!m) m = String(s || "").match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+}
+
+function resolvePhimApiByTitle(title, epNum) {
+    if (!title) return "";
+    var searchUrl = "https://phimapi.com/v1/api/tim-kiem?keyword=" + encodeURIComponent(title) + "&limit=5";
+    var sJson = fetchJson(searchUrl, { referer: "https://phimapi.com/" });
+    if (!sJson || !sJson.data || !sJson.data.items || sJson.data.items.length === 0) return "";
+    var slug = String(sJson.data.items[0].slug || "");
+    if (!slug) return "";
+    var dJson = fetchJson("https://phimapi.com/phim/" + slug, { referer: "https://phimapi.com/" });
+    if (!dJson || !dJson.episodes || !(dJson.episodes instanceof Array)) return "";
+    var targetEp = parseInt(epNum, 10) || 1;
+    var s = 0;
+    for (s = 0; s < dJson.episodes.length; s++) {
+        var srv = dJson.episodes[s];
+        var list = (srv && srv.server_data) ? srv.server_data : [];
+        var j = 0;
+        for (j = 0; j < list.length; j++) {
+            var item = list[j];
+            if (!item || !item.link_m3u8) continue;
+            var n = phimApiEpisodeNumber(item.slug) || phimApiEpisodeNumber(item.name);
+            if (n === targetEp || (targetEp <= 1 && String(item.slug || "").toLowerCase() === "full")) {
+                return String(item.link_m3u8);
+            }
+        }
+    }
+    return "";
+}
+
 function execute(data) {
     data = String(data === undefined || data === null ? "" : data).trim();
     if (!data) return Response.error("Không có dữ liệu server để phát.");
@@ -134,6 +168,15 @@ function execute(data) {
             var payload = JSON.parse(data);
             if (payload && payload.mode === "webview" && payload.url) {
                 return webviewTrack(normalizeUrl(payload.url), BASE_URL + "/");
+            }
+            if (payload && payload.mode === "phimapi") {
+                var apiStream = resolvePhimApiByTitle(payload.title || "", payload.ep || 1);
+                if (apiStream) {
+                    return nativeTrack(apiStream, "https://phimapi.com/");
+                }
+                if (payload.url) {
+                    data = String(payload.url);
+                }
             }
         } catch (e0) {
         }

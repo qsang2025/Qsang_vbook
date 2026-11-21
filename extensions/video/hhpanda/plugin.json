@@ -1,0 +1,41 @@
+{
+  "config": {
+    "DOMAIN": {
+      "default": "https://hhpanda.st",
+      "mode": "select",
+      "title": "Domain",
+      "values": [
+        "https://hhpanda.st",
+        "https://hhpanda.tech"
+      ]
+    },
+    "MIRRORS": {
+      "default": "https://hhpanda.tech",
+      "format": "text",
+      "mode": "input",
+      "title": "Mirror dự phòng (cách nhau bằng dấu phẩy, theo thứ tự ưu tiên)"
+    }
+  },
+  "metadata": {
+    "author": "MuseAi",
+    "description": "HHPanda (hhpanda.st / hhpanda.tech) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh: ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI/hhtq.press khi có tập tương ứng, kèm các server 1080P/4K qua AJAX player.php và Webview Trang Nguồn.",
+    "encrypt": false,
+    "language": "javascript",
+    "locale": "vi_VN",
+    "name": "HHPanda",
+    "nsfw": false,
+    "regexp": "^(?:https?://)?(?:www\\.)?hhpanda\\.(?:st|tech)/(?:watch-[^/\\?]+/[^/\\?]+|(?!moi-cap-nhat|top-xem-nhieu|hoan-thanh|lich-chieu|lich-su|bookmark|category|tag|watch-|page|wp-|dang-ky|sitemap|player|feed)[^/\\?]+)/?$",
+    "source": "https://hhpanda.st",
+    "type": "video",
+    "version": 1
+  },
+  "script": {
+    "chap": "chap.js",
+    "detail": "detail.js",
+    "genre": "genre.js",
+    "home": "home.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "track": "track.js"
+  }
+}

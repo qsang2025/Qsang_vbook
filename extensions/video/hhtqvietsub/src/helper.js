@@ -252,3 +252,219 @@ function originOf(url) {
     var m = String(url || "").match(/^(https?:\/\/[^\/]+)/i);
     return m ? m[1] : BASE_URL;
 }
+
+function episodeNumber(s) {
+    var m = String(s || "").match(/tap-(\d+)/i);
+    if (!m) m = String(s || "").match(/Tập\s*(\d+)/i);
+    if (!m) m = String(s || "").match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+}
+
+function stripVnDiacritics(s) {
+    var str = String(s || "").toLowerCase();
+    var map = [
+        [/[àáảãạăằắẳẵặâầấẩẫậ]/g, "a"],
+        [/[èéẻẽẹêềếểễệ]/g, "e"],
+        [/[ìíỉĩị]/g, "i"],
+        [/[òóỏõọôồốổỗộơờớởỡợ]/g, "o"],
+        [/[ùúủũụưừứửữự]/g, "u"],
+        [/[ỳýỷỹỵ]/g, "y"],
+        [/đ/g, "d"]
+    ];
+    var i = 0;
+    for (i = 0; i < map.length; i++) {
+        str = str.replace(map[i][0], map[i][1]);
+    }
+    return str;
+}
+
+function normTitle(s) {
+    return stripVnDiacritics(s).replace(/[^a-z0-9]+/g, " ").replace(/^\s+|\s+$/g, "");
+}
+
+function fetchPhimApiJson(url, timeoutMs) {
+    var r = null;
+    try {
+        r = pacedFetch(url, {
+            headers: { "Accept": "application/json" },
+            referer: "https://phimapi.com/",
+            minDelayMs: 0,
+            maxDelayMs: 0,
+            maxRetries: 0,
+            timeout: timeoutMs || 6500
+        });
+    } catch (e) {
+        return null;
+    }
+    if (!r || !r.ok || !r.res) return null;
+    var text = "";
+    try { text = String(r.res.text() || ""); } catch (e2) { return null; }
+    if (!text || isChallengeText(text)) return null;
+    try { return JSON.parse(text); } catch (e3) { return null; }
+}
+
+function phimApiTitleMatches(candidateName, candidateSlug, hhSlug, hhTitle) {
+    var cNorm = normTitle(candidateName);
+    var hNorm = normTitle(hhTitle);
+    if (hhSlug && (candidateSlug === hhSlug || candidateSlug === hhSlug + "-hoat-hinh")) return true;
+    if (!cNorm || !hNorm) return false;
+    if (cNorm === hNorm) return true;
+    var cNoMov = cNorm.replace(/\bmovie\b/g, " ").replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
+    var hNoMov = hNorm.replace(/\bmovie\b/g, " ").replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
+    if (cNoMov && cNoMov === hNoMov) return true;
+    return false;
+}
+
+function isValidPhimApiMovie(detail, hhSlug, hhTitle, isSeries) {
+    if (!detail || !detail.status || !detail.movie || !detail.episodes) return false;
+    if (!detail.episodes.length) return false;
+    var mv = detail.movie;
+    var mType = String(mv.type || "").toLowerCase();
+    if (isSeries) {
+        if (mType === "single") return false;
+        var maxEps = 0;
+        var i = 0;
+        for (i = 0; i < detail.episodes.length; i++) {
+            var sd = detail.episodes[i] && detail.episodes[i].server_data;
+            if (sd && sd.length > maxEps) maxEps = sd.length;
+        }
+        if (maxEps <= 1) return false;
+    }
+    return phimApiTitleMatches(mv.name || "", String(mv.slug || ""), hhSlug, hhTitle);
+}
+
+function scorePhimApiItem(item, hhSlug, hhTitle, hhOrig, isSeries) {
+    if (!item || !item.slug) return -1;
+    var mType = String(item.type || "").toLowerCase();
+    if (isSeries && mType === "single") return -1;
+    if (!phimApiTitleMatches(item.name || "", String(item.slug || ""), hhSlug, hhTitle)) return -1;
+
+    var score = 0;
+    var cNorm = normTitle(item.name || "");
+    var hNorm = normTitle(hhTitle || "");
+    if (hNorm && cNorm === hNorm) score += 100;
+    else score += 60;
+    if (mType === "hoathinh") score += 50;
+    else if (mType === "series") score += 10;
+    if (hhSlug && (item.slug === hhSlug || item.slug === hhSlug + "-hoat-hinh")) score += 40;
+    var oNorm = normTitle(item.origin_name || "");
+    var hOrig = normTitle(hhOrig || "");
+    if (hOrig && oNorm && oNorm === hOrig) score += 20;
+    return score;
+}
+
+function findPhimApiEpisodeLink(serverData, targetEp, isFull) {
+    if (!serverData || !serverData.length) return null;
+    var i = 0;
+    if (isFull) {
+        for (i = 0; i < serverData.length; i++) {
+            var fep = serverData[i];
+            if (!fep || !fep.link_m3u8) continue;
+            var fSlug = String(fep.slug || "").toLowerCase();
+            var fName = String(fep.name || "").toLowerCase();
+            if (fSlug === "full" || fName.indexOf("full") !== -1 || serverData.length === 1) {
+                return { url: String(fep.link_m3u8), isRange: false };
+            }
+        }
+        return null;
+    }
+    if (!targetEp || targetEp <= 0) return null;
+
+    for (i = 0; i < serverData.length; i++) {
+        var ep = serverData[i];
+        if (!ep || !ep.link_m3u8) continue;
+        var slug = String(ep.slug || "").trim();
+        var name = String(ep.name || "").trim();
+        var m = slug.match(/^tap-0*(\d+)$/i);
+        if (!m) m = name.match(/^(?:Tập\s*)?0*(\d+)$/i);
+        if (m && parseInt(m[1], 10) === targetEp) {
+            return { url: String(ep.link_m3u8), isRange: false };
+        }
+    }
+
+    for (i = 0; i < serverData.length; i++) {
+        var rep = serverData[i];
+        if (!rep || !rep.link_m3u8) continue;
+        var rSlug = String(rep.slug || "").trim();
+        var rName = String(rep.name || "").trim();
+        var rm = rSlug.match(/^tap-0*(\d+)-0*(\d+)$/i);
+        if (!rm) rm = rName.match(/0*(\d+)\s*-\s*0*(\d+)/);
+        if (rm) {
+            var lo = parseInt(rm[1], 10);
+            var hi = parseInt(rm[2], 10);
+            if (!isNaN(lo) && !isNaN(hi) && lo <= targetEp && targetEp <= hi) {
+                return { url: String(rep.link_m3u8), isRange: true };
+            }
+        }
+    }
+    return null;
+}
+
+function resolvePhimApiTracks(hhSlug, hhTitle, hhOrig, targetEp, isFull, isSeries, preferDub) {
+    var out = { primary: [], secondary: [] };
+    var detail = null;
+
+    if (hhSlug) {
+        var direct = fetchPhimApiJson("https://phimapi.com/phim/" + encodeURIComponent(hhSlug), 6500);
+        if (isValidPhimApiMovie(direct, hhSlug, hhTitle, isSeries)) {
+            detail = direct;
+        }
+    }
+
+    if (!detail && hhTitle) {
+        var searchJson = fetchPhimApiJson("https://phimapi.com/v1/api/tim-kiem?keyword=" + encodeURIComponent(hhTitle), 5500);
+        var items = searchJson && searchJson.data && searchJson.data.items;
+        if (items && items.length > 0) {
+            var bestItem = null;
+            var bestScore = -1;
+            var i = 0;
+            for (i = 0; i < items.length; i++) {
+                var sc = scorePhimApiItem(items[i], hhSlug, hhTitle, hhOrig, isSeries);
+                if (sc > bestScore) {
+                    bestScore = sc;
+                    bestItem = items[i];
+                }
+            }
+            if (bestItem && bestItem.slug && bestItem.slug !== hhSlug) {
+                var fetched = fetchPhimApiJson("https://phimapi.com/phim/" + encodeURIComponent(bestItem.slug), 6500);
+                if (isValidPhimApiMovie(fetched, hhSlug, hhTitle, isSeries)) {
+                    detail = fetched;
+                }
+            }
+        }
+    }
+
+    if (!detail || !detail.episodes) return out;
+
+    var seenTitle = {};
+    var seenUrl = {};
+    var s = 0;
+    for (s = 0; s < detail.episodes.length; s++) {
+        var grp = detail.episodes[s];
+        if (!grp || !grp.server_data) continue;
+        var found = findPhimApiEpisodeLink(grp.server_data, targetEp, isFull);
+        if (!found || !found.url || found.url.indexOf("http") !== 0) continue;
+        if (seenUrl[found.url]) continue;
+        seenUrl[found.url] = true;
+
+        var rawServer = cleanText(grp.server_name || "").replace(/^#/, "");
+        var lower = rawServer.toLowerCase();
+        var isDub = lower.indexOf("thuyết minh") !== -1 || lower.indexOf("lồng tiếng") !== -1 || lower.indexOf("thuyet minh") !== -1;
+        var langLabel = isDub ? "Thuyết Minh" : (lower.indexOf("vietsub") !== -1 ? "Vietsub" : (rawServer || "PhimAPI"));
+        var title = "Native HLS (" + langLabel + ")";
+        if (seenTitle[title]) {
+            var n = 2;
+            while (seenTitle["Native HLS (" + langLabel + " " + n + ")"]) n++;
+            title = "Native HLS (" + langLabel + " " + n + ")";
+        }
+        seenTitle[title] = true;
+
+        var entry = { title: title, data: found.url };
+        if ((preferDub && isDub) || (!preferDub && !isDub)) {
+            out.primary.push(entry);
+        } else {
+            out.secondary.push(entry);
+        }
+    }
+    return out;
+}

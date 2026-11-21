@@ -26,7 +26,7 @@
     "regexp": "^(?:https?://)?(?:www\\.)?hhkungfu\\.ee/(?:watch-[^/\\?]+/[^/\\?]+|(?!moi-cap-nhat|top-xem-nhieu|hoan-thanh|lich-chieu|lich-su|bookmark|category|tag|watch-|page|wp-|dang-ky|sitemap|player|feed)[^/\\?]+)/?$",
     "source": "https://hhkungfu.ee",
     "type": "video",
-    "version": 7
+    "version": 8
   },
   "script": {
     "chap": "chap.js",

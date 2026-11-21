@@ -1,0 +1,7 @@
+{
+  "cases": [
+    { "name": "Trang chủ HHPanda", "pattern": "halim-thumb", "url": "https://hhpanda.st/" },
+    { "name": "Danh sách mới cập nhật", "pattern": "halim-thumb", "url": "https://hhpanda.st/moi-cap-nhat" },
+    { "name": "Chi tiết phim mẫu", "pattern": "Tru Tiên", "url": "https://hhpanda.st/tru-tien" }
+  ]
+}

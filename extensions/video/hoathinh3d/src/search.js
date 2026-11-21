@@ -1,31 +1,33 @@
-// search.js — tim kiem theo tu khoa + renderer danh sach cho tab
-// home/genre. Query bat dau bang "/" hoac "http" thi coi la duong dan
-// danh sach cua API, khong phai tu khoa. Phan trang theo
-// data.params.pagination cua API (totalPages), next = "" khi het.
-//
-// Load: build se copy config.js, helper.js vao src/.
+// search.js — tim kiem tu khoa (/?s=<tu-khoa>) va renderer danh sach cho
+// tab home/genre (/moi-cap-nhat, /category/...).
+// Tai len: file config.js, file config-helpers.js, file fetch-helpers.js,
+// file rate-limit.js, file safe-first.js, file helper.js.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('config-helpers.js');
+load('fetch-helpers.js');
+load('rate-limit.js');
+load('safe-first.js');
 load('helper.js');
 
 function execute(query, page) {
-    query = query || "";
-    page = page || "1";
+    query = String(query === undefined || query === null ? "" : query);
+    page = String(page === undefined || page === null || page === "" ? "1" : page);
+    if (!query) return Response.error("Nhập từ khóa để tìm kiếm");
 
     var url = "";
     if (query.indexOf("/") === 0 || query.indexOf("http") === 0) {
-        // Duyet tab: query la duong dan danh sach cua API hoac URL day du.
-        url = query.indexOf("http") === 0 ? query : BASE_URL + query;
+        var base = query.indexOf("http") === 0 ? normalizeUrl(query) : (BASE_URL + query);
+        url = pageUrl(base, page);
     } else {
-        // Tu khoa: /v1/api/tim-kiem?keyword=
-        url = BASE_URL + "/v1/api/tim-kiem?keyword=" + encodeURIComponent(query);
+        url = pageUrl(BASE_URL + "/?s=" + encodeURIComponent(query), page);
     }
-    url = apiPagedUrl(url, page);
 
-    var json = fetchJson(url);
-    if (!json) return Response.error("Không tải được kết quả tìm kiếm: " + url);
+    rateLimitDelay(siteOrigin(), 400, 1000);
+    var doc = fetchDocWithFallback(url, MIRROR_LIST);
+    if (!doc) return Response.error("Không tải được danh sách phim: " + url);
 
-    var parsed = listItems(json);
+    var parsed = parseListPage(doc, page);
     if (parsed.items.length === 0) return Response.success([], "");
     return Response.success(parsed.items, parsed.next);
 }

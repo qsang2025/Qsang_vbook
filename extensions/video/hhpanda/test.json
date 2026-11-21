@@ -1,0 +1,12 @@
+{
+  "cases": [
+    { "expect": { "contains": ["Tru Tiên"], "minItems": 1 }, "input": "tru tien", "script": "search.js" },
+    { "expect": { "contains": ["hhpanda"], "minItems": 10 }, "input": "/moi-cap-nhat", "script": "search.js" },
+    { "expect": { "contains": ["Tru Tiên"], "minItems": 1 }, "input": "https://hhpanda.st/tru-tien", "script": "detail.js" },
+    { "expect": { "contains": ["Tập 1"], "minItems": 10 }, "input": "https://hhpanda.st/tru-tien", "script": "toc.js" },
+    { "expect": { "contains": ["Native HLS", "1080P"], "minItems": 2 }, "input": "https://hhpanda.st/watch-tru-tien/tap-1-sv1.html", "script": "chap.js" },
+    { "expect": { "contains": ["native", ".m3u8"], "minItems": 1 }, "input": "https://example.com/video/index.m3u8", "script": "track.js" },
+    { "expect": { "contains": ["Tu Tiên"], "minItems": 6 }, "input": "", "script": "genre.js" },
+    { "expect": { "contains": ["Mới Cập Nhật"], "minItems": 4 }, "input": "", "script": "home.js" }
+  ]
+}

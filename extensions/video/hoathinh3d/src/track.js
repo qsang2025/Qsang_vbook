@@ -1,59 +1,187 @@
-// track.js (video: buoc 2 cua chap -> track) — giai data cua mot server
-// (tu chap.js, la link m3u8 truc tiep) thanh stream phat duoc.
-// Thu tu uu tien: native (.m3u8/.mp4 truc tiep) -> auto (trang embed,
-// de app tu sniff) -> bao loi. Khong dung streamfree.vip.
-// host lay tu origin cua chinh URL stream that (vd. https://s5.phim1280.tv),
-// khong phai domain API phimapi.com — stream nam tren CDN khac; Referer
-// van la domain nguon BASE_URL + "/".
-//
-// Load: build se copy config.js vao src/ (chi can BASE_URL).
+// track.js (video: buoc 2 cua chap -> track) — giai payload server cua
+// HHKUNGFU (hhkungfu.ee) thanh doi tuong phat:
+//   1. Neu input la link .m3u8/.mp4 truc tiep -> native.
+//   2. Neu chon "Webview Trang Nguon" -> webview mo thang URL trang xem.
+//   3. Goi AJAX GET /player/player.php?action=dox_ajax_player lay URL
+//      iframe embed (streamfree.vip). Theo hop dong extension-api.md muc
+//      Resolvers -> webview: raw HTML phai bat dau bang <html> hoac
+//      <iframe (KHONG bat dau bang <!DOCTYPE html>). Dung <html><body>
+//      tao iframe dong qua JS voi host la trang xem tren hhkungfu.ee de
+//      giu window.self !== window.top va Referer hop le cho streamfree.vip.
+// Tai len: file config.js, file config-helpers.js, file fetch-helpers.js,
+// file rate-limit.js, file safe-first.js, file helper.js.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
+load('config-helpers.js');
+load('fetch-helpers.js');
+load('rate-limit.js');
+load('safe-first.js');
+load('helper.js');
 
-// Origin cua URL (vd. "https://s5.phim1280.tv") — dung lam host de app
-// gan cookie/Referer theo dung host phat stream. Fallback ve BASE_URL
-// neu khong tach duoc origin.
-function originOf(url) {
-    var m = String(url || "").match(/^(https?:\/\/[^\/]+)/i);
-    return m ? m[1] : BASE_URL;
+function nativeTrack(streamUrl, referer) {
+    var ref = referer;
+    if (!ref) {
+        var hostLower = originOf(streamUrl).toLowerCase();
+        if (hostLower.indexOf("tenmienphu68") !== -1 || hostLower.indexOf("syntheticvideo") !== -1) {
+            ref = "https://tenmienphu68.lol/";
+        } else if (hostLower.indexOf("phim1280") !== -1 || hostLower.indexOf("kkphim") !== -1 || hostLower.indexOf("kvp") !== -1) {
+            ref = "https://phimapi.com/";
+        } else {
+            ref = BASE_URL + "/";
+        }
+    }
+    return Response.success({
+        type: "native",
+        data: streamUrl,
+        host: originOf(streamUrl),
+        mimeType: streamUrl.indexOf(".mp4") !== -1 ? "video/mp4" : "application/x-mpegURL",
+        headers: { "Referer": ref },
+        timeSkip: []
+    });
 }
 
-function execute(data) {
-    data = String(data || "");
-    var host = originOf(data);
+function createPlayerHtml(embedUrl) {
+    return "<html><head>" +
+        "<meta charset=\"utf-8\">" +
+        "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no\">" +
+        "<style>*{margin:0;padding:0;box-sizing:border-box;}html,body{width:100%;height:100%;background:#000;overflow:hidden;}#p-wrap{width:100%;height:100%;}</style>" +
+        "</head><body>" +
+        "<div id=\"p-wrap\"></div>" +
+        "<script>" +
+        "var ifr=document.createElement(\"iframe\");" +
+        "ifr.src=" + JSON.stringify(embedUrl) + ";" +
+        "ifr.setAttribute(\"allowfullscreen\",\"true\");" +
+        "ifr.setAttribute(\"webkitallowfullscreen\",\"true\");" +
+        "ifr.setAttribute(\"mozallowfullscreen\",\"true\");" +
+        "ifr.setAttribute(\"allow\",\"autoplay; fullscreen; encrypted-media\");" +
+        "ifr.style.width=\"100%\";" +
+        "ifr.style.height=\"100%\";" +
+        "ifr.style.border=\"none\";" +
+        "document.getElementById(\"p-wrap\").appendChild(ifr);" +
+        "</script>" +
+        "</body></html>";
+}
 
-    // Da la stream truc tiep.
-    if (data.indexOf(".m3u8") !== -1) {
+function execute(input) {
+    input = String(input === undefined || input === null ? "" : input).trim();
+    if (!input) return Response.error("Không có dữ liệu server để phát.");
+
+    if (/\.(m3u8|mp4)(\?|$)/i.test(input)) {
+        return nativeTrack(input, "");
+    }
+
+    var params = null;
+    if (input.indexOf("{") === 0) {
+        try {
+            params = JSON.parse(input);
+        } catch (e0) {
+            params = null;
+        }
+    }
+
+    if (params && params.type === "native" && params.stream) {
+        return nativeTrack(String(params.stream), params.referer || "");
+    }
+
+    if (params && params.resolvedStream) {
+        return nativeTrack(String(params.resolvedStream), params.resolvedReferer || "");
+    }
+
+    var fallbackUrl = (params && params.url) ? normalizeUrl(params.url) : (input.indexOf("http") === 0 ? normalizeUrl(input) : (BASE_URL + "/"));
+    var urlParts = fallbackUrl.match(/\/(?:watch|xem-phim)-([^\/]+)\/([^\/\?\.]+?)(?:-sv(\d+))?\.html/i);
+    var hhSlug = (params && params.hhSlug) ? String(params.hhSlug) : (urlParts ? urlParts[1] : "");
+    var hhTitle = (params && params.hhTitle) ? String(params.hhTitle) : "";
+    var chapter = (params && params.chapter) ? String(params.chapter) : (urlParts ? urlParts[2] : "");
+    var sv = (params && params.sv) ? String(params.sv) : (urlParts && urlParts[3] ? urlParts[3] : "1");
+    var targetEp = (params && params.targetEp) ? params.targetEp : episodeNumber(chapter);
+
+    if (chapter && (hhSlug || hhTitle)) {
+        var hhtqRes = resolveHhtqPressStream(hhSlug, hhTitle, chapter, targetEp, sv);
+        if (hhtqRes && hhtqRes.url) {
+            return nativeTrack(hhtqRes.url, hhtqRes.referer || "");
+        }
+        var phimRes = resolvePhimApiTracks(
+            hhSlug,
+            hhTitle,
+            "",
+            targetEp,
+            /full/i.test(chapter),
+            true,
+            sv === "2"
+        );
+        if (phimRes.primary.length > 0) {
+            return nativeTrack(phimRes.primary[0].data, "");
+        }
+        if (phimRes.secondary.length > 0) {
+            return nativeTrack(phimRes.secondary[0].data, "");
+        }
+    }
+
+    if (params && params.type === "web" && params.url) {
         return Response.success({
-            type: "native",
-            data: data,
-            host: host,
-            mimeType: "application/x-mpegURL",
+            type: "webview",
+            data: fallbackUrl,
+            host: siteOrigin(),
             headers: { "Referer": BASE_URL + "/" },
             timeSkip: []
         });
     }
-    if (data.indexOf(".mp4") !== -1) {
-        return Response.success({
-            type: "native",
-            data: data,
-            host: host,
-            mimeType: "video/mp4",
-            headers: { "Referer": BASE_URL + "/" },
-            timeSkip: []
-        });
+
+    var playerApi = "";
+    if (params && params.postId && params.chapter && params.type) {
+        playerApi = BASE_URL + "/player/player.php?action=dox_ajax_player" +
+            "&post_id=" + encodeURIComponent(String(params.postId)) +
+            "&chapter_st=" + encodeURIComponent(String(params.chapter)) +
+            "&type=" + encodeURIComponent(String(params.type)) +
+            "&sv=" + encodeURIComponent(String(params.sv || "1"));
+    } else if (input.indexOf("player.php") !== -1) {
+        playerApi = normalizeUrl(input);
     }
 
-    // Trang embed (vd. player.phimapi.com): de app tu sniff stream.
-    if (data.indexOf("http") === 0) {
-        return Response.success({
-            type: "auto",
-            data: data,
-            host: host,
-            headers: { "Referer": BASE_URL + "/" },
-            timeSkip: []
-        });
+    if (playerApi) {
+        rateLimitDelay(siteOrigin(), 300, 800);
+        var r = null;
+        try {
+            r = pacedFetch(playerApi, {
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                referer: fallbackUrl,
+                timeout: 30000
+            });
+        } catch (e1) {
+            r = null;
+        }
+        if (r && r.ok && r.res) {
+            var html = "";
+            try { html = String(r.res.text() || ""); } catch (e2) { html = ""; }
+            var m = html.match(/src="([^"]+)"/i);
+            if (!m) m = html.match(/src='([^']+)'/i);
+            if (m && m[1]) {
+                var embed = m[1].replace(/&amp;/g, "&");
+                if (embed.indexOf("//") === 0) embed = "https:" + embed;
+                else if (embed.indexOf("/") === 0) embed = siteOrigin() + embed;
+
+                if (embed.indexOf("not-found") !== -1) {
+                    return Response.error("Tập này chưa có video ở server này, vui lòng chọn server khác hoặc Webview Trang Nguồn.");
+                }
+                if (/\.(m3u8|mp4)(\?|$)/i.test(embed)) {
+                    return nativeTrack(embed, fallbackUrl);
+                }
+                return Response.success({
+                    type: "webview",
+                    data: createPlayerHtml(embed),
+                    host: fallbackUrl,
+                    headers: { "Referer": fallbackUrl },
+                    timeSkip: []
+                });
+            }
+        }
     }
 
-    return Response.error("Không giải được link phát từ dữ liệu server.");
+    return Response.success({
+        type: "webview",
+        data: fallbackUrl,
+        host: siteOrigin(),
+        headers: { "Referer": BASE_URL + "/" },
+        timeSkip: []
+    });
 }

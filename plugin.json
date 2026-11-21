@@ -1389,10 +1389,21 @@
       "locale": "zh_CN"
     },
     {
+      "name": "HH3D",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hh3d/plugin.zip",
+      "version": 1,
+      "source": "https://hh3d.ad",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hh3d/icon.png",
+      "description": "HH3D (hh3d.ad) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh, trích xuất trực tiếp link Native HLS (.m3u8) từ trang tập phim kèm fallback PhimAPI.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
       "name": "HHHTQ",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhhtq/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://hhhtq.team",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhhtq/icon.png",
       "description": "HHHTQ (hhhtq.team) — xem phim hoạt hình 3D Trung Quốc Vietsub (Tiên Nghịch, Tru Tiên, Đấu Phá Thương Khung, Sư Huynh Ơi Sư Huynh, Phàm Nhân Tu Tiên...): hỗ trợ cả giao diện mobile và desktop của MacCMS, giải mã link phát native .m3u8/.mp4 trực tiếp từ Dailymotion, Archive.org, DU server và fallback WebView cho các server nhúng khác (ref: kychitoge).",
@@ -1403,7 +1414,7 @@
       "name": "HHKUNGFU",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/plugin.zip",
-      "version": 7,
+      "version": 8,
       "source": "https://hhkungfu.ee",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/icon.png",
       "description": "HHKUNGFU (hhkungfu.ee) — xem phim hoạt hình 3D Kungfu Trung Quốc Vietsub & Thuyết Minh (Thương Nguyên Đồ, Đấu La Đại Lục 2, Tru Tiên, Tiên Nghịch...): ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI khi có tập tương ứng, kèm đầy đủ 4 server 1080P V1/V2 & 4K V1/V2 qua AJAX player.php (WebView dynamic-iframe) và Webview Trang Nguồn (ref: Qsang, kychitoge).",
@@ -1411,10 +1422,43 @@
       "locale": "vi_VN"
     },
     {
+      "name": "HHPanda",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhpanda/plugin.zip",
+      "version": 1,
+      "source": "https://hhpanda.st",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhpanda/icon.png",
+      "description": "HHPanda (hhpanda.st / hhpanda.tech) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh: ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI/hhtq.press khi có tập tương ứng, kèm các server 1080P/4K qua AJAX player.php và Webview Trang Nguồn.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "HHTQ 4K",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtq_sh/plugin.zip",
+      "version": 1,
+      "source": "https://hhtq.sh",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtq_sh/icon.png",
+      "description": "HHTQ 4K (hhtq.sh) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh: ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI/hhtq.press khi có tập tương ứng, kèm các server 1080P/4K qua AJAX player.php và Webview Trang Nguồn.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "HHTQ IO",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtq_io/plugin.zip",
+      "version": 1,
+      "source": "https://hhtq.io",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtq_io/icon.png",
+      "description": "HHTQ IO (hhtq.io) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh, tự động giải iframe embed -> YanHH3D player -> Native HLS/MP4 kèm fallback PhimAPI.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
       "name": "HHTQ Vietsub",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtqvietsub/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://hhtq.press",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhtqvietsub/icon.png",
       "description": "HHTQ Vietsub (hhtq.press) — xem phim hoạt hình 3D Trung Quốc Vietsub: danh sách, tìm kiếm, chi tiết, mục lục tập qua AJAX của theme HalimMovies, phát qua player của site (iframe embed). Build mới từ đầu theo cấu trúc live của hhtq.press khảo sát 2026-11-20; bản Darkrai9x hhtqvietsub bị mã hoá toàn bộ nên không dùng lại code, chỉ dùng để chứng minh site làm được extension.",
@@ -1425,10 +1469,10 @@
       "name": "Hoạt Hình 3D Trung Quốc",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/plugin.zip",
-      "version": 3,
-      "source": "https://phimapi.com/v1/api/the-loai",
+      "version": 4,
+      "source": "https://hoathinh3d.ee",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hoathinh3d/icon.png",
-      "description": "Kho phim hoạt hình 3D Trung Quốc (Donghua 3D) Vietsub & Thuyết minh: Thế Giới Hoàn Mỹ, Tiên Nghịch, Đấu Phá Thương Khung, Linh Cảnh Hành Giả... Link m3u8 trực tiếp, phát mượt trên ExoPlayer.",
+      "description": "Hoạt Hình 3D (hoathinh3d.ee) — xem phim hoạt hình 3D Trung Quốc Vietsub & Thuyết Minh: ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI/hhtq.press khi có tập tương ứng, kèm 4 server 1080P V1/V2 & 4K V1/V2 qua AJAX player.php và Webview Trang Nguồn.",
       "type": "video",
       "locale": "vi_VN"
     },
@@ -1444,10 +1488,21 @@
       "locale": "vi_VN"
     },
     {
+      "name": "KKPhim",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/kkphim/plugin.zip",
+      "version": 2,
+      "source": "https://kkphim.com",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/kkphim/icon.png",
+      "description": "Kho phim tổng hợp KKPhim (kkphim.com) qua API công khai phimapi.com: hoạt hình, phim bộ, phim lẻ Vietsub & Thuyết minh, link m3u8 trực tiếp phát mượt trên ExoPlayer. Không cần đăng nhập.",
+      "type": "video",
+      "locale": "vi_VN"
+    },
+    {
       "name": "YanHH3D",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/yanhh3d/plugin.zip",
-      "version": 1,
+      "version": 2,
       "source": "https://yanhh3d.baby",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/yanhh3d/icon.png",
       "description": "YanHH3D (yanhh3d.baby) — xem phim hoạt hình 3D 4K Trung Quốc Thuyết Minh & Vietsub, có mục Hoạt Hình AI riêng: server 1080/1080-/HD/4K/4K- phát Native HLS (.m3u8 plain) và MP4 trực tiếp, giải stream lúc bấm Play.",

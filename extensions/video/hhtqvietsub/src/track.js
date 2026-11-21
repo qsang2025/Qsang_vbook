@@ -23,13 +23,20 @@ load('fetch-helpers.js');
 load('rate-limit.js');
 load('helper.js');
 
-function nativeResult(stream, referer) {
+function nativeResult(streamUrl, referer) {
+    var ref = referer || (BASE_URL + "/");
+    var hostLower = originOf(streamUrl).toLowerCase();
+    if (hostLower.indexOf("tenmienphu68") !== -1 || hostLower.indexOf("syntheticvideo") !== -1) {
+        ref = "https://tenmienphu68.lol/";
+    } else if (!referer && (hostLower.indexOf("phim1280") !== -1 || hostLower.indexOf("kkphim") !== -1 || hostLower.indexOf("kvp") !== -1)) {
+        ref = "https://phimapi.com/";
+    }
     return Response.success({
         type: "native",
-        data: stream,
-        host: originOf(stream),
-        mimeType: stream.indexOf(".mp4") !== -1 ? "video/mp4" : "application/x-mpegURL",
-        headers: { "Referer": referer },
+        data: streamUrl,
+        host: originOf(streamUrl),
+        mimeType: streamUrl.indexOf(".mp4") !== -1 ? "video/mp4" : "application/x-mpegURL",
+        headers: { "Referer": ref },
         timeSkip: []
     });
 }
@@ -279,7 +286,36 @@ function execute(data) {
             var parsed = parseSources(fetchPlayerSources(cfg, watchUrl));
             if (parsed.stream) return nativeResult(parsed.stream, watchUrl);
             if (parsed.embed) data = parsed.embed;
-            else return webviewResult(watchUrl);
+            else {
+                var um = watchUrl.match(/\/-?([^\/]+)\/(tap-[^\/\?\.]+?)(?:-sv(\d+))?\.html/i);
+                var hhSlug = um ? um[1] : "";
+                var epSlug = (cfg && cfg.episodeSlug) ? cfg.episodeSlug : (um ? um[2] : "");
+                var sv = (cfg && cfg.server) ? cfg.server : (um && um[3] ? um[3] : "1");
+                var targetEp = episodeNumber(epSlug);
+                var isFull = /full/i.test(epSlug);
+                var hhTitle = "";
+                var h1 = doc.select("h1.entry-title").first();
+                if (h1 !== null) {
+                    hhTitle = cleanText(h1.text())
+                        .replace(/\s*Tập\s+.*$/i, "")
+                        .replace(/\s*(?:Vietsub|Thuyết Minh).*$/i, "")
+                        .replace(/^\s+|\s+$/g, "");
+                }
+                var hhOrig = "";
+                var orgEl = doc.select("p.org_title, h2.org_title").first();
+                if (orgEl !== null) hhOrig = cleanText(orgEl.text());
+                var isSeries = doc.select("li.halim-episode").size() > 2 || targetEp > 1;
+                var preferDub = sv === "2";
+
+                var phimRes = resolvePhimApiTracks(hhSlug, hhTitle, hhOrig, targetEp, isFull, isSeries, preferDub);
+                if (phimRes.primary.length > 0) {
+                    return nativeResult(phimRes.primary[0].data, "https://phimapi.com/");
+                }
+                if (phimRes.secondary.length > 0) {
+                    return nativeResult(phimRes.secondary[0].data, "https://phimapi.com/");
+                }
+                return webviewResult(watchUrl);
+            }
         } else {
             return webviewResult(watchUrl);
         }

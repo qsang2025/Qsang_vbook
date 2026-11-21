@@ -1,20 +1,8 @@
-// config.js — cau hinh goc cua extension Hoat Hinh 3D Trung Quoc.
-//
-// Nguon: API JSON cong khai https://phimapi.com (khong can scrape HTML).
-// BASE_URL mac dinh la domain chinh; nguoi dung doi domain trong cai dat
-// (config DOMAIN trong plugin.json) thi gia tri do se override qua bien
-// DOMAIN duoc app inject. CONFIG_URL (neu co trong plugin.json) override
-// sau cung. Ca hai phep override deu nam trong try/catch: neu app khong
-// inject bien do thi BASE_URL mac dinh van dung duoc.
-//
-// MIRRORS: API nay khong co mirror drop-in (KKPhim/OPhim la API khac,
-// khac cau truc response) nen MIRROR_LIST mac dinh rong. Neu app inject
-// MIRRORS thi van ton trong danh sach do.
-// Luu y load(): file nay duoc load() boi cac script khac, nen KHONG duoc
-// load() them file nao khac o day.
+// config.js — cau hinh goc cua extension Hoạt Hình 3D (hoathinh3d.ee).
+// File nay duoc nap boi cac script khac, KHONG nap them file nao o day.
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 
-var BASE_URL = "https://phimapi.com";
+var BASE_URL = "https://hoathinh3d.ee";
 
 try {
     if (DOMAIN) {
@@ -30,8 +18,6 @@ try {
 } catch (e) {
 }
 
-// Tach chuoi mirror cach nhau bang dau phay (hoac mang co san) thanh mang
-// cac base URL sach (bo khoang trang va dau "/" cuoi).
 function parseMirrorList(value) {
     var list = [];
     var parts = [];
@@ -54,7 +40,6 @@ function parseMirrorList(value) {
     return list;
 }
 
-// Danh sach mirror mac dinh: rong (khong co mirror drop-in cho API nay).
 var MIRROR_LIST = [];
 
 try {
@@ -65,7 +50,6 @@ try {
 } catch (e) {
 }
 
-// BASE_URL khong bao gio nam trong danh sach mirror (tranh thu lap chinh no).
 (function () {
     var kept = [];
     var k = 0;

@@ -1,0 +1,7 @@
+{
+  "cases": [
+    { "name": "Trang chủ HHTQ 4K", "pattern": "halim-thumb", "url": "https://hhtq.sh/" },
+    { "name": "Danh sách mới cập nhật", "pattern": "halim-thumb", "url": "https://hhtq.sh/moi-cap-nhat" },
+    { "name": "Danh sách Tu Tiên", "pattern": "halim-thumb", "url": "https://hhtq.sh/tu-tien" }
+  ]
+}

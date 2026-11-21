@@ -12,6 +12,7 @@ function execute() {
         { title: "OVA", input: "/category/ova", script: "search.js" },
         { title: "Mới Cập Nhật", input: "/moi-cap-nhat", script: "search.js" },
         { title: "Top Xem Nhiều", input: "/top-xem-nhieu", script: "search.js" },
-        { title: "Hoàn Thành", input: "/hoan-thanh", script: "search.js" }
+        { title: "Hoàn Thành", input: "/hoan-thanh", script: "search.js" },
+        { title: "Lịch Chiếu", input: "/lich-chieu", script: "search.js" }
     ]);
 }
