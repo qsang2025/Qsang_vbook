@@ -44,7 +44,7 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
             if (!vf || !vf.url || !vf.mimeType || !vf.initRange || !vf.indexRange) continue;
             var vmt = String(vf.mimeType);
             if (vmt.indexOf("video/mp4") === -1) continue;
-            var h = parseInt(vf.height || 0, 10) || 0;
+            var h = getFormatQualityHeight(vf);
             if (h < 720) continue;
             if (!byH[h]) {
                 heights.push(h);
@@ -171,9 +171,13 @@ function resolveTracks(vid, startSec, endSec, durSec) {
     var clients = getPlayerClientsOrder();
     var i = 0;
 
+    var totalDur = durSec || 0;
     for (i = 0; i < clients.length; i++) {
         var itData = requestInnerTube("player", { videoId: vid }, clients[i]);
         if (itData && itData.streamingData) {
+            if (!totalDur && itData.videoDetails && itData.videoDetails.lengthSeconds) {
+                totalDur = parseDurationSec(itData.videoDetails.lengthSeconds);
+            }
             collectInnerTubeStreams(itData, hlsList, mp4List, hdList);
             if (subtitles.length === 0) {
                 subtitles = extractInnerTubeSubtitles(itData);
@@ -313,7 +317,7 @@ function resolveTracks(vid, startSec, endSec, durSec) {
 
     servers.push({
         title: "Tự động giải mã (Re-resolve)",
-        data: buildResolveToken(vid, startSec, endSec, durSec)
+        data: buildResolveToken(vid, startSec, endSec, totalDur || durSec)
     });
     return servers;
 }

@@ -43,7 +43,7 @@ function fetchDanmakuFromComments(vid, startSec, endSec, totalDurSec) {
     try {
         var rawTexts = [];
         var i = 0;
-        var nextRes = requestInnerTube("next", { videoId: vid }, "WEB", 3000);
+        var nextRes = requestInnerTube("next", { videoId: vid }, "WEB", 2000);
         var contents = nextRes && nextRes.contents && nextRes.contents.twoColumnWatchNextResults && nextRes.contents.twoColumnWatchNextResults.results && nextRes.contents.twoColumnWatchNextResults.results.results && nextRes.contents.twoColumnWatchNextResults.results.results.contents;
         var cTok = "";
         if (contents && contents.length) {
@@ -64,7 +64,7 @@ function fetchDanmakuFromComments(vid, startSec, endSec, totalDurSec) {
                 }
             }
         }
-        var cRes = cTok ? requestInnerTube("next", { continuation: cTok }, "WEB", 3000) : null;
+        var cRes = cTok ? requestInnerTube("next", { continuation: cTok }, "WEB", 2000) : null;
         if (cRes) {
             var entityMap = {};
             var mutations = cRes.frameworkUpdates && cRes.frameworkUpdates.entityBatchUpdate && cRes.frameworkUpdates.entityBatchUpdate.mutations;
@@ -104,39 +104,6 @@ function fetchDanmakuFromComments(vid, startSec, endSec, totalDurSec) {
                         txt = getRunsText(cr.contentText);
                     }
                     if (txt) rawTexts.push(txt);
-                }
-            }
-        }
-
-        if (rawTexts.length === 0) {
-            var pipedList = getCustomMirrors().concat(PIPED_INSTANCES);
-            for (i = 0; i < pipedList.length && rawTexts.length === 0; i++) {
-                var pj = fetchJsonSafe(pipedList[i] + "/comments/" + vid, 3000);
-                if (pj && pj.comments && pj.comments.length > 0) {
-                    var pk = 0;
-                    for (pk = 0; pk < pj.comments.length && rawTexts.length < 40; pk++) {
-                        var pc = pj.comments[pk];
-                        if (pc && pc.commentText) {
-                            var pTxt = cleanText(pc.commentText);
-                            if (pTxt) rawTexts.push(pTxt);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (rawTexts.length === 0) {
-            for (i = 0; i < INVIDIOUS_INSTANCES.length && rawTexts.length === 0; i++) {
-                var ij = fetchJsonSafe(INVIDIOUS_INSTANCES[i] + "/api/v1/comments/" + vid, 3000);
-                if (ij && ij.comments && ij.comments.length > 0) {
-                    var ik = 0;
-                    for (ik = 0; ik < ij.comments.length && rawTexts.length < 40; ik++) {
-                        var ic = ij.comments[ik];
-                        if (ic && ic.content) {
-                            var iTxt = cleanText(ic.content);
-                            if (iTxt) rawTexts.push(iTxt);
-                        }
-                    }
                 }
             }
         }
@@ -197,7 +164,7 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
             toTime: Math.round(totalDurSec * 1000)
         });
     }
-    if (opts.vid) {
+    if (opts.vid && !opts.skipExtras) {
         var sbSkips = fetchSponsorBlockSkips(opts.vid);
         var i = 0;
         for (i = 0; i < sbSkips.length; i++) {
@@ -229,7 +196,7 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
         }];
     }
 
-    if (opts.vid && isDanmakuEnabled()) {
+    if (opts.vid && !opts.skipExtras && isDanmakuEnabled()) {
         var dmItems = fetchDanmakuFromComments(opts.vid, startSec, endSec, totalDurSec);
         if (dmItems.length > 0) {
             out.danmaku = [{
@@ -245,9 +212,9 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
 
 function buildFmp4TrackFromPair(pair, hdrs, opts) {
     if (!pair || !pair.vUrl || !pair.vInit || !pair.vIndex || !pair.aUrl || !pair.aInit || !pair.aIndex) return null;
-    var videoM3u8 = buildFmp4MediaM3u8(pair.vUrl, pair.vInit, pair.vIndex, 3);
+    var videoM3u8 = buildFmp4MediaM3u8(pair.vUrl, pair.vInit, pair.vIndex, 6);
     if (!videoM3u8) return null;
-    var audioM3u8 = buildFmp4MediaM3u8(pair.aUrl, pair.aInit, pair.aIndex, 4);
+    var audioM3u8 = buildFmp4MediaM3u8(pair.aUrl, pair.aInit, pair.aIndex, 16);
     if (!audioM3u8) return null;
     var audioUri = buildFmp4DataUri(audioM3u8);
     if (!audioUri) return null;
@@ -257,6 +224,7 @@ function buildFmp4TrackFromPair(pair, hdrs, opts) {
         startSec: opts.startSec || 0,
         endSec: opts.endSec || 0,
         durSec: opts.durSec || 0,
+        skipExtras: !!opts.skipExtras,
         subtitles: opts.subtitles || [],
         audios: [{
             title: "Audio",
@@ -331,6 +299,7 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                     startSec: startSec,
                     endSec: endSec,
                     durSec: totalDur,
+                    skipExtras: true,
                     subtitles: subs,
                     audios: multiAudios
                 });
@@ -345,11 +314,29 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                         startSec: startSec,
                         endSec: endSec,
                         durSec: totalDur,
+                        skipExtras: true,
                         subtitles: subs
                     });
                     if (hdTrack) {
                         setPreferredPlayerClient(clients[i]);
                         return hdTrack;
+                    }
+                }
+                if (wantH !== 720) {
+                    var hdPair720 = findAdaptiveMp4Pair(adaptive, 720);
+                    if (hdPair720) {
+                        var hdTrack720 = buildFmp4TrackFromPair(hdPair720, hdrs, {
+                            vid: vid,
+                            startSec: startSec,
+                            endSec: endSec,
+                            durSec: totalDur,
+                            skipExtras: true,
+                            subtitles: subs
+                        });
+                        if (hdTrack720) {
+                            setPreferredPlayerClient(clients[i]);
+                            return hdTrack720;
+                        }
                     }
                 }
             }
@@ -372,6 +359,7 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                     startSec: startSec,
                     endSec: endSec,
                     durSec: totalDur,
+                    skipExtras: true,
                     subtitles: subs,
                     audios: multiAudios
                 });
@@ -384,6 +372,7 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                     startSec: startSec,
                     endSec: endSec,
                     durSec: totalDur,
+                    skipExtras: true,
                     subtitles: subs
                 });
                 if (fbTrack) {
@@ -453,7 +442,7 @@ function execute(data) {
                     return resolveAdaptiveFmp4Hls(obj, opts);
                 }
                 if (obj.mode === "audio_only" && obj.a && obj.aInit && obj.aIndex) {
-                    var aM3u8 = buildFmp4MediaM3u8(String(obj.a), String(obj.aInit), String(obj.aIndex), 4);
+                    var aM3u8 = buildFmp4MediaM3u8(String(obj.a), String(obj.aInit), String(obj.aIndex), 16);
                     if (aM3u8) {
                         return buildNativeTrack(aM3u8, "application/x-mpegURL", opts);
                     }

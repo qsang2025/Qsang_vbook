@@ -611,6 +611,7 @@ function b64ToBytes(b64) {
 function strToB64(str) {
     var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     var raw = unescape(encodeURIComponent(String(str || "")));
+    var chunks = [];
     var out = "";
     var i = 0;
     while (i < raw.length) {
@@ -620,12 +621,26 @@ function strToB64(str) {
         var has3 = i < raw.length;
         var b3 = has3 ? (raw.charCodeAt(i++) & 255) : 0;
         var trip = (b1 << 16) | (b2 << 8) | b3;
-        out += chars.charAt((trip >> 18) & 63);
-        out += chars.charAt((trip >> 12) & 63);
-        out += has2 ? chars.charAt((trip >> 6) & 63) : "=";
-        out += has3 ? chars.charAt(trip & 63) : "=";
+        out += chars.charAt((trip >> 18) & 63) +
+            chars.charAt((trip >> 12) & 63) +
+            (has2 ? chars.charAt((trip >> 6) & 63) : "=") +
+            (has3 ? chars.charAt(trip & 63) : "=");
+        if (out.length >= 4096) {
+            chunks.push(out);
+            out = "";
+        }
     }
-    return out;
+    if (out) chunks.push(out);
+    return chunks.join("");
+}
+
+function getFormatQualityHeight(f) {
+    if (!f) return 0;
+    if (f.qualityLabel) {
+        var m = String(f.qualityLabel).match(/(\d{3,4})p/i);
+        if (m) return parseInt(m[1], 10) || 0;
+    }
+    return parseInt(f.height || 0, 10) || 0;
 }
 
 function sidxU32(b, o) {
@@ -673,18 +688,31 @@ function parseSidxSegments(bytes, indexEnd, groupCount) {
                 curByte += refSize;
                 off += 12;
             }
-            if (!groupCount || groupCount <= 1) return rawSegs;
+            var baseGroup = groupCount || 3;
+            var effGroup = Math.max(baseGroup, Math.ceil(rawSegs.length / 220));
+            if (effGroup <= 1) return rawSegs;
+            var maxGroupBytes = 8 * 1024 * 1024;
             var grouped = [];
-            for (i = 0; i < rawSegs.length; i += groupCount) {
-                var endIdx = Math.min(i + groupCount - 1, rawSegs.length - 1);
-                var sumDur = 0;
-                var j = i;
-                for (j = i; j <= endIdx; j++) sumDur += rawSegs[j].dur;
+            i = 0;
+            while (i < rawSegs.length) {
+                var startByte = rawSegs[i].start;
+                var endByte = rawSegs[i].end;
+                var sumDur = rawSegs[i].dur;
+                var j = i + 1;
+                var limit = Math.min(i + effGroup, rawSegs.length);
+                while (j < limit) {
+                    var nextEnd = rawSegs[j].end;
+                    if ((nextEnd - startByte + 1) > maxGroupBytes) break;
+                    endByte = nextEnd;
+                    sumDur += rawSegs[j].dur;
+                    j++;
+                }
                 grouped.push({
-                    start: rawSegs[i].start,
-                    end: rawSegs[endIdx].end,
+                    start: startByte,
+                    end: endByte,
                     dur: sumDur
                 });
+                i = j;
             }
             return grouped;
         }
@@ -760,13 +788,13 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         if (!vf || !vf.url || !vf.mimeType || !vf.initRange || !vf.indexRange) continue;
         var vmt = String(vf.mimeType);
         if (vmt.indexOf("video/mp4") === -1) continue;
-        var h = parseInt(vf.height || 0, 10) || 0;
+        var h = getFormatQualityHeight(vf);
         if (h < 720) continue;
         if (targetHeight > 0 && h === targetHeight) {
             bestVideo = vf;
             break;
         }
-        if (!bestVideo || h > (parseInt(bestVideo.height || 0, 10) || 0)) {
+        if (!bestVideo || h > getFormatQualityHeight(bestVideo)) {
             bestVideo = vf;
         }
     }
@@ -778,7 +806,7 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         aUrl: String(bestAudio.url),
         aInit: String(bestAudio.initRange.start) + "-" + String(bestAudio.initRange.end),
         aIndex: String(bestAudio.indexRange.start) + "-" + String(bestAudio.indexRange.end),
-        height: parseInt(bestVideo.height || 0, 10) || 0
+        height: getFormatQualityHeight(bestVideo)
     };
 }
 

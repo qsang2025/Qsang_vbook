@@ -107,7 +107,7 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 6
+    "version": 7
   },
   "script": {
     "chap": "chap.js",

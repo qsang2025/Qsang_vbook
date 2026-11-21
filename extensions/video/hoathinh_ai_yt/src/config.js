@@ -327,7 +327,7 @@ function isBadApiText(txt) {
     return false;
 }
 
-function requestInnerTube(action, payload, clientType, timeoutMs) {
+function requestInnerTubeOnce(action, payload, clientType, timeoutMs, visitorData) {
     var url = BASE_URL + "/youtubei/v1/" + action + "?prettyPrint=false";
     var body = {};
     var k;
@@ -336,13 +336,11 @@ function requestInnerTube(action, payload, clientType, timeoutMs) {
             if (payload.hasOwnProperty(k)) body[k] = payload[k];
         }
     }
-    var vd = "";
     if (action === "player" && clientType && clientType !== "WEB") {
-        vd = fetchVisitorData();
         body.contentCheckOk = true;
         body.racyCheckOk = true;
     }
-    body.context = getInnerTubeContext(clientType || "WEB", vd);
+    body.context = getInnerTubeContext(clientType || "WEB", visitorData || "");
 
     var headers = {
         "Content-Type": "application/json",
@@ -372,6 +370,23 @@ function requestInnerTube(action, payload, clientType, timeoutMs) {
     } catch (e) {
         return null;
     }
+}
+
+function requestInnerTube(action, payload, clientType, timeoutMs, useVisitorData) {
+    var vd = "";
+    if (useVisitorData && action === "player" && clientType && clientType !== "WEB") {
+        vd = fetchVisitorData();
+    }
+    var j = requestInnerTubeOnce(action, payload, clientType, timeoutMs, vd);
+    if (action === "player" && clientType && clientType !== "WEB" && !useVisitorData) {
+        if (!j || !j.streamingData) {
+            var retryVd = fetchVisitorData();
+            if (retryVd) {
+                j = requestInnerTubeOnce(action, payload, clientType, timeoutMs, retryVd);
+            }
+        }
+    }
+    return j;
 }
 
 function fetchJsonSafe(url, timeoutMs) {
