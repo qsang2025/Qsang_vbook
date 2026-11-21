@@ -88,15 +88,45 @@ function execute(url) {
     var isSeries = allEps.size() > 2 || (targetEp > 1);
 
     var nativeMatches = resolvePhimApiTracks(hhSlug, hhTitle, hhOrig, targetEp, isFull, isSeries, preferDub);
+    var hhtqStream = resolveHhtqPressStream(hhSlug, hhTitle, chapter, targetEp, sv);
 
     var servers = [];
     for (i = 0; i < nativeMatches.primary.length; i++) {
         servers.push(nativeMatches.primary[i]);
     }
-    if (!preferDub && nativeMatches.secondary.length > 0) {
+    if (hhtqStream && hhtqStream.url) {
+        if (nativeMatches.primary.length > 0) {
+            servers.push({
+                title: "Native HD (Server 2)",
+                data: JSON.stringify({
+                    type: "native",
+                    stream: hhtqStream.url,
+                    referer: hhtqStream.referer || ""
+                })
+            });
+        } else {
+            servers.push({
+                title: preferDub ? "Native HLS (Thuyết Minh)" : "Native HLS (Vietsub)",
+                data: JSON.stringify({
+                    type: "native",
+                    stream: hhtqStream.url,
+                    referer: hhtqStream.referer || ""
+                })
+            });
+        }
+    }
+    if (nativeMatches.secondary.length > 0) {
         for (i = 0; i < nativeMatches.secondary.length; i++) {
             servers.push(nativeMatches.secondary[i]);
         }
+    }
+
+    var bestNativeStream = (hhtqStream && hhtqStream.url) ? hhtqStream.url : "";
+    var bestNativeReferer = (hhtqStream && hhtqStream.url) ? (hhtqStream.referer || "") : "";
+    if (!bestNativeStream && nativeMatches.primary.length > 0) {
+        bestNativeStream = nativeMatches.primary[0].data;
+    } else if (!bestNativeStream && nativeMatches.secondary.length > 0) {
+        bestNativeStream = nativeMatches.secondary[0].data;
     }
 
     if (postId && chapter) {
@@ -114,7 +144,12 @@ function execute(url) {
                     postId: postId,
                     chapter: chapter,
                     sv: sv,
-                    url: url
+                    url: url,
+                    hhSlug: hhSlug,
+                    hhTitle: hhTitle,
+                    targetEp: targetEp,
+                    resolvedStream: bestNativeStream,
+                    resolvedReferer: bestNativeReferer
                 })
             });
         }
@@ -133,7 +168,12 @@ function execute(url) {
                         postId: postId,
                         chapter: chapter,
                         sv: sv,
-                        url: url
+                        url: url,
+                        hhSlug: hhSlug,
+                        hhTitle: hhTitle,
+                        targetEp: targetEp,
+                        resolvedStream: bestNativeStream,
+                        resolvedReferer: bestNativeReferer
                     })
                 });
             }
@@ -143,15 +183,19 @@ function execute(url) {
         }
     }
 
-    if (preferDub && nativeMatches.secondary.length > 0) {
-        for (i = 0; i < nativeMatches.secondary.length; i++) {
-            servers.push(nativeMatches.secondary[i]);
-        }
-    }
-
     servers.push({
         title: "Webview Trang Nguồn",
-        data: JSON.stringify({ type: "web", url: url })
+        data: JSON.stringify({
+            type: "web",
+            url: url,
+            hhSlug: hhSlug,
+            hhTitle: hhTitle,
+            targetEp: targetEp,
+            chapter: chapter,
+            sv: sv,
+            resolvedStream: bestNativeStream,
+            resolvedReferer: bestNativeReferer
+        })
     });
     return Response.success(servers);
 }
