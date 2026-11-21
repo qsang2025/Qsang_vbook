@@ -42,7 +42,7 @@ function extractChannelId(url) {
 
 function extractHandle(url) {
     var s = String(url || "").trim();
-    var m = s.match(/youtube\.com\/(@[a-zA-Z0-9_.-]+)/);
+    var m = s.match(/youtube\.com\/(@[^\s\/?#&]+)/);
     if (m) return m[1];
     if (s.charAt(0) === "@") return s;
     return "";
@@ -252,11 +252,11 @@ function isBlockedByUserKeywords(title) {
     return false;
 }
 
-function isNoiseVideoTitle(title) {
+function isNoiseVideoTitle(title, skipRecapFilter) {
     var s = String(title || "").toLowerCase();
     if (!s) return false;
     if (isBlockedByUserKeywords(s)) return true;
-    if (typeof getFilterRecapMode === "function" && getFilterRecapMode() === "hide" && isRecapOrReviewTitle(title)) {
+    if (!skipRecapFilter && typeof getFilterRecapMode === "function" && getFilterRecapMode() === "hide" && isRecapOrReviewTitle(title)) {
         return true;
     }
     if (s.indexOf("karaoke") !== -1) return true;

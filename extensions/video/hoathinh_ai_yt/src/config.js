@@ -545,7 +545,7 @@ function getFilterRecapMode() {
             if (m === "hide" || m === "tag_only" || m === "off") return m;
         }
     } catch (e) {}
-    return "hide";
+    return "tag_only";
 }
 
 function getSubLangMode() {
@@ -577,7 +577,7 @@ function getRemoteChannelsUrl() {
             if (u.indexOf("http") === 0) return u;
         }
     } catch (e) {}
-    return "";
+    return "https://raw.githubusercontent.com/qsang2025/Qsang_cloudstream/master/community_channels.json";
 }
 
 function getFastCacheMode() {

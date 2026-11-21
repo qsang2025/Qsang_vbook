@@ -97,12 +97,12 @@
       "title": "Từ khóa chặn (cách nhau dấu phẩy, vd: reaction, game, đam mỹ)"
     },
     "FILTER_RECAP": {
-      "default": "hide",
+      "default": "tag_only",
       "mode": "select",
       "title": "Lọc video Tóm tắt / Review / Phân tích cốt truyện (>20p)",
       "values": [
-        "hide",
         "tag_only",
+        "hide",
         "off"
       ]
     },
@@ -131,7 +131,7 @@
       ]
     },
     "REMOTE_CHANNELS_URL": {
-      "default": "",
+      "default": "https://raw.githubusercontent.com/qsang2025/Qsang_cloudstream/master/community_channels.json",
       "format": "text",
       "mode": "input",
       "title": "URL JSON Kho Kênh Cộng Đồng (để trống dùng kho kênh mặc định + đám mây)"

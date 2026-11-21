@@ -134,7 +134,7 @@ function searchChannel(cid, page) {
                 var rc = richContents[i];
                 if (rc.richItemRenderer && rc.richItemRenderer.content && rc.richItemRenderer.content.lockupViewModel) {
                     var pv = parseLockupViewModel(rc.richItemRenderer.content.lockupViewModel);
-                    if (pv && !isNoiseVideoTitle(pv.name) && pv.durationSec > 0 && !isShortOrTooShort(pv.link, pv.durationSec, getMinDurationSec()) && !seen[pv.link]) {
+                    if (pv && !isNoiseVideoTitle(pv.name, true) && pv.durationSec > 0 && !isShortOrTooShort(pv.link, pv.durationSec, getMinDurationSec()) && !seen[pv.link]) {
                         seen[pv.link] = true;
                         items.push({
                             name: pv.name,
