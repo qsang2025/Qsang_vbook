@@ -126,11 +126,72 @@ function parseTimestampsFromDescription(desc, durSec) {
     return list;
 }
 
+function findSiblingSeriesParts(channelId, currentVid, baseTitle) {
+    var siblings = [];
+    if (!channelId || !baseTitle || baseTitle.length < 6) return siblings;
+    var res = requestInnerTube("browse", {
+        browseId: channelId,
+        params: "EgZ2aWRlb3PyBgQKAjoA"
+    }, "WEB");
+    if (!res || !res.contents || !res.contents.twoColumnBrowseResultsRenderer || !res.contents.twoColumnBrowseResultsRenderer.tabs) {
+        return siblings;
+    }
+    var tabs = res.contents.twoColumnBrowseResultsRenderer.tabs;
+    var minSec = getMinDurationSec();
+    var seen = {};
+    var i = 0;
+    for (i = 0; i < tabs.length; i++) {
+        var tr = tabs[i].tabRenderer;
+        if (tr && tr.selected && tr.content && tr.content.richGridRenderer && tr.content.richGridRenderer.contents) {
+            var rc = tr.content.richGridRenderer.contents;
+            var j = 0;
+            for (j = 0; j < rc.length; j++) {
+                var vm = rc[j].richItemRenderer && rc[j].richItemRenderer.content && rc[j].richItemRenderer.content.lockupViewModel;
+                if (!vm) continue;
+                var p = parseLockupViewModel(vm);
+                if (!p || !p.id || p.id === currentVid || seen[p.id]) continue;
+                if (isNoiseVideoTitle(p.name)) continue;
+                if (!p.durationSec || p.durationSec < minSec) continue;
+                if (extractBaseSeriesTitle(p.name) !== baseTitle) continue;
+                seen[p.id] = true;
+                siblings.push({
+                    name: p.name,
+                    url: p.link,
+                    description: p.durationText || "",
+                    lock: false,
+                    pay: false,
+                    _partNum: extractPartNumber(p.name)
+                });
+            }
+            break;
+        }
+    }
+    siblings.sort(function (a, b) {
+        if (a._partNum !== b._partNum) return a._partNum - b._partNum;
+        return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+    });
+    var out = [];
+    for (i = 0; i < siblings.length; i++) {
+        out.push({
+            name: siblings[i].name,
+            url: siblings[i].url,
+            description: siblings[i].description,
+            lock: false,
+            pay: false
+        });
+    }
+    return out;
+}
+
 function tocVideo(vid) {
+    var title = "";
+    var channelId = "";
     var shortDesc = "";
     var durSec = 0;
     var pRes = requestInnerTube("player", { videoId: vid }, "WEB");
     if (pRes && pRes.videoDetails) {
+        title = cleanText(pRes.videoDetails.title || "");
+        channelId = pRes.videoDetails.channelId ? String(pRes.videoDetails.channelId) : "";
         shortDesc = String(pRes.videoDetails.shortDescription || "");
         durSec = parseDurationSec(pRes.videoDetails.lengthSeconds);
     }
@@ -150,9 +211,13 @@ function tocVideo(vid) {
             var st = stamps[i];
             var lbl = st.label ? st.label : ("Phần " + (i + 1));
             var tsFmt = formatTimestamp(st.startSec);
+            var stEnd = (i + 1 < stamps.length) ? stamps[i + 1].startSec : durSec;
+            var stUrl = BASE_URL + "/watch?v=" + vid + "&t=" + st.startSec;
+            if (stEnd > st.startSec) stUrl += "&end=" + stEnd;
+            if (durSec > 0) stUrl += "&dur=" + durSec;
             episodes.push({
                 name: lbl + " (" + tsFmt + ")",
-                url: BASE_URL + "/watch?v=" + vid + "&t=" + st.startSec,
+                url: stUrl,
                 description: tsFmt,
                 lock: false,
                 pay: false
@@ -164,15 +229,28 @@ function tocVideo(vid) {
         var sec = 0;
         while (sec < durSec) {
             var markerFmt = formatTimestamp(sec);
+            var segEnd = sec + step;
+            if (segEnd > durSec) segEnd = durSec;
+            var segUrl = BASE_URL + "/watch?v=" + vid + "&t=" + sec;
+            if (segEnd > sec) segUrl += "&end=" + segEnd;
+            if (durSec > 0) segUrl += "&dur=" + durSec;
             episodes.push({
                 name: "Phần " + idx + " (" + markerFmt + ")",
-                url: BASE_URL + "/watch?v=" + vid + "&t=" + sec,
+                url: segUrl,
                 description: markerFmt,
                 lock: false,
                 pay: false
             });
             sec += step;
             idx += 1;
+        }
+    }
+
+    var baseTitle = extractBaseSeriesTitle(title);
+    if (channelId && baseTitle.length >= 6) {
+        var siblingParts = findSiblingSeriesParts(channelId, vid, baseTitle);
+        for (i = 0; i < siblingParts.length; i++) {
+            episodes.push(siblingParts[i]);
         }
     }
 

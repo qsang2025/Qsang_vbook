@@ -25,31 +25,48 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
 
     var adaptive = sd.adaptiveFormats || [];
     var bestAudio = "";
+    var fallbackAudio = "";
     for (i = 0; i < adaptive.length; i++) {
         var af = adaptive[i];
-        if (af && af.url && af.mimeType && String(af.mimeType).indexOf("audio/mp4") !== -1) {
+        if (!af || !af.url || !af.mimeType) continue;
+        var amt = String(af.mimeType);
+        if (amt.indexOf("audio/mp4") !== -1) {
             if (!bestAudio || parseInt(af.itag || 0, 10) === 140) {
                 bestAudio = String(af.url);
                 if (parseInt(af.itag || 0, 10) === 140) break;
             }
+        } else if (amt.indexOf("audio/webm") !== -1 && !fallbackAudio) {
+            fallbackAudio = String(af.url);
         }
     }
+    if (!bestAudio) bestAudio = fallbackAudio;
     if (bestAudio) {
-        var seenH = {};
+        var byH = {};
+        var heights = [];
         for (i = 0; i < adaptive.length; i++) {
             var vf = adaptive[i];
-            if (vf && vf.url && vf.mimeType && String(vf.mimeType).indexOf("video/mp4") !== -1) {
-                var h = parseInt(vf.height || 0, 10) || 0;
-                if (h >= 720 && !seenH[h]) {
-                    seenH[h] = true;
-                    hdList.push({
-                        v: String(vf.url),
-                        a: bestAudio,
-                        height: h,
-                        label: vf.qualityLabel ? String(vf.qualityLabel) : (h + "p")
-                    });
-                }
+            if (!vf || !vf.url || !vf.mimeType) continue;
+            var vmt = String(vf.mimeType);
+            var isMp4 = vmt.indexOf("video/mp4") !== -1;
+            var isWebm = vmt.indexOf("video/webm") !== -1;
+            if (!isMp4 && !isWebm) continue;
+            var h = parseInt(vf.height || 0, 10) || 0;
+            if (h < 720) continue;
+            var existing = byH[h];
+            if (!existing || (isMp4 && !existing.isMp4)) {
+                if (!existing) heights.push(h);
+                byH[h] = {
+                    v: String(vf.url),
+                    a: bestAudio,
+                    height: h,
+                    isMp4: isMp4,
+                    mimeType: isMp4 ? "video/mp4" : "video/webm",
+                    label: vf.qualityLabel ? String(vf.qualityLabel) : (h + "p")
+                };
             }
+        }
+        for (i = 0; i < heights.length; i++) {
+            hdList.push(byH[heights[i]]);
         }
     }
 }
@@ -88,13 +105,74 @@ function collectInvidiousStreams(data, hlsList, mp4List) {
     }
 }
 
-function resolveTracks(vid, startSec) {
+function formatHdTitle(hdItem) {
+    var h = hdItem.height || 0;
+    var lbl = hdItem.label || (h + "p");
+    if (h >= 2160 && lbl.indexOf("4K") === -1) return "4K " + lbl + " (HD)";
+    if (h >= 1440 && h < 2160 && lbl.indexOf("2K") === -1) return "2K " + lbl + " (HD)";
+    return "MP4 " + lbl + " (HD)";
+}
+
+function buildResolveToken(vid, startSec, endSec, durSec) {
+    var tok = "resolve:" + vid;
+    if (startSec > 0) tok += "|t=" + startSec;
+    if (endSec > 0) tok += "|end=" + endSec;
+    if (durSec > 0) tok += "|dur=" + durSec;
+    return tok;
+}
+
+function orderServersByQuality(hlsServers, videoServers, pref) {
+    var ordered = [];
+    var used = {};
+    var i = 0;
+
+    function pushList(list) {
+        var idx = 0;
+        for (idx = 0; idx < list.length; idx++) {
+            if (!used[list[idx].title]) {
+                used[list[idx].title] = true;
+                ordered.push({ title: list[idx].title, data: list[idx].data });
+            }
+        }
+    }
+
+    function filterByHeight(minH, maxH) {
+        var matched = [];
+        var idx = 0;
+        for (idx = 0; idx < videoServers.length; idx++) {
+            var h = videoServers[idx].height || 0;
+            if (h >= minH && h <= maxH) matched.push(videoServers[idx]);
+        }
+        return matched;
+    }
+
+    if (pref === "auto_hls") {
+        pushList(hlsServers);
+        pushList(videoServers);
+    } else if (pref === "4k_2k") {
+        pushList(filterByHeight(1440, 99999));
+        pushList(hlsServers);
+        pushList(videoServers);
+    } else if (pref === "720p") {
+        pushList(filterByHeight(720, 720));
+        pushList(hlsServers);
+        pushList(videoServers);
+    } else {
+        // Default "1080p"
+        pushList(filterByHeight(1080, 1080));
+        pushList(hlsServers);
+        pushList(videoServers);
+    }
+    return ordered;
+}
+
+function resolveTracks(vid, startSec, endSec, durSec) {
     var hlsList = [];
     var mp4List = [];
     var hdList = [];
     var subtitles = [];
     var audios = [];
-    var clients = ["ANDROID", "IOS", "ANDROID_VR"];
+    var clients = getPlayerClientsOrder();
     var i = 0;
 
     for (i = 0; i < clients.length; i++) {
@@ -110,7 +188,10 @@ function resolveTracks(vid, startSec) {
                     "Origin": BASE_URL
                 });
             }
-            if (hlsList.length > 0 || mp4List.length > 0 || hdList.length > 0) break;
+            if (hlsList.length > 0 || mp4List.length > 0 || hdList.length > 0) {
+                setPreferredPlayerClient(clients[i]);
+                break;
+            }
         }
     }
 
@@ -129,34 +210,22 @@ function resolveTracks(vid, startSec) {
     mp4List.sort(function (a, b) { return b.height - a.height; });
     hdList.sort(function (a, b) { return b.height - a.height; });
 
-    var servers = [];
+    var hlsServers = [];
+    var videoServers = [];
     var seenUrl = {};
     for (i = 0; i < hlsList.length; i++) {
         if (hlsList[i] && !seenUrl[hlsList[i]]) {
             seenUrl[hlsList[i]] = true;
-            servers.push({
+            hlsServers.push({
                 title: "Native HLS (.m3u8)",
+                height: 0,
                 data: JSON.stringify({
                     mode: "hls",
                     url: hlsList[i],
                     vid: vid,
                     startSec: startSec || 0,
-                    subtitles: subtitles,
-                    audios: audios
-                })
-            });
-        }
-    }
-    for (i = 0; i < mp4List.length; i++) {
-        if (mp4List[i].url && !seenUrl[mp4List[i].url]) {
-            seenUrl[mp4List[i].url] = true;
-            servers.push({
-                title: "MP4 " + mp4List[i].label,
-                data: JSON.stringify({
-                    mode: "mp4",
-                    url: mp4List[i].url,
-                    vid: vid,
-                    startSec: startSec || 0,
+                    endSec: endSec || 0,
+                    durSec: durSec || 0,
                     subtitles: subtitles,
                     audios: audios
                 })
@@ -166,23 +235,50 @@ function resolveTracks(vid, startSec) {
     for (i = 0; i < hdList.length; i++) {
         if (hdList[i].v && !seenUrl[hdList[i].v]) {
             seenUrl[hdList[i].v] = true;
-            servers.push({
-                title: "MP4 " + hdList[i].label + " (HD)",
+            videoServers.push({
+                title: formatHdTitle(hdList[i]),
+                height: hdList[i].height || 0,
                 data: JSON.stringify({
                     mode: "av",
                     v: hdList[i].v,
                     a: hdList[i].a,
+                    mimeType: hdList[i].mimeType || "video/mp4",
                     vid: vid,
                     startSec: startSec || 0,
+                    endSec: endSec || 0,
+                    durSec: durSec || 0,
                     subtitles: subtitles,
                     audios: audios
                 })
             });
         }
     }
+    for (i = 0; i < mp4List.length; i++) {
+        if (mp4List[i].url && !seenUrl[mp4List[i].url]) {
+            seenUrl[mp4List[i].url] = true;
+            videoServers.push({
+                title: "MP4 " + mp4List[i].label,
+                height: mp4List[i].height || 0,
+                data: JSON.stringify({
+                    mode: "mp4",
+                    url: mp4List[i].url,
+                    vid: vid,
+                    startSec: startSec || 0,
+                    endSec: endSec || 0,
+                    durSec: durSec || 0,
+                    subtitles: subtitles,
+                    audios: audios
+                })
+            });
+        }
+    }
+
+    videoServers.sort(function (a, b) { return b.height - a.height; });
+    var servers = orderServersByQuality(hlsServers, videoServers, getPreferredQuality());
+
     servers.push({
         title: "Tự động giải mã (Re-resolve)",
-        data: startSec > 0 ? ("resolve:" + vid + "|t=" + startSec) : ("resolve:" + vid)
+        data: buildResolveToken(vid, startSec, endSec, durSec)
     });
     return servers;
 }
@@ -192,6 +288,8 @@ function execute(url) {
     var vid = extractVideoId(url);
     if (!vid) return Response.error("Không đọc được ID video YouTube từ URL: " + url);
     var startSec = extractStartSec(url);
+    var endSec = extractEndSec(url);
+    var durSec = extractDurSec(url);
 
-    return Response.success(resolveTracks(vid, startSec));
+    return Response.success(resolveTracks(vid, startSec, endSec, durSec));
 }

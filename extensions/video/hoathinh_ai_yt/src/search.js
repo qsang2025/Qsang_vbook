@@ -32,7 +32,7 @@ function collectSearchItems(contents, items, seen, filterMode) {
                                 });
                             }
                         } else if (parsed.kind === "video" && filterMode !== "playlist") {
-                            if (!isShortOrTooShort(parsed.link, parsed.durationSec, getMinDurationSec()) && !seen[parsed.link]) {
+                            if (!isNoiseVideoTitle(parsed.name) && parsed.durationSec > 0 && !isShortOrTooShort(parsed.link, parsed.durationSec, getMinDurationSec()) && !seen[parsed.link]) {
                                 seen[parsed.link] = true;
                                 items.push({
                                     name: parsed.name,
@@ -46,9 +46,15 @@ function collectSearchItems(contents, items, seen, filterMode) {
                     }
                 } else if (s.videoRenderer && filterMode !== "playlist") {
                     var vItem = parseVideoRenderer(s.videoRenderer);
-                    if (vItem && !seen[vItem.link]) {
+                    if (vItem && !isNoiseVideoTitle(vItem.name) && vItem.durationSec > 0 && !seen[vItem.link]) {
                         seen[vItem.link] = true;
-                        items.push(vItem);
+                        items.push({
+                            name: vItem.name,
+                            cover: vItem.cover,
+                            link: vItem.link,
+                            description: vItem.description,
+                            host: vItem.host
+                        });
                     }
                 }
             }
@@ -123,7 +129,7 @@ function searchChannel(cid, page) {
                 var rc = richContents[i];
                 if (rc.richItemRenderer && rc.richItemRenderer.content && rc.richItemRenderer.content.lockupViewModel) {
                     var pv = parseLockupViewModel(rc.richItemRenderer.content.lockupViewModel);
-                    if (pv && !isShortOrTooShort(pv.link, pv.durationSec, getMinDurationSec()) && !seen[pv.link]) {
+                    if (pv && !isNoiseVideoTitle(pv.name) && pv.durationSec > 0 && !isShortOrTooShort(pv.link, pv.durationSec, getMinDurationSec()) && !seen[pv.link]) {
                         seen[pv.link] = true;
                         items.push({
                             name: pv.name,
@@ -142,6 +148,19 @@ function searchChannel(cid, page) {
     }
 
     return Response.success(items, next);
+}
+
+function getSearchParams(filterMode, sortBy) {
+    if (filterMode === "playlist") return "EgIQAw==";
+    if (filterMode === "video") {
+        if (sortBy === "upload_date") return "CAISAhgC";
+        if (sortBy === "view_count") return "CAMSAhgC";
+        return "EgIYAg==";
+    }
+    if (sortBy === "upload_date") return "CAI=";
+    if (sortBy === "view_count") return "CAM=";
+    if (sortBy === "duration") return "EgIYAg==";
+    return "";
 }
 
 function execute(query, page) {
@@ -175,19 +194,17 @@ function execute(query, page) {
 
     var filterMode = "all";
     var searchKw = query;
-    var params = "";
     if (query.indexOf("playlist:") === 0) {
         filterMode = "playlist";
         searchKw = cleanText(query.substring(9));
-        params = "EgIQAw==";
     } else if (query.indexOf("video:") === 0) {
         filterMode = "video";
         searchKw = cleanText(query.substring(6));
-        params = "EgIYAg==";
     }
 
     if (!searchKw) return Response.error("Chưa nhập từ khóa tìm kiếm");
 
+    var params = getSearchParams(filterMode, getSortBy());
     var payload = page ? { continuation: page } : { query: searchKw };
     if (!page && params) payload.params = params;
 

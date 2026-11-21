@@ -82,9 +82,9 @@
     },
     {
       "script": "track.js",
-      "input": "resolve:vU2qMWj-750|t=1800",
+      "input": "resolve:vU2qMWj-750|t=1800|end=3600|dur=7200",
       "expect": {
-        "contains": ["native", "1800000"],
+        "contains": ["native", "1800000", "3600000", "7200000"],
         "minItems": 1
       }
     },
@@ -96,5 +96,5 @@
       }
     }
   ],
-  "note": "Golden fixture v2 cho Hoạt Hình AI YouTube (InnerTube API + 3-tier Piped/Invidious + Timestamp Split + Subtitles VTT + Multi-Audio + SponsorBlock + Comments)."
+  "note": "Golden fixture v3 cho Hoạt Hình AI YouTube (2K/4K + Preferred Quality, Smart Multi-Part Aggregator, Dual-Bound timeSkip, Danmaku từ bình luận YouTube, Sort By & Anti-Noise Filter)."
 }

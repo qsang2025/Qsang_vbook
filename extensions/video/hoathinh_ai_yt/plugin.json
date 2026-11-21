@@ -29,6 +29,37 @@
       "format": "text",
       "mode": "input",
       "title": "Kênh YouTube bổ sung (@handle hoặc UC..., cách nhau dấu phẩy)"
+    },
+    "PREFERRED_QUALITY": {
+      "default": "1080p",
+      "mode": "select",
+      "title": "Chất lượng ưu tiên mặc định",
+      "values": [
+        "auto_hls",
+        "4k_2k",
+        "1080p",
+        "720p"
+      ]
+    },
+    "SORT_BY": {
+      "default": "relevance",
+      "mode": "select",
+      "title": "Sắp xếp kết quả tìm kiếm",
+      "values": [
+        "relevance",
+        "upload_date",
+        "view_count",
+        "duration"
+      ]
+    },
+    "ENABLE_DANMAKU": {
+      "default": "on",
+      "mode": "select",
+      "title": "Mưa bình luận (Danmaku) từ bình luận YouTube",
+      "values": [
+        "on",
+        "off"
+      ]
     }
   },
   "metadata": {
@@ -41,7 +72,7 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 2
+    "version": 3
   },
   "script": {
     "chap": "chap.js",

@@ -93,6 +93,58 @@ function extractStartSec(url) {
     return (!isNaN(n) && n > 0) ? n : 0;
 }
 
+function extractEndSec(url) {
+    var s = String(url || "");
+    var m = s.match(/[?&]end=(\d+)/);
+    if (!m) return 0;
+    var n = parseInt(m[1], 10);
+    return (!isNaN(n) && n > 0) ? n : 0;
+}
+
+function extractDurSec(url) {
+    var s = String(url || "");
+    var m = s.match(/[?&]dur=(\d+)/);
+    if (!m) return 0;
+    var n = parseInt(m[1], 10);
+    return (!isNaN(n) && n > 0) ? n : 0;
+}
+
+function extractBaseSeriesTitle(title) {
+    var s = String(title || "").toLowerCase();
+    if (!s) return "";
+    s = s.replace(/\[[^\]]*\]/g, " ");
+    s = s.replace(/\([^)]*(?:full|4k|2k|1080p|720p|hd|60fps|thuyết minh|thuyet minh|vietsub|lồng tiếng|long tieng|trọn bộ|tron bo|phần|phan|part|season|tập|tap|ep)[^)]*\)/gi, " ");
+    s = s.replace(/(?:phần|phan|part|season|mùa|mua)\s*\d+(?:\s*[-–~]\s*\d+)?/gi, " ");
+    s = s.replace(/\b[ps]\d+\b/gi, " ");
+    s = s.replace(/(?:tập|tap|episode|ep\.?)\s*\d+(?:\s*[-–~]\s*\d+)?/gi, " ");
+    s = s.replace(/\b(?:trọn bộ|tron bo|bản full|ban full|full hd|full|thuyết minh|thuyet minh|vietsub|lồng tiếng|long tieng|hoạt hình 3d|hoat hinh 3d|hoạt hình ai|hoat hinh ai|4k|2k|1080p|720p|60fps|hd|3d)\b/gi, " ");
+    s = s.replace(/[|\-–—•:\/()\[\]]+/g, " ");
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+}
+
+function extractPartNumber(title) {
+    var s = String(title || "");
+    var m = s.match(/(?:phần|phan|part|season|mùa|mua)\s*0*(\d+)/i);
+    if (m) return parseInt(m[1], 10);
+    m = s.match(/\b[ps]0*(\d+)\b/i);
+    if (m) return parseInt(m[1], 10);
+    var ep = extractEpisodeNumber(s);
+    return ep > 0 ? ep : 0;
+}
+
+function isNoiseVideoTitle(title) {
+    var s = String(title || "").toLowerCase();
+    if (!s) return false;
+    if (s.indexOf("karaoke") !== -1) return true;
+    if (s.indexOf("nhạc nền") !== -1 || s.indexOf("nhac nen") !== -1) return true;
+    if (s.indexOf("behind the scenes") !== -1) return true;
+    if (s.indexOf("soundtrack") !== -1) return true;
+    if (s.indexOf("nhạc phim") !== -1 || s.indexOf("nhac phim") !== -1) return true;
+    if (/\b(?:ost|trailer|teaser|reaction|amv|mv)\b/i.test(s)) return true;
+    return false;
+}
+
 function isShortOrTooShort(urlOrFlag, durSec, minSec) {
     if (urlOrFlag === true) return true;
     if (typeof urlOrFlag === "string" && urlOrFlag.indexOf("/shorts/") !== -1) return true;
@@ -254,6 +306,7 @@ function parseVideoRenderer(vr) {
         cover: cover,
         link: BASE_URL + "/watch?v=" + id,
         description: desc,
+        durationSec: durSec,
         host: BASE_URL
     };
 }

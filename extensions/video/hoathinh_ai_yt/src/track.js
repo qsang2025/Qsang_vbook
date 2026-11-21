@@ -37,6 +37,143 @@ function fetchSponsorBlockSkips(vid) {
     return skips;
 }
 
+function fetchDanmakuFromComments(vid, startSec, endSec, totalDurSec) {
+    var result = [];
+    if (!vid || !isDanmakuEnabled()) return result;
+    try {
+        var rawTexts = [];
+        var i = 0;
+        var nextRes = requestInnerTube("next", { videoId: vid }, "WEB", 3000);
+        var contents = nextRes && nextRes.contents && nextRes.contents.twoColumnWatchNextResults && nextRes.contents.twoColumnWatchNextResults.results && nextRes.contents.twoColumnWatchNextResults.results.results && nextRes.contents.twoColumnWatchNextResults.results.results.contents;
+        var cTok = "";
+        if (contents && contents.length) {
+            for (i = 0; i < contents.length; i++) {
+                var isr = contents[i] && contents[i].itemSectionRenderer;
+                if (isr && isr.sectionIdentifier === "comment-item-section" && isr.contents) {
+                    cTok = extractContinuationToken(isr.contents);
+                    if (cTok) break;
+                }
+            }
+            if (!cTok) {
+                for (i = 0; i < contents.length; i++) {
+                    var isr2 = contents[i] && contents[i].itemSectionRenderer;
+                    if (isr2 && isr2.contents) {
+                        cTok = extractContinuationToken(isr2.contents);
+                        if (cTok) break;
+                    }
+                }
+            }
+        }
+        var cRes = cTok ? requestInnerTube("next", { continuation: cTok }, "WEB", 3000) : null;
+        if (cRes) {
+            var entityMap = {};
+            var mutations = cRes.frameworkUpdates && cRes.frameworkUpdates.entityBatchUpdate && cRes.frameworkUpdates.entityBatchUpdate.mutations;
+            if (mutations && mutations.length) {
+                for (i = 0; i < mutations.length; i++) {
+                    var m = mutations[i];
+                    var cep = m && m.payload && m.payload.commentEntityPayload;
+                    if (cep && cep.properties && cep.properties.commentId) {
+                        entityMap[String(cep.properties.commentId)] = cep;
+                    }
+                }
+            }
+
+            var endpoints = cRes.onResponseReceivedEndpoints || [];
+            for (i = 0; i < endpoints.length && rawTexts.length < 40; i++) {
+                var ep = endpoints[i];
+                var contItems = null;
+                if (ep.reloadContinuationItemsCommand && ep.reloadContinuationItemsCommand.continuationItems) {
+                    contItems = ep.reloadContinuationItemsCommand.continuationItems;
+                } else if (ep.appendContinuationItemsAction && ep.appendContinuationItemsAction.continuationItems) {
+                    contItems = ep.appendContinuationItemsAction.continuationItems;
+                }
+                if (!contItems || !contItems.length) continue;
+
+                var j = 0;
+                for (j = 0; j < contItems.length && rawTexts.length < 40; j++) {
+                    var ci = contItems[j];
+                    if (!ci || !ci.commentThreadRenderer) continue;
+                    var ctr = ci.commentThreadRenderer;
+                    var cr = ctr.comment && ctr.comment.commentRenderer;
+                    var cvm = ctr.commentViewModel && ctr.commentViewModel.commentViewModel;
+                    var txt = "";
+                    if (cvm && cvm.commentKey && entityMap[cvm.commentKey]) {
+                        var props = entityMap[cvm.commentKey].properties || {};
+                        txt = props.content && props.content.content ? cleanText(props.content.content) : "";
+                    } else if (cr) {
+                        txt = getRunsText(cr.contentText);
+                    }
+                    if (txt) rawTexts.push(txt);
+                }
+            }
+        }
+
+        if (rawTexts.length === 0) {
+            var pipedList = getCustomMirrors().concat(PIPED_INSTANCES);
+            for (i = 0; i < pipedList.length && rawTexts.length === 0; i++) {
+                var pj = fetchJsonSafe(pipedList[i] + "/comments/" + vid, 3000);
+                if (pj && pj.comments && pj.comments.length > 0) {
+                    var pk = 0;
+                    for (pk = 0; pk < pj.comments.length && rawTexts.length < 40; pk++) {
+                        var pc = pj.comments[pk];
+                        if (pc && pc.commentText) {
+                            var pTxt = cleanText(pc.commentText);
+                            if (pTxt) rawTexts.push(pTxt);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (rawTexts.length === 0) {
+            for (i = 0; i < INVIDIOUS_INSTANCES.length && rawTexts.length === 0; i++) {
+                var ij = fetchJsonSafe(INVIDIOUS_INSTANCES[i] + "/api/v1/comments/" + vid, 3000);
+                if (ij && ij.comments && ij.comments.length > 0) {
+                    var ik = 0;
+                    for (ik = 0; ik < ij.comments.length && rawTexts.length < 40; ik++) {
+                        var ic = ij.comments[ik];
+                        if (ic && ic.content) {
+                            var iTxt = cleanText(ic.content);
+                            if (iTxt) rawTexts.push(iTxt);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (rawTexts.length === 0) return result;
+
+        var winStart = startSec > 0 ? startSec : 0;
+        var winEnd = (endSec > winStart) ? endSec : (totalDurSec > winStart ? totalDurSec : (winStart + 1200));
+        var span = winEnd - winStart;
+        if (span <= 0) span = 1200;
+
+        var colors = ["#FFFFFF", "#FFE082", "#80DEEA", "#FFAB91", "#A5D6A7"];
+        for (i = 0; i < rawTexts.length; i++) {
+            var t = rawTexts[i];
+            if (t.length > 120) t = t.substring(0, 117) + "...";
+            var tsMatch = t.match(/\b(\d{1,2}:\d{2}(?::\d{2})?)\b/);
+            var sec = -1;
+            if (tsMatch) {
+                var parsedSec = parseDurationSec(tsMatch[1]);
+                if (parsedSec >= winStart && parsedSec <= winEnd) {
+                    sec = parsedSec;
+                }
+            }
+            if (sec < 0) {
+                sec = Math.round(winStart + (span * (i + 1)) / (rawTexts.length + 1));
+            }
+            result.push({
+                time: sec,
+                text: t,
+                color: colors[i % colors.length],
+                mode: "scroll"
+            });
+        }
+    } catch (e) {}
+    return result;
+}
+
 function buildNativeTrack(streamUrl, mimeType, opts) {
     opts = opts || {};
     var hdrs = {
@@ -45,10 +182,19 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
     };
     var skips = [];
     var startSec = parseInt(opts.startSec || 0, 10) || 0;
+    var endSec = parseInt(opts.endSec || 0, 10) || 0;
+    var totalDurSec = parseInt(opts.durSec || 0, 10) || 0;
+
     if (startSec > 0) {
         skips.push({
             fromTime: 0,
             toTime: Math.round(startSec * 1000)
+        });
+    }
+    if (endSec > startSec && totalDurSec > endSec) {
+        skips.push({
+            fromTime: Math.round(endSec * 1000),
+            toTime: Math.round(totalDurSec * 1000)
         });
     }
     if (opts.vid) {
@@ -83,15 +229,26 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
         }];
     }
 
+    if (opts.vid && isDanmakuEnabled()) {
+        var dmItems = fetchDanmakuFromComments(opts.vid, startSec, endSec, totalDurSec);
+        if (dmItems.length > 0) {
+            out.danmaku = [{
+                data: JSON.stringify(dmItems),
+                type: "json",
+                label: "Bình luận YouTube"
+            }];
+        }
+    }
+
     return Response.success(out);
 }
 
-function resolveLazy(vid, startSec) {
+function resolveLazy(vid, startSec, endSec, durSec) {
     var hdrs = {
         "Referer": BASE_URL + "/",
         "Origin": BASE_URL
     };
-    var clients = ["ANDROID", "IOS", "ANDROID_VR"];
+    var clients = getPlayerClientsOrder();
     var i = 0;
     for (i = 0; i < clients.length; i++) {
         var itData = requestInnerTube("player", { videoId: vid }, clients[i]);
@@ -99,11 +256,15 @@ function resolveLazy(vid, startSec) {
             var subs = extractInnerTubeSubtitles(itData);
             var adaptive = itData.streamingData.adaptiveFormats || [];
             var multiAudios = extractInnerTubeAudios(adaptive, hdrs);
+            var totalDur = durSec || parseDurationSec(itData.videoDetails && itData.videoDetails.lengthSeconds);
 
             if (itData.streamingData.hlsManifestUrl) {
+                setPreferredPlayerClient(clients[i]);
                 return buildNativeTrack(String(itData.streamingData.hlsManifestUrl), "application/x-mpegURL", {
                     vid: vid,
                     startSec: startSec,
+                    endSec: endSec,
+                    durSec: totalDur,
                     subtitles: subs,
                     audios: multiAudios
                 });
@@ -120,9 +281,12 @@ function resolveLazy(vid, startSec) {
                 }
             }
             if (best && best.url) {
+                setPreferredPlayerClient(clients[i]);
                 return buildNativeTrack(String(best.url), "video/mp4", {
                     vid: vid,
                     startSec: startSec,
+                    endSec: endSec,
+                    durSec: totalDur,
                     subtitles: subs,
                     audios: multiAudios
                 });
@@ -136,14 +300,22 @@ function resolveLazy(vid, startSec) {
                 var mt = String(af.mimeType);
                 if (mt.indexOf("audio/mp4") !== -1) {
                     if (!bestA || parseInt(af.itag || 0, 10) === 140) bestA = String(af.url);
-                } else if (mt.indexOf("video/mp4") !== -1) {
-                    if (!bestV || parseInt(af.height || 0, 10) > parseInt(bestV.height || 0, 10)) bestV = af;
+                } else if (mt.indexOf("video/mp4") !== -1 || mt.indexOf("video/webm") !== -1) {
+                    var afH = parseInt(af.height || 0, 10);
+                    var bestH = bestV ? parseInt(bestV.height || 0, 10) : 0;
+                    if (!bestV || afH > bestH || (afH === bestH && mt.indexOf("video/mp4") !== -1)) {
+                        bestV = af;
+                    }
                 }
             }
             if (bestV && bestV.url) {
-                return buildNativeTrack(String(bestV.url), "video/mp4", {
+                setPreferredPlayerClient(clients[i]);
+                var vMime = String(bestV.mimeType).indexOf("video/webm") !== -1 ? "video/webm" : "video/mp4";
+                return buildNativeTrack(String(bestV.url), vMime, {
                     vid: vid,
                     startSec: startSec,
+                    endSec: endSec,
+                    durSec: totalDur,
                     audioUrl: bestA,
                     audios: multiAudios,
                     subtitles: subs
@@ -156,8 +328,8 @@ function resolveLazy(vid, startSec) {
     if (apiRes && apiRes.data) {
         var d = apiRes.data;
         var pSubs = apiRes.tier === "piped" ? extractPipedSubtitles(d) : [];
-        if (d.hls) return buildNativeTrack(String(d.hls), "application/x-mpegURL", { vid: vid, startSec: startSec, subtitles: pSubs });
-        if (d.hlsUrl) return buildNativeTrack(String(d.hlsUrl), "application/x-mpegURL", { vid: vid, startSec: startSec });
+        if (d.hls) return buildNativeTrack(String(d.hls), "application/x-mpegURL", { vid: vid, startSec: startSec, endSec: endSec, durSec: durSec, subtitles: pSubs });
+        if (d.hlsUrl) return buildNativeTrack(String(d.hlsUrl), "application/x-mpegURL", { vid: vid, startSec: startSec, endSec: endSec, durSec: durSec });
         var vs = d.videoStreams || d.formatStreams || [];
         var bestAlt = null;
         for (i = 0; i < vs.length; i++) {
@@ -167,7 +339,7 @@ function resolveLazy(vid, startSec) {
             }
         }
         if (bestAlt && bestAlt.url) {
-            return buildNativeTrack(String(bestAlt.url), "video/mp4", { vid: vid, startSec: startSec, subtitles: pSubs });
+            return buildNativeTrack(String(bestAlt.url), "video/mp4", { vid: vid, startSec: startSec, endSec: endSec, durSec: durSec, subtitles: pSubs });
         }
     }
 
@@ -185,6 +357,8 @@ function execute(data) {
                 var opts = {
                     vid: obj.vid ? String(obj.vid) : "",
                     startSec: obj.startSec || 0,
+                    endSec: obj.endSec || 0,
+                    durSec: obj.durSec || 0,
                     subtitles: obj.subtitles || [],
                     audios: obj.audios || [],
                     audioUrl: obj.a ? String(obj.a) : ""
@@ -196,7 +370,7 @@ function execute(data) {
                     return buildNativeTrack(String(obj.url), "video/mp4", opts);
                 }
                 if (obj.mode === "av" && obj.v) {
-                    return buildNativeTrack(String(obj.v), "video/mp4", opts);
+                    return buildNativeTrack(String(obj.v), obj.mimeType ? String(obj.mimeType) : "video/mp4", opts);
                 }
             }
         } catch (e) {}
@@ -216,23 +390,33 @@ function execute(data) {
     }
     if (s.indexOf("resolve:") === 0) {
         var raw = s.substring(8);
-        var startSec = 0;
-        var tIdx = raw.indexOf("|t=");
-        if (tIdx !== -1) {
-            startSec = parseInt(raw.substring(tIdx + 3), 10) || 0;
-            raw = raw.substring(0, tIdx);
+        var parts = raw.split("|");
+        var rawId = parts[0];
+        var rStart = 0;
+        var rEnd = 0;
+        var rDur = 0;
+        var pi = 0;
+        for (pi = 1; pi < parts.length; pi++) {
+            var seg = parts[pi];
+            if (seg.indexOf("t=") === 0) rStart = parseInt(seg.substring(2), 10) || 0;
+            else if (seg.indexOf("end=") === 0) rEnd = parseInt(seg.substring(4), 10) || 0;
+            else if (seg.indexOf("dur=") === 0) rDur = parseInt(seg.substring(4), 10) || 0;
         }
-        var vid = extractVideoId(raw);
+        var vid = extractVideoId(rawId);
         if (!vid) return Response.error("ID video không hợp lệ: " + s);
-        return resolveLazy(vid, startSec);
+        return resolveLazy(vid, rStart, rEnd, rDur);
     }
 
     var directVid = extractVideoId(s);
-    if (directVid) return resolveLazy(directVid, extractStartSec(s));
+    if (directVid) return resolveLazy(directVid, extractStartSec(s), extractEndSec(s), extractDurSec(s));
 
     if (s.indexOf("http") === 0) {
         var mime = s.indexOf(".m3u8") !== -1 ? "application/x-mpegURL" : "video/mp4";
-        return buildNativeTrack(s, mime, { startSec: extractStartSec(s) });
+        return buildNativeTrack(s, mime, {
+            startSec: extractStartSec(s),
+            endSec: extractEndSec(s),
+            durSec: extractDurSec(s)
+        });
     }
 
     return Response.error("Định dạng track không hỗ trợ: " + s);

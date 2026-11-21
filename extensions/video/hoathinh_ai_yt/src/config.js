@@ -93,6 +93,53 @@ function getMinDurationSec() {
     return 1200;
 }
 
+function getPreferredQuality() {
+    try {
+        if (typeof PREFERRED_QUALITY !== "undefined" && PREFERRED_QUALITY) {
+            var q = String(PREFERRED_QUALITY).trim();
+            if (q === "auto_hls" || q === "4k_2k" || q === "1080p" || q === "720p") return q;
+        }
+    } catch (e) {}
+    return "1080p";
+}
+
+function getSortBy() {
+    try {
+        if (typeof SORT_BY !== "undefined" && SORT_BY) {
+            var s = String(SORT_BY).trim();
+            if (s === "relevance" || s === "upload_date" || s === "view_count" || s === "duration") return s;
+        }
+    } catch (e) {}
+    return "relevance";
+}
+
+function isDanmakuEnabled() {
+    try {
+        if (typeof ENABLE_DANMAKU !== "undefined" && ENABLE_DANMAKU !== null) {
+            var v = String(ENABLE_DANMAKU).trim().toLowerCase();
+            if (v === "off" || v === "false" || v === "0") return false;
+        }
+    } catch (e) {}
+    return true;
+}
+
+var _preferredPlayerClient = "";
+
+function getPlayerClientsOrder() {
+    var defaults = ["ANDROID", "IOS", "ANDROID_VR"];
+    if (!_preferredPlayerClient) return defaults;
+    var out = [_preferredPlayerClient];
+    var i = 0;
+    for (i = 0; i < defaults.length; i++) {
+        if (defaults[i] !== _preferredPlayerClient) out.push(defaults[i]);
+    }
+    return out;
+}
+
+function setPreferredPlayerClient(clientType) {
+    if (clientType) _preferredPlayerClient = String(clientType);
+}
+
 function getAllFeaturedChannels() {
     var list = [];
     var seen = {};
@@ -225,7 +272,7 @@ function isBadApiText(txt) {
     return false;
 }
 
-function requestInnerTube(action, payload, clientType) {
+function requestInnerTube(action, payload, clientType, timeoutMs) {
     var url = BASE_URL + "/youtubei/v1/" + action + "?prettyPrint=false";
     var body = {};
     var k;
@@ -261,7 +308,7 @@ function requestInnerTube(action, payload, clientType) {
             method: "POST",
             headers: headers,
             body: JSON.stringify(body),
-            timeout: 12000
+            timeout: timeoutMs || 12000
         });
         if (!res || !res.ok) return null;
         var txt = res.text();
