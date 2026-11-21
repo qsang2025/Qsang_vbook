@@ -343,6 +343,16 @@ function resolveLazy(vid, startSec, endSec, durSec) {
         }
     }
 
+    var dmFallback = resolveCrossSourceFallback(vid);
+    if (dmFallback && dmFallback.url) {
+        return buildNativeTrack(dmFallback.url, dmFallback.mimeType || "application/x-mpegURL", {
+            vid: vid,
+            startSec: startSec,
+            endSec: endSec,
+            durSec: durSec || dmFallback.duration || 0
+        });
+    }
+
     return Response.error("Không giải mã được stream YouTube (có thể IP bị chặn bot): " + vid);
 }
 

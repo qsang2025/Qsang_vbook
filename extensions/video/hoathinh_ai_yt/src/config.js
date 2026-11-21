@@ -123,6 +123,61 @@ function isDanmakuEnabled() {
     return true;
 }
 
+function getAudioFilter() {
+    try {
+        if (typeof AUDIO_FILTER !== "undefined" && AUDIO_FILTER) {
+            var f = String(AUDIO_FILTER).trim();
+            if (f === "thuyet_minh" || f === "tron_bo" || f === "all") return f;
+        }
+    } catch (e) {}
+    return "all";
+}
+
+function isCleanTitlesEnabled() {
+    try {
+        if (typeof CLEAN_TITLES !== "undefined" && CLEAN_TITLES !== null) {
+            var v = String(CLEAN_TITLES).trim().toLowerCase();
+            if (v === "off" || v === "false" || v === "0") return false;
+        }
+    } catch (e) {}
+    return true;
+}
+
+var _cloudInvidious = [];
+var _cloudInvidiousFetched = false;
+
+function fetchCloudInvidiousInstances() {
+    if (_cloudInvidiousFetched) return _cloudInvidious;
+    _cloudInvidiousFetched = true;
+    try {
+        var res = fetch("https://api.invidious.io/instances.json?sort_by=health", {
+            headers: { "Accept": "application/json" },
+            timeout: 3500
+        });
+        if (!res || !res.ok) return _cloudInvidious;
+        var arr = JSON.parse(res.text());
+        if (!arr || !arr.length) return _cloudInvidious;
+        var seen = {};
+        var i = 0;
+        for (i = 0; i < INVIDIOUS_INSTANCES.length; i++) {
+            seen[INVIDIOUS_INSTANCES[i].replace(/\/+$/, "").toLowerCase()] = true;
+        }
+        for (i = 0; i < arr.length && _cloudInvidious.length < 4; i++) {
+            var pair = arr[i];
+            if (!pair || pair.length < 2) continue;
+            var info = pair[1];
+            if (!info || info.type !== "https" || info.api !== true) continue;
+            var uri = info.uri ? String(info.uri).trim().replace(/\/+$/, "") : "";
+            if (!uri || uri.indexOf("https://") !== 0) continue;
+            var key = uri.toLowerCase();
+            if (seen[key]) continue;
+            seen[key] = true;
+            _cloudInvidious.push(uri);
+        }
+    } catch (e) {}
+    return _cloudInvidious;
+}
+
 var _preferredPlayerClient = "";
 
 function getPlayerClientsOrder() {
@@ -366,6 +421,12 @@ function requestApi(endpoint, opts) {
     }
     for (i = 0; i < INVIDIOUS_INSTANCES.length; i++) {
         j = fetchJsonSafe(INVIDIOUS_INSTANCES[i] + invEndpoint, timeoutMs);
+        if (j) return { tier: "invidious", data: j };
+    }
+
+    var cloudInv = fetchCloudInvidiousInstances();
+    for (i = 0; i < cloudInv.length; i++) {
+        j = fetchJsonSafe(cloudInv[i] + invEndpoint, timeoutMs);
         if (j) return { tier: "invidious", data: j };
     }
 

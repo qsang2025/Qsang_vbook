@@ -60,6 +60,25 @@
         "on",
         "off"
       ]
+    },
+    "AUDIO_FILTER": {
+      "default": "all",
+      "mode": "select",
+      "title": "Lọc ưu tiên bản Thuyết Minh / Trọn Bộ",
+      "values": [
+        "all",
+        "thuyet_minh",
+        "tron_bo"
+      ]
+    },
+    "CLEAN_TITLES": {
+      "default": "on",
+      "mode": "select",
+      "title": "Làm gọn tiêu đề tập phim trong mục lục",
+      "values": [
+        "on",
+        "off"
+      ]
     }
   },
   "metadata": {
@@ -72,7 +91,7 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 3
+    "version": 4
   },
   "script": {
     "chap": "chap.js",

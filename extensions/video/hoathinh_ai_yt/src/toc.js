@@ -40,7 +40,7 @@ function tocPlaylist(listId) {
                     if (!isShortOrTooShort(parsed.link, parsed.durationSec, 120) && !seen[parsed.link]) {
                         seen[parsed.link] = true;
                         episodes.push({
-                            name: parsed.name,
+                            name: formatCleanEpisodeTitle(parsed.name, episodes.length + 1),
                             url: parsed.link,
                             description: parsed.durationText || "",
                             lock: false,

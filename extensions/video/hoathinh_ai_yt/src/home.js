@@ -28,6 +28,21 @@ function execute() {
             script: "search.js"
         },
         {
+            title: "Marathon Trên 3 Tiếng",
+            input: "min:10800:video:hoạt hình AI Trung Quốc full trọn bộ thuyết minh",
+            script: "search.js"
+        },
+        {
+            title: "Top Xem Nhiều Nhất",
+            input: "sort:view_count:video:hoạt hình AI Trung Quốc full thuyết minh",
+            script: "search.js"
+        },
+        {
+            title: "Mới Ra Trong Tuần",
+            input: "sort:upload_date:video:hoạt hình AI tu tiên thuyết minh",
+            script: "search.js"
+        },
+        {
             title: "Kênh Tuyển Chọn",
             input: "channels:featured",
             script: "search.js"

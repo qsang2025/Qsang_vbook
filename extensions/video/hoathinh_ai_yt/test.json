@@ -4,16 +4,16 @@
       "script": "home.js",
       "input": "",
       "expect": {
-        "contains": ["Bộ AI Dài Tập", "Kênh Tuyển Chọn"],
-        "minItems": 5
+        "contains": ["Bộ AI Dài Tập", "Marathon Trên 3 Tiếng", "Top Xem Nhiều Nhất", "Mới Ra Trong Tuần", "Kênh Tuyển Chọn"],
+        "minItems": 8
       }
     },
     {
       "script": "genre.js",
       "input": "",
       "expect": {
-        "contains": ["Tu Tiên", "Mạt Thế", "Hệ Thống"],
-        "minItems": 10
+        "contains": ["Tu Tiên", "Mạt Thế", "Hệ Thống", "Marathon Trên 3 Tiếng", "Top Xem Nhiều Nhất", "Mới Ra Trong Tuần"],
+        "minItems": 13
       }
     },
     {
@@ -30,6 +30,22 @@
       "expect": {
         "contains": ["watch?v="],
         "minItems": 5
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "min:10800:video:hoạt hình AI Trung Quốc full trọn bộ thuyết minh",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 1
+      }
+    },
+    {
+      "script": "search.js",
+      "input": "sort:view_count:video:hoạt hình AI Trung Quốc full thuyết minh",
+      "expect": {
+        "contains": ["watch?v="],
+        "minItems": 3
       }
     },
     {
@@ -96,5 +112,5 @@
       }
     }
   ],
-  "note": "Golden fixture v3 cho Hoạt Hình AI YouTube (2K/4K + Preferred Quality, Smart Multi-Part Aggregator, Dual-Bound timeSkip, Danmaku từ bình luận YouTube, Sort By & Anti-Noise Filter)."
+  "note": "Golden fixture v4 cho Hoạt Hình AI YouTube (Cloud Invidious Auto-Discovery, AUDIO_FILTER & CLEAN_TITLES, AI Badges, Marathon/Top Views/New This Week tabs + min:/sort: prefixes, Cross-Source YouTube -> Dailymotion HLS fallback)."
 }

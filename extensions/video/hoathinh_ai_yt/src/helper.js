@@ -133,6 +133,61 @@ function extractPartNumber(title) {
     return ep > 0 ? ep : 0;
 }
 
+function detectAiBadges(title, durSec) {
+    var s = String(title || "").toLowerCase();
+    var hasTm = s.indexOf("thuyết minh") !== -1 || s.indexOf("thuyet minh") !== -1;
+    var hasLt = s.indexOf("lồng tiếng") !== -1 || s.indexOf("long tieng") !== -1;
+    var hasSub = s.indexOf("vietsub") !== -1;
+    var hasTb = s.indexOf("trọn bộ") !== -1 || s.indexOf("tron bo") !== -1;
+    var has4k = /\b(?:4k|2160p)\b/i.test(s);
+    var has2k = /\b(?:2k|1440p)\b/i.test(s);
+    var hasFull = /\bfull\b/i.test(s);
+    var isMarathon = typeof durSec === "number" && durSec >= 10800;
+
+    var parts = [];
+    if (hasTm) parts.push("Thuyết Minh");
+    else if (hasLt) parts.push("Lồng Tiếng");
+    else if (hasSub) parts.push("Vietsub");
+
+    if (has4k) parts.push("4K");
+    else if (has2k) parts.push("2K");
+    else if (isMarathon) parts.push("Marathon");
+    else if (hasTb) {
+        parts.push("Trọn Bộ");
+        if (hasFull && parts.length < 2) parts.push("Full");
+    } else if (hasFull && parts.length === 0) {
+        parts.push("Full");
+    }
+
+    return parts.join(" • ");
+}
+
+function formatCleanEpisodeTitle(rawTitle, fallbackIndex) {
+    var raw = cleanText(rawTitle);
+    if (!raw) return fallbackIndex ? ("Tập " + fallbackIndex) : "";
+    if (!isCleanTitlesEnabled()) return raw;
+
+    var s = raw;
+    s = s.replace(/\[[^\]]*\]/g, " ");
+    s = s.replace(/\([^)]*(?:full|4k|2k|1080p|720p|60fps|hd|thuyết minh|thuyet minh|vietsub|lồng tiếng|long tieng|trọn bộ|tron bo|hoạt hình|hoat hinh|ai|3d)[^)]*\)/gi, " ");
+    s = s.replace(/\#[^\s#]+/g, " ");
+    s = s.replace(/\s*\|.*$/, "");
+    s = cleanText(s);
+
+    if (!s) return fallbackIndex ? ("Tập " + fallbackIndex) : raw;
+
+    var ep = extractEpisodeNumber(s);
+    if (ep > 0) {
+        var rest = s.replace(/(?:tập|tap|episode|ep\.?)\s*0*\d+\s*[-–:|.]?\s*/i, "");
+        rest = cleanText(rest).replace(/^[-–:|.\s]+|[-–:|.\s]+$/g, "");
+        return rest ? ("Tập " + ep + " - " + rest) : ("Tập " + ep);
+    }
+    if (fallbackIndex && fallbackIndex > 0) {
+        return "Tập " + fallbackIndex + " - " + s;
+    }
+    return s;
+}
+
 function isNoiseVideoTitle(title) {
     var s = String(title || "").toLowerCase();
     if (!s) return false;
@@ -242,6 +297,7 @@ function parseLockupViewModel(vm) {
             cover: cover,
             link: BASE_URL + "/playlist?list=" + id,
             description: descPl,
+            tag: detectAiBadges(title, 0),
             channelName: channelName,
             channelId: channelId,
             host: BASE_URL
@@ -275,6 +331,7 @@ function parseLockupViewModel(vm) {
         cover: cover,
         link: BASE_URL + "/watch?v=" + id,
         description: descVid,
+        tag: detectAiBadges(title, durSec),
         durationSec: durSec,
         durationText: durFmt,
         channelName: channelName,
@@ -306,6 +363,7 @@ function parseVideoRenderer(vr) {
         cover: cover,
         link: BASE_URL + "/watch?v=" + id,
         description: desc,
+        tag: detectAiBadges(title, durSec),
         durationSec: durSec,
         host: BASE_URL
     };
@@ -475,4 +533,39 @@ function extractInnerTubeAudios(adaptiveFormats, headers) {
         });
     }
     return out;
+}
+
+function resolveCrossSourceFallback(vid) {
+    if (!vid) return null;
+    try {
+        var oembedUrl = "https://www.youtube.com/oembed?url=" + encodeURIComponent("https://www.youtube.com/watch?v=" + vid) + "&format=json";
+        var oembed = fetchJsonSafe(oembedUrl, 4000);
+        if (!oembed || !oembed.title) return null;
+
+        var searchQ = extractBaseSeriesTitle(oembed.title);
+        if (!searchQ || searchQ.length < 3) searchQ = cleanText(oembed.title);
+        if (!searchQ) return null;
+
+        var dmSearchUrl = "https://api.dailymotion.com/videos?search=" + encodeURIComponent(searchQ) + "&limit=3&fields=id,title,duration";
+        var dmSearch = fetchJsonSafe(dmSearchUrl, 5000);
+        if (!dmSearch || !dmSearch.list || !dmSearch.list.length) return null;
+
+        var i = 0;
+        for (i = 0; i < dmSearch.list.length; i++) {
+            var item = dmSearch.list[i];
+            if (!item || !item.id) continue;
+            var metaUrl = "https://www.dailymotion.com/player/metadata/video/" + encodeURIComponent(String(item.id));
+            var meta = fetchJsonSafe(metaUrl, 5000);
+            var hlsUrl = meta && meta.qualities && meta.qualities.auto && meta.qualities.auto[0] && meta.qualities.auto[0].url;
+            if (hlsUrl) {
+                return {
+                    url: String(hlsUrl),
+                    mimeType: "application/x-mpegURL",
+                    title: item.title ? cleanText(item.title) : cleanText(oembed.title),
+                    duration: parseInt(item.duration || 0, 10) || 0
+                };
+            }
+        }
+    } catch (e) {}
+    return null;
 }

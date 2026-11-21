@@ -4,8 +4,9 @@ load('config.js');
 load('config-helpers.js');
 load('helper.js');
 
-function collectSearchItems(contents, items, seen, filterMode) {
+function collectSearchItems(contents, items, seen, filterMode, minDur) {
     if (!contents || !contents.length) return "";
+    var limitSec = (minDur && minDur > 0) ? minDur : getMinDurationSec();
     var i = 0;
     var nextToken = "";
     for (i = 0; i < contents.length; i++) {
@@ -28,17 +29,19 @@ function collectSearchItems(contents, items, seen, filterMode) {
                                     cover: parsed.cover,
                                     link: parsed.link,
                                     description: parsed.description,
+                                    tag: parsed.tag || "",
                                     host: BASE_URL
                                 });
                             }
                         } else if (parsed.kind === "video" && filterMode !== "playlist") {
-                            if (!isNoiseVideoTitle(parsed.name) && parsed.durationSec > 0 && !isShortOrTooShort(parsed.link, parsed.durationSec, getMinDurationSec()) && !seen[parsed.link]) {
+                            if (!isNoiseVideoTitle(parsed.name) && parsed.durationSec > 0 && !isShortOrTooShort(parsed.link, parsed.durationSec, limitSec) && !seen[parsed.link]) {
                                 seen[parsed.link] = true;
                                 items.push({
                                     name: parsed.name,
                                     cover: parsed.cover,
                                     link: parsed.link,
                                     description: parsed.description,
+                                    tag: parsed.tag || "",
                                     host: BASE_URL
                                 });
                             }
@@ -46,13 +49,14 @@ function collectSearchItems(contents, items, seen, filterMode) {
                     }
                 } else if (s.videoRenderer && filterMode !== "playlist") {
                     var vItem = parseVideoRenderer(s.videoRenderer);
-                    if (vItem && !isNoiseVideoTitle(vItem.name) && vItem.durationSec > 0 && !seen[vItem.link]) {
+                    if (vItem && !isNoiseVideoTitle(vItem.name) && vItem.durationSec > 0 && !isShortOrTooShort(vItem.link, vItem.durationSec, limitSec) && !seen[vItem.link]) {
                         seen[vItem.link] = true;
                         items.push({
                             name: vItem.name,
                             cover: vItem.cover,
                             link: vItem.link,
                             description: vItem.description,
+                            tag: vItem.tag || "",
                             host: vItem.host
                         });
                     }
@@ -96,6 +100,7 @@ function searchChannel(cid, page) {
                                         cover: p.cover,
                                         link: p.link,
                                         description: p.description,
+                                        tag: p.tag || "",
                                         host: BASE_URL
                                     });
                                 }
@@ -136,6 +141,7 @@ function searchChannel(cid, page) {
                             cover: pv.cover,
                             link: pv.link,
                             description: pv.description,
+                            tag: pv.tag || "",
                             host: BASE_URL
                         });
                     }
@@ -161,6 +167,49 @@ function getSearchParams(filterMode, sortBy) {
     if (sortBy === "view_count") return "CAM=";
     if (sortBy === "duration") return "EgIYAg==";
     return "";
+}
+
+function applyAudioFilterToQuery(kw, audioFilter) {
+    var lower = String(kw || "").toLowerCase();
+    if (audioFilter === "thuyet_minh") {
+        if (lower.indexOf("thuyết minh") === -1 && lower.indexOf("thuyet minh") === -1 &&
+            lower.indexOf("lồng tiếng") === -1 && lower.indexOf("long tieng") === -1) {
+            return kw + " thuyết minh";
+        }
+    } else if (audioFilter === "tron_bo") {
+        if (lower.indexOf("trọn bộ") === -1 && lower.indexOf("tron bo") === -1 &&
+            !/\bfull\b/i.test(lower)) {
+            return kw + " trọn bộ";
+        }
+    }
+    return kw;
+}
+
+function matchesAudioFilter(name, audioFilter) {
+    var s = String(name || "").toLowerCase();
+    if (audioFilter === "thuyet_minh") {
+        return s.indexOf("thuyết minh") !== -1 || s.indexOf("thuyet minh") !== -1 ||
+            s.indexOf("lồng tiếng") !== -1 || s.indexOf("long tieng") !== -1;
+    }
+    if (audioFilter === "tron_bo") {
+        return s.indexOf("trọn bộ") !== -1 || s.indexOf("tron bo") !== -1 || /\bfull\b/i.test(s);
+    }
+    return false;
+}
+
+function prioritizeByAudioFilter(items, audioFilter) {
+    if (!items || items.length < 2 || audioFilter === "all") return items;
+    var matched = [];
+    var rest = [];
+    var i = 0;
+    for (i = 0; i < items.length; i++) {
+        if (matchesAudioFilter(items[i].name, audioFilter)) {
+            matched.push(items[i]);
+        } else {
+            rest.push(items[i]);
+        }
+    }
+    return matched.concat(rest);
 }
 
 function execute(query, page) {
@@ -192,20 +241,43 @@ function execute(query, page) {
         return searchChannel(cid, page);
     }
 
+    var minDurOverride = 0;
+    var sortOverride = "";
+    var workQ = query;
+    while (true) {
+        var mMin = workQ.match(/^min:(\d+):(.*)$/);
+        if (mMin) {
+            minDurOverride = parseInt(mMin[1], 10) || 0;
+            workQ = cleanText(mMin[2]);
+            continue;
+        }
+        var mSort = workQ.match(/^sort:([a-z_]+):(.*)$/);
+        if (mSort) {
+            sortOverride = String(mSort[1]);
+            workQ = cleanText(mSort[2]);
+            continue;
+        }
+        break;
+    }
+
     var filterMode = "all";
-    var searchKw = query;
-    if (query.indexOf("playlist:") === 0) {
+    var searchKw = workQ;
+    if (workQ.indexOf("playlist:") === 0) {
         filterMode = "playlist";
-        searchKw = cleanText(query.substring(9));
-    } else if (query.indexOf("video:") === 0) {
+        searchKw = cleanText(workQ.substring(9));
+    } else if (workQ.indexOf("video:") === 0) {
         filterMode = "video";
-        searchKw = cleanText(query.substring(6));
+        searchKw = cleanText(workQ.substring(6));
     }
 
     if (!searchKw) return Response.error("Chưa nhập từ khóa tìm kiếm");
 
-    var params = getSearchParams(filterMode, getSortBy());
-    var payload = page ? { continuation: page } : { query: searchKw };
+    var audioFilter = getAudioFilter();
+    var apiKw = applyAudioFilterToQuery(searchKw, audioFilter);
+    var activeSort = sortOverride || getSortBy();
+    var activeMinDur = minDurOverride > 0 ? minDurOverride : getMinDurationSec();
+    var params = getSearchParams(filterMode, activeSort);
+    var payload = page ? { continuation: page } : { query: apiKw };
     if (!page && params) payload.params = params;
 
     var res = requestInnerTube("search", payload, "WEB");
@@ -216,10 +288,11 @@ function execute(query, page) {
     var next = "";
 
     if (res.onResponseReceivedCommands && res.onResponseReceivedCommands[0] && res.onResponseReceivedCommands[0].appendContinuationItemsAction) {
-        next = collectSearchItems(res.onResponseReceivedCommands[0].appendContinuationItemsAction.continuationItems, items, seen, filterMode);
+        next = collectSearchItems(res.onResponseReceivedCommands[0].appendContinuationItemsAction.continuationItems, items, seen, filterMode, activeMinDur);
     } else if (res.contents && res.contents.twoColumnSearchResultsRenderer && res.contents.twoColumnSearchResultsRenderer.primaryContents && res.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer) {
-        next = collectSearchItems(res.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents, items, seen, filterMode);
+        next = collectSearchItems(res.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents, items, seen, filterMode, activeMinDur);
     }
 
+    items = prioritizeByAudioFilter(items, audioFilter);
     return Response.success(items, next || "");
 }
