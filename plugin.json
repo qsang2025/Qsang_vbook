@@ -654,6 +654,17 @@
       "locale": "ja_JP"
     },
     {
+      "name": "Kho Truyện Chữ",
+      "author": "MuseAi",
+      "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/khotruyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://khotruyenchu.fun",
+      "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/khotruyenchu/icon.png",
+      "description": "Kho Truyện Chữ (khotruyenchu.fun, Tàng Kinh Các) — truyện chữ tiên hiệp, huyền huyễn, đô thị tiếng Việt, đọc miễn phí không cần tài khoản. Mục lục phân trang 50 chương/trang. Lưu ý: một dải chương giữa của một số truyện (vd. Trận Vấn Trường Sinh, trang mục lục 10–22) web gốc để trống nội dung — chap.js báo lỗi tiếng Việt rõ ràng cho các chương đó thay vì trả rỗng.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Kỳ Huyễn",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/novel/kyhuyen/plugin.zip",
