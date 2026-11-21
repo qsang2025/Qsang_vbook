@@ -350,3 +350,248 @@ function resolvePhimApiTracks(hhSlug, hhTitle, hhOrig, targetEp, isFull, isSerie
     }
     return out;
 }
+
+var HHTQ_PRESS_BASE = "https://hhtq.press";
+
+function fetchHhtqPressText(url, opts) {
+    var o = opts || {};
+    var r = null;
+    try {
+        r = pacedFetch(url, {
+            method: o.method || "GET",
+            headers: o.headers || {},
+            referer: o.referer || (HHTQ_PRESS_BASE + "/"),
+            body: o.body,
+            minDelayMs: 0,
+            maxDelayMs: 0,
+            maxRetries: 0,
+            timeout: o.timeout || 10000
+        });
+    } catch (e) {
+        return "";
+    }
+    if (!r || !r.ok || !r.res) return "";
+    var text = "";
+    try { text = String(r.res.text() || ""); } catch (e2) { return ""; }
+    if (!text || isChallengeText(text)) return "";
+    return text;
+}
+
+function hhtqCfgField(html, key) {
+    var text = String(html || "");
+    var m = text.match(new RegExp("\"" + key + "\"\\s*:\\s*\"([^\"]*)\""));
+    if (m) return m[1].replace(/\\\//g, "/");
+    m = text.match(new RegExp("\"" + key + "\"\\s*:\\s*(\\d+)"));
+    if (m) return m[1];
+    return "";
+}
+
+function extractMediaFromEmbedHtml(html) {
+    var clean = String(html || "").replace(/\\\//g, "/");
+    if (!clean) return "";
+    var m = clean.match(/https?:\/\/[^"'\s<>]+\.(?:m3u8|mp4)[^"'\s<>]*/i);
+    return m ? m[0] : "";
+}
+
+function hhtqPlaylistFromGrant(grant) {
+    if (!grant || typeof grant !== "object") return "";
+    var url = grant.playlist ? String(grant.playlist) : "";
+    if (!url || url.indexOf("http") !== 0) return "";
+    var fmt = grant.playlistFormat;
+    if (fmt === undefined || fmt === null || fmt === "") return url;
+    if (String(fmt) === "hls") return url;
+    return "";
+}
+
+function resolveHhtqBootstrap(embedHtml, embedUrl) {
+    var api = "";
+    var m = String(embedHtml || "").match(/id="stream-bootstrap"[^>]*>([^<]+)</i);
+    if (m) {
+        try {
+            var cfg = JSON.parse(m[1]);
+            if (cfg && cfg.api && String(cfg.api).indexOf("http") === 0) {
+                api = String(cfg.api);
+            }
+        } catch (e) {
+        }
+    }
+    if (!api && String(embedUrl || "").indexOf("embed.php") !== -1) api = String(embedUrl);
+    if (!api) return "";
+
+    var origins = [HHTQ_PRESS_BASE];
+    var bootText = fetchHhtqPressText(api, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        referer: embedUrl,
+        body: JSON.stringify({
+            action: "bootstrap",
+            referrer: HHTQ_PRESS_BASE + "/",
+            frame_origins: origins,
+            request_grant: true,
+            playlist_format: "hls",
+            pretty_url: true,
+            path_chunks: true,
+            bootstrap_format: "json"
+        }),
+        timeout: 12000
+    });
+    if (!bootText) return "";
+    var boot = null;
+    try { boot = JSON.parse(bootText); } catch (e2) { return ""; }
+    if (!boot) return "";
+
+    var pl = hhtqPlaylistFromGrant(boot.preissued) || hhtqPlaylistFromGrant(boot);
+    if (pl) return pl;
+    if (boot.turnstileEnabled === true || !boot.bootstrap || typeof boot.bootstrap !== "string") return "";
+
+    var issueText = fetchHhtqPressText(api, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        referer: embedUrl,
+        body: JSON.stringify({
+            action: "issue",
+            bootstrap: boot.bootstrap,
+            turnstile_response: "",
+            playlist_format: "hls",
+            pretty_url: true,
+            path_chunks: true,
+            frame_origins: origins
+        }),
+        timeout: 12000
+    });
+    if (!issueText) return "";
+    try {
+        var issued = JSON.parse(issueText);
+        return hhtqPlaylistFromGrant(issued);
+    } catch (e3) {
+        return "";
+    }
+}
+
+function tryResolveHhtqWatchUrl(watchUrl) {
+    var html = fetchHhtqPressText(watchUrl, { referer: HHTQ_PRESS_BASE + "/", timeout: 10000 });
+    if (!html) return null;
+
+    var postId = hhtqCfgField(html, "post_id");
+    var epSlug = hhtqCfgField(html, "episode_slug");
+    var serverId = hhtqCfgField(html, "server") || "1";
+    var nm = html.match(/<body[^>]+data-nonce=["']([^"']+)["']/i);
+    var nonce = nm ? nm[1] : "";
+    if (!postId || !epSlug) return null;
+
+    var playerUrl = HHTQ_PRESS_BASE + "/wp-content/themes/haunmovies/player.php"
+        + "?episode_slug=" + encodeURIComponent(epSlug)
+        + "&server_id=" + encodeURIComponent(serverId)
+        + "&subsv_id="
+        + "&post_id=" + encodeURIComponent(postId)
+        + "&nonce=" + encodeURIComponent(nonce)
+        + "&custom_var=";
+
+    var playerText = fetchHhtqPressText(playerUrl, {
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        referer: watchUrl,
+        timeout: 10000
+    });
+    if (!playerText) return null;
+
+    var pJson = null;
+    try { pJson = JSON.parse(playerText); } catch (e) { return null; }
+    var sources = (pJson && pJson.data && pJson.data.sources) ? String(pJson.data.sources).replace(/\\\//g, "/") : "";
+    if (!sources) return null;
+
+    var direct = extractMediaFromEmbedHtml(sources);
+    if (direct) return { url: direct, referer: HHTQ_PRESS_BASE + "/" };
+
+    var em = sources.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+    if (!em || !em[1]) return null;
+    var embedUrl = em[1].replace(/&amp;/g, "&");
+    if (embedUrl.indexOf("//") === 0) embedUrl = "https:" + embedUrl;
+    else if (embedUrl.indexOf("/") === 0) embedUrl = HHTQ_PRESS_BASE + embedUrl;
+
+    var embedHtml = fetchHhtqPressText(embedUrl, { referer: HHTQ_PRESS_BASE + "/", timeout: 12000 });
+    if (!embedHtml) return null;
+
+    var mediaUrl = extractMediaFromEmbedHtml(embedHtml);
+    if (mediaUrl) {
+        return { url: mediaUrl, referer: originOf(embedUrl) + "/" };
+    }
+
+    var bootUrl = resolveHhtqBootstrap(embedHtml, embedUrl);
+    if (bootUrl) {
+        return { url: bootUrl, referer: embedUrl };
+    }
+    return null;
+}
+
+function resolveHhtqPressStream(hhSlug, hhTitle, chapter, targetEp, sv) {
+    var epSlug = String(chapter || "").replace(/^\s+|\s+$/g, "");
+    if (!epSlug && targetEp > 0) epSlug = "tap-" + targetEp;
+    if (!epSlug) return null;
+
+    var candidates = [];
+    var seen = {};
+    function addCand(slug, ep, sNum) {
+        if (!slug || !ep) return;
+        var u = HHTQ_PRESS_BASE + "/-" + slug + "/" + ep + "-sv" + (sNum || "1") + ".html";
+        if (!seen[u]) {
+            seen[u] = true;
+            candidates.push(u);
+        }
+    }
+
+    if (hhSlug) {
+        addCand(hhSlug, epSlug, sv || "1");
+        if (sv && sv !== "1") addCand(hhSlug, epSlug, "1");
+        if (targetEp > 0 && epSlug !== "tap-" + targetEp) addCand(hhSlug, "tap-" + targetEp, "1");
+    }
+
+    var i = 0;
+    for (i = 0; i < candidates.length; i++) {
+        var res = tryResolveHhtqWatchUrl(candidates[i]);
+        if (res && res.url) return res;
+    }
+
+    if (hhTitle) {
+        var searchUrl = HHTQ_PRESS_BASE + "/search/" + encodeURIComponent(hhTitle);
+        var r = null;
+        try {
+            r = pacedFetch(searchUrl, {
+                referer: HHTQ_PRESS_BASE + "/",
+                minDelayMs: 0,
+                maxDelayMs: 0,
+                maxRetries: 0,
+                timeout: 10000
+            });
+        } catch (e) {
+            r = null;
+        }
+        if (r && r.ok && r.res) {
+            var doc = null;
+            try { doc = r.res.html(); } catch (e2) { doc = null; }
+            if (doc) {
+                var thumbs = doc.select("a.halim-thumb");
+                var matchedSlug = "";
+                for (i = 0; i < thumbs.size(); i++) {
+                    var a = thumbs.get(i);
+                    var href = String(a.attr("href") || "");
+                    var sm = href.match(/\/([^\/\?#]+)\/?$/);
+                    if (!sm || !sm[1]) continue;
+                    var candSlug = sm[1];
+                    var candTitle = cleanText(a.attr("title")) || cleanText(a.text());
+                    if (phimApiTitleMatches(candTitle, candSlug, hhSlug, hhTitle)) {
+                        matchedSlug = candSlug;
+                        break;
+                    }
+                }
+                if (matchedSlug && matchedSlug !== hhSlug) {
+                    var fallbackUrl = HHTQ_PRESS_BASE + "/-" + matchedSlug + "/" + epSlug + "-sv1.html";
+                    if (!seen[fallbackUrl]) {
+                        var res2 = tryResolveHhtqWatchUrl(fallbackUrl);
+                        if (res2 && res2.url) return res2;
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}

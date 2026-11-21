@@ -1392,7 +1392,7 @@
       "name": "HHKUNGFU",
       "author": "MuseAi",
       "path": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/plugin.zip",
-      "version": 5,
+      "version": 6,
       "source": "https://hhkungfu.ee",
       "icon": "https://raw.githubusercontent.com/qsang2025/Qsang_vbook/main/extensions/video/hhkungfu/icon.png",
       "description": "HHKUNGFU (hhkungfu.ee) — xem phim hoạt hình 3D Kungfu Trung Quốc Vietsub & Thuyết Minh (Thương Nguyên Đồ, Đấu La Đại Lục 2, Tru Tiên, Tiên Nghịch...): ưu tiên phát Native HLS (.m3u8) tự động qua PhimAPI khi có tập tương ứng, kèm đầy đủ 4 server 1080P V1/V2 & 4K V1/V2 qua AJAX player.php (WebView dynamic-iframe) và Webview Trang Nguồn (ref: Qsang, kychitoge).",

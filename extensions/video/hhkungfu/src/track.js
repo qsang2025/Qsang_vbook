@@ -22,7 +22,9 @@ function nativeTrack(streamUrl, referer) {
     var ref = referer;
     if (!ref) {
         var hostLower = originOf(streamUrl).toLowerCase();
-        if (hostLower.indexOf("phim1280") !== -1 || hostLower.indexOf("kkphim") !== -1 || hostLower.indexOf("kvp") !== -1) {
+        if (hostLower.indexOf("tenmienphu68") !== -1 || hostLower.indexOf("syntheticvideo") !== -1) {
+            ref = "https://tenmienphu68.lol/";
+        } else if (hostLower.indexOf("phim1280") !== -1 || hostLower.indexOf("kkphim") !== -1 || hostLower.indexOf("kvp") !== -1) {
             ref = "https://phimapi.com/";
         } else {
             ref = BASE_URL + "/";
@@ -79,6 +81,38 @@ function execute(input) {
 
     if (params && params.type === "native" && params.stream) {
         return nativeTrack(String(params.stream), params.referer || "");
+    }
+
+    if (params && params.resolvedStream) {
+        return nativeTrack(String(params.resolvedStream), params.resolvedReferer || "");
+    }
+
+    if (params && params.chapter && (params.hhSlug || params.hhTitle)) {
+        var hhtqRes = resolveHhtqPressStream(
+            String(params.hhSlug || ""),
+            String(params.hhTitle || ""),
+            String(params.chapter || ""),
+            params.targetEp || episodeNumber(params.chapter),
+            String(params.sv || "1")
+        );
+        if (hhtqRes && hhtqRes.url) {
+            return nativeTrack(hhtqRes.url, hhtqRes.referer || "");
+        }
+        var phimRes = resolvePhimApiTracks(
+            String(params.hhSlug || ""),
+            String(params.hhTitle || ""),
+            "",
+            params.targetEp || episodeNumber(params.chapter),
+            /full/i.test(String(params.chapter || "")),
+            true,
+            String(params.sv || "1") === "2"
+        );
+        if (phimRes.primary.length > 0) {
+            return nativeTrack(phimRes.primary[0].data, "");
+        }
+        if (phimRes.secondary.length > 0) {
+            return nativeTrack(phimRes.secondary[0].data, "");
+        }
     }
 
     var fallbackUrl = (params && params.url) ? normalizeUrl(params.url) : (input.indexOf("http") === 0 ? normalizeUrl(input) : (BASE_URL + "/"));
