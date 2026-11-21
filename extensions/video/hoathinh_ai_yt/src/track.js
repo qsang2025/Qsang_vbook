@@ -212,9 +212,9 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
 
 function buildFmp4TrackFromPair(pair, hdrs, opts) {
     if (!pair || !pair.vUrl || !pair.vInit || !pair.vIndex || !pair.aUrl || !pair.aInit || !pair.aIndex) return null;
-    var videoM3u8 = buildFmp4MediaM3u8(pair.vUrl, pair.vInit, pair.vIndex, 6);
+    var videoM3u8 = buildFmp4MediaM3u8(pair.vUrl, pair.vInit, pair.vIndex, 2);
     if (!videoM3u8) return null;
-    var audioM3u8 = buildFmp4MediaM3u8(pair.aUrl, pair.aInit, pair.aIndex, 16);
+    var audioM3u8 = buildFmp4MediaM3u8(pair.aUrl, pair.aInit, pair.aIndex, 2);
     if (!audioM3u8) return null;
     var audioUri = buildFmp4DataUri(audioM3u8);
     if (!audioUri) return null;
@@ -442,7 +442,7 @@ function execute(data) {
                     return resolveAdaptiveFmp4Hls(obj, opts);
                 }
                 if (obj.mode === "audio_only" && obj.a && obj.aInit && obj.aIndex) {
-                    var aM3u8 = buildFmp4MediaM3u8(String(obj.a), String(obj.aInit), String(obj.aIndex), 16);
+                    var aM3u8 = buildFmp4MediaM3u8(String(obj.a), String(obj.aInit), String(obj.aIndex), 2);
                     if (aM3u8) {
                         return buildNativeTrack(aM3u8, "application/x-mpegURL", opts);
                     }

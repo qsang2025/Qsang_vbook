@@ -688,10 +688,10 @@ function parseSidxSegments(bytes, indexEnd, groupCount) {
                 curByte += refSize;
                 off += 12;
             }
-            var baseGroup = groupCount || 3;
-            var effGroup = Math.max(baseGroup, Math.ceil(rawSegs.length / 220));
+            var effGroup = groupCount || 2;
             if (effGroup <= 1) return rawSegs;
-            var maxGroupBytes = 8 * 1024 * 1024;
+            var maxGroupBytes = 2 * 1024 * 1024;
+            var maxGroupDur = 20;
             var grouped = [];
             i = 0;
             while (i < rawSegs.length) {
@@ -703,6 +703,7 @@ function parseSidxSegments(bytes, indexEnd, groupCount) {
                 while (j < limit) {
                     var nextEnd = rawSegs[j].end;
                     if ((nextEnd - startByte + 1) > maxGroupBytes) break;
+                    if ((sumDur + rawSegs[j].dur) > maxGroupDur) break;
                     endByte = nextEnd;
                     sumDur += rawSegs[j].dur;
                     j++;
@@ -776,9 +777,11 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         if (!af || !af.url || !af.mimeType || !af.initRange || !af.indexRange) continue;
         var mt = String(af.mimeType);
         if (mt.indexOf("audio/mp4") !== -1) {
-            if (!bestAudio || parseInt(af.itag || 0, 10) === 140) {
+            var isItag140 = parseInt(af.itag || 0, 10) === 140;
+            var isOrig140 = isItag140 && !af.isDrc;
+            if (!bestAudio || isOrig140 || (isItag140 && parseInt(bestAudio.itag || 0, 10) !== 140)) {
                 bestAudio = af;
-                if (parseInt(af.itag || 0, 10) === 140) break;
+                if (isOrig140) break;
             }
         }
     }

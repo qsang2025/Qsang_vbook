@@ -30,9 +30,11 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
         if (!af || !af.url || !af.mimeType || !af.initRange || !af.indexRange) continue;
         var amt = String(af.mimeType);
         if (amt.indexOf("audio/mp4") !== -1) {
-            if (!bestAudioObj || parseInt(af.itag || 0, 10) === 140) {
+            var isItag140 = parseInt(af.itag || 0, 10) === 140;
+            var isOrig140 = isItag140 && !af.isDrc;
+            if (!bestAudioObj || isOrig140 || (isItag140 && parseInt(bestAudioObj.itag || 0, 10) !== 140)) {
                 bestAudioObj = af;
-                if (parseInt(af.itag || 0, 10) === 140) break;
+                if (isOrig140) break;
             }
         }
     }
