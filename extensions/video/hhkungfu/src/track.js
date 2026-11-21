@@ -87,25 +87,27 @@ function execute(input) {
         return nativeTrack(String(params.resolvedStream), params.resolvedReferer || "");
     }
 
-    if (params && params.chapter && (params.hhSlug || params.hhTitle)) {
-        var hhtqRes = resolveHhtqPressStream(
-            String(params.hhSlug || ""),
-            String(params.hhTitle || ""),
-            String(params.chapter || ""),
-            params.targetEp || episodeNumber(params.chapter),
-            String(params.sv || "1")
-        );
+    var fallbackUrl = (params && params.url) ? normalizeUrl(params.url) : (input.indexOf("http") === 0 ? normalizeUrl(input) : (BASE_URL + "/"));
+    var urlParts = fallbackUrl.match(/\/watch-([^\/]+)\/([^\/\?\.]+?)(?:-sv(\d+))?\.html/i);
+    var hhSlug = (params && params.hhSlug) ? String(params.hhSlug) : (urlParts ? urlParts[1] : "");
+    var hhTitle = (params && params.hhTitle) ? String(params.hhTitle) : "";
+    var chapter = (params && params.chapter) ? String(params.chapter) : (urlParts ? urlParts[2] : "");
+    var sv = (params && params.sv) ? String(params.sv) : (urlParts && urlParts[3] ? urlParts[3] : "1");
+    var targetEp = (params && params.targetEp) ? params.targetEp : episodeNumber(chapter);
+
+    if (chapter && (hhSlug || hhTitle)) {
+        var hhtqRes = resolveHhtqPressStream(hhSlug, hhTitle, chapter, targetEp, sv);
         if (hhtqRes && hhtqRes.url) {
             return nativeTrack(hhtqRes.url, hhtqRes.referer || "");
         }
         var phimRes = resolvePhimApiTracks(
-            String(params.hhSlug || ""),
-            String(params.hhTitle || ""),
+            hhSlug,
+            hhTitle,
             "",
-            params.targetEp || episodeNumber(params.chapter),
-            /full/i.test(String(params.chapter || "")),
+            targetEp,
+            /full/i.test(chapter),
             true,
-            String(params.sv || "1") === "2"
+            sv === "2"
         );
         if (phimRes.primary.length > 0) {
             return nativeTrack(phimRes.primary[0].data, "");
@@ -114,8 +116,6 @@ function execute(input) {
             return nativeTrack(phimRes.secondary[0].data, "");
         }
     }
-
-    var fallbackUrl = (params && params.url) ? normalizeUrl(params.url) : (input.indexOf("http") === 0 ? normalizeUrl(input) : (BASE_URL + "/"));
 
     if (params && params.type === "web" && params.url) {
         return Response.success({
