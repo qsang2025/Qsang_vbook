@@ -183,6 +183,9 @@ function buildNativeTrack(streamUrl, mimeType, opts) {
 
     if (opts.subtitles && opts.subtitles.length > 0) {
         out.subtitles = opts.subtitles;
+        if (!opts.skipExtras) {
+            out.subtitles = attachBilingualSubtitles(out.subtitles) || out.subtitles;
+        }
     }
 
     if (opts.audios && opts.audios.length > 0) {
@@ -263,7 +266,7 @@ function resolveAdaptiveFmp4Hls(obj, opts) {
         for (i = 0; i < clients.length; i++) {
             var itData = requestInnerTube("player", { videoId: vid }, clients[i]);
             if (itData && itData.streamingData && itData.streamingData.adaptiveFormats) {
-                var pair = findAdaptiveMp4Pair(itData.streamingData.adaptiveFormats, targetH);
+                var pair = findAdaptiveMp4Pair(itData.streamingData.adaptiveFormats, targetH, obj.codecFam || "");
                 if (pair) {
                     var res = buildFmp4TrackFromPair(pair, hdrs, opts);
                     if (res) {
@@ -305,9 +308,17 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                 });
             }
             var prefQ = getPreferredQuality();
-            var wantH = prefQ === "720p" ? 720 : 1080;
-            if (prefQ !== "auto_hls") {
-                var hdPair = findAdaptiveMp4Pair(adaptive, wantH);
+            var targetHeights = [];
+            if (prefQ === "4k_2k") {
+                targetHeights = [2160, 1440, 1080, 720];
+            } else if (prefQ === "720p") {
+                targetHeights = [720];
+            } else if (prefQ !== "auto_hls") {
+                targetHeights = [1080, 720];
+            }
+            var hi = 0;
+            for (hi = 0; hi < targetHeights.length; hi++) {
+                var hdPair = findAdaptiveMp4Pair(adaptive, targetHeights[hi]);
                 if (hdPair) {
                     var hdTrack = buildFmp4TrackFromPair(hdPair, hdrs, {
                         vid: vid,
@@ -320,23 +331,6 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                     if (hdTrack) {
                         setPreferredPlayerClient(clients[i]);
                         return hdTrack;
-                    }
-                }
-                if (wantH !== 720) {
-                    var hdPair720 = findAdaptiveMp4Pair(adaptive, 720);
-                    if (hdPair720) {
-                        var hdTrack720 = buildFmp4TrackFromPair(hdPair720, hdrs, {
-                            vid: vid,
-                            startSec: startSec,
-                            endSec: endSec,
-                            durSec: totalDur,
-                            skipExtras: true,
-                            subtitles: subs
-                        });
-                        if (hdTrack720) {
-                            setPreferredPlayerClient(clients[i]);
-                            return hdTrack720;
-                        }
                     }
                 }
             }
@@ -365,6 +359,7 @@ function resolveLazy(vid, startSec, endSec, durSec) {
                 });
             }
 
+            var wantH = prefQ === "720p" ? 720 : (prefQ === "4k_2k" ? 2160 : 1080);
             var fallbackPair = findAdaptiveMp4Pair(adaptive, wantH);
             if (fallbackPair) {
                 var fbTrack = buildFmp4TrackFromPair(fallbackPair, hdrs, {

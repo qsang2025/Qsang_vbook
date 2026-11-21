@@ -241,6 +241,20 @@ function execute(query, page) {
         return searchChannel(cid, page);
     }
 
+    if (query.indexOf("related:") === 0) {
+        var relVid = cleanText(query.substring(8));
+        if (!relVid) return Response.error("Thiếu ID video YouTube");
+        var nextRes = requestInnerTube("next", { videoId: relVid }, "WEB");
+        var relItems = nextRes ? parseWatchNextRelatedItems(nextRes) : [];
+        if (relItems && relItems.length > 0) {
+            return Response.success(relItems, "");
+        }
+        var pRes = requestInnerTube("player", { videoId: relVid }, "WEB");
+        var fallbackTitle = pRes && pRes.videoDetails && pRes.videoDetails.title ? cleanText(pRes.videoDetails.title) : "";
+        if (!fallbackTitle) return Response.success([], "");
+        query = fallbackTitle;
+    }
+
     var minDurOverride = 0;
     var sortOverride = "";
     var workQ = query;

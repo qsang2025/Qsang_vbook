@@ -133,6 +133,34 @@ function extractPartNumber(title) {
     return ep > 0 ? ep : 0;
 }
 
+function isRecapOrReviewTitle(title) {
+    var s = String(title || "").toLowerCase();
+    if (!s) return false;
+    var strong = [
+        "tóm tắt phim",
+        "tom tat phim",
+        "review phim",
+        "recap",
+        "phân tích cốt truyện",
+        "phan tich cot truyen",
+        "giải thích cốt truyện",
+        "giai thich cot truyen",
+        "spoil",
+        "bình luận phim"
+    ];
+    var i = 0;
+    for (i = 0; i < strong.length; i++) {
+        if (s.indexOf(strong[i]) !== -1) return true;
+    }
+    if (/\b(?:tóm tắt|tom tat|review)\b/i.test(s)) {
+        if (s.indexOf("trọn bộ") !== -1 || s.indexOf("tron bo") !== -1) return false;
+        if (/\bfull\b/i.test(s)) return false;
+        if (/(?:tập|tap)\s*1\b/i.test(s)) return false;
+        return true;
+    }
+    return false;
+}
+
 function detectAiBadges(title, durSec) {
     var s = String(title || "").toLowerCase();
     var hasTm = s.indexOf("thuyết minh") !== -1 || s.indexOf("thuyet minh") !== -1;
@@ -145,6 +173,7 @@ function detectAiBadges(title, durSec) {
     var isMarathon = typeof durSec === "number" && durSec >= 10800;
 
     var parts = [];
+    if (isRecapOrReviewTitle(title)) parts.push("Review/Tóm tắt");
     if (hasTm) parts.push("Thuyết Minh");
     else if (hasLt) parts.push("Lồng Tiếng");
     else if (hasSub) parts.push("Vietsub");
@@ -204,6 +233,9 @@ function isNoiseVideoTitle(title) {
     var s = String(title || "").toLowerCase();
     if (!s) return false;
     if (isBlockedByUserKeywords(s)) return true;
+    if (typeof getFilterRecapMode === "function" && getFilterRecapMode() === "hide" && isRecapOrReviewTitle(title)) {
+        return true;
+    }
     if (s.indexOf("karaoke") !== -1) return true;
     if (s.indexOf("nhạc nền") !== -1 || s.indexOf("nhac nen") !== -1) return true;
     if (s.indexOf("behind the scenes") !== -1) return true;
@@ -440,12 +472,34 @@ function ensureFmtVtt(url) {
     return u + (u.indexOf("?") === -1 ? "?" : "&") + "fmt=vtt";
 }
 
+function matchesSubLang(lang, target) {
+    var l = String(lang || "").toLowerCase();
+    var t = String(target || "").toLowerCase();
+    if (!l || !t) return false;
+    if (l === t) return true;
+    if (t === "vi") return l.indexOf("vi-") === 0 || l.indexOf("vi_") === 0;
+    if (t === "en") return l.indexOf("en-") === 0 || l.indexOf("en_") === 0;
+    if (t === "zh-hans") return l === "zh-cn" || l === "zh" || l.indexOf("zh-hans") === 0;
+    return false;
+}
+
+function buildTranslatedVttUrl(baseVttUrl, targetLang) {
+    var u = String(baseVttUrl || "").replace(/([?&])tlang=[^&]*/i, "");
+    return u + (u.indexOf("?") === -1 ? "?" : "&") + "tlang=" + encodeURIComponent(targetLang);
+}
+
 function extractInnerTubeSubtitles(data) {
+    var subMode = (typeof getSubLangMode === "function") ? getSubLangMode() : "vi";
+    if (subMode === "off") return [];
     var list = [];
     if (!data || !data.captions || !data.captions.playerCaptionsTracklistRenderer) return list;
     var tracks = data.captions.playerCaptionsTracklistRenderer.captionTracks || [];
-    var hasVi = false;
+    var targetLang = (subMode === "bilingual_vi") ? "vi" : subMode;
+
+    var targetIdx = -1;
     var translatableBase = "";
+    var viVttUrl = "";
+    var origVttUrl = "";
     var i = 0;
     for (i = 0; i < tracks.length; i++) {
         var ct = tracks[i];
@@ -453,11 +507,17 @@ function extractInnerTubeSubtitles(data) {
         var vttUrl = ensureFmtVtt(ct.baseUrl);
         var lang = ct.languageCode ? String(ct.languageCode) : "";
         var label = getRunsText(ct.name) || lang || "Subtitle";
-        if (lang === "vi" || lang.indexOf("vi-") === 0 || lang.indexOf("vi_") === 0) {
-            hasVi = true;
+        var isAsr = (ct.kind === "asr");
+        if (matchesSubLang(lang, targetLang) && targetIdx === -1) {
+            targetIdx = list.length;
         }
-        if (!translatableBase && ct.isTranslatable !== false) {
-            translatableBase = vttUrl;
+        if (matchesSubLang(lang, "vi") && !viVttUrl) {
+            viVttUrl = vttUrl;
+        } else if (!matchesSubLang(lang, "vi") && (!origVttUrl || (!isAsr && origVttUrl))) {
+            if (!origVttUrl) origVttUrl = vttUrl;
+        }
+        if (ct.isTranslatable !== false && (!translatableBase || !isAsr)) {
+            if (!translatableBase || !isAsr) translatableBase = vttUrl;
         }
         list.push({
             data: vttUrl,
@@ -466,17 +526,158 @@ function extractInnerTubeSubtitles(data) {
             language: lang
         });
     }
-    if (!hasVi && translatableBase) {
-        var autoUrl = translatableBase.replace(/([?&])tlang=[^&]*/i, "");
-        autoUrl += (autoUrl.indexOf("?") === -1 ? "?" : "&") + "tlang=vi";
-        list.push({
+
+    if (targetIdx > 0) {
+        var chosen = list.splice(targetIdx, 1)[0];
+        list.unshift(chosen);
+    } else if (targetIdx === -1 && translatableBase) {
+        var autoLabel = "Tiếng Việt (Tự dịch)";
+        if (targetLang === "en") autoLabel = "English (Auto)";
+        else if (targetLang === "zh-Hans") autoLabel = "中文 (自动翻译)";
+        var autoUrl = buildTranslatedVttUrl(translatableBase, targetLang);
+        list.unshift({
             data: autoUrl,
             type: "vtt",
-            label: "Tiếng Việt (Tự dịch)",
-            language: "vi"
+            label: autoLabel,
+            language: targetLang
         });
+        if (targetLang === "vi" && !viVttUrl) viVttUrl = autoUrl;
+    }
+
+    if (!viVttUrl && translatableBase) {
+        viVttUrl = buildTranslatedVttUrl(translatableBase, "vi");
+    }
+    if (viVttUrl && origVttUrl && viVttUrl !== origVttUrl) {
+        list._viVttUrl = viVttUrl;
+        list._origVttUrl = origVttUrl;
     }
     return list;
+}
+
+function parseVttTimeSec(ts) {
+    var s = String(ts || "").trim().replace(",", ".");
+    var parts = s.split(":");
+    if (parts.length < 2 || parts.length > 3) return -1;
+    var sec = 0;
+    var i = 0;
+    for (i = 0; i < parts.length; i++) {
+        var n = parseFloat(parts[i]);
+        if (isNaN(n)) return -1;
+        sec = sec * 60 + n;
+    }
+    return sec;
+}
+
+function parseVttCues(vttText) {
+    var raw = String(vttText || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    if (!raw) return [];
+    var blocks = raw.split(/\n{2,}/);
+    var cues = [];
+    var i = 0;
+    for (i = 0; i < blocks.length; i++) {
+        var lines = blocks[i].split("\n");
+        var arrowIdx = -1;
+        var j = 0;
+        for (j = 0; j < lines.length; j++) {
+            if (lines[j].indexOf("-->") !== -1) {
+                arrowIdx = j;
+                break;
+            }
+        }
+        if (arrowIdx === -1) continue;
+        var timeLine = lines[arrowIdx].trim();
+        var tParts = timeLine.split("-->");
+        var startSec = parseVttTimeSec(tParts[0]);
+        var endSec = parseVttTimeSec((tParts[1] || "").trim().split(/\s+/)[0]);
+        var textParts = [];
+        for (j = arrowIdx + 1; j < lines.length; j++) {
+            var cleaned = cleanText(lines[j].replace(/<[^>]+>/g, " "));
+            if (cleaned) textParts.push(cleaned);
+        }
+        var txt = textParts.join(" ");
+        if (!txt) continue;
+        cues.push({
+            startSec: startSec,
+            endSec: endSec,
+            timeLine: timeLine,
+            text: txt
+        });
+    }
+    return cues;
+}
+
+function buildBilingualVttDataUri(viVttUrl, origVttUrl) {
+    if (!viVttUrl || !origVttUrl || viVttUrl === origVttUrl) return "";
+    try {
+        var rVi = fetch(viVttUrl, { timeout: 2500 });
+        var rOrig = fetch(origVttUrl, { timeout: 2500 });
+        if (!rVi || !rVi.ok || !rOrig || !rOrig.ok) return "";
+        var viCues = parseVttCues(rVi.text());
+        var origCues = parseVttCues(rOrig.text());
+        if (!viCues.length || !origCues.length) return "";
+
+        var out = ["WEBVTT\n\n"];
+        var origIdx = 0;
+        var i = 0;
+        for (i = 0; i < viCues.length; i++) {
+            var vc = viCues[i];
+            var matchText = "";
+            if (vc.startSec >= 0) {
+                while (origIdx + 1 < origCues.length && origCues[origIdx + 1].startSec >= 0 && origCues[origIdx + 1].startSec <= vc.startSec + 0.6) {
+                    origIdx++;
+                }
+                if (origCues[origIdx] && origCues[origIdx].startSec >= 0 && Math.abs(origCues[origIdx].startSec - vc.startSec) <= 1.5) {
+                    matchText = origCues[origIdx].text;
+                }
+            }
+            if (!matchText && i < origCues.length && (viCues.length === origCues.length || vc.startSec < 0)) {
+                matchText = origCues[i].text;
+            }
+            var body = (matchText && matchText !== vc.text) ? (vc.text + "\n" + matchText) : vc.text;
+            out.push(vc.timeLine + "\n" + body + "\n\n");
+        }
+        return "data:text/vtt;base64," + strToB64(out.join(""));
+    } catch (e) {
+        return "";
+    }
+}
+
+function attachBilingualSubtitles(subtitles) {
+    if (!subtitles || !subtitles.length) return subtitles || [];
+    var subMode = (typeof getSubLangMode === "function") ? getSubLangMode() : "vi";
+    if (subMode === "off") return subtitles;
+
+    var viUrl = subtitles._viVttUrl || "";
+    var origUrl = subtitles._origVttUrl || "";
+    var i = 0;
+    if (!viUrl || !origUrl) {
+        for (i = 0; i < subtitles.length; i++) {
+            var s = subtitles[i];
+            if (!s || !s.data) continue;
+            if (matchesSubLang(s.language, "vi")) {
+                if (!viUrl) viUrl = s.data;
+            } else {
+                if (!origUrl) origUrl = s.data;
+            }
+        }
+    }
+    if (!viUrl || !origUrl || viUrl === origUrl) return subtitles;
+
+    var biUri = buildBilingualVttDataUri(viUrl, origUrl);
+    if (!biUri) return subtitles;
+
+    var biTrack = {
+        data: biUri,
+        type: "vtt",
+        label: "Song ngữ (Việt + Gốc)",
+        language: "vi"
+    };
+    if (subMode === "bilingual_vi") {
+        subtitles.unshift(biTrack);
+    } else {
+        subtitles.splice(1, 0, biTrack);
+    }
+    return subtitles;
 }
 
 function extractPipedSubtitles(data) {
@@ -767,7 +968,48 @@ function buildFmp4DataUri(m3u8Text) {
     return "data:application/x-mpegurl;base64," + strToB64(m3u8Text);
 }
 
-function findAdaptiveMp4Pair(adaptive, targetHeight) {
+function getVideoCodecFamily(f) {
+    if (!f || !f.mimeType) return "";
+    var mt = String(f.mimeType).toLowerCase();
+    if (mt.indexOf("av01") !== -1) return "av01";
+    if (mt.indexOf("avc1") !== -1) return "avc1";
+    if (mt.indexOf("vp9") !== -1 || mt.indexOf("vp09") !== -1) return "vp9";
+    return "";
+}
+
+function getCodecPreferenceRank(codec, preferCodec) {
+    var pref = preferCodec ? String(preferCodec).toLowerCase() : "avc1";
+    if (codec === pref) return 3;
+    if (codec === "avc1" || codec === "av01") return 2;
+    return 1;
+}
+
+function isBetterMp4VideoCandidate(vf, best, targetHeight, preferCodec) {
+    var h = getFormatQualityHeight(vf);
+    var c = getVideoCodecFamily(vf);
+    var cRank = getCodecPreferenceRank(c, preferCodec);
+    if (!best) return true;
+
+    var bh = getFormatQualityHeight(best);
+    var bc = getVideoCodecFamily(best);
+    var bcRank = getCodecPreferenceRank(bc, preferCodec);
+
+    if (targetHeight > 0) {
+        var exactNew = (h === targetHeight);
+        var exactBest = (bh === targetHeight);
+        if (exactNew !== exactBest) return exactNew;
+        if (exactNew && exactBest) return cRank > bcRank;
+
+        var underNew = (h <= targetHeight);
+        var underBest = (bh <= targetHeight);
+        if (underNew !== underBest) return underNew;
+    }
+
+    if (h !== bh) return h > bh;
+    return cRank > bcRank;
+}
+
+function findAdaptiveMp4Pair(adaptive, targetHeight, preferCodec) {
     if (!adaptive || !adaptive.length) return null;
     var bestAudio = null;
     var bestVideo = null;
@@ -786,6 +1028,7 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         }
     }
     if (!bestAudio) return null;
+    var th = parseInt(targetHeight || 0, 10) || 0;
     for (i = 0; i < adaptive.length; i++) {
         var vf = adaptive[i];
         if (!vf || !vf.url || !vf.mimeType || !vf.initRange || !vf.indexRange) continue;
@@ -793,11 +1036,7 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         if (vmt.indexOf("video/mp4") === -1) continue;
         var h = getFormatQualityHeight(vf);
         if (h < 720) continue;
-        if (targetHeight > 0 && h === targetHeight) {
-            bestVideo = vf;
-            break;
-        }
-        if (!bestVideo || h > getFormatQualityHeight(bestVideo)) {
+        if (isBetterMp4VideoCandidate(vf, bestVideo, th, preferCodec)) {
             bestVideo = vf;
         }
     }
@@ -809,7 +1048,8 @@ function findAdaptiveMp4Pair(adaptive, targetHeight) {
         aUrl: String(bestAudio.url),
         aInit: String(bestAudio.initRange.start) + "-" + String(bestAudio.initRange.end),
         aIndex: String(bestAudio.indexRange.start) + "-" + String(bestAudio.indexRange.end),
-        height: getFormatQualityHeight(bestVideo)
+        height: getFormatQualityHeight(bestVideo),
+        codec: getVideoCodecFamily(bestVideo)
     };
 }
 
@@ -889,4 +1129,161 @@ function fetchPhimApiTocFallback(seriesTitle) {
     } catch (e) {
         return [];
     }
+}
+
+function recordWatchedVideo(vid, title, cover, durText) {
+    var id = String(vid || "").trim();
+    if (!id) return;
+    try {
+        if (typeof localStorage === "undefined" || !localStorage) return;
+        var vids = [];
+        var rawVids = localStorage.getItem("watched_vids_v9");
+        if (rawVids) {
+            var parsedVids = JSON.parse(rawVids);
+            if (parsedVids && parsedVids.length) vids = parsedVids;
+        }
+        var nextVids = [id];
+        var i = 0;
+        for (i = 0; i < vids.length && nextVids.length < 200; i++) {
+            if (vids[i] && String(vids[i]) !== id) nextVids.push(String(vids[i]));
+        }
+        localStorage.setItem("watched_vids_v9", JSON.stringify(nextVids));
+
+        var items = [];
+        var rawItems = localStorage.getItem("watched_items_v9");
+        if (rawItems) {
+            var parsedItems = JSON.parse(rawItems);
+            if (parsedItems && parsedItems.length) items = parsedItems;
+        }
+        var cleanTitle = title ? cleanText(title) : ("Video " + id);
+        var cleanDur = durText ? cleanText(durText) : "";
+        var desc = cleanDur ? ("[" + cleanDur + "] • Đã xem") : "Đã xem";
+        var newItem = {
+            id: id,
+            name: cleanTitle,
+            cover: cover ? String(cover) : pickBestThumb(null, id),
+            link: BASE_URL + "/watch?v=" + id,
+            description: desc,
+            tag: detectAiBadges(cleanTitle, parseDurationSec(cleanDur))
+        };
+        var nextItems = [newItem];
+        for (i = 0; i < items.length && nextItems.length < 20; i++) {
+            var it = items[i];
+            if (it && it.id && String(it.id) !== id) nextItems.push(it);
+        }
+        localStorage.setItem("watched_items_v9", JSON.stringify(nextItems));
+    } catch (e) {}
+}
+
+function isVideoWatched(vid) {
+    var id = String(vid || "").trim();
+    if (!id) return false;
+    try {
+        if (typeof localStorage === "undefined" || !localStorage) return false;
+        var raw = localStorage.getItem("watched_vids_v9");
+        if (!raw) return false;
+        var arr = JSON.parse(raw);
+        if (!arr || !arr.length) return false;
+        var i = 0;
+        for (i = 0; i < arr.length; i++) {
+            if (String(arr[i]) === id) return true;
+        }
+    } catch (e) {}
+    return false;
+}
+
+function getRecentWatchedItems() {
+    try {
+        if (typeof localStorage === "undefined" || !localStorage) return [];
+        var raw = localStorage.getItem("watched_items_v9");
+        if (!raw) return [];
+        var arr = JSON.parse(raw);
+        return (arr && arr.length) ? arr : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function parseWatchNextRelatedItems(nextRes) {
+    var results = nextRes &&
+        nextRes.contents &&
+        nextRes.contents.twoColumnWatchNextResults &&
+        nextRes.contents.twoColumnWatchNextResults.secondaryResults &&
+        nextRes.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults &&
+        nextRes.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results;
+    if (!results || !results.length) return [];
+
+    var minSec = getMinDurationSec();
+    var out = [];
+    var seen = {};
+    var i = 0;
+    for (i = 0; i < results.length; i++) {
+        var r = results[i];
+        if (!r) continue;
+        if (r.lockupViewModel) {
+            var lv = parseLockupViewModel(r.lockupViewModel);
+            if (!lv || !lv.id || seen[lv.id]) continue;
+            if (isNoiseVideoTitle(lv.name)) continue;
+            if (lv.kind === "video" && isShortOrTooShort(false, lv.durationSec || 0, minSec)) continue;
+            seen[lv.id] = true;
+            out.push(lv);
+        } else if (r.compactVideoRenderer) {
+            var cv = r.compactVideoRenderer;
+            var vid = cv.videoId ? String(cv.videoId) : "";
+            var vTitle = getRunsText(cv.title);
+            if (!vid || !vTitle || seen[vid]) continue;
+            if (isNoiseVideoTitle(vTitle)) continue;
+            var durText = getRunsText(cv.lengthText);
+            var durSec = parseDurationSec(durText);
+            var navUrl = cv.navigationEndpoint &&
+                cv.navigationEndpoint.commandMetadata &&
+                cv.navigationEndpoint.commandMetadata.webCommandMetadata &&
+                cv.navigationEndpoint.commandMetadata.webCommandMetadata.url;
+            var isShort = !!(navUrl && String(navUrl).indexOf("/shorts/") !== -1);
+            if (isShortOrTooShort(isShort, durSec, minSec)) continue;
+            var vChannel = getRunsText(cv.shortBylineText || cv.longBylineText);
+            var vCover = pickBestThumb(cv.thumbnail && cv.thumbnail.thumbnails, vid);
+            var durFmt = durSec > 0 ? formatDuration(durSec) : durText;
+            var vDesc = durFmt ? ("[" + durFmt + "]") : "[Video]";
+            if (vChannel) vDesc += " • " + vChannel;
+            seen[vid] = true;
+            out.push({
+                kind: "video",
+                id: vid,
+                name: vTitle,
+                cover: vCover,
+                link: BASE_URL + "/watch?v=" + vid,
+                description: vDesc,
+                tag: detectAiBadges(vTitle, durSec),
+                durationSec: durSec,
+                durationText: durFmt,
+                channelName: vChannel,
+                host: BASE_URL
+            });
+        } else if (r.compactPlaylistRenderer) {
+            var cp = r.compactPlaylistRenderer;
+            var pid = cp.playlistId ? String(cp.playlistId) : "";
+            var pTitle = getRunsText(cp.title);
+            if (!pid || !pTitle || seen[pid]) continue;
+            if (isNoiseVideoTitle(pTitle)) continue;
+            var countText = getRunsText(cp.videoCountShortText || cp.videoCountText);
+            var pChannel = getRunsText(cp.shortBylineText || cp.longBylineText);
+            var pCover = pickBestThumb(cp.thumbnail && cp.thumbnail.thumbnails, "");
+            var pDesc = countText ? ("[" + countText.replace(/video/i, "tập").trim() + "]") : "[Danh sách phát]";
+            if (pChannel) pDesc += " • " + pChannel;
+            seen[pid] = true;
+            out.push({
+                kind: "playlist",
+                id: pid,
+                name: pTitle,
+                cover: pCover,
+                link: BASE_URL + "/playlist?list=" + pid,
+                description: pDesc,
+                tag: detectAiBadges(pTitle, 0),
+                channelName: pChannel,
+                host: BASE_URL
+            });
+        }
+    }
+    return out;
 }

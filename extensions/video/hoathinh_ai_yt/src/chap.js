@@ -39,8 +39,8 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
         }
     }
     if (bestAudioObj) {
-        var byH = {};
-        var heights = [];
+        var byKey = {};
+        var keys = [];
         for (i = 0; i < adaptive.length; i++) {
             var vf = adaptive[i];
             if (!vf || !vf.url || !vf.mimeType || !vf.initRange || !vf.indexRange) continue;
@@ -48,9 +48,11 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
             if (vmt.indexOf("video/mp4") === -1) continue;
             var h = getFormatQualityHeight(vf);
             if (h < 720) continue;
-            if (!byH[h]) {
-                heights.push(h);
-                byH[h] = {
+            var codecFam = getVideoCodecFamily(vf) || "mp4";
+            var key = h + "_" + codecFam;
+            if (!byKey[key]) {
+                keys.push(key);
+                byKey[key] = {
                     v: String(vf.url),
                     a: String(bestAudioObj.url),
                     vInit: String(vf.initRange.start) + "-" + String(vf.initRange.end),
@@ -58,13 +60,15 @@ function collectInnerTubeStreams(data, hlsList, mp4List, hdList) {
                     aInit: String(bestAudioObj.initRange.start) + "-" + String(bestAudioObj.initRange.end),
                     aIndex: String(bestAudioObj.indexRange.start) + "-" + String(bestAudioObj.indexRange.end),
                     height: h,
+                    codecFam: codecFam,
+                    isAv1Bonus: (codecFam === "av01" && (h === 1080 || h === 720)),
                     mimeType: "video/mp4",
                     label: vf.qualityLabel ? String(vf.qualityLabel) : (h + "p")
                 };
             }
         }
-        for (i = 0; i < heights.length; i++) {
-            hdList.push(byH[heights[i]]);
+        for (i = 0; i < keys.length; i++) {
+            hdList.push(byKey[keys[i]]);
         }
     }
 }
@@ -106,8 +110,15 @@ function collectInvidiousStreams(data, hlsList, mp4List) {
 function formatHdTitle(hdItem) {
     var h = hdItem.height || 0;
     var lbl = hdItem.label || (h + "p");
-    if (h >= 2160 && lbl.indexOf("4K") === -1) return "4K " + lbl + " (HD)";
-    if (h >= 1440 && h < 2160 && lbl.indexOf("2K") === -1) return "2K " + lbl + " (HD)";
+    if (h >= 2160) {
+        return lbl.indexOf("4K") === -1 ? ("4K " + lbl + " (HD)") : (lbl + " (HD)");
+    }
+    if (h >= 1440 && h < 2160) {
+        return lbl.indexOf("2K") === -1 ? ("2K " + lbl + " (HD)") : (lbl + " (HD)");
+    }
+    if (hdItem.isAv1Bonus) {
+        return "MP4 " + h + "p AV1 (HD)";
+    }
     return "MP4 " + lbl + " (HD)";
 }
 
@@ -134,12 +145,15 @@ function orderServersByQuality(hlsServers, videoServers, pref) {
         }
     }
 
-    function filterByHeight(minH, maxH) {
+    function filterByHeight(minH, maxH, preferH264Only) {
         var matched = [];
         var idx = 0;
         for (idx = 0; idx < videoServers.length; idx++) {
             var h = videoServers[idx].height || 0;
-            if (h >= minH && h <= maxH) matched.push(videoServers[idx]);
+            if (h >= minH && h <= maxH) {
+                if (preferH264Only && videoServers[idx].isAv1Bonus) continue;
+                matched.push(videoServers[idx]);
+            }
         }
         return matched;
     }
@@ -148,16 +162,19 @@ function orderServersByQuality(hlsServers, videoServers, pref) {
         pushList(hlsServers);
         pushList(videoServers);
     } else if (pref === "4k_2k") {
-        pushList(filterByHeight(1440, 99999));
+        pushList(filterByHeight(2160, 99999, false));
+        pushList(filterByHeight(1440, 2159, false));
         pushList(hlsServers);
         pushList(videoServers);
     } else if (pref === "720p") {
-        pushList(filterByHeight(720, 720));
+        pushList(filterByHeight(720, 720, true));
+        pushList(filterByHeight(720, 720, false));
         pushList(hlsServers);
         pushList(videoServers);
     } else {
         // Default "1080p"
-        pushList(filterByHeight(1080, 1080));
+        pushList(filterByHeight(1080, 1080, true));
+        pushList(filterByHeight(1080, 1080, false));
         pushList(hlsServers);
         pushList(videoServers);
     }
@@ -240,6 +257,8 @@ function resolveTracks(vid, startSec, endSec, durSec) {
             videoServers.push({
                 title: formatHdTitle(hdList[i]),
                 height: hdList[i].height || 0,
+                codecFam: hdList[i].codecFam || "",
+                isAv1Bonus: !!hdList[i].isAv1Bonus,
                 data: JSON.stringify({
                     mode: "av",
                     v: hdList[i].v,
@@ -249,6 +268,7 @@ function resolveTracks(vid, startSec, endSec, durSec) {
                     aInit: hdList[i].aInit,
                     aIndex: hdList[i].aIndex,
                     height: hdList[i].height || 0,
+                    codecFam: hdList[i].codecFam || "",
                     mimeType: hdList[i].mimeType || "video/mp4",
                     vid: vid,
                     startSec: startSec || 0,
@@ -280,7 +300,10 @@ function resolveTracks(vid, startSec, endSec, durSec) {
         }
     }
 
-    videoServers.sort(function (a, b) { return b.height - a.height; });
+    videoServers.sort(function (a, b) {
+        if (b.height !== a.height) return b.height - a.height;
+        return (a.isAv1Bonus ? 1 : 0) - (b.isAv1Bonus ? 1 : 0);
+    });
     var servers = orderServersByQuality(hlsServers, videoServers, getPreferredQuality());
 
     if (hdList.length > 0 && hdList[0].a && hdList[0].aInit && hdList[0].aIndex) {
@@ -332,6 +355,7 @@ function execute(url) {
     url = normYtUrl(raw);
     var vid = extractVideoId(url);
     if (!vid) return Response.error("Không đọc được ID video YouTube từ URL: " + url);
+    recordWatchedVideo(vid, "", "", "");
     var startSec = extractStartSec(url);
     var endSec = extractEndSec(url);
     var durSec = extractDurSec(url);

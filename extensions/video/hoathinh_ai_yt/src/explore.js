@@ -2,6 +2,7 @@
 // Tuong thich Rhino ES6: chi dung var/function, noi chuoi bang +.
 load('config.js');
 load('config-helpers.js');
+load('helper.js');
 
 function execute() {
     var chList = getAllFeaturedChannels();
@@ -100,6 +101,17 @@ function execute() {
             input: "sort:view_count:video:hoạt hình AI Trung Quốc full thuyết minh"
         }
     });
+
+    var recentItems = getRecentWatchedItems();
+    if (recentItems && recentItems.length > 0) {
+        sections.unshift({
+            id: "recent_watched",
+            title: "Tiếp tục xem (Đã mở gần đây)",
+            type: "horizontal_list",
+            shape: "movie",
+            items: recentItems
+        });
+    }
 
     return Response.success(sections);
 }

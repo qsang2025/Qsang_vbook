@@ -480,3 +480,23 @@ function getBlockedKeywords() {
     } catch (e) {}
     return out;
 }
+
+function getFilterRecapMode() {
+    try {
+        if (typeof FILTER_RECAP !== "undefined" && FILTER_RECAP) {
+            var m = String(FILTER_RECAP).trim();
+            if (m === "hide" || m === "tag_only" || m === "off") return m;
+        }
+    } catch (e) {}
+    return "hide";
+}
+
+function getSubLangMode() {
+    try {
+        if (typeof SUB_LANG !== "undefined" && SUB_LANG) {
+            var s = String(SUB_LANG).trim();
+            if (s === "vi" || s === "bilingual_vi" || s === "en" || s === "zh-Hans" || s === "off") return s;
+        }
+    } catch (e) {}
+    return "vi";
+}

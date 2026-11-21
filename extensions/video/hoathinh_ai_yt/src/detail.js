@@ -39,17 +39,18 @@ function detailPlaylist(listId) {
         }
     }
 
-    if (!cover || !title) {
-        var tabs = res.contents && res.contents.twoColumnBrowseResultsRenderer && res.contents.twoColumnBrowseResultsRenderer.tabs;
-        var items = tabs && tabs[0] && tabs[0].tabRenderer && tabs[0].tabRenderer.content && tabs[0].tabRenderer.content.sectionListRenderer && tabs[0].tabRenderer.content.sectionListRenderer.contents && tabs[0].tabRenderer.content.sectionListRenderer.contents[0] && tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer && tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents;
-        if (items && items.length > 0 && items[0].lockupViewModel) {
-            var first = parseLockupViewModel(items[0].lockupViewModel);
-            if (first) {
-                if (!cover) cover = first.cover;
-                if (!title) title = first.name;
-                if (!author) author = first.channelName;
-                if (!channelId) channelId = first.channelId;
-            }
+    var firstVid = "";
+    var tabs = res.contents && res.contents.twoColumnBrowseResultsRenderer && res.contents.twoColumnBrowseResultsRenderer.tabs;
+    var items = tabs && tabs[0] && tabs[0].tabRenderer && tabs[0].tabRenderer.content && tabs[0].tabRenderer.content.sectionListRenderer && tabs[0].tabRenderer.content.sectionListRenderer.contents && tabs[0].tabRenderer.content.sectionListRenderer.contents[0] && tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer && tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents;
+    if (items && items.length > 0 && items[0].lockupViewModel) {
+        var first = parseLockupViewModel(items[0].lockupViewModel);
+        if (first) {
+            if (first.id) firstVid = first.id;
+            else if (first.link) firstVid = extractVideoId(first.link) || "";
+            if (!cover) cover = first.cover;
+            if (!title) title = first.name;
+            if (!author) author = first.channelName;
+            if (!channelId) channelId = first.channelId;
         }
     }
 
@@ -70,6 +71,13 @@ function detailPlaylist(listId) {
         ongoing: true
     };
     var plSuggests = [];
+    if (firstVid) {
+        plSuggests.push({
+            title: "Đề xuất liên quan (YouTube Up Next)",
+            input: "related:" + firstVid,
+            script: "search.js"
+        });
+    }
     if (channelId) {
         result.genres = [{
             title: author || "Xem kênh",
@@ -130,6 +138,7 @@ function detailVideo(vid) {
     if (vd.viewCount) detailParts.push("Lượt xem: " + vd.viewCount);
 
     var cover = pickBestThumb(vd.thumbnail && vd.thumbnail.thumbnails, vid);
+    recordWatchedVideo(vid, cleanText(vd.title), cover, durFmt);
     var result = {
         name: cleanText(vd.title),
         author: author,
@@ -141,7 +150,11 @@ function detailVideo(vid) {
         format: "stream",
         ongoing: false
     };
-    var vidSuggests = [];
+    var vidSuggests = [{
+        title: "Đề xuất liên quan (YouTube Up Next)",
+        input: "related:" + vid,
+        script: "search.js"
+    }];
     if (vd.channelId) {
         result.genres = [{
             title: author || "Xem kênh",

@@ -95,6 +95,28 @@
       "format": "text",
       "mode": "input",
       "title": "Từ khóa chặn (cách nhau dấu phẩy, vd: reaction, game, đam mỹ)"
+    },
+    "FILTER_RECAP": {
+      "default": "hide",
+      "mode": "select",
+      "title": "Lọc video Tóm tắt / Review / Phân tích cốt truyện (>20p)",
+      "values": [
+        "hide",
+        "tag_only",
+        "off"
+      ]
+    },
+    "SUB_LANG": {
+      "default": "vi",
+      "mode": "select",
+      "title": "Ngôn ngữ Phụ đề Tự dịch & Song ngữ",
+      "values": [
+        "vi",
+        "bilingual_vi",
+        "en",
+        "zh-Hans",
+        "off"
+      ]
     }
   },
   "metadata": {
@@ -107,7 +129,7 @@
     "regexp": "^https://(www\\.|m\\.)?(youtube\\.com/(watch\\?v=[a-zA-Z0-9_-]+|playlist\\?list=[a-zA-Z0-9_-]+|channel/UC[a-zA-Z0-9_-]+|@[a-zA-Z0-9_.-]+)|youtu\\.be/[a-zA-Z0-9_-]+)",
     "source": "https://www.youtube.com",
     "type": "video",
-    "version": 8
+    "version": 9
   },
   "script": {
     "chap": "chap.js",

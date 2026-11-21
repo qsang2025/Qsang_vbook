@@ -9,6 +9,16 @@ function isDeletedOrPrivate(title) {
     return t === "[private video]" || t === "[deleted video]" || t === "private video" || t === "deleted video";
 }
 
+function markWatchedEpisodeName(name, url) {
+    var wVid = extractVideoId(url);
+    if (wVid && isVideoWatched(wVid)) {
+        if (String(name || "").indexOf("[Đã xem] ") !== 0) {
+            return "[Đã xem] " + name;
+        }
+    }
+    return name;
+}
+
 function tocPlaylist(listId) {
     var episodes = [];
     var seen = {};
@@ -43,8 +53,9 @@ function tocPlaylist(listId) {
                 if (parsed && parsed.id && !isDeletedOrPrivate(parsed.name)) {
                     if (!isShortOrTooShort(parsed.link, parsed.durationSec, 120) && !seen[parsed.link]) {
                         seen[parsed.link] = true;
+                        var epName = formatCleanEpisodeTitle(parsed.name, episodes.length + 1);
                         episodes.push({
-                            name: formatCleanEpisodeTitle(parsed.name, episodes.length + 1),
+                            name: markWatchedEpisodeName(epName, parsed.link),
                             url: parsed.link,
                             description: parsed.durationText || "",
                             lock: false,
@@ -93,7 +104,7 @@ function tocChannel(cid) {
                         if (p && !isShortOrTooShort(p.link, p.durationSec, minSec) && !seen[p.link]) {
                             seen[p.link] = true;
                             episodes.push({
-                                name: p.name,
+                                name: markWatchedEpisodeName(p.name, p.link),
                                 url: p.link,
                                 description: p.durationText || "",
                                 lock: false,
@@ -205,9 +216,10 @@ function tocVideo(vid) {
         durSec = parseDurationSec(pRes.videoDetails.lengthSeconds);
     }
     var durFmt = durSec > 0 ? formatDuration(durSec) : "";
+    var fullUrl = BASE_URL + "/watch?v=" + vid;
     var episodes = [{
-        name: "Xem Bản Full (Trọn Bộ)",
-        url: BASE_URL + "/watch?v=" + vid,
+        name: markWatchedEpisodeName("Xem Bản Full (Trọn Bộ)", fullUrl),
+        url: fullUrl,
         description: durFmt,
         lock: false,
         pay: false
@@ -259,6 +271,7 @@ function tocVideo(vid) {
     if (channelId && baseTitle.length >= 6) {
         var siblingParts = findSiblingSeriesParts(channelId, vid, baseTitle);
         for (i = 0; i < siblingParts.length; i++) {
+            siblingParts[i].name = markWatchedEpisodeName(siblingParts[i].name, siblingParts[i].url);
             episodes.push(siblingParts[i]);
         }
     }
